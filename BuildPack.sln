@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeDomGoKit", "CodeDomGoKit\CodeDomGoKit.csproj", "{F1935A78-6ECA-4AA9-9BE2-0C64BE4297C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeDomDemo", "CodeDomDemo\CodeDomDemo.csproj", "{7AFC4EDB-E0F9-4B3B-A620-2D9C383BA386}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rolex", "Rolex\Rolex.csproj", "{CDCB6188-5D93-42AA-B555-984E0CCE2069}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Regex", "Regex\Regex.csproj", "{5046D3E3-4669-402C-A79F-1EB73392012A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegexDemo", "RegexDemo\RegexDemo.csproj", "{9DBC5930-27C8-48FA-A734-902FE3F12052}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RolexDemo", "RolexDemo\RolexDemo.csproj", "{ACC2D799-4CE0-40C7-AA0D-3A156D2EF630}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "scratch", "scratch\scratch.csproj", "{75B1AF15-2EA0-48A2-9D96-F9B8A836B738}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F1935A78-6ECA-4AA9-9BE2-0C64BE4297C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1935A78-6ECA-4AA9-9BE2-0C64BE4297C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1935A78-6ECA-4AA9-9BE2-0C64BE4297C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1935A78-6ECA-4AA9-9BE2-0C64BE4297C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AFC4EDB-E0F9-4B3B-A620-2D9C383BA386}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AFC4EDB-E0F9-4B3B-A620-2D9C383BA386}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AFC4EDB-E0F9-4B3B-A620-2D9C383BA386}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AFC4EDB-E0F9-4B3B-A620-2D9C383BA386}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDCB6188-5D93-42AA-B555-984E0CCE2069}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDCB6188-5D93-42AA-B555-984E0CCE2069}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDCB6188-5D93-42AA-B555-984E0CCE2069}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDCB6188-5D93-42AA-B555-984E0CCE2069}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5046D3E3-4669-402C-A79F-1EB73392012A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5046D3E3-4669-402C-A79F-1EB73392012A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5046D3E3-4669-402C-A79F-1EB73392012A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5046D3E3-4669-402C-A79F-1EB73392012A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DBC5930-27C8-48FA-A734-902FE3F12052}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DBC5930-27C8-48FA-A734-902FE3F12052}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DBC5930-27C8-48FA-A734-902FE3F12052}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DBC5930-27C8-48FA-A734-902FE3F12052}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACC2D799-4CE0-40C7-AA0D-3A156D2EF630}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACC2D799-4CE0-40C7-AA0D-3A156D2EF630}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACC2D799-4CE0-40C7-AA0D-3A156D2EF630}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACC2D799-4CE0-40C7-AA0D-3A156D2EF630}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75B1AF15-2EA0-48A2-9D96-F9B8A836B738}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75B1AF15-2EA0-48A2-9D96-F9B8A836B738}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75B1AF15-2EA0-48A2-9D96-F9B8A836B738}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75B1AF15-2EA0-48A2-9D96-F9B8A836B738}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5958453F-60BE-4AC0-A22D-D27725340263}
+	EndGlobalSection
+EndGlobal

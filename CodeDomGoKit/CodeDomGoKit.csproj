@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F1935A78-6ECA-4AA9-9BE2-0C64BE4297C7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CD</RootNamespace>
+    <AssemblyName>CodeDomGoKit</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;GOKITLIB</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\CodeDomGoKit.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;GOKITLIB</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\CodeDomGoKit.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CodeDomBinder\CodeDomBinder.cs" />
+    <Compile Include="CodeDomBinder\CodeDomBinder.FindMostSpecific.cs" />
+    <Compile Include="CodeDomBinder\CodeDomBinder.GetMembers.cs" />
+    <Compile Include="CodeDomBinder\CodeDomBinder.Select.cs" />
+    <Compile Include="CodeDomResolver\CodeDomResolver.cs" />
+    <Compile Include="CodeDomResolver\CodeDomResolver.Evaluate.cs" />
+    <Compile Include="CodeDomResolver\CodeDomResolver.GetTypeOfExpression.cs" />
+    <Compile Include="CodeDomUtility.cs" />
+    <Compile Include="CodeDomVisitor.cs" />
+    <Compile Include="CodeTypeReferenceEqualityComparer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Slang\ConcatEnumerator.cs" />
+    <Compile Include="Slang\IndexedQueue.Collection.cs" />
+    <Compile Include="Slang\IndexedQueue.cs" />
+    <Compile Include="Slang\IndexedQueue.Enumerable.cs" />
+    <Compile Include="Slang\LookAheadEnumerator.cs" />
+    <Compile Include="Slang\SlangParser.CompileUnit.cs" />
+    <Compile Include="Slang\SlangParser.cs" />
+    <Compile Include="Slang\SlangParser.Expression.cs" />
+    <Compile Include="Slang\SlangParser.Member.cs" />
+    <Compile Include="Slang\SlangParser.Namespace.cs" />
+    <Compile Include="Slang\SlangParser.Statement.cs" />
+    <Compile Include="Slang\SlangParser.Type.cs" />
+    <Compile Include="Slang\SlangParser.TypeRef.cs" />
+    <Compile Include="Slang\SlangPatcher.cs" />
+    <Compile Include="Slang\SlangPreprocessor.cs" />
+    <Compile Include="Slang\SlangTokenizer.cs" />
+    <Compile Include="Slang\TextReaderEnumerable.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Key.snk" />
+    <None Include="Slang\SlangTokenizer.rl" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>"$(SolutionDir)Rolex\bin\Release\rolex.exe" "$(ProjectDir)Slang\SlangTokenizer.rl" /output "$(ProjectDir)Slang\SlangTokenizer.cs" /namespace CD</PreBuildEvent>
+  </PropertyGroup>
+</Project>
