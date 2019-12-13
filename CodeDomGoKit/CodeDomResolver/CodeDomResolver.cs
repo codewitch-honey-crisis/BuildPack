@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace CD
 {
@@ -44,83 +45,17 @@ namespace CD
 			if (null != prop)
 				foreach (CodeParameterDeclarationExpression arg in prop.Parameters)
 					result.Add(arg.Name, arg.Type);
-			object p = scope.Statement;
-			CodeCatchClause c = null;
-			while (null != (p = _GetRef(p, _parentKey)))
-			{
-				c = p as CodeCatchClause;
-				if (null != c)
-				{
-					break;
-				}
-			}
-			if (null != c)
-				result.Add(c.LocalName, c.CatchExceptionType);
 			return result;
 		}
+		
 		internal IDictionary<string, CodeTypeReference> GetVariableTypes(CodeDomResolverScope scope)
 		{
 			var result = new Dictionary<string, CodeTypeReference>();
-			CodeDomVisitor.Visit(scope.Member, (ctx) => {
-				var v = ctx.Target as CodeVariableDeclarationStatement;
-				if(null!=v)
-				{
-					if(!CodeDomResolver.IsNullOrVoidType(v.Type))
-					{
-						result[v.Name]=v.Type;
-					}
-				}
-
-			});
-			return result;
-		}
-		internal IDictionary<string, CodeTypeReference> GetVariableTypes2(CodeDomResolverScope scope)
-		{
-			var result = new Dictionary<string, CodeTypeReference>();
-			
-			object p = scope.Statement;
-			object prev = null;
-			while (null != (p = _GetRef(p, _parentKey)))
-			{
-				if (p as CodeTypeMember != null)
-					break;
-				prev = p;
-			}
-			if (null == p)
+			if (null == scope.Member || null == scope.Statement)
 				return result;
-			CodeStatementCollection cs = null;
-			var meth = p as CodeMemberMethod;
-			if (null != meth)
-				cs = meth.Statements;
-			else
-			{
-				var prop = p as CodeMemberProperty;
-				if (null != prop)
-				{
-					if (null == prev)
-						prev = scope.Statement;
-					// find out which set of statements we're in.
-					if (prop.GetStatements.Contains(prev as CodeStatement))
-						cs = prop.GetStatements;
-					else if (prop.SetStatements.Contains(prev as CodeStatement))
-						cs = prop.SetStatements;
-				}
-
-			}
-
-			var idx = cs.IndexOf(scope.Statement);
-			if (0 > idx)
-				idx = cs.Count;
-			else
-				++idx;
-			for (var i = 0; i < idx; ++i)
-			{
-				var v = cs[i] as CodeVariableDeclarationStatement;
-				if (null != v)
-					result.Add(v.Name, v.Type);
-				else if (_TraceVarDecls(cs[i], scope.Statement, result))
-					break;
-			}
+			// we have to trace to get the ones in scope - they may be partially resolved if they're "var"
+			foreach(var v in CodeDomVariableTracer.Trace(scope.Member,scope.Statement))
+				result.Add(v.Name, v.Type);
 			return result;
 		}
 		static bool _TraceVarDecls(CodeStatement s, CodeStatement target, IDictionary<string, CodeTypeReference> result)
@@ -749,6 +684,37 @@ namespace CD
 				}
 			}
 			return result;
+		}
+		
+		/// <summary>
+		/// Gets the scope for the specified object
+		/// </summary>
+		/// <param name="target">The target</param>
+		/// <returns>The scope</returns>
+		public CodeDomResolverScope GetScope(CodeObject target)
+		{
+			var ccu = target as CodeCompileUnit;
+			if (null != ccu)
+				return GetScope(target);
+			var ns = target as CodeNamespace;
+			if (null != ns)
+				return GetScope(ns);
+			var td = target as CodeTypeDeclaration;
+			if (null != td)
+				return GetScope(td);
+			var tm = target as CodeTypeMember;
+			if (null != tm)
+				return GetScope(tm);
+			var st = target as CodeStatement;
+			if (null != st)
+				return GetScope(st);
+			var ex = target as CodeExpression;
+			if (null != ex)
+				return GetScope(ex);
+			var tr = target as CodeTypeReference;
+			if (null != tr)
+				return GetScope(tr);
+			throw new ArgumentException("Cannot get the scope from this code object", nameof(target));
 		}
 		/// <summary>
 		/// Gets the scope for the specified type reference
@@ -1488,6 +1454,66 @@ namespace CD
 		internal CodeDomResolverScope(CodeDomResolver resolver)
 		{
 			_resolver = new WeakReference<CodeDomResolver>(resolver);
+		}
+		/// <summary>
+		/// Returns a string summarizing the scope
+		/// </summary>
+		/// <returns>A string printing a scope summary</returns>
+		public override string ToString()
+		{
+			var sb = new StringBuilder();
+			if(null!=CompileUnit)
+			{
+				sb.Append("Compile Unit: (");
+				sb.Append(CompileUnit.Namespaces.Count);
+				sb.AppendLine(" namespaces)");
+			}
+			if(null!=Namespace)
+			{
+				sb.Append("Namespace ");
+				if(!string.IsNullOrEmpty(Namespace.Name))
+				{
+					sb.Append(Namespace.Name);
+					sb.Append(" ");
+				}
+				sb.Append("(");
+				sb.Append(Namespace.Types.Count);
+				sb.AppendLine(" types)");
+			}
+			if(null!=DeclaringType)
+			{
+				sb.Append("Declaring Type: ");
+				sb.AppendLine(CodeDomUtility.ToString(Resolver.GetType(DeclaringType, this)));
+			}
+			if(null!=Member)
+			{
+				sb.Append("Member: ");
+				sb.Append(CodeDomUtility.ToString(CodeDomResolver.GetTypeForMember(Member)));
+				sb.Append(" ");
+				sb.AppendLine(Member.Name);
+			}
+			if(null!=Statement)
+			{
+				sb.Append("Statement: ");
+				var s = CodeDomUtility.ToString(Statement).Trim();
+				var i = s.IndexOfAny(new char[] { '\r', '\n' });
+				if(-1<i)
+				{
+					s = s.Substring(0, i) + "...";
+				}
+				sb.AppendLine(s);
+			}
+			if (null != Expression)
+			{
+				sb.Append("Expression: ");
+				sb.AppendLine(CodeDomUtility.ToString(Expression).Trim());
+			}
+			if(null!=TypeRef)
+			{
+				sb.Append("Type Ref: ");
+				sb.AppendLine(CodeDomUtility.ToString(TypeRef).Trim());
+			}
+			return sb.ToString();
 		}
 	}
 }

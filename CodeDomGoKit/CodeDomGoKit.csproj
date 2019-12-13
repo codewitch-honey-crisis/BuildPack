@@ -51,6 +51,7 @@
     <Compile Include="CodeDomResolver\CodeDomResolver.Evaluate.cs" />
     <Compile Include="CodeDomResolver\CodeDomResolver.GetTypeOfExpression.cs" />
     <Compile Include="CodeDomUtility.cs" />
+    <Compile Include="CodeDomVariableTracer.cs" />
     <Compile Include="CodeDomVisitor.cs" />
     <Compile Include="CodeTypeReferenceEqualityComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

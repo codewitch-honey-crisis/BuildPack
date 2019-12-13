@@ -335,7 +335,8 @@ namespace Rolex
 			return false;
 		}
 		// reads until the string is encountered, capturing it.
-		bool _TryReadUntilBlockEnd(string blockEnd)
+		bool 
+			_TryReadUntilBlockEnd(string blockEnd)
 		{
 			while (_InnerFinished != _state && _TryReadUntil(blockEnd[0]))
 			{

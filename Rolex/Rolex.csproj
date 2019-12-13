@@ -66,6 +66,9 @@
     <Compile Include="..\CodeDomGoKit\CodeDomUtility.cs">
       <Link>CodeDomGoKit\CodeDomUtility.cs</Link>
     </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomVariableTracer.cs">
+      <Link>CodeDomGoKit\CodeDomVariableTracer.cs</Link>
+    </Compile>
     <Compile Include="..\CodeDomGoKit\CodeDomVisitor.cs">
       <Link>CodeDomGoKit\CodeDomVisitor.cs</Link>
     </Compile>

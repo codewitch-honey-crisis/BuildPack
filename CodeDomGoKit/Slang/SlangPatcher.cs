@@ -167,14 +167,22 @@ namespace CD
 		{
 			if(null!=vr)
 			{
-				if ("NodeFlags" == vr.VariableName)
-					System.Diagnostics.Debugger.Break();
+				if (vr.VariableName == "done")
+					System.Diagnostics.Debug.WriteLine("done var ref hit");
 				var scope = resolver.GetScope(vr);
-				if (scope.VariableTypes.ContainsKey(vr.VariableName))
+				CodeTypeReference ctr;
+				if (scope.VariableTypes.TryGetValue(vr.VariableName, out ctr))
 				{
-					vr.UserData.Remove("slang:unresolved");
-					return;
+					if (!CodeDomResolver.IsNullOrVoidType(ctr))
+					{
+						if (vr.VariableName == "done")
+							System.Diagnostics.Debug.WriteLine("done var resolved to var");
+						vr.UserData.Remove("slang:unresolved");
+						return;
+					}
 				}
+				//else if (vr.VariableName == "done")
+				//	System.Diagnostics.Debugger.Break();
 				// we need to replace it.
 				if (scope.ArgumentTypes.ContainsKey(vr.VariableName))
 				{
@@ -337,6 +345,8 @@ namespace CD
 		{
 			if (null != vd)
 			{
+				if (vd.Name == "done")
+					System.Diagnostics.Debug.WriteLine("debug var decl hit");
 				if (CodeDomResolver.IsNullOrVoidType(vd.Type))
 				{
 					if (null == vd.InitExpression)
@@ -348,6 +358,9 @@ namespace CD
 						vd.Type = t;
 						if (!CodeDomResolver.IsNullOrVoidType(t))
 						{
+							if (vd.Name == "done")
+								System.Diagnostics.Debug.WriteLine("debug var decl resolved");
+
 							vd.UserData.Remove("slang:unresolved");
 
 						}
@@ -410,6 +423,8 @@ namespace CD
 					var scope = resolver.GetScope(fr);
 					var binder = new CodeDomBinder(scope);
 					var t = resolver.GetTypeOfExpression(fr.TargetObject);
+					if (null!=t && CodeDomResolver.IsNullOrVoidType(t) && fr.TargetObject is CodeVariableReferenceExpression)
+						return; // can't patch this field yet - it's part of a var reference that hasn't been filled in
 					var isStatic = false;
 					var tre = fr.TargetObject as CodeTypeReferenceExpression;
 					if (null != tre)
@@ -417,7 +432,6 @@ namespace CD
 					var tt = resolver.TryResolveType(isStatic ? tre.Type: t, scope);
 					if (null == tt)
 						throw new InvalidOperationException(string.Format("The type {0} could not be resolved.", t.BaseType));
-
 					var td = tt as CodeTypeDeclaration;
 					// TODO: This code could be a lot faster if we added some functionality to the binder
 					// we're just checking to see if the method, property or field exists
