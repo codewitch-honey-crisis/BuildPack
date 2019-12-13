@@ -64,9 +64,17 @@ namespace CD
 				if (ST.lbrace != pc.SymbolId)
 					throw new ArgumentException("Expecting { in namespace declaration");
 				pc.Advance();
-				_SkipComments(pc);
 				if (pc.IsEnded)
 					throw new ArgumentException("Unterminated namespace declaration", "input");
+				// Use lookahead so we don't remove the comments of the first type
+				if (ST.lineComment == pc.SymbolId || ST.blockComment == pc.SymbolId)
+				{
+					var pc2 = pc.GetLookAhead();
+					pc2.EnsureStarted();
+					_SkipComments(pc2);
+					if (ST.keyword == pc2.SymbolId && "using" == pc2.Value)
+						_SkipComments(pc);
+				}
 				foreach (CodeNamespaceImport nsi in _ParseNamespaceImports(pc))
 					result.Imports.Add(nsi);
 				while (ST.rbrace != pc.SymbolId)
@@ -103,7 +111,15 @@ namespace CD
 				if (ST.semi != pc.SymbolId)
 					throw new ArgumentException("Expecting ; in using declaration", "input");
 				pc.Advance();
-				_SkipComments(pc);
+				// Use lookahead so we don't remove the comments of the first type
+				if (ST.lineComment == pc.SymbolId || ST.blockComment == pc.SymbolId)
+				{
+					var pc2 = pc.GetLookAhead();
+					pc2.EnsureStarted();
+					_SkipComments(pc2);
+					if (ST.keyword == pc2.SymbolId && "using" == pc2.Value)
+						_SkipComments(pc);
+				}
 				result.Add(new CodeNamespaceImport(ns));
 			}
 			return result;

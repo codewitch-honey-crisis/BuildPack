@@ -10,6 +10,18 @@ namespace Rolex
 {
 	class Program
 	{
+		static string _GetName() {
+			foreach(var attr in Assembly.GetEntryAssembly().CustomAttributes)
+			{
+				if(typeof(AssemblyTitleAttribute)==attr.AttributeType)
+				{
+					return attr.ConstructorArguments[0].Value as string;
+				}
+			}
+			return Path.GetFileNameWithoutExtension(_File);
+		}
+		static readonly string _File = Assembly.GetEntryAssembly().GetModules()[0].Name;
+		static readonly string _Name = _GetName();
 		static int Main(string[] args)
 		{
 			// our return code
@@ -93,11 +105,11 @@ namespace Rolex
 					}
 					if (!stale)
 					{
-						Console.Error.WriteLine("Skipped building {0} because it was not stale.",outputfile);
+						Console.Error.WriteLine("{0} skipped building {1} because it was not stale.",_Name, outputfile);
 					} else
 					{ 
 						if(null!=outputfile)
-							Console.Error.WriteLine("Building {0}", outputfile);
+							Console.Error.WriteLine("{0} is building {1}.",_Name, outputfile);
 						input = new StreamReader(inputfile);
 						var rules = _ParseRules(input);
 						_FillRuleIds(rules);
@@ -420,7 +432,7 @@ namespace Rolex
 			// write the name of our app. this actually uses the 
 			// name of the executable so it will always be correct
 			// even if the executable file was renamed.
-			t.Write(Assembly.GetEntryAssembly().GetModules()[0].Name);
+			t.Write(_File);
 			t.WriteLine(" <inputfile> [/output <outputfile>] [/name <name>]");
 			t.WriteLine("   [/namespace <codenamespace>] [/language <codelanguage>]");
 			t.WriteLine("   [/noshared] [/ifstale]");

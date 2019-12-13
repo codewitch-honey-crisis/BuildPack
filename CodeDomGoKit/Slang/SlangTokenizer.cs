@@ -13,6 +13,9 @@ namespace CD {
     using System.Collections.Generic;
     using System.Text;
     
+    /// <summary>
+    /// Reference implementation for generated shared code
+    /// </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal struct Token {
         /// <summary>
