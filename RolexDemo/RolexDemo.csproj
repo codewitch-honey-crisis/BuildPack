@@ -51,7 +51,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="SampleTokenizer.rl" />
-    <None Include="SlangTokenizer.rl" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -222,7 +222,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="SampleTokenizer.rl" />
-    <None Include="SlangTokenizer.rl" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
