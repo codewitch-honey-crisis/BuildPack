@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegexDemo", "RegexDemo\Rege
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RolexDemo", "RolexDemo\RolexDemo.csproj", "{ACC2D799-4CE0-40C7-AA0D-3A156D2EF630}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "scratch", "scratch\scratch.csproj", "{75B1AF15-2EA0-48A2-9D96-F9B8A836B738}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,10 +45,6 @@ Global
 		{ACC2D799-4CE0-40C7-AA0D-3A156D2EF630}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ACC2D799-4CE0-40C7-AA0D-3A156D2EF630}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ACC2D799-4CE0-40C7-AA0D-3A156D2EF630}.Release|Any CPU.Build.0 = Release|Any CPU
-		{75B1AF15-2EA0-48A2-9D96-F9B8A836B738}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{75B1AF15-2EA0-48A2-9D96-F9B8A836B738}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{75B1AF15-2EA0-48A2-9D96-F9B8A836B738}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{75B1AF15-2EA0-48A2-9D96-F9B8A836B738}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
