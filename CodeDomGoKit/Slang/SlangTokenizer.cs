@@ -146,17 +146,17 @@ namespace CD {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal class TableTokenizerEnumerator : IEnumerator<Token> {
         // our error symbol. Always -1
-        public const int ErrorSymbol = (0 - 1);
+        public const int ErrorSymbol = -1;
         // our end of stream symbol - returned by _Lex() and used internally but not reported
-        const int _EosSymbol = (0 - 2);
+        const int _EosSymbol = -2;
         // our disposed state indicator
-        const int _Disposed = (0 - 4);
+        const int _Disposed = -4;
         // the state indicates the cursor is before the beginning (initial state)
-        const int _BeforeBegin = (0 - 3);
+        const int _BeforeBegin = -3;
         // the state indicates the cursor is after the end
-        const int _AfterEnd = (0 - 2);
+        const int _AfterEnd = -2;
         // the state indicates that the inner input enumeration has finished (we still have one more token to report)
-        const int _InnerFinished = (0 - 1);
+        const int _InnerFinished = -1;
         // indicates we're currently enumerating. We spend most of our time and effort in this state
         const int _Enumerating = 0;
         // indicates the tab width, used for updating the Column property when we encounter a tab
@@ -398,8 +398,7 @@ namespace CD {
                     // otherwise, error
                     acceptSymbolId = this._dfaTable[dfaState].AcceptSymbolId;
                     if ((false 
-                                == ((0 - 1) 
-                                == acceptSymbolId))) {
+                                == (-1 == acceptSymbolId))) {
                         return acceptSymbolId;
                     }
                     else {
@@ -419,7 +418,7 @@ namespace CD {
             for (
             ; (false == done); 
             ) {
-                int nextDfaState = (0 - 1);
+                int nextDfaState = -1;
                 // go through all the transitions
                 for (int i = 0; (i < this._dfaTable[dfaState].Transitions.Length); i = (i + 1)) {
                     DfaTransitionEntry entry = this._dfaTable[dfaState].Transitions[i];
@@ -448,8 +447,7 @@ namespace CD {
                     }
                 }
                 if ((false 
-                            == ((0 - 1) 
-                            == nextDfaState))) {
+                            == (-1 == nextDfaState))) {
                     // capture our character
                     this._buffer.Append(this._input.Current);
                     // and iterate to our next state
@@ -460,8 +458,7 @@ namespace CD {
                         // if we're not, then we error, just like before
                         acceptSymbolId = this._dfaTable[dfaState].AcceptSymbolId;
                         if ((false 
-                                    == ((0 - 1) 
-                                    == acceptSymbolId))) {
+                                    == (-1 == acceptSymbolId))) {
                             return acceptSymbolId;
                         }
                         else {
@@ -476,8 +473,7 @@ namespace CD {
             }
             acceptSymbolId = this._dfaTable[dfaState].AcceptSymbolId;
             if ((false 
-                        == ((0 - 1) 
-                        == acceptSymbolId))) {
+                        == (-1 == acceptSymbolId))) {
                 return acceptSymbolId;
             }
             else {

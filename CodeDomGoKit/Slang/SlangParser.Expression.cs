@@ -371,6 +371,24 @@ namespace CD
 					pc.Advance();
 					rhs = _ParseUnary(pc);
 					// simulate the negation unary operator in the codedom
+					var pe = rhs as CodePrimitiveExpression;
+					if(null!=pe)
+					{
+						if (pe.Value is int)
+							return new CodePrimitiveExpression(-(int)pe.Value);
+						if (pe.Value is long)
+							return new CodePrimitiveExpression(-(long)pe.Value);
+						if (pe.Value is short)
+							return new CodePrimitiveExpression(-(short)pe.Value);
+						if (pe.Value is sbyte)
+							return new CodePrimitiveExpression(-(sbyte)pe.Value);
+						if (pe.Value is float)
+							return new CodePrimitiveExpression(-(float)pe.Value);
+						if (pe.Value is double)
+							return new CodePrimitiveExpression(-(double)pe.Value);
+						if (pe.Value is decimal)
+							return new CodePrimitiveExpression(-(decimal)pe.Value);
+					}
 					return new CodeBinaryOperatorExpression(new CodePrimitiveExpression(0), CodeBinaryOperatorType.Subtract, rhs);
 				case ST.not:
 					pc.Advance();
