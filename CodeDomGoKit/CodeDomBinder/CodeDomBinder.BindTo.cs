@@ -11,8 +11,19 @@ namespace CD
 	using E = CodeTypeReferenceEqualityComparer;
 	partial class CodeDomBinder
 	{
+		/// <summary>
+		/// Binds to a method using the specified arguments
+		/// </summary>
+		/// <param name="flags">The binding flags to use</param>
+		/// <param name="match">The candidates to select from</param>
+		/// <param name="args">The arguments to use</param>
+		/// <param name="modifiers">Not used</param>
+		/// <param name="cultureInfo">Not used</param>
+		/// <param name="names">The argument names or null</param>
+		/// <param name="state">A state object used to reorder arguments</param>
+		/// <returns>The method that best fits</returns>
 		public object BindToMethod(
-			BindingFlags bindingAttr, object[] match, ref Object[] args,
+			BindingFlags flags, object[] match, ref Object[] args,
 			ParameterModifier[] modifiers, CultureInfo cultureInfo, String[] names, out Object state)
 		{
 			if (null == match)
@@ -21,10 +32,10 @@ namespace CD
 				throw new ArgumentException("The match array cannot be empty.", nameof(match));
 			state = null;
 			var k = _SplitMatchMethods(match);
-			var csm = 0 < k.Key.Length ? BindToMethod(bindingAttr, k.Key, ref args, modifiers, cultureInfo, names, out state) : null;
+			var csm = 0 < k.Key.Length ? BindToMethod(flags, k.Key, ref args, modifiers, cultureInfo, names, out state) : null;
 			// if they're not a runtime type we treat the argument as an undefined reference type
 			// it won't be type checked against the arguments
-			var rsm = 0 < k.Value.Length ? BindToMethod(bindingAttr, k.Value, ref args, modifiers,cultureInfo, names,out state ) : null;
+			var rsm = 0 < k.Value.Length ? BindToMethod(flags, k.Value, ref args, modifiers,cultureInfo, names,out state ) : null;
 			if (null != csm)
 			{
 				if (null != rsm)
@@ -33,7 +44,7 @@ namespace CD
 			}
 			return rsm;
 		}
-		
+
 		// This method is passed a set of methods and must choose the best
 		// fit.  The methods all have the same number of arguments as the object
 		// array args.  On exit, this method will choice the best fit method
@@ -47,9 +58,19 @@ namespace CD
 		// 
 		// The most specific match will be selected.  
 		// 
-
+		/// <summary>
+		/// Binds to a method using the specified arguments
+		/// </summary>
+		/// <param name="flags">The binding flags to use</param>
+		/// <param name="match">The candidates to select from</param>
+		/// <param name="args">The arguments to use</param>
+		/// <param name="modifiers">Not used</param>
+		/// <param name="cultureInfo">Not used</param>
+		/// <param name="names">The argument names or null</param>
+		/// <param name="state">A state object used to reorder arguments</param>
+		/// <returns>The method that best fits</returns>
 		public MethodBase BindToMethod(
-			BindingFlags bindingAttr, MethodBase[] match, ref Object[] args,
+			BindingFlags flags, MethodBase[] match, ref Object[] args,
 			ParameterModifier[] modifiers, CultureInfo cultureInfo, String[] names, out Object state)
 		{
 			if (match == null || match.Length == 0)
@@ -113,7 +134,7 @@ namespace CD
 
 			// Find the method that matches...
 			int CurIdx = 0;
-			bool defaultValueBinding = ((bindingAttr & BindingFlags.OptionalParamBinding) != 0);
+			bool defaultValueBinding = ((flags & BindingFlags.OptionalParamBinding) != 0);
 
 			CodeTypeReference paramArrayType = null;
 
@@ -526,8 +547,19 @@ namespace CD
 			}
 			return true;
 		}
+		/// <summary>
+		/// Binds to a method using the specified arguments
+		/// </summary>
+		/// <param name="flags">The binding flags to use</param>
+		/// <param name="match">The candidates to select from</param>
+		/// <param name="args">The arguments to use</param>
+		/// <param name="modifiers">Not used</param>
+		/// <param name="cultureInfo">Not used</param>
+		/// <param name="names">The argument names or null</param>
+		/// <param name="state">A state object used to reorder arguments</param>
+		/// <returns>The method that best fits</returns>
 		public CodeMemberMethod BindToMethod(
-			BindingFlags bindingAttr, CodeMemberMethod[] match, ref Object[] args,
+			BindingFlags flags, CodeMemberMethod[] match, ref Object[] args,
 			ParameterModifier[] modifiers, CultureInfo cultureInfo, String[] names, out Object state)
 		{
 			if (match == null || match.Length == 0)
@@ -590,7 +622,7 @@ namespace CD
 
 			// Find the method that matches...
 			int CurIdx = 0;
-			bool defaultValueBinding = ((bindingAttr & BindingFlags.OptionalParamBinding) != 0);
+			bool defaultValueBinding = ((flags & BindingFlags.OptionalParamBinding) != 0);
 
 			CodeTypeReference paramArrayType = null;
 

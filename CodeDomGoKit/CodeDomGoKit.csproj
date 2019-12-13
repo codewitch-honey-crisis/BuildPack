@@ -42,6 +42,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeDomBinder\CodeDomBinder.BindTo.cs" />
     <Compile Include="CodeDomBinder\CodeDomBinder.cs" />
     <Compile Include="CodeDomBinder\CodeDomBinder.FindMostSpecific.cs" />
     <Compile Include="CodeDomBinder\CodeDomBinder.GetMembers.cs" />
