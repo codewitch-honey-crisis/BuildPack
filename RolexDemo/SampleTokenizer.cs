@@ -361,7 +361,7 @@ namespace RolexDemo {
                         && (current <= 'z')))) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 1;
+                    return SampleTokenizer.Identifier;
                 }
                 current = this.CurrentInput;
                 goto q1;
@@ -370,7 +370,7 @@ namespace RolexDemo {
                         && (current <= '9'))) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 2;
+                    return SampleTokenizer.Integer;
                 }
                 current = this.CurrentInput;
                 goto q3;
@@ -378,7 +378,7 @@ namespace RolexDemo {
             if ((current == '+')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 3;
+                    return SampleTokenizer.Plus;
                 }
                 current = this.CurrentInput;
                 goto q4;
@@ -386,7 +386,7 @@ namespace RolexDemo {
             if ((current == '-')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 4;
+                    return SampleTokenizer.Minus;
                 }
                 current = this.CurrentInput;
                 goto q5;
@@ -394,7 +394,7 @@ namespace RolexDemo {
             if ((current == '*')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 5;
+                    return SampleTokenizer.Multiply;
                 }
                 current = this.CurrentInput;
                 goto q6;
@@ -402,7 +402,7 @@ namespace RolexDemo {
             if ((current == '/')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 6;
+                    return SampleTokenizer.Divide;
                 }
                 current = this.CurrentInput;
                 goto q7;
@@ -410,7 +410,7 @@ namespace RolexDemo {
             if ((current == '(')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 7;
+                    return SampleTokenizer.LParen;
                 }
                 current = this.CurrentInput;
                 goto q10;
@@ -418,7 +418,7 @@ namespace RolexDemo {
             if ((current == ')')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 8;
+                    return SampleTokenizer.RParen;
                 }
                 current = this.CurrentInput;
                 goto q11;
@@ -428,7 +428,7 @@ namespace RolexDemo {
                         || (current == ' '))) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 9;
+                    return SampleTokenizer.Whitespace;
                 }
                 current = this.CurrentInput;
                 goto q12;
@@ -444,12 +444,12 @@ namespace RolexDemo {
                         && (current <= 'z')))) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 1;
+                    return SampleTokenizer.Identifier;
                 }
                 current = this.CurrentInput;
                 goto q2;
             }
-            return 1;
+            return SampleTokenizer.Identifier;
         q2:
             if ((((((current >= '0') 
                         && (current <= '9')) 
@@ -460,34 +460,34 @@ namespace RolexDemo {
                         && (current <= 'z')))) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 1;
+                    return SampleTokenizer.Identifier;
                 }
                 current = this.CurrentInput;
                 goto q2;
             }
-            return 1;
+            return SampleTokenizer.Identifier;
         q3:
             if (((current >= '0') 
                         && (current <= '9'))) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 2;
+                    return SampleTokenizer.Integer;
                 }
                 current = this.CurrentInput;
                 goto q3;
             }
-            return 2;
+            return SampleTokenizer.Integer;
         q4:
-            return 3;
+            return SampleTokenizer.Plus;
         q5:
-            return 4;
+            return SampleTokenizer.Minus;
         q6:
-            return 5;
+            return SampleTokenizer.Multiply;
         q7:
             if ((current == '/')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 10;
+                    return SampleTokenizer.LineComment;
                 }
                 current = this.CurrentInput;
                 goto q8;
@@ -495,12 +495,12 @@ namespace RolexDemo {
             if ((current == '*')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 11;
+                    return SampleTokenizer.BlockComment;
                 }
                 current = this.CurrentInput;
                 goto q9;
             }
-            return 6;
+            return SampleTokenizer.Divide;
         q8:
             if ((((current >= '\0') 
                         && (current <= '\t')) 
@@ -508,20 +508,20 @@ namespace RolexDemo {
                         && (current <= '￿')))) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 10;
+                    return SampleTokenizer.LineComment;
                 }
                 current = this.CurrentInput;
                 goto q8;
             }
-            return 10;
+            return SampleTokenizer.LineComment;
         q9:
-            return 11;
+            return SampleTokenizer.BlockComment;
         q10:
-            return 7;
+            return SampleTokenizer.LParen;
         q11:
-            return 8;
+            return SampleTokenizer.RParen;
         q12:
-            return 9;
+            return SampleTokenizer.Whitespace;
         error:
             this.ValueBuffer.Append(current);
             this.MoveNextInput();

@@ -10,11 +10,22 @@ namespace RolexDemo
 	{
 		static void Main(string[] args)
 		{
-			var vars = new Dictionary<string, int>();
-			vars.Add("a", 1);
-			vars.Add("c", 3);
-			var test = "((a + 2) * c) -1";
-			Console.WriteLine(Parser.Eval(test,vars));
+			while (true)
+			{
+				Console.Write("Expr>");
+				var s = Console.ReadLine();
+				if (null != s) s = s.Trim();
+				if (string.IsNullOrEmpty(s))
+					break;
+				try
+				{
+					Console.WriteLine(Parser.Eval(s));
+				}
+				catch (ArgumentException ex)
+				{
+					Console.WriteLine("Error: " + ex.Message);
+				}
+			}
 		}
 
 	}

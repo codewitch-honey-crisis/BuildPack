@@ -50,11 +50,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="SampleTokenizer2.rl" />
     <None Include="SampleTokenizer.rl" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>$(SolutionDir)\Rolex\bin\Release\rolex.exe $(ProjectDir)SampleTokenizer.rl /output $(ProjectDir)SampleTokenizer.cs /namespace RolexDemo /compiled</PreBuildEvent>
+    <PreBuildEvent>$(SolutionDir)\Rolex\bin\Release\rolex.exe $(ProjectDir)SampleTokenizer.rl /output $(ProjectDir)SampleTokenizer.cs /namespace RolexDemo /compiled /ifstale</PreBuildEvent>
   </PropertyGroup>
 </Project>

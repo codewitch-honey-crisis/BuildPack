@@ -492,52 +492,6 @@ namespace CD {
     }
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal partial class SlangTokenizer : TableTokenizer {
-        public const int keyword = 0;
-        public const int identifier = 1;
-        public const int lineComment = 2;
-        public const int blockComment = 3;
-        public const int stringLiteral = 4;
-        public const int characterLiteral = 5;
-        public const int whitespace = 6;
-        public const int lte = 7;
-        public const int lt = 8;
-        public const int gte = 9;
-        public const int gt = 10;
-        public const int eqEq = 11;
-        public const int notEq = 12;
-        public const int eq = 13;
-        public const int inc = 14;
-        public const int addAssign = 15;
-        public const int add = 16;
-        public const int dec = 17;
-        public const int subAssign = 18;
-        public const int sub = 19;
-        public const int mulAssign = 20;
-        public const int mul = 21;
-        public const int divAssign = 22;
-        public const int div = 23;
-        public const int modAssign = 24;
-        public const int mod = 25;
-        public const int and = 26;
-        public const int bitwiseAndAssign = 27;
-        public const int bitwiseAnd = 28;
-        public const int or = 29;
-        public const int bitwiseOrAssign = 30;
-        public const int bitwiseOr = 31;
-        public const int not = 32;
-        public const int lbracket = 33;
-        public const int rbracket = 34;
-        public const int lparen = 35;
-        public const int rparen = 36;
-        public const int lbrace = 37;
-        public const int rbrace = 38;
-        public const int comma = 39;
-        public const int colonColon = 40;
-        public const int colon = 41;
-        public const int semi = 42;
-        public const int dot = 43;
-        public const int integerLiteral = 44;
-        public const int floatLiteral = 45;
         internal static DfaEntry[] DfaTable = new DfaEntry[] {
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
@@ -8699,5 +8653,51 @@ namespace CD {
         public SlangTokenizer(System.Collections.Generic.IEnumerable<char> input) : 
                 base(DfaTable, BlockEnds, NodeFlags, input) {
         }
+        public const int keyword = 0;
+        public const int identifier = 1;
+        public const int lineComment = 2;
+        public const int blockComment = 3;
+        public const int stringLiteral = 4;
+        public const int characterLiteral = 5;
+        public const int whitespace = 6;
+        public const int lte = 7;
+        public const int lt = 8;
+        public const int gte = 9;
+        public const int gt = 10;
+        public const int eqEq = 11;
+        public const int notEq = 12;
+        public const int eq = 13;
+        public const int inc = 14;
+        public const int addAssign = 15;
+        public const int add = 16;
+        public const int dec = 17;
+        public const int subAssign = 18;
+        public const int sub = 19;
+        public const int mulAssign = 20;
+        public const int mul = 21;
+        public const int divAssign = 22;
+        public const int div = 23;
+        public const int modAssign = 24;
+        public const int mod = 25;
+        public const int and = 26;
+        public const int bitwiseAndAssign = 27;
+        public const int bitwiseAnd = 28;
+        public const int or = 29;
+        public const int bitwiseOrAssign = 30;
+        public const int bitwiseOr = 31;
+        public const int not = 32;
+        public const int lbracket = 33;
+        public const int rbracket = 34;
+        public const int lparen = 35;
+        public const int rparen = 36;
+        public const int lbrace = 37;
+        public const int rbrace = 38;
+        public const int comma = 39;
+        public const int colonColon = 40;
+        public const int colon = 41;
+        public const int semi = 42;
+        public const int dot = 43;
+        public const int integerLiteral = 44;
+        public const int floatLiteral = 45;
     }
 }

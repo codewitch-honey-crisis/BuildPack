@@ -173,7 +173,7 @@ namespace Rolex
 						else
 						{
 							cns.Types.Add(CodeGenerator.GenerateCompiledTokenizer(name, symbolTable));
-							cns.Types.Add(CodeGenerator.GenerateCompiledTokenizerEnumerator(name, dfaTable, blockEnds, nodeFlags));
+							cns.Types.Add(CodeGenerator.GenerateCompiledTokenizerEnumerator(name,symbolTable, dfaTable, blockEnds, nodeFlags));
 						}
 						var prov = CodeDomProvider.CreateProvider(codelanguage);
 						var opts = new CodeGeneratorOptions();
@@ -484,7 +484,7 @@ namespace Rolex
 		static DfaEntry[] _ToDfaStateTable<TAccept>(CharFA<TAccept> fsm,IList<TAccept> symbolTable = null, IProgress<CharFAProgress> progress = null)
 		{
 			// only convert to a DFA if we haven't already
-			// ToDfa() already checks but it always copies
+			// ToDfa() already checks but it always clones
 			// the state information so this performs better
 			var dfa = fsm.IsDfa ? fsm : fsm.ToDfa(progress);
 			var closure = dfa.FillClosure();
@@ -494,7 +494,7 @@ namespace Rolex
 			if (null == symbolTable)
 			{
 				// go through each state, looking for accept symbols
-				// and then add them to the new symbol table is we
+				// and then add them to the new symbol table if we
 				// haven't already
 				var i = 0;
 				for (int jc = closure.Count, j = 0; j < jc; ++j)

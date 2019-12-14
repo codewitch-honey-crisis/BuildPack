@@ -69,10 +69,11 @@ namespace Rolex
 			}
 			return result;
 		}
-		static CodeMemberMethod _GenerateLexMethod(DfaEntry[] dfaTable)
+		static CodeMemberMethod _GenerateLexMethod(string name,IList<string> constSymbolTable,DfaEntry[] dfaTable)
 		{
 			var result = C.Method(typeof(int), "Lex", MemberAttributes.Family | MemberAttributes.Override);
 			result.Statements.Add(C.Var(typeof(char), "current"));
+			var otref = C.TypeRef(name);
 			var errorSym = C.FieldRef(C.TypeRef("CompiledTokenizerEnumerator"), "ErrorSymbol");
 			// we generate labels for each state except maybe the first.
 			// we only generate a label for the first state if any of the
@@ -101,7 +102,7 @@ namespace Rolex
 			result.Statements.Add(C.IfElse(C.Eq(C.FieldRef(C.TypeRef("CompiledTokenizerEnumerator"), "BeforeBegin"), C.FieldRef(C.This, "State")),
 				new CodeStatement[] {
 				C.If(C.Not(C.Invoke(C.This, "MoveNextInput")),
-					C.Return(-1 == dfaTable[0].AcceptSymbolId ? errorSym : C.Literal(dfaTable[0].AcceptSymbolId))
+					C.Return(-1 == dfaTable[0].AcceptSymbolId ? errorSym :  C.FieldRef(otref,constSymbolTable[dfaTable[0].AcceptSymbolId]))
 				),
 				C.Let(C.FieldRef(C.This,"State"),C.FieldRef(C.TypeRef("CompiledTokenizerEnumerator"),"Enumerating"))
 				},
@@ -164,7 +165,7 @@ namespace Rolex
 					cif.TrueStatements.Add(pccc);
 					if (-1 != ds.AcceptSymbolId) {
 						cif.TrueStatements.Add(C.If(C.Not(C.Invoke(C.This, "MoveNextInput")),
-							C.Return(C.Literal(ds.AcceptSymbolId))
+							C.Return(C.FieldRef(otref,constSymbolTable[ds.AcceptSymbolId]))
 							));
 						cif.TrueStatements.Add(C.Let(pci, pccr));
 					} else
@@ -180,7 +181,7 @@ namespace Rolex
 
 				}
 				if (-1 != se.AcceptSymbolId) // is accepting
-					stmts.Add(C.Return(C.Literal(se.AcceptSymbolId)));
+					stmts.Add(C.Return(C.FieldRef(otref,constSymbolTable[se.AcceptSymbolId])));
 				else
 				{
 					hasError = true;
@@ -270,6 +271,7 @@ namespace Rolex
 						new CodePrimitiveExpression(i)
 					);
 					result.Members.Add(constField);
+					symbolTable[i] = s;
 				}
 			}
 
@@ -284,6 +286,7 @@ namespace Rolex
 			return result;
 		}
 		public static CodeTypeDeclaration GenerateCompiledTokenizerEnumerator(string name,
+			IList<string> constSymbolTable,
 			DfaEntry[] dfaTable,
 			IList<string> blockEnds,
 			IList<int> nodeFlags)
@@ -291,9 +294,8 @@ namespace Rolex
 			var result = C.Class(name+"Enumerator", false);
 			result.IsPartial = true;
 			result.BaseTypes.Add("CompiledTokenizerEnumerator");
-			
 			// lex method
-			var lexMethod = _GenerateLexMethod(dfaTable);
+			var lexMethod = _GenerateLexMethod(name,constSymbolTable,dfaTable);
 			result.Members.Add(lexMethod);
 			// block ends
 			var getBlockEndMethod = _GenerateGetBlockEndMethod(blockEnds);
@@ -321,20 +323,6 @@ namespace Rolex
 			var result = C.Class(name, false);
 			result.IsPartial = true;
 			result.BaseTypes.Add("TableTokenizer");
-			// generate symbol constants
-			for (int ic = symbolTable.Count,i=0;i<ic;++i)
-			{
-				var symbol = symbolTable[i];
-				if (null != symbol)
-				{
-					var s = _MakeSafeName(symbol);
-					s = _MakeUniqueMember(result, s);
-					var constField = new CodeMemberField(typeof(int), s);
-					constField.Attributes = MemberAttributes.Const | MemberAttributes.Public;
-					constField.InitExpression = new CodePrimitiveExpression(i);
-					result.Members.Add(constField);
-				}
-			}
 			// dfa table
 			var dfaTableField = new CodeMemberField(new CodeTypeReference("DfaEntry", 1), "DfaTable");
 			dfaTableField.Attributes = MemberAttributes.Static | MemberAttributes.FamilyAndAssembly;
@@ -359,6 +347,20 @@ namespace Rolex
 			ctor.BaseConstructorArgs.Add(new CodeFieldReferenceExpression(null, nodeFlagsField.Name));
 			ctor.BaseConstructorArgs.Add(new CodeArgumentReferenceExpression(ctor.Parameters[0].Name));
 			result.Members.Add(ctor);
+			// generate symbol constants
+			for (int ic = symbolTable.Count, i = 0; i < ic; ++i)
+			{
+				var symbol = symbolTable[i];
+				if (null != symbol)
+				{
+					var s = _MakeSafeName(symbol);
+					s = _MakeUniqueMember(result, s);
+					var constField = new CodeMemberField(typeof(int), s);
+					constField.Attributes = MemberAttributes.Const | MemberAttributes.Public;
+					constField.InitExpression = new CodePrimitiveExpression(i);
+					result.Members.Add(constField);
+				}
+			}
 			result.CustomAttributes.Add(GeneratedCodeAttribute);
 			return result;
 		}

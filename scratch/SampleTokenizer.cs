@@ -348,7 +348,7 @@ namespace RolexDemo {
             if ((current == 'a')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 0;
+                    return SampleTokenizer2.A;
                 }
                 current = this.CurrentInput;
                 goto q1;
@@ -356,16 +356,16 @@ namespace RolexDemo {
             if ((current == 'b')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 1;
+                    return SampleTokenizer2.B;
                 }
                 current = this.CurrentInput;
                 goto q2;
             }
             goto error;
         q1:
-            return 0;
+            return SampleTokenizer2.A;
         q2:
-            return 1;
+            return SampleTokenizer2.B;
         error:
             this.ValueBuffer.Append(current);
             this.MoveNextInput();
