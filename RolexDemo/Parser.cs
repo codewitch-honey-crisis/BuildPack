@@ -62,8 +62,8 @@ namespace RolexDemo
 		}
 		// evaluate an expression of the form
 		// Expr -> Term
-		// Term -> Factor (+|-) Factor
-		// Factor -> Unary (*|/) Unary
+		// Term -> Factor (+|-) Factor | Factor
+		// Factor -> Unary (*|/) Unary | Unary
 		// Unary -> (+|-) Unary | Leaf
 		// Leaf -> Identifier | Integer | ( Expr )
 		public static int Eval(IEnumerable<char> expr,VARS variables = null)
@@ -91,7 +91,7 @@ namespace RolexDemo
 		{
 			return _EvalTerm(pc, vars);
 		}
-		// Term -> Factor (+|-) Factor
+		// Term -> Factor (+|-) Factor | Factor
 		static int _EvalTerm(_PC pc, VARS vars)
 		{
 			var lhs = _EvalFactor(pc, vars);
@@ -109,7 +109,7 @@ namespace RolexDemo
 					return lhs;
 			}
 		}
-		// Factor -> Unary (*|/) Unary
+		// Factor -> Unary (*|/) Unary | Unary
 		static int _EvalFactor(_PC pc,VARS vars)
 		{
 			var lhs = _EvalUnary(pc, vars);
