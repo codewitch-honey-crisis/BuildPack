@@ -21,7 +21,7 @@ namespace RolexDemo
 				{
 					Console.WriteLine(Parser.Eval(s));
 				}
-				catch (ArgumentException ex)
+				catch (Exception ex)
 				{
 					Console.WriteLine("Error: " + ex.Message);
 				}
