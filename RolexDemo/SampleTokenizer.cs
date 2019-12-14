@@ -373,31 +373,20 @@ namespace RolexDemo {
                     return SampleTokenizer.Integer;
                 }
                 current = this.CurrentInput;
-                goto q3;
+                goto q2;
             }
-            if ((current == '+')) {
+            if ((((((current >= '\t') 
+                        && (current <= '\r')) 
+                        || (current == ' ')) 
+                        || ((current >= '(') 
+                        && (current <= '+'))) 
+                        || (current == '-'))) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
                     return SampleTokenizer.Plus;
                 }
                 current = this.CurrentInput;
-                goto q4;
-            }
-            if ((current == '-')) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return SampleTokenizer.Minus;
-                }
-                current = this.CurrentInput;
-                goto q5;
-            }
-            if ((current == '*')) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return SampleTokenizer.Multiply;
-                }
-                current = this.CurrentInput;
-                goto q6;
+                goto q3;
             }
             if ((current == '/')) {
                 this.ValueBuffer.Append(current);
@@ -405,33 +394,7 @@ namespace RolexDemo {
                     return SampleTokenizer.Divide;
                 }
                 current = this.CurrentInput;
-                goto q7;
-            }
-            if ((current == '(')) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return SampleTokenizer.LParen;
-                }
-                current = this.CurrentInput;
-                goto q10;
-            }
-            if ((current == ')')) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return SampleTokenizer.RParen;
-                }
-                current = this.CurrentInput;
-                goto q11;
-            }
-            if ((((current >= '\t') 
-                        && (current <= '\r')) 
-                        || (current == ' '))) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return SampleTokenizer.Whitespace;
-                }
-                current = this.CurrentInput;
-                goto q12;
+                goto q4;
             }
             goto error;
         q1:
@@ -447,26 +410,10 @@ namespace RolexDemo {
                     return SampleTokenizer.Identifier;
                 }
                 current = this.CurrentInput;
-                goto q2;
+                goto q1;
             }
             return SampleTokenizer.Identifier;
         q2:
-            if ((((((current >= '0') 
-                        && (current <= '9')) 
-                        || ((current >= 'A') 
-                        && (current <= 'Z'))) 
-                        || (current == '_')) 
-                        || ((current >= 'a') 
-                        && (current <= 'z')))) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return SampleTokenizer.Identifier;
-                }
-                current = this.CurrentInput;
-                goto q2;
-            }
-            return SampleTokenizer.Identifier;
-        q3:
             if (((current >= '0') 
                         && (current <= '9'))) {
                 this.ValueBuffer.Append(current);
@@ -474,34 +421,30 @@ namespace RolexDemo {
                     return SampleTokenizer.Integer;
                 }
                 current = this.CurrentInput;
-                goto q3;
+                goto q2;
             }
             return SampleTokenizer.Integer;
-        q4:
+        q3:
             return SampleTokenizer.Plus;
-        q5:
-            return SampleTokenizer.Minus;
-        q6:
-            return SampleTokenizer.Multiply;
-        q7:
+        q4:
             if ((current == '/')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
                     return SampleTokenizer.LineComment;
                 }
                 current = this.CurrentInput;
-                goto q8;
+                goto q5;
             }
             if ((current == '*')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return SampleTokenizer.BlockComment;
+                    return SampleTokenizer.Plus;
                 }
                 current = this.CurrentInput;
-                goto q9;
+                goto q3;
             }
             return SampleTokenizer.Divide;
-        q8:
+        q5:
             if ((((current >= '\0') 
                         && (current <= '\t')) 
                         || ((current >= '') 
@@ -511,17 +454,9 @@ namespace RolexDemo {
                     return SampleTokenizer.LineComment;
                 }
                 current = this.CurrentInput;
-                goto q8;
+                goto q5;
             }
             return SampleTokenizer.LineComment;
-        q9:
-            return SampleTokenizer.BlockComment;
-        q10:
-            return SampleTokenizer.LParen;
-        q11:
-            return SampleTokenizer.RParen;
-        q12:
-            return SampleTokenizer.Whitespace;
         error:
             this.ValueBuffer.Append(current);
             this.MoveNextInput();

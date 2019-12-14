@@ -122,21 +122,15 @@ namespace Rolex
 					{
 						Console.Error.WriteLine("{0} skipped building {1} because it was not stale.",_Name, outputfile);
 					} else
-					{ 
-						if(null!=outputfile)
-							Console.Error.WriteLine("{0} is building {1}.",_Name, outputfile);
+					{
+						if (null != outputfile)
+							Console.Error.Write("{0} is building {1}.", _Name, outputfile);
+						else
+							Console.Error.Write("{0} is building tokenizer.", _Name);
 						input = new StreamReader(inputfile);
 						var rules = _ParseRules(input);
 						_FillRuleIds(rules);
-						if (null == outputfile)
-							output = Console.Out;
-						else
-						{
-							// open the file and truncate it if necessary
-							var stm = File.Open(outputfile, FileMode.Create);
-							stm.SetLength(0);
-							output = new StreamWriter(stm);
-						}
+						
 						var ccu = new CodeCompileUnit();
 						var cns = new CodeNamespace();
 						if (!string.IsNullOrEmpty(codenamespace))
@@ -175,10 +169,20 @@ namespace Rolex
 							cns.Types.Add(CodeGenerator.GenerateCompiledTokenizer(name, symbolTable));
 							cns.Types.Add(CodeGenerator.GenerateCompiledTokenizerEnumerator(name,symbolTable, dfaTable, blockEnds, nodeFlags));
 						}
+						Console.Error.WriteLine();
 						var prov = CodeDomProvider.CreateProvider(codelanguage);
 						var opts = new CodeGeneratorOptions();
 						opts.BlankLinesBetweenMembers = false;
 						opts.VerbatimOrder = true;
+						if (null == outputfile)
+							output = Console.Out;
+						else
+						{
+							// open the file and truncate it if necessary
+							var stm = File.Open(outputfile, FileMode.Create);
+							stm.SetLength(0);
+							output = new StreamWriter(stm);
+						}
 						prov.GenerateCodeFromCompileUnit(ccu, output, opts);
 					}
 				}
@@ -483,10 +487,10 @@ namespace Rolex
 		}
 		static DfaEntry[] _ToDfaStateTable<TAccept>(CharFA<TAccept> fsm,IList<TAccept> symbolTable = null, IProgress<CharFAProgress> progress = null)
 		{
-			// only convert to a DFA if we haven't already
-			// ToDfa() already checks but it always clones
-			// the state information so this performs better
-			var dfa = fsm.IsDfa ? fsm : fsm.ToDfa(progress);
+			
+			
+			var dfa = fsm.ToDfa(new _ConsoleProgress());
+			dfa.TrimDuplicates(new _ConsoleProgress());
 			var closure = dfa.FillClosure();
 			var symbolLookup = new ListDictionary<TAccept, int>();
 			// if we don't have a symbol table, build 
@@ -601,5 +605,11 @@ namespace Rolex
 		public int Column;
 		public long Position;
 	}
-
+	class _ConsoleProgress : IProgress<CharFAProgress>
+	{
+		public void Report(CharFAProgress progress)
+		{
+			Console.Error.Write(".");
+		}
+	}
 }

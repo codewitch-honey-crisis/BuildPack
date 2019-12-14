@@ -228,6 +228,7 @@
     <None Include="Key.snk" />
     <None Include="SampleTokenizer2.rl" />
     <None Include="SampleTokenizer.rl" />
+    <None Include="SlangTokenizer.rl" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
