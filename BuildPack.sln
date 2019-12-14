@@ -17,8 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RolexDemo", "RolexDemo\Role
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlangDemo", "SlangDemo\SlangDemo.csproj", "{47A1489D-78EB-40C6-ACED-A3E1B7CFC55D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "scratch", "scratch\scratch.csproj", "{75B1AF15-2EA0-48A2-9D96-F9B8A836B738}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,10 +51,6 @@ Global
 		{47A1489D-78EB-40C6-ACED-A3E1B7CFC55D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47A1489D-78EB-40C6-ACED-A3E1B7CFC55D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47A1489D-78EB-40C6-ACED-A3E1B7CFC55D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{75B1AF15-2EA0-48A2-9D96-F9B8A836B738}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{75B1AF15-2EA0-48A2-9D96-F9B8A836B738}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{75B1AF15-2EA0-48A2-9D96-F9B8A836B738}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{75B1AF15-2EA0-48A2-9D96-F9B8A836B738}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

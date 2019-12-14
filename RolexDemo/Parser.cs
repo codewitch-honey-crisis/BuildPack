@@ -11,7 +11,7 @@ namespace RolexDemo
 	class Parser
 	{
 		// This little parse context class just makes 
-		// our parsing a little bit easier. I always
+		// our parsing a little bit easier. I tend to
 		// use something like this over IEnumerator<T>
 		// interfaces
 		private class _PC
@@ -138,7 +138,7 @@ namespace RolexDemo
 					return _EvalUnary(pc, vars);
 				case T.Minus:
 					if (!pc.Advance())
-						throw new Exception("Unterminated expression. Expecting factor.");
+						throw new Exception("Unterminated expression. Expecting unary.");
 					return - _EvalUnary(pc, vars);
 				default:
 					return _EvalLeaf(pc, vars);
