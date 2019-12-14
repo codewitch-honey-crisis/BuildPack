@@ -135,36 +135,10 @@ namespace Rolex
 						//throw new NotImplementedException();
 						if (!noshared)
 						{
-							// import our Shared/Tokenizer.cs into the library
-							CodeCompileUnit sharedCcu = null;
-							using (var stm = typeof(Program).Assembly.GetManifestResourceStream("Rolex.Shared.Tokenizer.cs"))
-							{
-								var sr = new StreamReader(stm);
-								sharedCcu=SlangParser.ReadCompileUnitFrom(sr);
-							}
-							// import all the usings and all the types
-							foreach(CodeNamespace ns in sharedCcu.Namespaces)
-							{
-								foreach (CodeNamespaceImport nsi in ns.Imports)
-								{
-									var found = false;
-									foreach (CodeNamespaceImport nsicmp in cns.Imports)
-									{
-										if (0 == string.Compare(nsicmp.Namespace, nsi.Namespace, StringComparison.InvariantCulture))
-										{
-											found = true;
-											break;
-										}
-									}
-									if (!found)
-										cns.Imports.Add(nsi);
-								}
-								foreach(CodeTypeDeclaration type in ns.Types)
-								{
-									type.CustomAttributes.Add(CodeGenerator.GeneratedCodeAttribute);
-									cns.Types.Add(type);
-								}
-							}
+							// import our Shared/Token.cs into the library
+							_ImportCompileUnit("Rolex.Shared.Token.cs", cns);
+							// import our Shared/TableTokenizer.cs into the library
+							_ImportCompileUnit("Rolex.Shared.TableTokenizer.cs", cns);
 							SlangPatcher.Patch(ccu);
 							var elem = SlangPatcher.GetNextUnresolvedElement(ccu);
 							if (null != elem)
@@ -204,6 +178,41 @@ namespace Rolex
 			}
 			return result;
 		}
+
+		private static void _ImportCompileUnit(string name,CodeNamespace dst)
+		{
+			
+			CodeCompileUnit fromCcu = null;
+			using (var stm = typeof(Program).Assembly.GetManifestResourceStream(name))
+			{
+				var sr = new StreamReader(stm);
+				fromCcu = SlangParser.ReadCompileUnitFrom(sr);
+			}
+			// import all the usings and all the types
+			foreach (CodeNamespace ns in fromCcu.Namespaces)
+			{
+				foreach (CodeNamespaceImport nsi in ns.Imports)
+				{
+					var found = false;
+					foreach (CodeNamespaceImport nsicmp in dst.Imports)
+					{
+						if (0 == string.Compare(nsicmp.Namespace, nsi.Namespace, StringComparison.InvariantCulture))
+						{
+							found = true;
+							break;
+						}
+					}
+					if (!found)
+						dst.Imports.Add(nsi);
+				}
+				foreach (CodeTypeDeclaration type in ns.Types)
+				{
+					type.CustomAttributes.Add(CodeGenerator.GeneratedCodeAttribute);
+					dst.Types.Add(type);
+				}
+			}
+		}
+
 		static void _FillRuleIds(IList<_LexRule> rules)
 		{
 			var ids = new HashSet<int>();

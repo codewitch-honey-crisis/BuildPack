@@ -219,7 +219,8 @@
     <Compile Include="CodeGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Shared\Tokenizer.cs" />
+    <EmbeddedResource Include="Shared\Token.cs" />
+    <EmbeddedResource Include="Shared\TableTokenizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
