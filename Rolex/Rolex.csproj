@@ -219,12 +219,14 @@
     <Compile Include="CodeGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Shared\CompiledTokenizer.cs" />
     <EmbeddedResource Include="Shared\Token.cs" />
     <EmbeddedResource Include="Shared\TableTokenizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Key.snk" />
+    <None Include="SampleTokenizer2.rl" />
     <None Include="SampleTokenizer.rl" />
   </ItemGroup>
   <ItemGroup />

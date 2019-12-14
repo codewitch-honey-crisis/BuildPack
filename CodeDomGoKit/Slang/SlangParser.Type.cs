@@ -322,6 +322,9 @@ namespace CD
 					case "internal":
 						result = (result & ~TypeAttributes.VisibilityMask) | TypeAttributes.NotPublic;
 						break;
+					case "abstract":
+						result |= TypeAttributes.Abstract;
+						break;
 					case "private":
 						throw new ArgumentException("Top level types cannot be private", "input");
 					case "protected":

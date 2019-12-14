@@ -317,27 +317,18 @@ namespace RolexDemo {
             throw new ObjectDisposedException("CompiledTokenizerEnumerator");
         }
     }
-    internal class SampleTokenizer : CompiledTokenizer {
-        public const int Identifier = 1;
-        public const int Integer = 2;
-        public const int Plus = 3;
-        public const int Minus = 4;
-        public const int Multiply = 5;
-        public const int Divide = 6;
-        public const int LParen = 7;
-        public const int RParen = 8;
-        public const int Whitespace = 9;
-        public const int LineComment = 10;
-        public const int BlockComment = 11;
+    internal class SampleTokenizer2 : CompiledTokenizer {
+        public const int A = 0;
+        public const int B = 1;
         public override System.Collections.Generic.IEnumerator<Token> GetEnumerator() {
-            return new SampleTokenizerEnumerator(this.Input.GetEnumerator());
+            return new SampleTokenizer2Enumerator(this.Input.GetEnumerator());
         }
-        public SampleTokenizer(System.Collections.Generic.IEnumerable<char> input) : 
+        public SampleTokenizer2(System.Collections.Generic.IEnumerable<char> input) : 
                 base(input) {
         }
     }
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
-    internal partial class SampleTokenizerEnumerator : CompiledTokenizerEnumerator {
+    internal partial class SampleTokenizer2Enumerator : CompiledTokenizerEnumerator {
         protected override int Lex() {
             char current;
             if ((CompiledTokenizerEnumerator.BeforeBegin == this.State)) {
@@ -354,191 +345,39 @@ namespace RolexDemo {
             }
             current = this.CurrentInput;
             // q0
-            if (((((current >= 'A') 
-                        && (current <= 'Z')) 
-                        || (current == '_')) 
-                        || ((current >= 'a') 
-                        && (current <= 'z')))) {
+            if ((current == 'a')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 1;
+                    return 0;
                 }
                 current = this.CurrentInput;
                 goto q1;
             }
-            if (((current >= '0') 
-                        && (current <= '9'))) {
+            if ((current == 'b')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return 2;
+                    return 1;
                 }
                 current = this.CurrentInput;
-                goto q3;
-            }
-            if ((current == '+')) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return 3;
-                }
-                current = this.CurrentInput;
-                goto q4;
-            }
-            if ((current == '-')) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return 4;
-                }
-                current = this.CurrentInput;
-                goto q5;
-            }
-            if ((current == '*')) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return 5;
-                }
-                current = this.CurrentInput;
-                goto q6;
-            }
-            if ((current == '/')) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return 6;
-                }
-                current = this.CurrentInput;
-                goto q7;
-            }
-            if ((current == '(')) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return 7;
-                }
-                current = this.CurrentInput;
-                goto q10;
-            }
-            if ((current == ')')) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return 8;
-                }
-                current = this.CurrentInput;
-                goto q11;
-            }
-            if ((((current >= '\t') 
-                        && (current <= '\r')) 
-                        || (current == ' '))) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return 9;
-                }
-                current = this.CurrentInput;
-                goto q12;
+                goto q2;
             }
             goto error;
         q1:
-            if ((((((current >= '0') 
-                        && (current <= '9')) 
-                        || ((current >= 'A') 
-                        && (current <= 'Z'))) 
-                        || (current == '_')) 
-                        || ((current >= 'a') 
-                        && (current <= 'z')))) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return 1;
-                }
-                current = this.CurrentInput;
-                goto q2;
-            }
-            return 1;
+            return 0;
         q2:
-            if ((((((current >= '0') 
-                        && (current <= '9')) 
-                        || ((current >= 'A') 
-                        && (current <= 'Z'))) 
-                        || (current == '_')) 
-                        || ((current >= 'a') 
-                        && (current <= 'z')))) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return 1;
-                }
-                current = this.CurrentInput;
-                goto q2;
-            }
             return 1;
-        q3:
-            if (((current >= '0') 
-                        && (current <= '9'))) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return 2;
-                }
-                current = this.CurrentInput;
-                goto q3;
-            }
-            return 2;
-        q4:
-            return 3;
-        q5:
-            return 4;
-        q6:
-            return 5;
-        q7:
-            if ((current == '/')) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return 10;
-                }
-                current = this.CurrentInput;
-                goto q8;
-            }
-            if ((current == '*')) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return 11;
-                }
-                current = this.CurrentInput;
-                goto q9;
-            }
-            return 6;
-        q8:
-            if ((((current >= '\0') 
-                        && (current <= '\t')) 
-                        || ((current >= '') 
-                        && (current <= '￿')))) {
-                this.ValueBuffer.Append(current);
-                if ((false == this.MoveNextInput())) {
-                    return 10;
-                }
-                current = this.CurrentInput;
-                goto q8;
-            }
-            return 10;
-        q9:
-            return 11;
-        q10:
-            return 7;
-        q11:
-            return 8;
-        q12:
-            return 9;
         error:
             this.ValueBuffer.Append(current);
             this.MoveNextInput();
             return CompiledTokenizerEnumerator.ErrorSymbol;
         }
         protected override string GetBlockEnd(int symbolId) {
-            if ((11 == symbolId)) {
-                return "*/";
-            }
             return null;
         }
         protected override bool IsHidden(int symbolId) {
-            return (((9 == symbolId) 
-                        || (10 == symbolId)) 
-                        || (11 == symbolId));
+            return false;
         }
-        public SampleTokenizerEnumerator(System.Collections.Generic.IEnumerator<char> input) : 
+        public SampleTokenizer2Enumerator(System.Collections.Generic.IEnumerator<char> input) : 
                 base(input) {
         }
     }

@@ -372,6 +372,8 @@ namespace CD
 		{
 			if (null != fr)
 			{
+				// TODO: This shouldn't be done first because it's resolving types before fields and 
+				// that is a no no. To fix.
 				var path = _GetUnresRootPathOfExpression(fr);
 				if (null != path)
 				{

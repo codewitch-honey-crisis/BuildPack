@@ -30,8 +30,9 @@ namespace Rolex
 			string inputfile = null;
 			string outputfile = null;
 			string name = null;
-			var codelanguage = "cs";
+			string codelanguage = null;
 			string codenamespace = null;
+			bool compiled = false;
 			bool noshared = false;
 			bool ifstale = false;
 			// our working variables
@@ -82,6 +83,9 @@ namespace Rolex
 							case "/noshared":
 								noshared = true;
 								break;
+							case "/compiled":
+								compiled = true;
+								break;
 							case "/ifstale":
 								ifstale= true;
 								break;
@@ -92,6 +96,17 @@ namespace Rolex
 					// now build it
 					if (string.IsNullOrEmpty(name))
 						name = Path.GetFileNameWithoutExtension(inputfile);
+					if (string.IsNullOrEmpty(codelanguage))
+					{
+						if (!string.IsNullOrEmpty(outputfile))
+						{
+							codelanguage = Path.GetExtension(outputfile);
+							if (codelanguage.StartsWith("."))
+								codelanguage = codelanguage.Substring(1);
+						}
+						if (string.IsNullOrEmpty(codelanguage))
+							codelanguage = "cs";
+					}
 					var stale = true;
 					if (ifstale && null!=outputfile)
 					{
@@ -132,26 +147,34 @@ namespace Rolex
 						var blockEnds = _BuildBlockEnds(rules);
 						var nodeFlags = _BuildNodeFlags(rules);
 						var dfaTable = _ToDfaStateTable(fa,symbolTable);
-						//throw new NotImplementedException();
 						if (!noshared)
 						{
 							// import our Shared/Token.cs into the library
 							_ImportCompileUnit("Rolex.Shared.Token.cs", cns);
-							// import our Shared/TableTokenizer.cs into the library
-							_ImportCompileUnit("Rolex.Shared.TableTokenizer.cs", cns);
+							if (!compiled)
+							{
+								// import our Shared/TableTokenizer.cs into the library
+								_ImportCompileUnit("Rolex.Shared.TableTokenizer.cs", cns);
+							} else
+							{
+								// import our Shared/CompiledTokenizer.cs into the library
+								_ImportCompileUnit("Rolex.Shared.CompiledTokenizer.cs", cns);
+							}
 							SlangPatcher.Patch(ccu);
 							var elem = SlangPatcher.GetNextUnresolvedElement(ccu);
 							if (null != elem)
 							{
-								Console.Error.WriteLine("Error resolving tokenizer shared library code:");
-								Console.Error.WriteLine(CodeDomUtility.ToString(elem));
-								//Console.Error.WriteLine(CodeDomUtility.ToString(sharedCcu));
-								return 1;
+								throw new InvalidProgramException("Error resolving tokenizer shared library code:"+CodeDomUtility.ToString(elem).Trim());
 							}
 
 						}
-						cns.Types.Add(CodeGenerator.GenerateTableTokenizer(name, dfaTable, symbolTable, blockEnds, nodeFlags));
-						
+						if (!compiled)
+							cns.Types.Add(CodeGenerator.GenerateTableTokenizer(name, dfaTable, symbolTable, blockEnds, nodeFlags));
+						else
+						{
+							cns.Types.Add(CodeGenerator.GenerateCompiledTokenizer(name, symbolTable));
+							cns.Types.Add(CodeGenerator.GenerateCompiledTokenizerEnumerator(name, dfaTable, blockEnds, nodeFlags));
+						}
 						var prov = CodeDomProvider.CreateProvider(codelanguage);
 						var opts = new CodeGeneratorOptions();
 						opts.BlankLinesBetweenMembers = false;
@@ -444,14 +467,15 @@ namespace Rolex
 			t.Write(_File);
 			t.WriteLine(" <inputfile> [/output <outputfile>] [/name <name>]");
 			t.WriteLine("   [/namespace <codenamespace>] [/language <codelanguage>]");
-			t.WriteLine("   [/noshared] [/ifstale]");
+			t.WriteLine("   [/noshared] [/compiled] [/ifstale]");
 			t.WriteLine();
 			t.WriteLine("   <inputfile>      The input file to use.");
 			t.WriteLine("   <outputfile>     The output file to use - default stdout.");
 			t.WriteLine("   <name>           The name to use - default taken from <inputfile>.");
-			t.WriteLine("   <codelanguage>   The code language - default C#.");
+			t.WriteLine("   <codelanguage>   The code language - default based on output file - default C#");
 			t.WriteLine("   <codenamepace>   The code namespace");
 			t.WriteLine("   <noshared>       Do not generate the shared dependency code");
+			t.WriteLine("   <compiled>       Generate compiled instead of table driven code (not recommended)");
 			t.WriteLine("   <ifstale>        Do not generate unless <outputfile> is older than <inputfile>.");
 			t.WriteLine();
 			t.WriteLine("Any other switch displays this screen and exits.");

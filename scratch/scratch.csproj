@@ -45,8 +45,8 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SlangTokenizer.cs" />
-    <None Include="SlangTokenizer.rl" />
+    <Compile Include="SampleTokenizer.cs" />
+    <None Include="SampleTokenizer2.rl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -62,4 +62,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>$(SolutionDir)\Rolex\bin\Release\rolex.exe $(ProjectDir)SampleTokenizer2.rl /output $(ProjectDir)SampleTokenizer.cs /namespace RolexDemo /compiled</PreBuildEvent>
+  </PropertyGroup>
 </Project>

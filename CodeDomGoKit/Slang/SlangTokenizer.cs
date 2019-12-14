@@ -386,7 +386,7 @@ namespace CD {
             return false;
         }
         // lex the next token
-        public int _Lex() {
+        int _Lex() {
             // our accepting symbol id
             int acceptSymbolId;
             // the DFA state we're currently in (start at zero)

@@ -333,7 +333,7 @@ namespace Rolex
 			return false;
 		}
 		// lex the next token
-		public int _Lex()
+		int _Lex()
 		{
 			// our accepting symbol id
 			int acceptSymbolId;

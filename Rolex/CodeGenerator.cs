@@ -12,7 +12,7 @@ using System.Reflection;
 
 namespace Rolex
 {
-	using CD = CD.CodeDomUtility;
+	using C = CD.CodeDomUtility;
 	static class CodeGenerator
 	{
 		const int _ErrorSymbol = -1;
@@ -24,17 +24,17 @@ namespace Rolex
 		const int _Enumerating = 0;
 		const int _TabWidth = 4;
 
-		static CodeConstructor _BuildCtor(CodeTypeDeclaration target)
+		static CodeConstructor _BuildTableCtor(CodeTypeDeclaration target)
 		{
-			var result =CD.Ctor(MemberAttributes.Public);
+			var result =C.Ctor(MemberAttributes.Public);
 			foreach (var member in target.Members)
 			{
 				var field = member as CodeMemberField;
 				if (null != field)
 				{
 					var n = _TitleToCamel(field.Name);
-					result.Parameters.Add(CD.Param(field.Type, n));
-					result.Statements.Add(CD.Let(CD.FieldRef(CD.This, field.Name), CD.ArgRef(n)));
+					result.Parameters.Add(C.Param(field.Type, n));
+					result.Statements.Add(C.Let(C.FieldRef(C.This, field.Name), C.ArgRef(n)));
 				}
 			}
 			return result;
@@ -69,7 +69,248 @@ namespace Rolex
 			}
 			return result;
 		}
+		static CodeMemberMethod _GenerateLexMethod(DfaEntry[] dfaTable)
+		{
+			var result = C.Method(typeof(int), "Lex", MemberAttributes.Family | MemberAttributes.Override);
+			result.Statements.Add(C.Var(typeof(char), "current"));
+			var errorSym = C.FieldRef(C.TypeRef("CompiledTokenizerEnumerator"), "ErrorSymbol");
+			// we generate labels for each state except maybe the first.
+			// we only generate a label for the first state if any of the
+			// states (including itself) reference it. This is to prevent
+			// a compiler warning in the case of an unreferenced label
+			var isRootLoop = false;
+			// we also need to see if any states do not accept
+			// if they don't we'll have to generate an error condition
+			var hasError = false;
+			for (var i = 0; i < dfaTable.Length; i++)
+			{
+				var trns = dfaTable[i].Transitions;
+				for (var j = 0; j < trns.Length; j++)
+				{
+					if (0 == trns[j].Destination)
+					{
+						isRootLoop = true;
+						break;
+					}
+				}
+			}
+			var pci = C.VarRef("current");
+			var pccr = C.PropRef(C.This,"CurrentInput");
+			var pccc=C.Call(C.FieldRef(C.This, "ValueBuffer"), "Append", pci);
+			// valid lexers never accept on the initial state, but we still handle it as though it does
+			result.Statements.Add(C.IfElse(C.Eq(C.FieldRef(C.TypeRef("CompiledTokenizerEnumerator"), "BeforeBegin"), C.FieldRef(C.This, "State")),
+				new CodeStatement[] {
+				C.If(C.Not(C.Invoke(C.This, "MoveNextInput")),
+					C.Return(-1 == dfaTable[0].AcceptSymbolId ? errorSym : C.Literal(dfaTable[0].AcceptSymbolId))
+				),
+				C.Let(C.FieldRef(C.This,"State"),C.FieldRef(C.TypeRef("CompiledTokenizerEnumerator"),"Enumerating"))
+				},
+				C.If(C.Or(C.Eq(C.FieldRef(C.This,"State"), C.FieldRef(C.TypeRef("CompiledTokenizerEnumerator"), "InnerFinished")), C.Eq(C.FieldRef(C.This, "State"), C.FieldRef(C.TypeRef("CompiledTokenizerEnumerator"), "AfterEnd"))),
+					C.Return(C.FieldRef(C.TypeRef("CompiledTokenizerEnumerator"),"EosSymbol")))
+			));
+			result.Statements.Add(C.Let(pci, pccr));
+			var exprs = new CodeExpressionCollection();
+			var stmts = new CodeStatementCollection();
 
+			for (var i = 0; i < dfaTable.Length; i++)
+			{
+				stmts.Clear();
+				var se = dfaTable[i];
+				var trns = se.Transitions;
+				for (var j = 0; j < trns.Length; j++)
+				{
+					var cif = new CodeConditionStatement();
+					stmts.Add(cif);
+					exprs.Clear();
+
+					var trn = trns[j];
+					var pr = trn.PackedRanges;
+					for (var k = 0; k < pr.Length; k++)
+					{
+						var first = pr[k];
+						++k; // advance an extra place
+						var last = pr[k];
+						if (first != last)
+						{
+							exprs.Add(
+								new CodeBinaryOperatorExpression(
+									new CodeBinaryOperatorExpression(
+										pci,
+										CodeBinaryOperatorType.GreaterThanOrEqual,
+										new CodePrimitiveExpression(first)
+										),
+									CodeBinaryOperatorType.BooleanAnd,
+									new CodeBinaryOperatorExpression(
+										pci,
+										CodeBinaryOperatorType.LessThanOrEqual,
+										new CodePrimitiveExpression(last)
+										)
+									)
+								);
+						}
+						else
+						{
+							exprs.Add(
+								new CodeBinaryOperatorExpression(
+									pci,
+									CodeBinaryOperatorType.ValueEquality,
+									new CodePrimitiveExpression(first)
+									)
+								);
+						}
+					}
+					cif.Condition = 1<exprs.Count?C.BinOp(exprs, CodeBinaryOperatorType.BooleanOr):exprs[0];
+					var ds = dfaTable[trn.Destination];
+					cif.TrueStatements.Add(pccc);
+					if (-1 != ds.AcceptSymbolId) {
+						cif.TrueStatements.Add(C.If(C.Not(C.Invoke(C.This, "MoveNextInput")),
+							C.Return(C.Literal(ds.AcceptSymbolId))
+							));
+						cif.TrueStatements.Add(C.Let(pci, pccr));
+					} else
+					{
+						hasError = true;
+						cif.TrueStatements.Add(C.If(C.Not(C.Invoke(C.This, "MoveNextInput")),
+							C.Goto("error")
+							));
+						cif.TrueStatements.Add(C.Let(pci, pccr));
+					}
+					
+					cif.TrueStatements.Add(C.Goto(string.Concat("q", trn.Destination.ToString())));
+
+				}
+				if (-1 != se.AcceptSymbolId) // is accepting
+					stmts.Add(C.Return(C.Literal(se.AcceptSymbolId)));
+				else
+				{
+					hasError = true;
+					stmts.Add(new CodeGotoStatement("error"));
+				}
+				if (0 < i || isRootLoop)
+				{
+					result.Statements.Add(new CodeLabeledStatement(string.Concat("q", i.ToString()), stmts[0]));
+					for (int jc = stmts.Count, j = 1; j < jc; ++j)
+						result.Statements.Add(stmts[j]);
+				}
+				else
+				{
+					result.Statements.Add(new CodeCommentStatement("q0"));
+					result.Statements.AddRange(stmts);
+				}
+			}
+			if (hasError)
+			{
+				result.Statements.Add(new CodeLabeledStatement("error", pccc));
+				result.Statements.Add(C.Call(C.This, "MoveNextInput"));
+				result.Statements.Add(C.Return(errorSym));
+			}
+			return result;
+		}
+		static CodeMemberMethod _GenerateGetBlockEndMethod(IList<string> blockEnds)
+		{
+			var result = C.Method(typeof(string), "GetBlockEnd", MemberAttributes.Family | MemberAttributes.Override,C.Param(typeof(int),"symbolId"));
+			for (int ic = blockEnds.Count, i = 0; i < ic; ++i)
+			{
+				var be = blockEnds[i];
+				if(!string.IsNullOrEmpty(be))
+				{
+					result.Statements.Add(C.If(C.Eq(C.Literal(i), C.ArgRef(result.Parameters[0].Name)),
+						C.Return(C.Literal(be))
+						));
+				}
+			}
+			result.Statements.Add(C.Return(C.Null));
+			return result;
+		}
+		static CodeMemberMethod _GenerateIsHiddenMethod(IList<int> nodeFlags)
+		{
+			var result = C.Method(typeof(bool), "IsHidden", MemberAttributes.Family | MemberAttributes.Override, C.Param(typeof(int), "symbolId"));
+			var exprs = new List<CodeExpression>();
+			for (int ic = nodeFlags.Count,i=0;i<ic;++i)
+			{
+				var nf = nodeFlags[i];
+				if(0!=(nf&1))
+					exprs.Add(C.Eq(C.Literal(i), C.ArgRef(result.Parameters[0].Name)));
+			}
+			switch(exprs.Count)
+			{
+				case 0:
+					result.Statements.Add(C.Return(C.False));
+					break;
+				case 1:
+					result.Statements.Add(C.Return(exprs[0]));
+					break;
+				default:
+					result.Statements.Add(C.Return(C.BinOp(exprs, CodeBinaryOperatorType.BooleanOr)));
+					break;
+			}
+			
+			return result;
+		}
+		public static CodeTypeDeclaration GenerateCompiledTokenizer(string name,IList<string> symbolTable)
+		{
+			var result = C.Class(name, false);
+			result.BaseTypes.Add("CompiledTokenizer");
+			var eType = new CodeTypeReference(typeof(IEnumerator<>));
+			eType.TypeArguments.Add("Token");
+			var iType = new CodeTypeReference(typeof(IEnumerable<char>));
+
+			// generate symbol constants
+			for (int ic = symbolTable.Count, i = 0; i < ic; ++i)
+			{
+				var symbol = symbolTable[i];
+				if (null != symbol)
+				{
+					var s = _MakeSafeName(symbol);
+					s = _MakeUniqueMember(result, s);
+					var constField = C.Field(
+						typeof(int),
+						s,
+						MemberAttributes.Const | MemberAttributes.Public,
+						new CodePrimitiveExpression(i)
+					);
+					result.Members.Add(constField);
+				}
+			}
+
+			var getEnum = C.Method(eType,"GetEnumerator",MemberAttributes.Override | MemberAttributes.Public | MemberAttributes.Override);
+			getEnum.Statements.Add(C.Return(C.New(name + "Enumerator", C.Invoke(C.FieldRef(C.This, "Input"), "GetEnumerator"))));
+			result.Members.Add(getEnum);
+
+			var ctor = C.Ctor(MemberAttributes.Public, C.Param(iType, "input"));
+			ctor.BaseConstructorArgs.Add(C.ArgRef("input"));
+
+			result.Members.Add(ctor);
+			return result;
+		}
+		public static CodeTypeDeclaration GenerateCompiledTokenizerEnumerator(string name,
+			DfaEntry[] dfaTable,
+			IList<string> blockEnds,
+			IList<int> nodeFlags)
+		{
+			var result = C.Class(name+"Enumerator", false);
+			result.IsPartial = true;
+			result.BaseTypes.Add("CompiledTokenizerEnumerator");
+			
+			// lex method
+			var lexMethod = _GenerateLexMethod(dfaTable);
+			result.Members.Add(lexMethod);
+			// block ends
+			var getBlockEndMethod = _GenerateGetBlockEndMethod(blockEnds);
+			result.Members.Add(getBlockEndMethod);
+			// node flags
+			var isHiddenMethod = _GenerateIsHiddenMethod(nodeFlags);
+			result.Members.Add(isHiddenMethod);
+			// constructor
+			var ctor = new CodeConstructor();
+			ctor.Attributes = MemberAttributes.Public;
+			ctor.Parameters.Add(C.Param(typeof(IEnumerator<char>), "input"));
+			ctor.BaseConstructorArgs.Add(C.ArgRef(ctor.Parameters[0].Name));
+			
+			result.Members.Add(ctor);
+			result.CustomAttributes.Add(GeneratedCodeAttribute);
+			return result;
+		}
 		public static CodeTypeDeclaration GenerateTableTokenizer(
 			string name,
 			DfaEntry[] dfaTable,
@@ -77,7 +318,7 @@ namespace Rolex
 			IList<string> blockEnds,
 			IList<int> nodeFlags)
 		{
-			var result = CD.Class(name, false);
+			var result = C.Class(name, false);
 			result.IsPartial = true;
 			result.BaseTypes.Add("TableTokenizer");
 			// generate symbol constants
@@ -97,17 +338,17 @@ namespace Rolex
 			// dfa table
 			var dfaTableField = new CodeMemberField(new CodeTypeReference("DfaEntry", 1), "DfaTable");
 			dfaTableField.Attributes = MemberAttributes.Static | MemberAttributes.FamilyAndAssembly;
-			dfaTableField.InitExpression = GenerateDfaTableInitializer(dfaTable);
+			dfaTableField.InitExpression = _GenerateDfaTableInitializer(dfaTable);
 			result.Members.Add(dfaTableField);
 			// block ends
 			var blockEndsField = new CodeMemberField(typeof(string[]), "BlockEnds");
 			blockEndsField.Attributes = MemberAttributes.Static | MemberAttributes.FamilyAndAssembly;
-			blockEndsField.InitExpression = GenerateBlockEndsTableInitializer(blockEnds);
+			blockEndsField.InitExpression = _GenerateBlockEndsTableInitializer(blockEnds);
 			result.Members.Add(blockEndsField);
 			// node flags
 			var nodeFlagsField = new CodeMemberField(typeof(int[]), "NodeFlags");
 			nodeFlagsField.Attributes = MemberAttributes.Static | MemberAttributes.FamilyAndAssembly;
-			nodeFlagsField.InitExpression = GenerateNodeFlagsTableInitializer(nodeFlags);
+			nodeFlagsField.InitExpression = _GenerateNodeFlagsTableInitializer(nodeFlags);
 			result.Members.Add(nodeFlagsField);
 			// constructor
 			var ctor = new CodeConstructor();
@@ -122,7 +363,7 @@ namespace Rolex
 			return result;
 		}
 		// we use our own serialization here to avoid the codedom trying to reference the DfaEntry under the wrong namespace
-		public static CodeExpression GenerateDfaTableInitializer(DfaEntry[] dfaTable)
+		static CodeExpression _GenerateDfaTableInitializer(DfaEntry[] dfaTable)
 		{
 			var result = new CodeArrayCreateExpression("DfaEntry");
 			for(var i = 0;i<dfaTable.Length;i++)
@@ -149,14 +390,14 @@ namespace Rolex
 			}
 			return result;
 		}
-		public static CodeExpression GenerateBlockEndsTableInitializer(IList<string> blockEnds)
+		static CodeExpression _GenerateBlockEndsTableInitializer(IList<string> blockEnds)
 		{
 			var result = new CodeArrayCreateExpression(typeof(string));
 			for(int ic=blockEnds.Count,i=0;i<ic;++i)
 				result.Initializers.Add(new CodePrimitiveExpression(blockEnds[i]));
 			return result;
 		}
-		public static CodeExpression GenerateNodeFlagsTableInitializer(IList<int> nodeFlags)
+		static CodeExpression _GenerateNodeFlagsTableInitializer(IList<int> nodeFlags)
 		{
 			var result = new CodeArrayCreateExpression(typeof(int));
 			for (int ic = nodeFlags.Count, i = 0; i < ic; ++i)
@@ -168,6 +409,6 @@ namespace Rolex
 			return string.Concat(char.ToLowerInvariant(name[0]), name.Substring(1));
 		}
 		public static readonly CodeAttributeDeclaration GeneratedCodeAttribute
-			= new CodeAttributeDeclaration(CD.Type(typeof(GeneratedCodeAttribute)), new CodeAttributeArgument(CD.Literal("Rolex")), new CodeAttributeArgument(CD.Literal(Assembly.GetExecutingAssembly().GetName().Version.ToString())));
+			= new CodeAttributeDeclaration(C.Type(typeof(GeneratedCodeAttribute)), new CodeAttributeArgument(C.Literal("Rolex")), new CodeAttributeArgument(C.Literal(Assembly.GetExecutingAssembly().GetName().Version.ToString())));
 	}
 }

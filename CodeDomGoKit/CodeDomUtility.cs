@@ -244,6 +244,30 @@ namespace CD
 			return BinOp(left, type, right, rightN.ToArray());
 		}
 		/// <summary>
+		/// Creates one or more potentially nested <see cref="CodeBinaryOperatorExpression"/> objects with the specified parameters
+		/// </summary>
+		/// <param name="exprs">The expressions</param>
+		/// <param name="type">A <see cref="CodeBinaryOperatorType"/> value indicating the type of operation</param>
+		/// <returns>One or more potentially nested <see cref="CodeBinaryOperatorExpression"/> objects with the specified parameters</returns>
+		public static CodeBinaryOperatorExpression BinOp(CodeExpressionCollection exprs, CodeBinaryOperatorType type)
+		{
+			CodeExpression left = null;
+			CodeExpression right = null;
+			var rightN = new List<CodeExpression>();
+			foreach (CodeExpression e in exprs)
+			{
+				if (null == left)
+					left = e;
+				else if (null == right)
+					right = e;
+				else
+					rightN.Add(e);
+			}
+			if (null == right)
+				throw new ArgumentException("There must be at least two expressions", nameof(exprs));
+			return BinOp(left, type, right, rightN.ToArray());
+		}
+		/// <summary>
 		/// Creates a simple or complex literal expression value based on <paramref name="value"/>
 		/// </summary>
 		/// <param name="value">The instance to serialize to code</param>
@@ -769,6 +793,13 @@ namespace CD
 		/// <returns>A <see cref="CodeIterationStatement"/> statement with the specified init statement, condition, increment statement, and inner statements</returns>
 		public static CodeIterationStatement For(CodeStatement init, CodeExpression cnd, CodeStatement inc, params CodeStatement[] statements)
 			=> new CodeIterationStatement(init ?? new CodeSnippetStatement(), cnd, inc ?? new CodeSnippetStatement(), statements);
+		/// <summary>
+		/// Creates a <see cref="CodeGotoStatement"/> with the specified target label
+		/// </summary>
+		/// <param name="label">The destination label</param>
+		/// <returns>A <see cref="CodeGotoStatement"/> with the specified target label</returns>
+		public static CodeGotoStatement Goto(string label)
+			=> new CodeGotoStatement(label);
 		/// <summary>
 		/// Creates a <see cref="CodeThrowExceptionStatement"/> with the specified target expression
 		/// </summary>
