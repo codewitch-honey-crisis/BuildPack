@@ -528,15 +528,15 @@ namespace RolexDemo {
             return CompiledTokenizerEnumerator.ErrorSymbol;
         }
         protected override string GetBlockEnd(int symbolId) {
-            if ((11 == symbolId)) {
+            if ((SampleTokenizer.BlockComment == symbolId)) {
                 return "*/";
             }
             return null;
         }
         protected override bool IsHidden(int symbolId) {
-            return (((9 == symbolId) 
-                        || (10 == symbolId)) 
-                        || (11 == symbolId));
+            return (((SampleTokenizer.Whitespace == symbolId) 
+                        || (SampleTokenizer.LineComment == symbolId)) 
+                        || (SampleTokenizer.BlockComment == symbolId));
         }
         public SampleTokenizerEnumerator(System.Collections.Generic.IEnumerator<char> input) : 
                 base(input) {

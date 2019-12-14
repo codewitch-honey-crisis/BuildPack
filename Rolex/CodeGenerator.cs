@@ -207,15 +207,16 @@ namespace Rolex
 			}
 			return result;
 		}
-		static CodeMemberMethod _GenerateGetBlockEndMethod(IList<string> blockEnds)
+		static CodeMemberMethod _GenerateGetBlockEndMethod(string name,IList<string> constSymbolTable, IList<string> blockEnds)
 		{
 			var result = C.Method(typeof(string), "GetBlockEnd", MemberAttributes.Family | MemberAttributes.Override,C.Param(typeof(int),"symbolId"));
+			var otref = C.TypeRef(name);
 			for (int ic = blockEnds.Count, i = 0; i < ic; ++i)
 			{
 				var be = blockEnds[i];
 				if(!string.IsNullOrEmpty(be))
 				{
-					result.Statements.Add(C.If(C.Eq(C.Literal(i), C.ArgRef(result.Parameters[0].Name)),
+					result.Statements.Add(C.If(C.Eq(C.FieldRef(otref, constSymbolTable[i]), C.ArgRef(result.Parameters[0].Name)),
 						C.Return(C.Literal(be))
 						));
 				}
@@ -223,15 +224,16 @@ namespace Rolex
 			result.Statements.Add(C.Return(C.Null));
 			return result;
 		}
-		static CodeMemberMethod _GenerateIsHiddenMethod(IList<int> nodeFlags)
+		static CodeMemberMethod _GenerateIsHiddenMethod(string name,IList<string> constSymbolTable,IList<int> nodeFlags)
 		{
 			var result = C.Method(typeof(bool), "IsHidden", MemberAttributes.Family | MemberAttributes.Override, C.Param(typeof(int), "symbolId"));
+			var otref = C.TypeRef(name);
 			var exprs = new List<CodeExpression>();
 			for (int ic = nodeFlags.Count,i=0;i<ic;++i)
 			{
 				var nf = nodeFlags[i];
 				if(0!=(nf&1))
-					exprs.Add(C.Eq(C.Literal(i), C.ArgRef(result.Parameters[0].Name)));
+					exprs.Add(C.Eq(C.FieldRef(otref,constSymbolTable[i]), C.ArgRef(result.Parameters[0].Name)));
 			}
 			switch(exprs.Count)
 			{
@@ -298,10 +300,10 @@ namespace Rolex
 			var lexMethod = _GenerateLexMethod(name,constSymbolTable,dfaTable);
 			result.Members.Add(lexMethod);
 			// block ends
-			var getBlockEndMethod = _GenerateGetBlockEndMethod(blockEnds);
+			var getBlockEndMethod = _GenerateGetBlockEndMethod(name,constSymbolTable,blockEnds);
 			result.Members.Add(getBlockEndMethod);
 			// node flags
-			var isHiddenMethod = _GenerateIsHiddenMethod(nodeFlags);
+			var isHiddenMethod = _GenerateIsHiddenMethod(name,constSymbolTable,nodeFlags);
 			result.Members.Add(isHiddenMethod);
 			// constructor
 			var ctor = new CodeConstructor();
