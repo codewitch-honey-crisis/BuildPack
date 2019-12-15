@@ -24,21 +24,7 @@ namespace Rolex
 		const int _Enumerating = 0;
 		const int _TabWidth = 4;
 
-		static CodeConstructor _BuildTableCtor(CodeTypeDeclaration target)
-		{
-			var result =C.Ctor(MemberAttributes.Public);
-			foreach (var member in target.Members)
-			{
-				var field = member as CodeMemberField;
-				if (null != field)
-				{
-					var n = _TitleToCamel(field.Name);
-					result.Parameters.Add(C.Param(field.Type, n));
-					result.Statements.Add(C.Let(C.FieldRef(C.This, field.Name), C.ArgRef(n)));
-				}
-			}
-			return result;
-		}
+		
 		
 		static string _MakeSafeName(string name)
 		{
@@ -250,71 +236,7 @@ namespace Rolex
 			
 			return result;
 		}
-		public static CodeTypeDeclaration GenerateCompiledTokenizer(string name,IList<string> symbolTable)
-		{
-			var result = C.Class(name, false);
-			result.BaseTypes.Add("CompiledTokenizer");
-			var eType = new CodeTypeReference(typeof(IEnumerator<>));
-			eType.TypeArguments.Add("Token");
-			var iType = new CodeTypeReference(typeof(IEnumerable<char>));
-
-			// generate symbol constants
-			for (int ic = symbolTable.Count, i = 0; i < ic; ++i)
-			{
-				var symbol = symbolTable[i];
-				if (null != symbol)
-				{
-					var s = _MakeSafeName(symbol);
-					s = _MakeUniqueMember(result, s);
-					var constField = C.Field(
-						typeof(int),
-						s,
-						MemberAttributes.Const | MemberAttributes.Public,
-						new CodePrimitiveExpression(i)
-					);
-					result.Members.Add(constField);
-					symbolTable[i] = s;
-				}
-			}
-
-			var getEnum = C.Method(eType,"GetEnumerator",MemberAttributes.Override | MemberAttributes.Public | MemberAttributes.Override);
-			getEnum.Statements.Add(C.Return(C.New(name + "Enumerator", C.Invoke(C.FieldRef(C.This, "Input"), "GetEnumerator"))));
-			result.Members.Add(getEnum);
-
-			var ctor = C.Ctor(MemberAttributes.Public, C.Param(iType, "input"));
-			ctor.BaseConstructorArgs.Add(C.ArgRef("input"));
-
-			result.Members.Add(ctor);
-			return result;
-		}
-		public static CodeTypeDeclaration GenerateCompiledTokenizerEnumerator(string name,
-			IList<string> constSymbolTable,
-			DfaEntry[] dfaTable,
-			IList<string> blockEnds,
-			IList<int> nodeFlags)
-		{
-			var result = C.Class(name+"Enumerator", false);
-			result.IsPartial = true;
-			result.BaseTypes.Add("CompiledTokenizerEnumerator");
-			// lex method
-			var lexMethod = GenerateLexMethod(name,constSymbolTable,dfaTable);
-			result.Members.Add(lexMethod);
-			// block ends
-			var getBlockEndMethod = GenerateGetBlockEndMethod(name,constSymbolTable,blockEnds);
-			result.Members.Add(getBlockEndMethod);
-			// node flags
-			var isHiddenMethod = GenerateIsHiddenMethod(name,constSymbolTable,nodeFlags);
-			result.Members.Add(isHiddenMethod);
-			// constructor
-			var ctor = new CodeConstructor();
-			ctor.Attributes = MemberAttributes.Public;
-			ctor.Parameters.Add(C.Param(typeof(IEnumerator<char>), "input"));
-			ctor.BaseConstructorArgs.Add(C.ArgRef(ctor.Parameters[0].Name));
-			
-			result.Members.Add(ctor);
-			result.CustomAttributes.Add(GeneratedCodeAttribute);
-			return result;
-		}
+		
 		public static void GenerateSymbolConstants(CodeTypeDeclaration target,IList<string> symbolTable)
 		{
 			/*var e = _MakeUniqueMember(target, "ErrorSymbol");
@@ -333,57 +255,7 @@ namespace Rolex
 				}
 			}
 		}
-		public static CodeTypeDeclaration GenerateTableTokenizer(
-			string name,
-			DfaEntry[] dfaTable,
-			IList<string> symbolTable,
-			IList<string> blockEnds,
-			IList<int> nodeFlags)
-		{
-			var result = C.Class(name, false);
-			result.IsPartial = true;
-			result.BaseTypes.Add("TableTokenizer");
-			// dfa table
-			var dfaTableField = new CodeMemberField(new CodeTypeReference("DfaEntry", 1), "DfaTable");
-			dfaTableField.Attributes = MemberAttributes.Static | MemberAttributes.FamilyAndAssembly;
-			dfaTableField.InitExpression = GenerateDfaTableInitializer(dfaTable);
-			result.Members.Add(dfaTableField);
-			// block ends
-			var blockEndsField = new CodeMemberField(typeof(string[]), "BlockEnds");
-			blockEndsField.Attributes = MemberAttributes.Static | MemberAttributes.FamilyAndAssembly;
-			blockEndsField.InitExpression = _GenerateBlockEndsTableInitializer(blockEnds);
-			result.Members.Add(blockEndsField);
-			// node flags
-			var nodeFlagsField = new CodeMemberField(typeof(int[]), "NodeFlags");
-			nodeFlagsField.Attributes = MemberAttributes.Static | MemberAttributes.FamilyAndAssembly;
-			nodeFlagsField.InitExpression = _GenerateNodeFlagsTableInitializer(nodeFlags);
-			result.Members.Add(nodeFlagsField);
-			// constructor
-			var ctor = new CodeConstructor();
-			ctor.Attributes = MemberAttributes.Public;
-			ctor.Parameters.Add(new CodeParameterDeclarationExpression(typeof(IEnumerable<char>), "input"));
-			ctor.BaseConstructorArgs.Add(new CodeFieldReferenceExpression(null, dfaTableField.Name));
-			ctor.BaseConstructorArgs.Add(new CodeFieldReferenceExpression(null, blockEndsField.Name));
-			ctor.BaseConstructorArgs.Add(new CodeFieldReferenceExpression(null, nodeFlagsField.Name));
-			ctor.BaseConstructorArgs.Add(new CodeArgumentReferenceExpression(ctor.Parameters[0].Name));
-			result.Members.Add(ctor);
-			// generate symbol constants
-			for (int ic = symbolTable.Count, i = 0; i < ic; ++i)
-			{
-				var symbol = symbolTable[i];
-				if (null != symbol)
-				{
-					var s = _MakeSafeName(symbol);
-					s = _MakeUniqueMember(result, s);
-					var constField = new CodeMemberField(typeof(int), s);
-					constField.Attributes = MemberAttributes.Const | MemberAttributes.Public;
-					constField.InitExpression = new CodePrimitiveExpression(i);
-					result.Members.Add(constField);
-				}
-			}
-			result.CustomAttributes.Add(GeneratedCodeAttribute);
-			return result;
-		}
+		
 		// we use our own serialization here to avoid the codedom trying to reference the DfaEntry under the wrong namespace
 		public static CodeExpression GenerateDfaTableInitializer(DfaEntry[] dfaTable)
 		{
@@ -412,24 +284,7 @@ namespace Rolex
 			}
 			return result;
 		}
-		static CodeExpression _GenerateBlockEndsTableInitializer(IList<string> blockEnds)
-		{
-			var result = new CodeArrayCreateExpression(typeof(string));
-			for(int ic=blockEnds.Count,i=0;i<ic;++i)
-				result.Initializers.Add(new CodePrimitiveExpression(blockEnds[i]));
-			return result;
-		}
-		static CodeExpression _GenerateNodeFlagsTableInitializer(IList<int> nodeFlags)
-		{
-			var result = new CodeArrayCreateExpression(typeof(int));
-			for (int ic = nodeFlags.Count, i = 0; i < ic; ++i)
-				result.Initializers.Add(new CodePrimitiveExpression(nodeFlags[i]));
-			return result;
-		}
-		// turns "FooBar" into "fooBar"
-		static string _TitleToCamel(string name) {
-			return string.Concat(char.ToLowerInvariant(name[0]), name.Substring(1));
-		}
+		
 		public static readonly CodeAttributeDeclaration GeneratedCodeAttribute
 			= new CodeAttributeDeclaration(C.Type(typeof(GeneratedCodeAttribute)), new CodeAttributeArgument(C.Literal("Rolex")), new CodeAttributeArgument(C.Literal(Assembly.GetExecutingAssembly().GetName().Version.ToString())));
 	}
