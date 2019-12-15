@@ -58,6 +58,7 @@ namespace Rolex
 	/// </summary>
 	class TableTokenizer : IEnumerable<Token>
 	{
+		public const int ErrorSymbol= -1;
 		// our state table
 		DfaEntry[] _dfaTable;
 		// our block ends (specified like comment<blockEnd="*/">="/*" in a rolex spec file)

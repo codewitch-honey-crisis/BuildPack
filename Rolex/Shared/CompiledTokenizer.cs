@@ -46,7 +46,7 @@ namespace Rolex
 	abstract class CompiledTokenizerEnumerator : IEnumerator<Token>
 	{
 		// our error symbol. Always -1
-		protected const int ErrorSymbol = -1;
+		public const int ErrorSymbol = -1;
 		// our end of stream symbol - returned by Lex() and used internally but not reported
 		protected const int EosSymbol = -2;
 		// our disposed state indicator

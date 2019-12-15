@@ -69,7 +69,7 @@ namespace Rolex
 			}
 			return result;
 		}
-		static CodeMemberMethod _GenerateLexMethod(string name,IList<string> constSymbolTable,DfaEntry[] dfaTable)
+		public static CodeMemberMethod GenerateLexMethod(string name,IList<string> constSymbolTable,DfaEntry[] dfaTable)
 		{
 			var result = C.Method(typeof(int), "Lex", MemberAttributes.Family | MemberAttributes.Override);
 			result.Statements.Add(C.Var(typeof(char), "current"));
@@ -207,7 +207,7 @@ namespace Rolex
 			}
 			return result;
 		}
-		static CodeMemberMethod _GenerateGetBlockEndMethod(string name,IList<string> constSymbolTable, IList<string> blockEnds)
+		public static CodeMemberMethod GenerateGetBlockEndMethod(string name,IList<string> constSymbolTable, IList<string> blockEnds)
 		{
 			var result = C.Method(typeof(string), "GetBlockEnd", MemberAttributes.Family | MemberAttributes.Override,C.Param(typeof(int),"symbolId"));
 			var otref = C.TypeRef(name);
@@ -224,7 +224,7 @@ namespace Rolex
 			result.Statements.Add(C.Return(C.Null));
 			return result;
 		}
-		static CodeMemberMethod _GenerateIsHiddenMethod(string name,IList<string> constSymbolTable,IList<int> nodeFlags)
+		public static CodeMemberMethod GenerateIsHiddenMethod(string name,IList<string> constSymbolTable,IList<int> nodeFlags)
 		{
 			var result = C.Method(typeof(bool), "IsHidden", MemberAttributes.Family | MemberAttributes.Override, C.Param(typeof(int), "symbolId"));
 			var otref = C.TypeRef(name);
@@ -297,13 +297,13 @@ namespace Rolex
 			result.IsPartial = true;
 			result.BaseTypes.Add("CompiledTokenizerEnumerator");
 			// lex method
-			var lexMethod = _GenerateLexMethod(name,constSymbolTable,dfaTable);
+			var lexMethod = GenerateLexMethod(name,constSymbolTable,dfaTable);
 			result.Members.Add(lexMethod);
 			// block ends
-			var getBlockEndMethod = _GenerateGetBlockEndMethod(name,constSymbolTable,blockEnds);
+			var getBlockEndMethod = GenerateGetBlockEndMethod(name,constSymbolTable,blockEnds);
 			result.Members.Add(getBlockEndMethod);
 			// node flags
-			var isHiddenMethod = _GenerateIsHiddenMethod(name,constSymbolTable,nodeFlags);
+			var isHiddenMethod = GenerateIsHiddenMethod(name,constSymbolTable,nodeFlags);
 			result.Members.Add(isHiddenMethod);
 			// constructor
 			var ctor = new CodeConstructor();
@@ -314,6 +314,24 @@ namespace Rolex
 			result.Members.Add(ctor);
 			result.CustomAttributes.Add(GeneratedCodeAttribute);
 			return result;
+		}
+		public static void GenerateSymbolConstants(CodeTypeDeclaration target,IList<string> symbolTable)
+		{
+			/*var e = _MakeUniqueMember(target, "ErrorSymbol");
+			var errField = C.Field(typeof(int), e,MemberAttributes.Const | MemberAttributes.Public,C.Literal(_ErrorSymbol));
+			target.Members.Add(errField);*/
+			// generate symbol constants
+			for (int ic = symbolTable.Count, i = 0; i < ic; ++i)
+			{
+				var symbol = symbolTable[i];
+				if (null != symbol)
+				{
+					var s = _MakeSafeName(symbol);
+					s = _MakeUniqueMember(target, s);
+					var constField = C.Field(typeof(int), s,MemberAttributes.Const | MemberAttributes.Public,C.Literal(i));
+					target.Members.Add(constField);
+				}
+			}
 		}
 		public static CodeTypeDeclaration GenerateTableTokenizer(
 			string name,
@@ -328,7 +346,7 @@ namespace Rolex
 			// dfa table
 			var dfaTableField = new CodeMemberField(new CodeTypeReference("DfaEntry", 1), "DfaTable");
 			dfaTableField.Attributes = MemberAttributes.Static | MemberAttributes.FamilyAndAssembly;
-			dfaTableField.InitExpression = _GenerateDfaTableInitializer(dfaTable);
+			dfaTableField.InitExpression = GenerateDfaTableInitializer(dfaTable);
 			result.Members.Add(dfaTableField);
 			// block ends
 			var blockEndsField = new CodeMemberField(typeof(string[]), "BlockEnds");
@@ -367,7 +385,7 @@ namespace Rolex
 			return result;
 		}
 		// we use our own serialization here to avoid the codedom trying to reference the DfaEntry under the wrong namespace
-		static CodeExpression _GenerateDfaTableInitializer(DfaEntry[] dfaTable)
+		public static CodeExpression GenerateDfaTableInitializer(DfaEntry[] dfaTable)
 		{
 			var result = new CodeArrayCreateExpression("DfaEntry");
 			for(var i = 0;i<dfaTable.Length;i++)

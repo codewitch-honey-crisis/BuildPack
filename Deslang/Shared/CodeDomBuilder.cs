@@ -388,6 +388,7 @@ namespace CD
 			CodeCommentStatement[] comments)
 		{
 			var result = new CodeNamespace();
+			result.Name = name;
 			result.Imports.AddRange(imports);
 			result.Types.AddRange(types);
 			result.Comments.AddRange(comments);

@@ -1,4 +1,14 @@
-﻿using RE;
+﻿//
+// Rolex .2b - The Gold Plated Lexer Generator (again!)
+//
+// Much faster than .2a thanks to Deslang, both much 
+// more maintainable than 1 thanks to Slang
+//
+// Copyright (c) 2019, honey the codewitch
+// MIT license
+
+using CD;
+using RE;
 using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
@@ -145,23 +155,76 @@ namespace Rolex
 						if (!noshared)
 						{
 							// import our Shared/Token.cs into the library
-							_ImportCompileUnit(Deslang.Token, cns);
+							_ImportCompileUnit(Shared.Token, cns);
 							if (!compiled)
 							{
 								// import our Shared/TableTokenizer.cs into the library
-								_ImportCompileUnit(Deslang.TableTokenizer, cns);
+								_ImportCompileUnit(Shared.TableTokenizer, cns);
 							} else
 							{
 								// import our Shared/CompiledTokenizer.cs into the library
-								_ImportCompileUnit(Deslang.CompiledTokenizer, cns);
+								_ImportCompileUnit(Shared.CompiledTokenizer, cns);
 							}
 						}
 						if (!compiled)
-							cns.Types.Add(CodeGenerator.GenerateTableTokenizer(name, dfaTable, symbolTable, blockEnds, nodeFlags));
+						{
+							var origName = "Rolex.";
+							CodeTypeDeclaration td = null;
+							CodeDomVisitor.Visit(Shared.TableTokenizerTemplate, (ctx) => {
+								td = ctx.Target as CodeTypeDeclaration;
+								if (null != td && td.Name.EndsWith("Template"))
+								{
+									origName += td.Name;
+									td.Name = name;
+									var f = CodeDomUtility.GetByName("DfaTable", td.Members) as CodeMemberField;
+									f.InitExpression = CodeGenerator.GenerateDfaTableInitializer(dfaTable);
+									f = CodeDomUtility.GetByName("NodeFlags", td.Members) as CodeMemberField;
+									f.InitExpression = CodeDomUtility.Literal(nodeFlags);
+									f = CodeDomUtility.GetByName("BlockEnds", td.Members) as CodeMemberField;
+									f.InitExpression = CodeDomUtility.Literal(blockEnds);
+									CodeGenerator.GenerateSymbolConstants(td, symbolTable);
+									ctx.Cancel = true;
+								}
+							});
+							CodeDomVisitor.Visit(Shared.TableTokenizerTemplate, (ctx) => {
+								var tr = ctx.Target as CodeTypeReference;
+								if (null != tr && 0 == string.Compare(origName, tr.BaseType, StringComparison.InvariantCulture))
+									tr.BaseType = name;
+							});
+							cns.Types.Add(td);
+						}
 						else
 						{
-							cns.Types.Add(CodeGenerator.GenerateCompiledTokenizer(name, symbolTable));
-							cns.Types.Add(CodeGenerator.GenerateCompiledTokenizerEnumerator(name,symbolTable, dfaTable, blockEnds, nodeFlags));
+							var tokOrigName = "";
+							var enumOrigName = "";
+							var types = Shared.CompiledTokenizerTemplate.Namespaces[Shared.CompiledTokenizerTemplate.Namespaces.Count - 1].Types;
+							var td = CodeDomUtility.GetByName("CompiledTokenizerTemplate",types);
+							tokOrigName += td.Name;
+							td.Name = name;
+							CodeGenerator.GenerateSymbolConstants(td, symbolTable); // syms are modified here
+							cns.Types.Add(td);
+							td = CodeDomUtility.GetByName("CompiledTokenizerEnumeratorTemplate", types);
+							enumOrigName += td.Name;
+							td.Name = name + "Enumerator";
+							td.Members.Add(CodeGenerator.GenerateLexMethod(name, symbolTable, dfaTable));
+							td.Members.Add(CodeGenerator.GenerateGetBlockEndMethod(name, symbolTable, blockEnds));
+							td.Members.Add(CodeGenerator.GenerateIsHiddenMethod(name, symbolTable, nodeFlags));
+							cns.Types.Add(td);
+							CodeDomVisitor.Visit(Shared.CompiledTokenizerTemplate, (ctx) => {
+								var tr = ctx.Target as CodeTypeReference;
+								if (null != tr) {
+									if (0 == string.Compare(tokOrigName, tr.BaseType, StringComparison.InvariantCulture) ||
+									0 == string.Compare("Rolex."+tokOrigName, tr.BaseType, StringComparison.InvariantCulture)
+									)
+										tr.BaseType = name;
+									else if (0 == string.Compare(enumOrigName, tr.BaseType, StringComparison.InvariantCulture)||
+									0 == string.Compare("Rolex."+enumOrigName, tr.BaseType, StringComparison.InvariantCulture))
+										tr.BaseType = name + "Enumerator";
+								}
+							});
+							
+							//cns.Types.Add(CodeGenerator.GenerateCompiledTokenizer(name, symbolTable));
+							//cns.Types.Add(CodeGenerator.GenerateCompiledTokenizerEnumerator(name, symbolTable, dfaTable, blockEnds, nodeFlags));
 						}
 						Console.Error.WriteLine();
 						var prov = CodeDomProvider.CreateProvider(codelanguage);

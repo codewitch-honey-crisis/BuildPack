@@ -1,5 +1,4 @@
-﻿
-namespace Rolex
+﻿namespace Rolex
 {
 	/// <summary>
 	/// Reference implementation for generated shared code

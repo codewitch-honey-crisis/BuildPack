@@ -77,7 +77,7 @@ namespace RolexDemo {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal abstract class CompiledTokenizerEnumerator : IEnumerator<Token> {
         // our error symbol. Always -1
-        protected const int ErrorSymbol = -1;
+        public const int ErrorSymbol = -1;
         // our end of stream symbol - returned by Lex() and used internally but not reported
         protected const int EosSymbol = -2;
         // our disposed state indicator
@@ -318,6 +318,12 @@ namespace RolexDemo {
         }
     }
     internal class SampleTokenizer : CompiledTokenizer {
+        public override IEnumerator<Token> GetEnumerator() {
+            return new SampleTokenizerEnumerator(this.Input.GetEnumerator());
+        }
+        public SampleTokenizer(IEnumerable<char> input) : 
+                base(input) {
+        }
         public const int Identifier = 1;
         public const int Integer = 2;
         public const int Plus = 3;
@@ -329,15 +335,11 @@ namespace RolexDemo {
         public const int Whitespace = 9;
         public const int LineComment = 10;
         public const int BlockComment = 11;
-        public override System.Collections.Generic.IEnumerator<Token> GetEnumerator() {
-            return new SampleTokenizerEnumerator(this.Input.GetEnumerator());
-        }
-        public SampleTokenizer(System.Collections.Generic.IEnumerable<char> input) : 
+    }
+    internal class SampleTokenizerEnumerator : CompiledTokenizerEnumerator {
+        public SampleTokenizerEnumerator(IEnumerator<char> input) : 
                 base(input) {
         }
-    }
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
-    internal partial class SampleTokenizerEnumerator : CompiledTokenizerEnumerator {
         protected override int Lex() {
             char current;
             if ((CompiledTokenizerEnumerator.BeforeBegin == this.State)) {
@@ -537,9 +539,6 @@ namespace RolexDemo {
             return (((SampleTokenizer.Whitespace == symbolId) 
                         || (SampleTokenizer.LineComment == symbolId)) 
                         || (SampleTokenizer.BlockComment == symbolId));
-        }
-        public SampleTokenizerEnumerator(System.Collections.Generic.IEnumerator<char> input) : 
-                base(input) {
         }
     }
 }

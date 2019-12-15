@@ -142,6 +142,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shared.cs" />
+    <Content Include="Shared\CompiledTokenizerTemplate.cs" />
+    <Content Include="Shared\TableTokenizerTemplate.cs" />
     <Content Include="Shared\CompiledTokenizer.cs" />
     <Content Include="Shared\Token.cs" />
     <Content Include="Shared\TableTokenizer.cs" />
@@ -155,6 +157,6 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>$(SolutionDir)Deslang\bin\Release\deslang.exe $(ProjectDir)Shared\Token.cs $(ProjectDir)Shared\TableTokenizer.cs $(ProjectDir)Shared\CompiledTokenizer.cs /output $(ProjectDir)Shared.cs /namespace Rolex /ifstale</PreBuildEvent>
+    <PreBuildEvent>$(SolutionDir)Deslang\bin\Release\deslang.exe $(ProjectDir)Shared\Token.cs $(ProjectDir)Shared\TableTokenizer.cs $(ProjectDir)Shared\CompiledTokenizer.cs $(ProjectDir)Shared\TableTokenizerTemplate.cs $(ProjectDir)Shared\CompiledTokenizerTemplate.cs /output $(ProjectDir)Shared.cs /namespace Rolex /class Shared /ifstale</PreBuildEvent>
   </PropertyGroup>
 </Project>

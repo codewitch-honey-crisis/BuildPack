@@ -1,4 +1,11 @@
-﻿using System;
+﻿//
+// Deslang - cooks a series of Slang files into static arrays of codedom structures
+// This can make your slang enabled projects perform much faster.
+//
+// Copyright (c) 2019 by honey the codewitch
+// MIT license
+
+using System;
 using System.Reflection;
 using System.IO;
 using System.CodeDom;
@@ -30,6 +37,7 @@ namespace Deslang
 			TextWriter output = null;
 			try
 			{
+				var asms = new List<string>(args.Length);
 				var inputs = new List<string>(args.Length);
 				if (0 == args.Length)
 				{
@@ -85,6 +93,18 @@ namespace Deslang
 									throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i].Substring(1)));
 								++i; // advance 
 								codenamespace = args[i];
+								break;
+							case "/asms":
+								if(args.Length-1==i) // check to see if we're at the end
+									throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i].Substring(1)));
+								++i;
+								while(i<args.Length && !args[i].StartsWith("/"))
+								{
+									asms.Add(args[i]);
+									++i;
+								}
+								if(0==asms.Count)
+									throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i-1].Substring(1)));
 								break;
 							case "/ifstale":
 								ifstale = true;
@@ -158,6 +178,10 @@ namespace Deslang
 						input.Close();
 						input = null;
 						var ccu = SlangParser.ParseCompileUnit(sw.ToString());
+						if(0==i)
+						{
+							ccu.ReferencedAssemblies.AddRange(asms.ToArray());
+						}
 						ccus[i]=ccu;
 					}
 					// now our unpatched input is in ccus
@@ -169,7 +193,7 @@ namespace Deslang
 					// create our namespace and compileunit.
 					var ns = new CodeNamespace();
 					if (string.IsNullOrEmpty(codeclass))
-						codeclass = "Deslang";
+						codeclass = "Deslanged";
 					var cls = new CodeTypeDeclaration(codeclass);
 					cls.IsClass = true;
 					cls.IsPartial = true;
@@ -178,6 +202,14 @@ namespace Deslang
 					{
 						var ccuInit = C.Literal(ccus[i], new CodeDomTypeConverter());
 						V.Visit(ccuInit, (ctx) => {
+							var tr = ctx.Target as CodeTypeReference;
+							if(null!=tr)
+							{
+								if (tr.BaseType.StartsWith("System.CodeDom."))
+									tr.BaseType = tr.BaseType.Substring(15);
+								else if(tr.BaseType.StartsWith("System.Reflection."))
+									tr.BaseType = tr.BaseType.Substring(18);
+							}
 							// look for our uses of codedombuilder
 							var mi = ctx.Target as CodeMethodInvokeExpression;
 							if (null != mi)
@@ -278,17 +310,21 @@ namespace Deslang
 			// name of the executable so it will always be correct
 			// even if the executable file was renamed.
 			t.Write(_File);
+			t.WriteLine("{0} cooks one or more input Slang files into static arrays of codedom structures", _Name);
+			t.WriteLine();
 			t.WriteLine(" <inputfile> [/output <outputfile>] [/name <name>] [/class <codeclass>]");
-			t.WriteLine("   [/namespace <codenamespace>] [/language <codelanguage>] [/ifstale]");
+			t.WriteLine("	[/namespace <codenamespace>] [/language <codelanguage>] [/ifstale]");
+			t.WriteLine("	[/asms <assembly1> <assembly2> ... <assemblyN>]");
 			t.WriteLine();
 			t.WriteLine("   <inputfile>     The input file to use.");
 			t.WriteLine("   <outputfile>    The output file to use - default stdout.");
 			t.WriteLine("   <name>          The name to use - default taken from <inputfile>.");
-			t.WriteLine("   <codeclass>	    The class to generate under - default Deslang");
+			t.WriteLine("   <codeclass>	    The class to generate under - default Deslanged");
 			t.WriteLine("   <codenamepace>  The code namespace");
 			t.WriteLine("   <codelanguage>  The code language - default based on output file - default C#");
 			t.WriteLine("   <t4language>	The t4 preprocessing language between <# and #> - default C#");
-			t.WriteLine("   <ifstale>       Do not generate unless <outputfile> is older than <inputfile>.");
+			t.WriteLine("	<ifstale>       Do not generate unless <outputfile> is older than <inputfile>.");
+			t.WriteLine("	<assembly>		The assembly name or path to the assembly to reference.");
 			t.WriteLine();
 			t.WriteLine("Any other switch displays this screen and exits.");
 			t.WriteLine();
