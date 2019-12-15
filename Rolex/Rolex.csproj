@@ -42,89 +42,11 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.cs">
-      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.FindMostSpecific.cs">
-      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.FindMostSpecific.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.GetMembers.cs">
-      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.GetMembers.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.Select.cs">
-      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.Select.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\CodeDomResolver\CodeDomResolver.cs">
-      <Link>CodeDomGoKit\CodeDomResolver\CodeDomResolver.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\CodeDomResolver\CodeDomResolver.Evaluate.cs">
-      <Link>CodeDomGoKit\CodeDomResolver\CodeDomResolver.Evaluate.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\CodeDomResolver\CodeDomResolver.GetTypeOfExpression.cs">
-      <Link>CodeDomGoKit\CodeDomResolver\CodeDomResolver.GetTypeOfExpression.cs</Link>
-    </Compile>
     <Compile Include="..\CodeDomGoKit\CodeDomUtility.cs">
       <Link>CodeDomGoKit\CodeDomUtility.cs</Link>
     </Compile>
-    <Compile Include="..\CodeDomGoKit\CodeDomVariableTracer.cs">
-      <Link>CodeDomGoKit\CodeDomVariableTracer.cs</Link>
-    </Compile>
     <Compile Include="..\CodeDomGoKit\CodeDomVisitor.cs">
       <Link>CodeDomGoKit\CodeDomVisitor.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\CodeTypeReferenceEqualityComparer.cs">
-      <Link>CodeDomGoKit\CodeTypeReferenceEqualityComparer.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\ConcatEnumerator.cs">
-      <Link>CodeDomGoKit\Slang\ConcatEnumerator.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\IndexedQueue.Collection.cs">
-      <Link>CodeDomGoKit\Slang\IndexedQueue.Collection.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\IndexedQueue.cs">
-      <Link>CodeDomGoKit\Slang\IndexedQueue.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\IndexedQueue.Enumerable.cs">
-      <Link>CodeDomGoKit\Slang\IndexedQueue.Enumerable.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\LookAheadEnumerator.cs">
-      <Link>CodeDomGoKit\Slang\LookAheadEnumerator.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.CompileUnit.cs">
-      <Link>CodeDomGoKit\Slang\SlangParser.CompileUnit.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.cs">
-      <Link>CodeDomGoKit\Slang\SlangParser.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.Expression.cs">
-      <Link>CodeDomGoKit\Slang\SlangParser.Expression.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.Member.cs">
-      <Link>CodeDomGoKit\Slang\SlangParser.Member.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.Namespace.cs">
-      <Link>CodeDomGoKit\Slang\SlangParser.Namespace.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.Statement.cs">
-      <Link>CodeDomGoKit\Slang\SlangParser.Statement.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.Type.cs">
-      <Link>CodeDomGoKit\Slang\SlangParser.Type.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.TypeRef.cs">
-      <Link>CodeDomGoKit\Slang\SlangParser.TypeRef.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\SlangPatcher.cs">
-      <Link>CodeDomGoKit\Slang\SlangPatcher.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\SlangPreprocessor.cs">
-      <Link>CodeDomGoKit\Slang\SlangPreprocessor.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\SlangTokenizer.cs">
-      <Link>CodeDomGoKit\Slang\SlangTokenizer.cs</Link>
-    </Compile>
-    <Compile Include="..\CodeDomGoKit\Slang\TextReaderEnumerable.cs">
-      <Link>CodeDomGoKit\Slang\TextReaderEnumerable.cs</Link>
     </Compile>
     <Compile Include="..\Regex\Ast\RegexBinaryExpression.cs">
       <Link>Regex\Ast\RegexBinaryExpression.cs</Link>
@@ -219,21 +141,20 @@
     <Compile Include="CodeGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Shared\CompiledTokenizer.cs" />
-    <EmbeddedResource Include="Shared\Token.cs" />
-    <EmbeddedResource Include="Shared\TableTokenizer.cs" />
+    <Compile Include="Shared.cs" />
+    <Content Include="Shared\CompiledTokenizer.cs" />
+    <Content Include="Shared\Token.cs" />
+    <Content Include="Shared\TableTokenizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Key.snk" />
-    <None Include="SampleTokenizer2.rl" />
     <None Include="SampleTokenizer.rl" />
     <None Include="SlangTokenizer.rl" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
+    <PreBuildEvent>$(SolutionDir)Deslang\bin\Release\deslang.exe $(ProjectDir)Shared\Token.cs $(ProjectDir)Shared\TableTokenizer.cs $(ProjectDir)Shared\CompiledTokenizer.cs /output $(ProjectDir)Shared.cs /namespace Rolex /ifstale</PreBuildEvent>
   </PropertyGroup>
 </Project>

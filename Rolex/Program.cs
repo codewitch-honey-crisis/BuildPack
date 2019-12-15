@@ -1,5 +1,4 @@
-﻿using CD;
-using RE;
+﻿using RE;
 using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
@@ -129,6 +128,8 @@ namespace Rolex
 							Console.Error.Write("{0} is building tokenizer.", _Name);
 						input = new StreamReader(inputfile);
 						var rules = _ParseRules(input);
+						input.Close();
+						input = null;
 						_FillRuleIds(rules);
 						
 						var ccu = new CodeCompileUnit();
@@ -144,23 +145,16 @@ namespace Rolex
 						if (!noshared)
 						{
 							// import our Shared/Token.cs into the library
-							_ImportCompileUnit("Rolex.Shared.Token.cs", cns);
+							_ImportCompileUnit(Deslang.Token, cns);
 							if (!compiled)
 							{
 								// import our Shared/TableTokenizer.cs into the library
-								_ImportCompileUnit("Rolex.Shared.TableTokenizer.cs", cns);
+								_ImportCompileUnit(Deslang.TableTokenizer, cns);
 							} else
 							{
 								// import our Shared/CompiledTokenizer.cs into the library
-								_ImportCompileUnit("Rolex.Shared.CompiledTokenizer.cs", cns);
+								_ImportCompileUnit(Deslang.CompiledTokenizer, cns);
 							}
-							SlangPatcher.Patch(ccu);
-							var elem = SlangPatcher.GetNextUnresolvedElement(ccu);
-							if (null != elem)
-							{
-								throw new InvalidProgramException("Error resolving tokenizer shared library code:"+CodeDomUtility.ToString(elem).Trim());
-							}
-
 						}
 						if (!compiled)
 							cns.Types.Add(CodeGenerator.GenerateTableTokenizer(name, dfaTable, symbolTable, blockEnds, nodeFlags));
@@ -206,15 +200,16 @@ namespace Rolex
 			return result;
 		}
 
-		private static void _ImportCompileUnit(string name,CodeNamespace dst)
+		private static void _ImportCompileUnit(CodeCompileUnit fromCcu,CodeNamespace dst)
 		{
-			
-			CodeCompileUnit fromCcu = null;
-			using (var stm = typeof(Program).Assembly.GetManifestResourceStream(name))
-			{
-				var sr = new StreamReader(stm);
-				fromCcu = SlangParser.ReadCompileUnitFrom(sr);
-			}
+			CD.CodeDomVisitor.Visit(fromCcu, (ctx) => {
+				var ctr = ctx.Target as CodeTypeReference;
+				if(null!=ctr)
+				{
+					if (ctr.BaseType.StartsWith("Rolex."))
+						ctr.BaseType = ctr.BaseType.Substring(6);
+				}
+			});
 			// import all the usings and all the types
 			foreach (CodeNamespace ns in fromCcu.Namespaces)
 			{
@@ -490,7 +485,7 @@ namespace Rolex
 			
 			
 			var dfa = fsm.ToDfa(new _ConsoleProgress());
-			dfa.TrimDuplicates(new _ConsoleProgress());
+			//dfa.TrimDuplicates(new _ConsoleProgress());
 			var closure = dfa.FillClosure();
 			var symbolLookup = new ListDictionary<TAccept, int>();
 			// if we don't have a symbol table, build 

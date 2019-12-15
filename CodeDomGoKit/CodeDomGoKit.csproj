@@ -47,9 +47,11 @@
     <Compile Include="CodeDomBinder\CodeDomBinder.FindMostSpecific.cs" />
     <Compile Include="CodeDomBinder\CodeDomBinder.GetMembers.cs" />
     <Compile Include="CodeDomBinder\CodeDomBinder.Select.cs" />
+    <Compile Include="CodeDomBuilder.cs" />
     <Compile Include="CodeDomResolver\CodeDomResolver.cs" />
     <Compile Include="CodeDomResolver\CodeDomResolver.Evaluate.cs" />
     <Compile Include="CodeDomResolver\CodeDomResolver.GetTypeOfExpression.cs" />
+    <Compile Include="CodeDomTypeConverter.cs" />
     <Compile Include="CodeDomUtility.cs" />
     <Compile Include="CodeDomVariableTracer.cs" />
     <Compile Include="CodeDomVisitor.cs" />
@@ -79,6 +81,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(SolutionDir)Rolex\bin\Release\rolex.exe" "$(ProjectDir)Slang\SlangTokenizer.rl" /output "$(ProjectDir)Slang\SlangTokenizer.cs" /namespace CD</PreBuildEvent>
+    <PreBuildEvent>"$(SolutionDir)Rolex\bin\Release\rolex.exe" "$(ProjectDir)Slang\SlangTokenizer.rl" /output "$(ProjectDir)Slang\SlangTokenizer.cs" /namespace CD /ifstale</PreBuildEvent>
   </PropertyGroup>
 </Project>

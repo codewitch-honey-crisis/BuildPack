@@ -109,7 +109,7 @@ namespace RolexDemo {
         protected CompiledTokenizerEnumerator(IEnumerator<char> input) {
             // just set up our initial values
             this._input = input;
-            this.State = RolexDemo.CompiledTokenizerEnumerator.BeforeBegin;
+            this.State = CompiledTokenizerEnumerator.BeforeBegin;
             this.ValueBuffer = new StringBuilder();
             this._line = 1;
             this._column = 1;
@@ -123,16 +123,16 @@ namespace RolexDemo {
         public Token Current {
             get {
                 // if we're not enumerating, find out what's going on
-                if ((RolexDemo.CompiledTokenizerEnumerator.Enumerating > this.State)) {
+                if ((CompiledTokenizerEnumerator.Enumerating > this.State)) {
                     // check which state we're in, and throw accordingly
-                    if ((RolexDemo.CompiledTokenizerEnumerator.BeforeBegin == this.State)) {
+                    if ((CompiledTokenizerEnumerator.BeforeBegin == this.State)) {
                         throw new InvalidOperationException("The cursor is before the start of the enumeration");
                     }
-                    if ((RolexDemo.CompiledTokenizerEnumerator.AfterEnd == this.State)) {
+                    if ((CompiledTokenizerEnumerator.AfterEnd == this.State)) {
                         throw new InvalidOperationException("The cursor is after the end of the enumeration");
                     }
-                    if ((RolexDemo.CompiledTokenizerEnumerator.Disposed == this.State)) {
-                        RolexDemo.CompiledTokenizerEnumerator._ThrowDisposed();
+                    if ((CompiledTokenizerEnumerator.Disposed == this.State)) {
+                        CompiledTokenizerEnumerator._ThrowDisposed();
                     }
                 }
                 return this._current;
@@ -149,14 +149,14 @@ namespace RolexDemo {
             }
         }
         void System.Collections.IEnumerator.Reset() {
-            if ((RolexDemo.CompiledTokenizerEnumerator.Disposed == this.State)) {
-                RolexDemo.CompiledTokenizerEnumerator._ThrowDisposed();
+            if ((CompiledTokenizerEnumerator.Disposed == this.State)) {
+                CompiledTokenizerEnumerator._ThrowDisposed();
             }
             if ((false 
-                        == (RolexDemo.CompiledTokenizerEnumerator.BeforeBegin == this.State))) {
+                        == (CompiledTokenizerEnumerator.BeforeBegin == this.State))) {
                 this._input.Reset();
             }
-            this.State = RolexDemo.CompiledTokenizerEnumerator.BeforeBegin;
+            this.State = CompiledTokenizerEnumerator.BeforeBegin;
             this._line = 1;
             this._column = 1;
             this._position = 0;
@@ -165,11 +165,11 @@ namespace RolexDemo {
         protected abstract string GetBlockEnd(int symbolId);
         bool System.Collections.IEnumerator.MoveNext() {
             // if we're not enumerating
-            if ((RolexDemo.CompiledTokenizerEnumerator.Enumerating > this.State)) {
-                if ((RolexDemo.CompiledTokenizerEnumerator.Disposed == this.State)) {
-                    RolexDemo.CompiledTokenizerEnumerator._ThrowDisposed();
+            if ((CompiledTokenizerEnumerator.Enumerating > this.State)) {
+                if ((CompiledTokenizerEnumerator.Disposed == this.State)) {
+                    CompiledTokenizerEnumerator._ThrowDisposed();
                 }
-                if ((RolexDemo.CompiledTokenizerEnumerator.AfterEnd == this.State)) {
+                if ((CompiledTokenizerEnumerator.AfterEnd == this.State)) {
                     return false;
                 }
             }
@@ -187,7 +187,7 @@ namespace RolexDemo {
             ) {
                 done = true;
                 // if we're on a valid symbol
-                if ((RolexDemo.CompiledTokenizerEnumerator.ErrorSymbol < this._current.SymbolId)) {
+                if ((CompiledTokenizerEnumerator.ErrorSymbol < this._current.SymbolId)) {
                     // get the block end for our symbol
                     string be = this.GetBlockEnd(this._current.SymbolId);
                     // if it's valid
@@ -197,7 +197,7 @@ namespace RolexDemo {
                                 == (0 == be.Length)))) {
                         // read until we find it or end of input
                         if ((false == this._TryReadUntilBlockEnd(be))) {
-                            this._current.SymbolId = RolexDemo.CompiledTokenizerEnumerator.ErrorSymbol;
+                            this._current.SymbolId = CompiledTokenizerEnumerator.ErrorSymbol;
                         }
                     }
                     if (this.IsHidden(this.Current.SymbolId)) {
@@ -213,21 +213,21 @@ namespace RolexDemo {
             }
             this._current.Value = this.ValueBuffer.ToString();
             // update our state if we hit the end
-            if ((RolexDemo.CompiledTokenizerEnumerator.EosSymbol == this._current.SymbolId)) {
-                this.State = RolexDemo.CompiledTokenizerEnumerator.AfterEnd;
+            if ((CompiledTokenizerEnumerator.EosSymbol == this._current.SymbolId)) {
+                this.State = CompiledTokenizerEnumerator.AfterEnd;
             }
             return (false 
-                        == (RolexDemo.CompiledTokenizerEnumerator.AfterEnd == this.State));
+                        == (CompiledTokenizerEnumerator.AfterEnd == this.State));
         }
         void IDisposable.Dispose() {
             this._input.Dispose();
-            this.State = RolexDemo.CompiledTokenizerEnumerator.Disposed;
+            this.State = CompiledTokenizerEnumerator.Disposed;
         }
         // moves to the next position, updates the state accordingly, and tracks the cursor position
         protected virtual bool MoveNextInput() {
             if (this._input.MoveNext()) {
                 if ((false 
-                            == (RolexDemo.CompiledTokenizerEnumerator.BeforeBegin == this.State))) {
+                            == (CompiledTokenizerEnumerator.BeforeBegin == this.State))) {
                     this._position = (this._position + 1);
                     if (('\n' == this._input.Current)) {
                         this._column = 1;
@@ -235,7 +235,7 @@ namespace RolexDemo {
                     }
                     else {
                         if (('\t' == this._input.Current)) {
-                            this._column = (this._column + RolexDemo.CompiledTokenizerEnumerator._TabWidth);
+                            this._column = (this._column + CompiledTokenizerEnumerator._TabWidth);
                         }
                         else {
                             this._column = (this._column + 1);
@@ -251,13 +251,13 @@ namespace RolexDemo {
                     else {
                         if (('\t' == this._input.Current)) {
                             this._column = (this._column 
-                                        + (RolexDemo.CompiledTokenizerEnumerator._TabWidth - 1));
+                                        + (CompiledTokenizerEnumerator._TabWidth - 1));
                         }
                     }
                 }
                 return true;
             }
-            this.State = RolexDemo.CompiledTokenizerEnumerator.InnerFinished;
+            this.State = CompiledTokenizerEnumerator.InnerFinished;
             return false;
         }
         // reads until the specified character, consuming it, returning false if it wasn't found
@@ -275,7 +275,7 @@ namespace RolexDemo {
                 this.ValueBuffer.Append(this._input.Current);
             }
             if ((false 
-                        == (this.State == RolexDemo.CompiledTokenizerEnumerator.InnerFinished))) {
+                        == (this.State == CompiledTokenizerEnumerator.InnerFinished))) {
                 this.ValueBuffer.Append(this._input.Current);
                 return (this._input.Current == character);
             }
@@ -285,7 +285,7 @@ namespace RolexDemo {
         bool _TryReadUntilBlockEnd(string blockEnd) {
             for (
             ; ((false 
-                        == (RolexDemo.CompiledTokenizerEnumerator.InnerFinished == this.State)) 
+                        == (CompiledTokenizerEnumerator.InnerFinished == this.State)) 
                         && this._TryReadUntil(blockEnd[0])); 
             ) {
                 bool found = true;
@@ -299,7 +299,7 @@ namespace RolexDemo {
                     }
                     else {
                         if ((false 
-                                    == (RolexDemo.CompiledTokenizerEnumerator.InnerFinished == this.State))) {
+                                    == (CompiledTokenizerEnumerator.InnerFinished == this.State))) {
                             this.ValueBuffer.Append(this._input.Current);
                         }
                     }
@@ -373,20 +373,31 @@ namespace RolexDemo {
                     return SampleTokenizer.Integer;
                 }
                 current = this.CurrentInput;
-                goto q2;
+                goto q3;
             }
-            if ((((((current >= '\t') 
-                        && (current <= '\r')) 
-                        || (current == ' ')) 
-                        || ((current >= '(') 
-                        && (current <= '+'))) 
-                        || (current == '-'))) {
+            if ((current == '+')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
                     return SampleTokenizer.Plus;
                 }
                 current = this.CurrentInput;
-                goto q3;
+                goto q4;
+            }
+            if ((current == '-')) {
+                this.ValueBuffer.Append(current);
+                if ((false == this.MoveNextInput())) {
+                    return SampleTokenizer.Minus;
+                }
+                current = this.CurrentInput;
+                goto q5;
+            }
+            if ((current == '*')) {
+                this.ValueBuffer.Append(current);
+                if ((false == this.MoveNextInput())) {
+                    return SampleTokenizer.Multiply;
+                }
+                current = this.CurrentInput;
+                goto q6;
             }
             if ((current == '/')) {
                 this.ValueBuffer.Append(current);
@@ -394,7 +405,33 @@ namespace RolexDemo {
                     return SampleTokenizer.Divide;
                 }
                 current = this.CurrentInput;
-                goto q4;
+                goto q7;
+            }
+            if ((current == '(')) {
+                this.ValueBuffer.Append(current);
+                if ((false == this.MoveNextInput())) {
+                    return SampleTokenizer.LParen;
+                }
+                current = this.CurrentInput;
+                goto q10;
+            }
+            if ((current == ')')) {
+                this.ValueBuffer.Append(current);
+                if ((false == this.MoveNextInput())) {
+                    return SampleTokenizer.RParen;
+                }
+                current = this.CurrentInput;
+                goto q11;
+            }
+            if ((((current >= '\t') 
+                        && (current <= '\r')) 
+                        || (current == ' '))) {
+                this.ValueBuffer.Append(current);
+                if ((false == this.MoveNextInput())) {
+                    return SampleTokenizer.Whitespace;
+                }
+                current = this.CurrentInput;
+                goto q12;
             }
             goto error;
         q1:
@@ -410,10 +447,26 @@ namespace RolexDemo {
                     return SampleTokenizer.Identifier;
                 }
                 current = this.CurrentInput;
-                goto q1;
+                goto q2;
             }
             return SampleTokenizer.Identifier;
         q2:
+            if ((((((current >= '0') 
+                        && (current <= '9')) 
+                        || ((current >= 'A') 
+                        && (current <= 'Z'))) 
+                        || (current == '_')) 
+                        || ((current >= 'a') 
+                        && (current <= 'z')))) {
+                this.ValueBuffer.Append(current);
+                if ((false == this.MoveNextInput())) {
+                    return SampleTokenizer.Identifier;
+                }
+                current = this.CurrentInput;
+                goto q2;
+            }
+            return SampleTokenizer.Identifier;
+        q3:
             if (((current >= '0') 
                         && (current <= '9'))) {
                 this.ValueBuffer.Append(current);
@@ -421,30 +474,34 @@ namespace RolexDemo {
                     return SampleTokenizer.Integer;
                 }
                 current = this.CurrentInput;
-                goto q2;
+                goto q3;
             }
             return SampleTokenizer.Integer;
-        q3:
-            return SampleTokenizer.Plus;
         q4:
+            return SampleTokenizer.Plus;
+        q5:
+            return SampleTokenizer.Minus;
+        q6:
+            return SampleTokenizer.Multiply;
+        q7:
             if ((current == '/')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
                     return SampleTokenizer.LineComment;
                 }
                 current = this.CurrentInput;
-                goto q5;
+                goto q8;
             }
             if ((current == '*')) {
                 this.ValueBuffer.Append(current);
                 if ((false == this.MoveNextInput())) {
-                    return SampleTokenizer.Plus;
+                    return SampleTokenizer.BlockComment;
                 }
                 current = this.CurrentInput;
-                goto q3;
+                goto q9;
             }
             return SampleTokenizer.Divide;
-        q5:
+        q8:
             if ((((current >= '\0') 
                         && (current <= '\t')) 
                         || ((current >= '') 
@@ -454,9 +511,17 @@ namespace RolexDemo {
                     return SampleTokenizer.LineComment;
                 }
                 current = this.CurrentInput;
-                goto q5;
+                goto q8;
             }
             return SampleTokenizer.LineComment;
+        q9:
+            return SampleTokenizer.BlockComment;
+        q10:
+            return SampleTokenizer.LParen;
+        q11:
+            return SampleTokenizer.RParen;
+        q12:
+            return SampleTokenizer.Whitespace;
         error:
             this.ValueBuffer.Append(current);
             this.MoveNextInput();

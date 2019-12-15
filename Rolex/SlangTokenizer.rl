@@ -1,9 +1,5 @@
-﻿// SlangTokenizer.rl
+﻿// SlangTokenizer.rl (copy)
 // This is the rolex specification file for SlangTokenizer.cs, the tokenizer the parser uses
-// Edits to this file will require a pre-build step, and the inclusion of rolex.exe
-// in the associated Rolex projects bin/release folder in order to enable
-// this adds no runtime dependencies, it's purely used to generate during the build, but edits to 
-// this file won't update SlangTokenizer.cs without it.
 // here is the macro to add to the build steps in order to enable:
 // "$(SolutionDir)Rolex\bin\Release\rolex.exe" "$(ProjectDir)Slang\SlangTokenizer.rl" /output "$(ProjectDir)Slang\SlangTokenizer.cs" /namespace CD
 // Note that edits to SlangTokenizer.cs can break the parser anyway, so it's best to leave this be

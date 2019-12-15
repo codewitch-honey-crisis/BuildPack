@@ -33,11 +33,72 @@ namespace SlangDemo
 				}
 				if (null!=co)
 				{
-					s = CodeDomUtility.ToString(co, "vb");
+					s = CodeDomUtility.ToString(co);
 					s = s.Trim();
+					Console.Write("C#: ");
+					Console.WriteLine(s);
+					s = CodeDomUtility.ToString(co,"vb");
+					s = s.Trim();
+					Console.Write("VB: ");
+					Console.WriteLine(s);
+
+					var ccu = _RootCode(co);
+					try
+					{
+						SlangPatcher.Patch(ccu);
+					}
+					catch(Exception ex)
+					{
+						Console.WriteLine("Warning: Error resolving code - " + ex.Message);
+					}
+					if(null!=SlangPatcher.GetNextUnresolvedElement(ccu))
+					{
+						Console.WriteLine("Warning: Not all of the code could be resolved.");
+					}
+					var tc = new CodeDomTypeConverter();
+					var item = (ccu.Namespaces[0].Types[0].Members[0] as CodeMemberMethod).Statements[0];
+
+					if (!isStatement)
+					{
+						co = item;
+						var es = item as CodeExpressionStatement;
+						if (null != es)
+							co = es.Expression;
+					}
+					else co = item;
+					
+					
+					s = CodeDomUtility.ToString(CodeDomUtility.Literal(co, tc));
+					s = s.Trim();
+					
+					Console.Write("CodeDom: ");
 					Console.WriteLine(s);
 				}
 			}
+		}
+		static CodeCompileUnit _RootCode(CodeObject obj)
+		{
+			var expr = obj as CodeExpression;
+			if (null != expr) return _RootCode(expr);
+			return _RootCode(obj as CodeStatement);
+		}
+		static CodeCompileUnit _RootCode(CodeExpression expr)
+		{
+			return _RootCode(new CodeExpressionStatement(expr));
+		}
+		static CodeCompileUnit _RootCode(CodeStatement stmt)
+		{
+			var main = new CodeEntryPointMethod();
+			main.Statements.Add(stmt);
+			var type = new CodeTypeDeclaration("Program");
+			type.Members.Add(main);
+			type.IsClass = true;
+			var ns = new CodeNamespace();
+			ns.Types.Add(type);
+			ns.Imports.Add(new CodeNamespaceImport("System"));
+			var result = new CodeCompileUnit();
+			result.Namespaces.Add(ns);
+			return result;
 			
 		}
 	}

@@ -33,6 +33,7 @@ namespace CD
 			foreach (var ccu in compileUnits)
 				resolver.CompileUnits.Add(ccu);
 			resolver.Refresh();
+			restart:
 			var working = -1;
 			var oworking = 0;
 			while(0!=working && oworking!=working)
@@ -59,6 +60,34 @@ namespace CD
 					});
 				}
 				resolver.Refresh();
+			}
+			oworking = working;
+			working = 0;
+			if (0 < oworking)
+			{
+				// one last time
+				for (int ic = resolver.CompileUnits.Count, i = 0; i < ic; ++i)
+				{
+					CodeDomVisitor.Visit(resolver.CompileUnits[i], (ctx) =>
+					{
+						var co = ctx.Target as CodeObject;
+						if (null != co && co.UserData.Contains("slang:unresolved"))
+						{
+							++working;
+							_Patch(ctx.Target as CodeFieldReferenceExpression, ctx, resolver);
+							_Patch(ctx.Target as CodeVariableDeclarationStatement, ctx, resolver);
+							_Patch(ctx.Target as CodeVariableReferenceExpression, ctx, resolver);
+							_Patch(ctx.Target as CodeDelegateInvokeExpression, ctx, resolver);
+							_Patch(ctx.Target as CodeObjectCreateExpression, ctx, resolver);
+							_Patch(ctx.Target as CodeIndexerExpression, ctx, resolver);
+							_Patch(ctx.Target as CodeMemberMethod, ctx, resolver);
+							_Patch(ctx.Target as CodeMemberProperty, ctx, resolver);
+							_Patch(ctx.Target as CodeTypeReference, ctx, resolver);
+						}
+					});
+				}
+				if (oworking != working)
+					goto restart;
 			}
 		}
 		/// <summary>
@@ -372,51 +401,7 @@ namespace CD
 		{
 			if (null != fr)
 			{
-				// TODO: This shouldn't be done first because it's resolving types before fields and 
-				// that is a no no. To fix.
-				var path = _GetUnresRootPathOfExpression(fr);
-				if (null != path)
-				{
-					// now we have something to work with.
-					var scope = resolver.GetScope(fr);
-					var sa = path.Split('.');
-					if (1 == sa.Length)
-					{
-						System.Diagnostics.Debugger.Break();
-						throw new NotImplementedException();
-					}
-					else
-					{
-						object t = null;
-						string tn = null;
-						CodeExpression tf = fr;
-						CodeExpression ptf = null;
-						CodeTypeReference ctr = null;
-						for (var i = sa.Length - 1; i >= 1; --i)
-						{
-							tn = string.Join(".", sa, 0, i);
-							ptf = tf;
-							tf = _GetTargetOfExpression(tf);
-							ctr = new CodeTypeReference(tn);
-							t = resolver.TryResolveType(ctr, scope);
-							if (null != t)
-								break;
-						}
-						if (null != t)
-						{
-							var tt = t as Type;
-							if (null != tt)
-								ctr = new CodeTypeReference(tt);
-							else
-								ctr = resolver.GetQualifiedType(ctr, scope);
-							// we found a type reference
-							_SetTargetOfExpression(ptf, new CodeTypeReferenceExpression(ctr));
-							return;
-							//args.Cancel = true;
-						}
-					}
-				}
-
+				
 				// this probably means part of our field has been resolved, or at the very least
 				// it does not come from a rooted var ref.
 				if (!fr.TargetObject.UserData.Contains("slang:unresolved"))
@@ -466,6 +451,52 @@ namespace CD
 					}
 					throw new InvalidProgramException(string.Format("Cannot deterimine the target reference {0}", fr.FieldName));
 				}
+				// TODO: This used to be first but I moved it here.
+				// This shouldn't be done first because it's resolving types before fields and 
+				// that is a no no. I still need to make sure it doesn't break things
+				var path = _GetUnresRootPathOfExpression(fr);
+				if (null != path)
+				{
+					// now we have something to work with.
+					var scope = resolver.GetScope(fr);
+					var sa = path.Split('.');
+					if (1 == sa.Length)
+					{
+						System.Diagnostics.Debugger.Break();
+						throw new NotImplementedException();
+					}
+					else
+					{
+						object t = null;
+						string tn = null;
+						CodeExpression tf = fr;
+						CodeExpression ptf = null;
+						CodeTypeReference ctr = null;
+						for (var i = sa.Length - 1; i >= 1; --i)
+						{
+							tn = string.Join(".", sa, 0, i);
+							ptf = tf;
+							tf = _GetTargetOfExpression(tf);
+							ctr = new CodeTypeReference(tn);
+							t = resolver.TryResolveType(ctr, scope);
+							if (null != t)
+								break;
+						}
+						if (null != t)
+						{
+							var tt = t as Type;
+							if (null != tt)
+								ctr = new CodeTypeReference(tt);
+							else
+								ctr = resolver.GetQualifiedType(ctr, scope);
+							// we found a type reference
+							_SetTargetOfExpression(ptf, new CodeTypeReferenceExpression(ctr));
+							return;
+							//args.Cancel = true;
+						}
+					}
+				}
+
 			}
 		}
 		static CodeDelegateCreateExpression _GetDelegateFromFields(CodeObjectCreateExpression oc, CodeExpression target, CodeDomResolver res)

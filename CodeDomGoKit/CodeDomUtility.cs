@@ -271,10 +271,11 @@ namespace CD
 		/// Creates a simple or complex literal expression value based on <paramref name="value"/>
 		/// </summary>
 		/// <param name="value">The instance to serialize to code</param>
+		/// <param name="typeConverter">An optional type converter to use. If specified, the same type converter will be used for all elements and subelements of <paramref name="value"/>.</param>
 		/// <returns>A <see cref="CodeExpression"/> that can be used to instantiate <paramref name="value"/></returns>
-		public static CodeExpression Literal(object value)
+		public static CodeExpression Literal(object value,TypeConverter typeConverter=null)
 		{
-			return _Serialize(value);
+			return _Serialize(value,typeConverter);
 		}
 		/// <summary>
 		/// Creates a <see cref="CodeCastExpression"/> based on the target type and expression
@@ -1272,18 +1273,43 @@ namespace CD
 			return result;
 		}
 		#region Type serialization
-		static CodeExpression _SerializeArray(Array arr)
+		static CodeExpression _SerializeArray(Array arr,TypeConverter typeConv)
 		{
 			if (1 == arr.Rank && 0 == arr.GetLowerBound(0))
 			{
 				var result = new CodeArrayCreateExpression(arr.GetType());
 				foreach (var elem in arr)
-					result.Initializers.Add(_Serialize(elem));
+					result.Initializers.Add(_Serialize(elem,typeConv));
 				return result;
 			}
 			throw new NotSupportedException("Only SZArrays can be serialized to code.");
 		}
-		static CodeExpression _Serialize(object val)
+		static CodeExpression _SerializeEnum(Enum value,TypeConverter converter)
+		{
+			var t = value.GetType();
+			var sa = value.ToString("F").Split(',');
+			double d;
+			if (!double.TryParse(sa[0], out d))
+			{
+				var exprs = new CodeExpressionCollection();
+				for (var i = 0; i < sa.Length; i++)
+				{
+					var s = sa[i];
+					exprs.Add(FieldRef(TypeRef(t), s));
+				}
+				switch (exprs.Count)
+				{
+					case 1:
+						return exprs[0];
+					default:
+						return BinOp(exprs, CodeBinaryOperatorType.BitwiseOr);
+				}
+			}
+			else
+				return Cast(t,Literal(Convert.ChangeType(value, System.Enum.GetUnderlyingType(t)), converter));
+			
+		}
+		static CodeExpression _Serialize(object val,TypeConverter typeConv)
 		{
 			if (null == val)
 				return new CodePrimitiveExpression(null);
@@ -1313,11 +1339,15 @@ namespace CD
 				// TODO: mess with strings to make them console safe.
 				return new CodePrimitiveExpression(val);
 			}
+			if(val is System.Enum)
+			{
+				return _SerializeEnum((Enum)val, typeConv);
+			}
 			if (val is Array && 1 == ((Array)val).Rank && 0 == ((Array)val).GetLowerBound(0))
 			{
-				return _SerializeArray((Array)val);
+				return _SerializeArray((Array)val,typeConv);
 			}
-			var conv = TypeDescriptor.GetConverter(val);
+			var conv = (null==typeConv)? TypeDescriptor.GetConverter(val):typeConv;
 			if (null != conv)
 			{
 				if (conv.CanConvertTo(typeof(InstanceDescriptor)))
@@ -1333,7 +1363,21 @@ namespace CD
 					{
 						var result = new CodeObjectCreateExpression(ctor.DeclaringType);
 						foreach (var arg in desc.Arguments)
-							result.Parameters.Add(_Serialize(arg));
+							result.Parameters.Add(_Serialize(arg,typeConv));
+						return result;
+					}
+					var meth = desc.MemberInfo as MethodInfo;
+					if(null!=meth && (MethodAttributes.Static == (meth.Attributes & MethodAttributes.Static)))
+					{
+						var result = new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeTypeReferenceExpression(meth.DeclaringType), meth.Name));
+						foreach (var arg in desc.Arguments)
+							result.Parameters.Add(_Serialize(arg, typeConv));
+						return result;
+					}
+					var fld = desc.MemberInfo as FieldInfo;
+					if (null != fld && ((FieldAttributes.Static == (fld.Attributes & FieldAttributes.Static)) || (FieldAttributes.Literal == (fld.Attributes & FieldAttributes.Literal))))
+					{
+						var result = new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(fld.DeclaringType), fld.Name);
 						return result;
 					}
 					throw new NotSupportedException(
@@ -1356,7 +1400,7 @@ namespace CD
 						for (int ic = kvpType.TypeArguments.Count, i = 0; i < ic; ++i)
 						{
 							var prop = val.GetType().GetProperty(0 == i ? "Key" : "Value");
-							result.Parameters.Add(_Serialize(prop.GetValue(val)));
+							result.Parameters.Add(_Serialize(prop.GetValue(val),typeConv));
 						}
 						return result;
 					}

@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0286AC77-D7C2-4681-A319-E5C6A2B2B7C1}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Deslang</RootNamespace>
+    <AssemblyName>deslang</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.cs">
+      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.FindMostSpecific.cs">
+      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.FindMostSpecific.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.GetMembers.cs">
+      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.GetMembers.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.Select.cs">
+      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.Select.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomBuilder.cs">
+      <Link>CodeDomGoKit\CodeDomBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomResolver\CodeDomResolver.cs">
+      <Link>CodeDomGoKit\CodeDomResolver\CodeDomResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomResolver\CodeDomResolver.GetTypeOfExpression.cs">
+      <Link>CodeDomGoKit\CodeDomResolver\CodeDomResolver.GetTypeOfExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomTypeConverter.cs">
+      <Link>CodeDomGoKit\CodeDomTypeConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomUtility.cs">
+      <Link>CodeDomGoKit\CodeDomUtility.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomVariableTracer.cs">
+      <Link>CodeDomGoKit\CodeDomVariableTracer.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomVisitor.cs">
+      <Link>CodeDomGoKit\CodeDomVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeTypeReferenceEqualityComparer.cs">
+      <Link>CodeDomGoKit\CodeTypeReferenceEqualityComparer.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\ConcatEnumerator.cs">
+      <Link>CodeDomGoKit\Slang\ConcatEnumerator.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\IndexedQueue.Collection.cs">
+      <Link>CodeDomGoKit\Slang\IndexedQueue.Collection.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\IndexedQueue.cs">
+      <Link>CodeDomGoKit\Slang\IndexedQueue.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\IndexedQueue.Enumerable.cs">
+      <Link>CodeDomGoKit\Slang\IndexedQueue.Enumerable.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\LookAheadEnumerator.cs">
+      <Link>CodeDomGoKit\Slang\LookAheadEnumerator.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.CompileUnit.cs">
+      <Link>CodeDomGoKit\Slang\SlangParser.CompileUnit.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.cs">
+      <Link>CodeDomGoKit\Slang\SlangParser.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.Expression.cs">
+      <Link>CodeDomGoKit\Slang\SlangParser.Expression.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.Member.cs">
+      <Link>CodeDomGoKit\Slang\SlangParser.Member.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.Namespace.cs">
+      <Link>CodeDomGoKit\Slang\SlangParser.Namespace.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.Statement.cs">
+      <Link>CodeDomGoKit\Slang\SlangParser.Statement.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.Type.cs">
+      <Link>CodeDomGoKit\Slang\SlangParser.Type.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\SlangParser.TypeRef.cs">
+      <Link>CodeDomGoKit\Slang\SlangParser.TypeRef.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\SlangPatcher.cs">
+      <Link>CodeDomGoKit\Slang\SlangPatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\SlangPreprocessor.cs">
+      <Link>CodeDomGoKit\Slang\SlangPreprocessor.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\SlangTokenizer.cs">
+      <Link>CodeDomGoKit\Slang\SlangTokenizer.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\TextReaderEnumerable.cs">
+      <Link>CodeDomGoKit\Slang\TextReaderEnumerable.cs</Link>
+    </Compile>
+    <Content Include="TableTokenizer.cs" />
+    <Content Include="CompiledTokenizer.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="Token.cs" />
+    <EmbeddedResource Include="Shared\CodeDomBuilder.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="Key.snk" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
