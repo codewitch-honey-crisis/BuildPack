@@ -65,5 +65,9 @@ namespace CD
 			while ((ST.blockComment == (t = pc.Current).SymbolId ||
 					ST.lineComment == t.SymbolId) && pc.Advance()) ;
 		}
+		static void _Error(string message,Token tok)
+		{
+			throw new SlangSyntaxException(message, tok.Line, tok.Column, tok.Position);
+		}
 	}
 }

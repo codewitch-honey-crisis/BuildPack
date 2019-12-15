@@ -45,7 +45,7 @@ namespace CD
 				pc.EnsureStarted();
 				var result = _ParseType(pc);
 				if (!pc.IsEnded)
-					throw new ArgumentException("Unrecognized remainder in type declaration", "input");
+					throw new SlangSyntaxException("Unrecognized remainder in type", pc.Current.Line, pc.Current.Column, pc.Current.Position);
 				return result;
 			}
 		}
@@ -65,25 +65,25 @@ namespace CD
 				if (attrs.Contains("static"))
 					throw new NotSupportedException("Explicitly static classes are not supported.");
 				result.Attributes = _BuildMemberAttributes(attrs);
-				result.TypeAttributes = (isNested)?_BuildNestedTypeAttributes(attrs): _BuildTopLevelTypeAttributes(attrs);
+				result.TypeAttributes = (isNested)?_BuildNestedTypeAttributes(attrs): _BuildTopLevelTypeAttributes(attrs,pc);
 				result.Comments.AddRange(comments);
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated type declaration", "input");
+					_Error("Unterminated type declaration", pc.Current);
 				if (ST.keyword == pc.SymbolId && "partial" == pc.Value)
 				{
 					pc.Advance();
 					_SkipComments(pc);
 					if (pc.IsEnded)
-						throw new ArgumentException("Unterminated type declaration", "input");
+						_Error("Unterminated type declaration", pc.Current);
 					result.IsPartial = true;
 				}
 				_AddCustomAttributes(custAttrs, null, result.CustomAttributes);
 				if (null!=custAttrs && custAttrs.Count > result.CustomAttributes.Count)
-					throw new ArgumentException("Invalid custom attribute targets", "input");
+					_Error("Invalid custom attribute targets", pc.Current);
 			}
 			if (ST.keyword != pc.SymbolId)
-				throw new ArgumentException("Expecting class, struct, enum, or interface","input");
+				_Error("Expecting class, struct, enum, or interface",pc.Current);
 			switch(pc.Value)
 			{
 				case "class":
@@ -94,26 +94,27 @@ namespace CD
 					break;
 				case "enum":
 					if (result.IsPartial)
-						throw new ArgumentException("Enums cannot be partial", "input");
+						_Error("Enums cannot be partial", pc.Current);
 					result.IsEnum = true;
 					break;
 				case "interface":
 					result.IsInterface = true;
 					break;
 				default:
-					throw new ArgumentException("Expecting class, struct, enum, or interface", "input");
+					_Error("Expecting class, struct, enum, or interface", pc.Current);
+					break;
 			}
 			pc.Advance();
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated type declaration", "input");
+				_Error("Unterminated type declaration", pc.Current);
 			if (ST.identifier != pc.SymbolId)
-				throw new ArgumentException("Expecting identifier in type declaration", "input");
+				_Error("Expecting identifier in type declaration", pc.Current);
 			result.Name = pc.Value;
 			pc.Advance();
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated type declaration", "input");
+				_Error("Unterminated type declaration", pc.Current);
 			if(result.IsEnum)
 				return _ParseEnum(pc, result);
 			if (ST.lt==pc.SymbolId)
@@ -122,47 +123,47 @@ namespace CD
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated generic type parameter specification", "input");
+					_Error("Unterminated generic type parameter specification", pc.Current);
 				if (ST.gt == pc.SymbolId)
-					throw new ArgumentException("Generic type parameter specification cannot be empty", "input");
+					_Error("Generic type parameter specification cannot be empty", pc.Current);
 				while (!pc.IsEnded && ST.gt!=pc.SymbolId)
 				{
 					var custAttrs2 = _ParseCustomAttributes(pc);
 					if (ST.identifier != pc.SymbolId)
-						throw new ArgumentException("Expecting identifier in type parameter specification", "input");
+						_Error("Expecting identifier in type parameter specification", pc.Current);
 					var tp = new CodeTypeParameter(pc.Value);
 					_AddCustomAttributes(custAttrs2, null, tp.CustomAttributes);
 					if (tp.CustomAttributes.Count < custAttrs2.Count)
-						throw new ArgumentException("Invalid target in custom attribute declaration on generic type parameter", "input");
+						_Error("Invalid target in custom attribute declaration on generic type parameter", pc.Current);
 					result.TypeParameters.Add(tp);
 					pc.Advance();
 					_SkipComments(pc);
 					if (pc.IsEnded)
-						throw new ArgumentException("Unterminated generic type parameter specification", "input");
+						_Error("Unterminated generic type parameter specification", pc.Current);
 					if (ST.comma != pc.SymbolId)
 						break;
 					pc.Advance();
 					_SkipComments(pc);
 					if (pc.IsEnded)
-						throw new ArgumentException("Unterminated generic type parameter specification", "input");
+						_Error("Unterminated generic type parameter specification", pc.Current);
 				}
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated generic type parameter specification", "input");
+					_Error("Unterminated generic type parameter specification", pc.Current);
 				if (ST.gt!=pc.SymbolId)
-					throw new ArgumentException("Illegal generic type parameter specification", "input");
+					_Error("Illegal generic type parameter specification", pc.Current);
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated generic type parameter specification", "input");
+					_Error("Unterminated generic type parameter specification", pc.Current);
 			}
 			if(ST.colon==pc.SymbolId) // parse base types 
 			{
 				pc.Advance();
 				_SkipComments(pc);
 				if(pc.IsEnded)
-					throw new ArgumentException("Unterminated type declaration", "input");
+					_Error("Unterminated type declaration", pc.Current);
 				if (ST.lbrace == pc.SymbolId || (ST.identifier == pc.SymbolId && "where" == pc.Value))
-					throw new ArgumentException("Empty base type specifiers", "input");
+					_Error("Empty base type specifiers", pc.Current);
 				while (!pc.IsEnded && !(ST.lbrace == pc.SymbolId || (ST.identifier == pc.SymbolId && "where" == pc.Value)))
 				{
 					result.BaseTypes.Add(_ParseTypeRef(pc));
@@ -170,71 +171,72 @@ namespace CD
 				}
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated type declaration", "input");
+					_Error("Unterminated type declaration", pc.Current);
 			}
 			if(ST.identifier==pc.SymbolId && "where" == pc.Value) // parse type constrants
 			{
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated type constraint", "input");
+					_Error("Unterminated type constraint", pc.Current);
 				var moved = false;
 				while (!pc.IsEnded && ST.lbrace != pc.SymbolId)
 				{
 					moved = true;
 					if (ST.identifier != pc.SymbolId)
-						throw new ArgumentException("Expecting identifier in type constraint", "input");
-					var cp = _LookupTypeParameter(result.TypeParameters, pc.Value);
+						_Error("Expecting identifier in type constraint", pc.Current);
+					var cp = _LookupTypeParameter(result.TypeParameters, pc.Value,pc);
 					pc.Advance();
 					_SkipComments(pc);
 					if (pc.IsEnded)
-						throw new ArgumentException("Unterminated type constraint", "input");
+						_Error("Unterminated type constraint", pc.Current);
 					if (ST.colon != pc.SymbolId)
-						throw new ArgumentException("Expecting : in type constraint", "input");
+						_Error("Expecting : in type constraint", pc.Current);
 					pc.Advance();
 					_SkipComments(pc);
 					if (pc.IsEnded)
-						throw new ArgumentException("Unterminated type constraint", "input");
+						_Error("Unterminated type constraint", pc.Current);
 					cp.Constraints.Add(_ParseTypeRef(pc));
 					_SkipComments(pc);
 					if (pc.IsEnded)
-						throw new ArgumentException("Unterminated type declaration", "input");
+						_Error("Unterminated type declaration", pc.Current);
 					if(ST.comma==pc.SymbolId)
 					{
 						pc.Advance();
 						_SkipComments(pc);
 						if(ST.lbrace==pc.SymbolId)
-							throw new ArgumentException("Unterminated type constraint", "input");
+							_Error("Unterminated type constraint", pc.Current);
 					}
 				}
 				if(!moved)
-					throw new ArgumentException("Unterminated type constraint", "input");
+					_Error("Unterminated type constraint", pc.Current);
 
 			}
 			if (ST.lbrace != pc.SymbolId)
-				throw new ArgumentException("Expecting { in type definition","input");
+				_Error("Expecting { in type definition",pc.Current);
 			pc.Advance();
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated type declaration", "input");
+				_Error("Unterminated type declaration", pc.Current);
 			while(!pc.IsEnded && ST.rbrace!=pc.SymbolId)
 			{ 
 				result.Members.Add(_ParseMember(pc, result.Name));
 			}
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated type declaration", "input");
+				_Error("Unterminated type declaration", pc.Current);
 
 			if (ST.rbrace != pc.SymbolId)
-				throw new ArgumentException("Illegal member declaration in type", "input");
+				_Error("Illegal member declaration in type", pc.Current);
 			pc.Advance();
 			return result;
 		}
 		
-		static CodeTypeParameter _LookupTypeParameter(CodeTypeParameterCollection parms,string name)
+		static CodeTypeParameter _LookupTypeParameter(CodeTypeParameterCollection parms,string name,_PC pc)
 		{
 			foreach (CodeTypeParameter tp in parms)
 				if (tp.Name == name)
 					return tp;
-			throw new ArgumentException("Undeclared type parameter", "input");
+			_Error("Undeclared type parameter", pc.Current);
+			return null;
 		}
 		static CodeTypeDeclaration _ParseEnum(_PC pc, CodeTypeDeclaration result)
 		{
@@ -244,26 +246,26 @@ namespace CD
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated enum declaration", "input");
+					_Error("Unterminated enum declaration", pc.Current);
 				bt = _ParseTypeRef(pc);
 				result.BaseTypes.Add(bt);
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated enum declaration", "input");
+					_Error("Unterminated enum declaration", pc.Current);
 			}
 			if (ST.lbrace != pc.SymbolId)
-				throw new ArgumentException("Expecting enum body", "input");
+				_Error("Expecting enum body", pc.Current);
 			pc.Advance();
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated enum declaration", "input");
+				_Error("Unterminated enum declaration", pc.Current);
 			while (ST.rbrace != pc.SymbolId)
 			{
 				_SkipComments(pc);
 				result.Members.Add(_ParseEnumField(pc, bt));
 			}
 			if (ST.rbrace != pc.SymbolId)
-				throw new ArgumentException("Unterminated enum declaration", "input");
+				_Error("Unterminated enum declaration", pc.Current);
 			pc.Advance();
 			return result;
 		}
@@ -272,44 +274,44 @@ namespace CD
 		{
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Expecting enum field declaration", "input");
+				_Error("Expecting enum field declaration", pc.Current);
 			IList<KeyValuePair<string, CodeAttributeDeclaration>> custAttrs = null;
 			if (ST.lbracket==pc.SymbolId)
 				custAttrs = _ParseCustomAttributes(pc);
 			_SkipComments(pc);
 			if (pc.IsEnded || ST.identifier!=pc.SymbolId)
-				throw new ArgumentException("Expecting enum field declaration", "input");
+				_Error("Expecting enum field declaration", pc.Current);
 			var result = new CodeMemberField();
 			result.Name = pc.Value;
 			_AddCustomAttributes(custAttrs, null, result.CustomAttributes);
 			_AddCustomAttributes(custAttrs, "field", result.CustomAttributes);
 			if (null!=custAttrs && custAttrs.Count > result.CustomAttributes.Count)
-				throw new ArgumentException("Invalid custom attribute targets", "input");
+				_Error("Invalid custom attribute targets", pc.Current);
 			pc.Advance();
 			_SkipComments(pc);
 			if (pc.IsEnded || (ST.eq!= pc.SymbolId &&ST.comma!=pc.SymbolId && ST.rbrace!=pc.SymbolId))
-				throw new ArgumentException("Expecting enum field value, }, or ,", "input");
+				_Error("Expecting enum field value, }, or ,", pc.Current);
 			if (ST.eq == pc.SymbolId) {
 				pc.Advance();
 				_SkipComments(pc);
 
 				if (pc.IsEnded)
-					throw new ArgumentException("Expecting enum field value", "input");
+					_Error("Expecting enum field value", pc.Current);
 				result.InitExpression = _ParseExpression(pc);
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Expecting , or } in enum declaration", "input");
+					_Error("Expecting , or } in enum declaration", pc.Current);
 			}
 			if (ST.comma==pc.SymbolId)
 			{
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Expecting enum field value", "input");
+					_Error("Expecting enum field value", pc.Current);
 			}
 			return result;
 		}
-		static TypeAttributes _BuildTopLevelTypeAttributes(ICollection<string> attrs)
+		static TypeAttributes _BuildTopLevelTypeAttributes(ICollection<string> attrs,_PC pc)
 		{
 			var result = (TypeAttributes)0;
 			foreach(var attr in attrs)
@@ -326,9 +328,11 @@ namespace CD
 						result |= TypeAttributes.Abstract;
 						break;
 					case "private":
-						throw new ArgumentException("Top level types cannot be private", "input");
+						_Error("Top level types cannot be private", pc.Current);
+						break;
 					case "protected":
-						throw new ArgumentException("Top level types cannot be protected", "input");
+						_Error("Top level types cannot be protected", pc.Current);
+						break;
 					
 				}
 			}

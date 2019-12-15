@@ -44,7 +44,7 @@ namespace CD
 				pc.EnsureStarted();
 				var result = _ParseExpression(pc);
 				if (!pc.IsEnded)
-					throw new ArgumentException("Unrecognized remainder in expression", "input");
+					throw new SlangSyntaxException("Unrecognized remainder in expression", pc.Current.Line, pc.Current.Column, pc.Current.Position);
 				return result;
 			}
 		}
@@ -63,9 +63,9 @@ namespace CD
 				{
 					case ST.dot:
 						if (!pc.Advance())
-							throw new ArgumentException("Unterminated member reference", "input");
+							_Error("Unterminated member reference", pc.Current);
 						if (ST.identifier != pc.SymbolId)
-							throw new ArgumentException(string.Format("Invalid token {0} found in member reference", pc.Value), "input");
+							_Error(string.Format("Invalid token {0} found in member reference", pc.Value), pc.Current);
 						var fr = new CodeFieldReferenceExpression(lhs, pc.Value);
 						fr.UserData.Add("slang:unresolved", true);
 						lhs = fr;
@@ -339,11 +339,11 @@ namespace CD
 			pc.Advance();
 			_SkipComments(pc);
 			if(pc.IsEnded)
-				throw new ArgumentException("Unterminated cast or subexpression.");
+				_Error("Unterminated cast or subexpression.",pc.Current);
 			var ctr = _ParseTypeRef(pc);
 			_SkipComments(pc);
 			if(ST.rparen!=pc.SymbolId)
-				throw new ArgumentException("Unterminated cast or subexpression.");
+				_Error("Unterminated cast or subexpression.",pc.Current);
 			pc.Advance();
 			var expr=_ParseExpression(pc);
 			return new CodeCastExpression(ctr, expr);
@@ -419,11 +419,11 @@ namespace CD
 						try
 						{
 							if (!pc.Advance())
-								throw new ArgumentException("Unterminated cast or subexpression", "input");
+								_Error("Unterminated cast or subexpression", pc.Current);
 							expr=_ParseExpression(pc);
 							_SkipComments(pc);
 							if(ST.rparen!=pc.SymbolId)
-								throw new ArgumentException("Invalid cast or subexpression", "input");
+								_Error("Invalid cast or subexpression", pc.Current);
 							pc.Advance();
 							return expr;
 						}
@@ -486,11 +486,11 @@ namespace CD
 							break;
 						case "new":
 							if (!pc.Advance())
-								throw new ArgumentException("Unterminated new expression.", "input");
+								_Error("Unterminated new expression.", pc.Current);
 							var ctr=_ParseTypeRef(pc,true);
 							_SkipComments(pc);
 							if(pc.IsEnded)
-								throw new ArgumentException("Unterminated new expression.", "input");
+								_Error("Unterminated new expression.", pc.Current);
 							switch(pc.SymbolId)
 							{
 								case ST.lparen:
@@ -508,7 +508,8 @@ namespace CD
 									e=_ParseArrayCreatePart(ctr, pc);
 									break;
 								default:
-									throw new ArgumentException(string.Format("Unrecognized token {0} in new expression", pc.Value), "input");
+									_Error(string.Format("Unrecognized token {0} in new expression", pc.Value), pc.Current);
+									break;
 							}
 
 							break;
@@ -526,11 +527,12 @@ namespace CD
 						case "float":
 						case "double":
 						case "decimal":
-							e = new CodeTypeReferenceExpression(_TranslateIntrinsicType(pc.Value));
+							e = new CodeTypeReferenceExpression(_TranslateIntrinsicType(pc.Value,pc));
 							pc.Advance();
 							break;
 						default:
-							throw new ArgumentException(string.Format("Unexpected keyword {0} found in expression", pc.Value), "input");
+							_Error(string.Format("Unexpected keyword {0} found in expression", pc.Value), pc.Current);
+							break;
 					}
 					break;
 				case ST.identifier:
@@ -542,7 +544,7 @@ namespace CD
 					break;
 			}
 			if (null == e)
-				throw new ArgumentException(string.Format("Unexpected token {0} in input", pc.Value), "input");
+				_Error(string.Format("Unexpected token {0} in input", pc.Value), pc.Current);
 			return e;
 		}
 		static CodeArrayCreateExpression _ParseArrayCreatePart(CodeTypeReference type, _PC pc)
@@ -553,10 +555,10 @@ namespace CD
 			var arrType = type;
 			_SkipComments(pc);
 			if (!pc.Advance())
-				throw new ArgumentException("Unterminated array create expression", "input");
+				_Error("Unterminated array create expression", pc.Current);
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated array create expression", "input");
+				_Error("Unterminated array create expression", pc.Current);
 			var done = false;
 			CodeExpression expr = null;
 			// this is structured as though multidim arrays are supported so if we ever make a hack to make it work
@@ -600,11 +602,11 @@ namespace CD
 			if(null==expr) // expect an initializer here
 			{
 				if (pc.IsEnded)
-					throw new ArgumentException("Expecting an array initializer in the array create expression", "input");
+					_Error("Expecting an array initializer in the array create expression", pc.Current);
 				if(ST.lbrace==pc.SymbolId)
 				{
 					if (!pc.Advance())
-						throw new ArgumentException("Unterminated array create initializer", "input");
+						_Error("Unterminated array create initializer", pc.Current);
 					while(!pc.IsEnded && ST.rbrace!=pc.SymbolId)
 					{
 						_SkipComments(pc);
@@ -614,7 +616,7 @@ namespace CD
 							pc.Advance();
 					}
 					if(pc.IsEnded)
-						throw new ArgumentException("Unterminated array create initializer", "input");
+						_Error("Unterminated array create initializer", pc.Current);
 					pc.Advance();
 				}
 			}
@@ -624,15 +626,15 @@ namespace CD
 		{
 			CodeExpression e;
 			if (!pc.Advance())
-				throw new ArgumentException("Unterminated typeof expression", "input");
+				_Error("Unterminated typeof expression", pc.Current);
 			_SkipComments(pc);
 			if (ST.lparen != pc.SymbolId || !pc.Advance())
-				throw new ArgumentException("Unterminated typeof expression", "input");
+				_Error("Unterminated typeof expression", pc.Current);
 			_SkipComments(pc);
 			var ctr = _ParseTypeRef(pc);
 			_SkipComments(pc);
 			if (ST.rparen != pc.SymbolId)
-				throw new ArgumentException("Unterminated typeof expression", "input");
+				_Error("Unterminated typeof expression", pc.Current);
 			pc.Advance();
 			e = new CodeTypeOfExpression(ctr);
 			return e;
@@ -641,15 +643,15 @@ namespace CD
 		{
 			CodeExpression e;
 			if (!pc.Advance())
-				throw new ArgumentException("Unterminated default() expression", "input");
+				_Error("Unterminated default() expression", pc.Current);
 			_SkipComments(pc);
 			if (ST.lparen != pc.SymbolId || !pc.Advance())
-				throw new ArgumentException("Unterminated default() expression", "input");
+				_Error("Unterminated default() expression", pc.Current);
 			_SkipComments(pc);
 			var ctr = _ParseTypeRef(pc);
 			_SkipComments(pc);
 			if (ST.rparen != pc.SymbolId)
-				throw new ArgumentException("Unterminated default expression", "input");
+				_Error("Unterminated default expression", pc.Current);
 			pc.Advance();
 			e = new CodeDefaultValueExpression(ctr);
 			return e;
@@ -680,7 +682,7 @@ namespace CD
 		{
 			var result = new CodeExpressionCollection();
 			if (!pc.Advance())
-				throw new ArgumentException("Unterminated argument list", "input");
+				_Error("Unterminated argument list", pc.Current);
 			while (endSym != pc.SymbolId)
 			{
 				var fd = default(FieldDirection);
@@ -690,19 +692,19 @@ namespace CD
 					{
 						fd = FieldDirection.In;
 						if (!pc.Advance())
-							throw new ArgumentException("Unterminated method invocation.", "input");
+							_Error("Unterminated method invocation.", pc.Current);
 					}
 					else if ("out" == pc.Value)
 					{
 						fd = FieldDirection.Out;
 						if (!pc.Advance())
-							throw new ArgumentException("Unterminated method invocation.", "input");
+							_Error("Unterminated method invocation.", pc.Current);
 					}
 					else if ("ref" == pc.Value)
 					{
 						fd = FieldDirection.Ref;
 						if (!pc.Advance())
-							throw new ArgumentException("Unterminated method invocation.", "input");
+							_Error("Unterminated method invocation.", pc.Current);
 					}
 					
 					_SkipComments(pc);
@@ -715,12 +717,12 @@ namespace CD
 				if (ST.comma == pc.SymbolId)
 				{
 					if (!pc.Advance())
-						throw new ArgumentException("Unterminated argument list.", "input");
+						_Error("Unterminated argument list.", pc.Current);
 				}
 			}
 			if (endSym != pc.SymbolId)
 			{
-				throw new ArgumentException("Unterminated argument list.", "input");
+				_Error("Unterminated argument list.", pc.Current);
 			}
 			pc.Advance();
 			return result;
@@ -740,7 +742,7 @@ namespace CD
 					if ('\"' == e.Current)
 						return new CodePrimitiveExpression(sb.ToString());
 					else if ('\\' == e.Current)
-						sb.Append(_ParseEscapeChar(e));
+						sb.Append(_ParseEscapeChar(e,pc.Current));
 					else
 					{
 						sb.Append(e.Current);
@@ -749,7 +751,8 @@ namespace CD
 					}
 				}
 			}
-			throw new ArgumentException("Unterminated string in input", "input");
+			_Error("Unterminated string in input", pc.Current);
+			return null;
 		}
 		static CodePrimitiveExpression _ParseChar(_PC pc)
 		{
@@ -761,7 +764,7 @@ namespace CD
 			e.MoveNext();
 			if ('\\' == e.Current)
 			{
-				s = _ParseEscapeChar(e);
+				s = _ParseEscapeChar(e,pc.Current);
 				if (1 == s.Length)
 					return new CodePrimitiveExpression(s[0]);
 				else // for UTF-32 this has to be a string
@@ -869,7 +872,7 @@ namespace CD
 		#endregion
 
 		#region String/Char escapes
-		static string _ParseEscapeChar(IEnumerator<char> e)
+		static string _ParseEscapeChar(IEnumerator<char> e,Token tok)
 		{
 			if (e.MoveNext())
 			{
@@ -1017,7 +1020,8 @@ namespace CD
 						throw new NotSupportedException(string.Format("Unsupported escape sequence \\{0}", e.Current));
 				}
 			}
-			throw new ArgumentException("Unterminated escape sequence", "input");
+			_Error("Unterminated escape sequence", tok);
+			return null;
 		}
 		static bool _IsHexChar(char hex)
 		{

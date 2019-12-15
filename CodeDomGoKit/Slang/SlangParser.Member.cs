@@ -43,7 +43,7 @@ namespace CD
 				pc.EnsureStarted();
 				var result = _ParseMember(pc);
 				if (!pc.IsEnded)
-					throw new ArgumentException("Unrecognized remainder in member declaration", "input");
+					throw new SlangSyntaxException("Unrecognized remainder in member", pc.Current.Line, pc.Current.Column, pc.Current.Position);
 				return result;
 			}
 		}
@@ -107,47 +107,47 @@ namespace CD
 				{
 					case "protected":
 						if (result.Contains("public") || result.Contains("private"))
-							throw new ArgumentException("Conflicting access modifiers on member", "input");
+							_Error("Conflicting access modifiers on member", pc.Current);
 						break;
 					case "internal":
 						if (result.Contains("public") || result.Contains("private"))
-							throw new ArgumentException("Conflicting access modifiers on member", "input");
+							_Error("Conflicting access modifiers on member", pc.Current);
 						break;
 					case "const":
 						if(result.Contains("virtual") || result.Contains("override") || result.Contains("abstract"))
-							throw new ArgumentException("Conflicting access modifiers on member", "input");
+							_Error("Conflicting access modifiers on member", pc.Current);
 						break;
 					case "virtual":
 						if (result.Contains("const"))
-							throw new ArgumentException("Conflicting access modifiers on member", "input");
+							_Error("Conflicting access modifiers on member", pc.Current);
 						break;
 					case "new":
 						break;
 					case "override":
 						if (result.Contains("const"))
-							throw new ArgumentException("Conflicting access modifiers on member", "input");
+							_Error("Conflicting access modifiers on member", pc.Current);
 						break;
 					case "public":
 						if (result.Contains("protected") || result.Contains("internal") || result.Contains("private"))
-							throw new ArgumentException("Conflicting access modifiers on member", "input");
+							_Error("Conflicting access modifiers on member", pc.Current);
 						break;
 					case "private":
 						if (result.Contains("protected") || result.Contains("internal") || result.Contains("public"))
-							throw new ArgumentException("Conflicting access modifiers on member", "input");
+							_Error("Conflicting access modifiers on member", pc.Current);
 						break;
 					case "abstract":
 						if (result.Contains("const") || result.Contains("static") || result.Contains("private"))
-							throw new ArgumentException("Conflicting access modifiers on member", "input");
+							_Error("Conflicting access modifiers on member", pc.Current);
 						break;
 					case "static":
 						if(result.Contains("abstract"))
-							throw new ArgumentException("Conflicting access modifiers on member", "input");
+							_Error("Conflicting access modifiers on member", pc.Current);
 						break;
 					default:
 						return result;
 				}
 				if (!result.Add(pc.Value))
-					throw new ArgumentException(string.Format("Duplicate member modifier {0} found", pc.Value), "input");
+					_Error(string.Format("Duplicate member modifier {0} found", pc.Value), pc.Current);
 				pc.Advance();
 				_SkipComments(pc);
 			}
@@ -175,7 +175,7 @@ namespace CD
 					pc.Advance();
 					_SkipComments(pc);
 					if(pc.IsEnded)
-						throw new ArgumentException("Unterminated private member declaration");
+						_Error("Unterminated private member declaration",pc.Current);
 					
 					var s = pc.Value;
 					pc.Advance();
@@ -189,7 +189,7 @@ namespace CD
 					{
 						// the entire thing is the name. There is no private implementation type
 						if (0 < ptr.TypeArguments.Count)
-							throw new ArgumentException("Missing member name on private member declaration", "input");
+							_Error("Missing member name on private member declaration", pc.Current);
 						return new KeyValuePair<CodeTypeReference, string>(null, ptr.BaseType);
 					}
 					else // this is probably a "this"
@@ -201,7 +201,7 @@ namespace CD
 							pc.Advance();
 							return new KeyValuePair<CodeTypeReference, string>(ptr, "this");
 						}
-						throw new ArgumentException("Illegal private member implementation type.", "input");
+						_Error("Illegal private member implementation type.", pc.Current);
 					}
 				}
 				name = ptr.BaseType.Substring(idx+1);
@@ -212,7 +212,7 @@ namespace CD
 			var n = pc.Value;
 			pc.Advance();
 			return new KeyValuePair<CodeTypeReference, string>(null, n);
-			//throw new ArgumentException("Expecting identifier on private member declaration", "input");
+			//_Error("Expecting identifier on private member declaration", pc.Current);
 
 		}
 
@@ -246,27 +246,27 @@ namespace CD
 				if(ST.identifier== pc.SymbolId && (string.IsNullOrEmpty(typeName)||typeName==pc.Value))
 				{
 					if (attrs.Contains("abstract"))
-						throw new ArgumentException("Constructors cannot be abstract", "input");
+						_Error("Constructors cannot be abstract", pc.Current);
 					if (attrs.Contains("const"))
-						throw new ArgumentException("Constructors cannot be const", "input");
+						_Error("Constructors cannot be const", pc.Current);
 					// store the name of the class in the constructor name just so we have it
 					// we don't use it right now, but it keeps things more flexible just in case
 					var ctorName = pc.Value;
 					pc.Advance();
 					_SkipComments(pc);
 					if (pc.IsEnded)
-						throw new ArgumentException("Unterminated constructor", "input");
+						_Error("Unterminated constructor", pc.Current);
 					if (ST.lparen != pc.SymbolId)
-						throw new ArgumentException("Expecting ( in constructor declaration", "input");
+						_Error("Expecting ( in constructor declaration", pc.Current);
 					pc.Advance();
 					_SkipComments(pc);
 					if (pc.IsEnded)
-						throw new ArgumentException("Unterminated constructor", "input");
+						_Error("Unterminated constructor", pc.Current);
 					var parms = _ParseParamDecls(pc, ST.rparen, false);
 					CodeTypeMember mctor = null;
 					_SkipComments(pc);
 					if (pc.IsEnded)
-						throw new ArgumentException("Unterminated constructor", "input");
+						_Error("Unterminated constructor", pc.Current);
 					if(!attrs.Contains("static"))
 					{
 						var ctor = new CodeConstructor();
@@ -280,7 +280,7 @@ namespace CD
 							pc.Advance();
 							_SkipComments(pc);
 							if (pc.IsEnded)
-								throw new ArgumentException("Unterminated constructor - expecting chained or base constructor args", "input");
+								_Error("Unterminated constructor - expecting chained or base constructor args", pc.Current);
 							if (ST.keyword == pc.SymbolId)
 							{
 								switch (pc.Value)
@@ -289,43 +289,44 @@ namespace CD
 										pc.Advance();
 										_SkipComments(pc);
 										if (pc.IsEnded)
-											throw new ArgumentException("Unterminated constructor - expecting base constructor args", "input");
+											_Error("Unterminated constructor - expecting base constructor args", pc.Current);
 										if (ST.lparen != pc.SymbolId)
-											throw new ArgumentException("Expecting ( in base constructor args", "input");
+											_Error("Expecting ( in base constructor args", pc.Current);
 										//pc.Advance();
 										//_SkipComments(pc);
 										if (pc.IsEnded)
-											throw new ArgumentException("Unterminated constructor - expecting base constructor args", "input");
+											_Error("Unterminated constructor - expecting base constructor args", pc.Current);
 										ctor.BaseConstructorArgs.AddRange(_ParseArguments(pc, ST.rparen, false));
 										break;
 									case "this":
 										pc.Advance();
 										_SkipComments(pc);
 										if (pc.IsEnded)
-											throw new ArgumentException("Unterminated constructor - expecting chained constructor args", "input");
+											_Error("Unterminated constructor - expecting chained constructor args", pc.Current);
 										if (ST.lparen != pc.SymbolId)
-											throw new ArgumentException("Expecting ( in chained constructor args", "input");
+											_Error("Expecting ( in chained constructor args", pc.Current);
 										//pc.Advance();
 										//_SkipComments(pc);
 										if (pc.IsEnded)
-											throw new ArgumentException("Unterminated constructor - expecting chained constructor args", "input");
+											_Error("Unterminated constructor - expecting chained constructor args", pc.Current);
 										ctor.ChainedConstructorArgs.AddRange(_ParseArguments(pc, ST.rparen, false));
 										break;
 									default:
-										throw new ArgumentException("Expecting chained or base constructor call", "input");
+										_Error("Expecting chained or base constructor call", pc.Current);
+										break;
 								}
 							}
 							else
-								throw new ArgumentException("Expecting chained or base constructor call", "input");
+								_Error("Expecting chained or base constructor call", pc.Current);
 						}
 						_SkipComments(pc);
 						if (pc.IsEnded || ST.lbrace != pc.SymbolId)
-							throw new ArgumentException("Expecting a constructor body", "input");
+							_Error("Expecting a constructor body", pc.Current);
 						pc.Advance();
 						while (!pc.IsEnded && ST.rbrace != pc.SymbolId)
 							ctor.Statements.Add(_ParseStatement(pc,true));
 						if (ST.rbrace != pc.SymbolId)
-							throw new ArgumentException("Unterminated method body", "input");
+							_Error("Unterminated method body", pc.Current);
 						pc.Advance();
 					} else
 					{
@@ -335,15 +336,15 @@ namespace CD
 						ctor.Attributes = _BuildMemberAttributes(attrs);
 						_AddCustomAttributes(customAttrs, null, ctor.CustomAttributes);
 						if (0 < parms.Count)
-							throw new ArgumentException("Type constructors cannot have parameters.", "input");
+							_Error("Type constructors cannot have parameters.", pc.Current);
 						_SkipComments(pc);
 						if (pc.IsEnded || ST.lbrace != pc.SymbolId)
-							throw new ArgumentException("Expecting a constructor body", "input");
+							_Error("Expecting a constructor body", pc.Current);
 						pc.Advance();
 						while (!pc.IsEnded && ST.rbrace != pc.SymbolId)
 							ctor.Statements.Add(_ParseStatement(pc,true));
 						if (ST.rbrace != pc.SymbolId)
-							throw new ArgumentException("Unterminated method body", "input");
+							_Error("Unterminated method body", pc.Current);
 						pc.Advance();
 					}
 					mctor.Comments.AddRange(comments);
@@ -361,9 +362,9 @@ namespace CD
 				pc.Advance();
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated member declaration", "input");
+				_Error("Unterminated member declaration", pc.Current);
 			if(ST.identifier!=pc.SymbolId && !(ST.keyword == pc.SymbolId && "this"== pc.Value))
-				throw new ArgumentException("Expecting identifier in member declaration", "input");
+				_Error("Expecting identifier in member declaration", pc.Current);
 			// this might be a private implementation type of the form 
 			// IEnumerable ICollection.GetEnumerator() 
 			var kvp = _ParsePrivateImplementationType(pc);
@@ -372,13 +373,13 @@ namespace CD
 			var isPriv = !(attrs.Contains("public")||attrs.Contains("protected") || attrs.Contains("internal"));
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated member declaration", "input");
+				_Error("Unterminated member declaration", pc.Current);
 			if(isEvent) // events are basically parsed like fields with no initializers. The only difference here is the error messages we throw
 			{
 				if (ST.semi == pc.SymbolId) 
 				{
 					if (null == ctr)
-						throw new ArgumentException("Events must not have a void type.", "input");
+						_Error("Events must not have a void type.", pc.Current);
 					var e = new CodeMemberEvent();
 					e.Type = ctr;
 					if (isPriv)
@@ -395,40 +396,40 @@ namespace CD
 					e.Comments.AddRange(comments);
 					return e;
 				}
-				throw new ArgumentException(string.Format("Unexpected token {0} found in event.",pc.Value),"input");
+				_Error(string.Format("Unexpected token {0} found in event.",pc.Value),pc.Current);
 			}
 			if (ST.semi==pc.SymbolId) // this is a field
 			{
 				if (attrs.Contains("abstract"))
-					throw new ArgumentException("Fields cannot be abstract.", "input");
+					_Error("Fields cannot be abstract.", pc.Current);
 				if (null == ctr)
-					throw new ArgumentException("Fields must not have a void type.", "input");
+					_Error("Fields must not have a void type.", pc.Current);
 				var f = new CodeMemberField(ctr, name);
 				f.Attributes = _BuildMemberAttributes(attrs);
 				_AddCustomAttributes(customAttrs, null, f.CustomAttributes);
 				if (null != ptr)
-					throw new ArgumentException("Fields cannot have a private implementation type.","input");
+					_Error("Fields cannot have a private implementation type.",pc.Current);
 				pc.Advance();
 				f.Comments.AddRange(comments);
 				return f;
 			} else if(ST.eq==pc.SymbolId) // this is a field with a value
 			{
 				if (null == ctr)
-					throw new ArgumentException("Fields must not have a void type.", "input");
+					_Error("Fields must not have a void type.", pc.Current);
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated field initializer", "input");
+					_Error("Unterminated field initializer", pc.Current);
 				var init = _ParseExpression(pc);
 				if (ST.semi != pc.SymbolId)
-					throw new ArgumentException("Invalid expression in field initializer", "input");
+					_Error("Invalid expression in field initializer", pc.Current);
 				pc.Advance();
 				var f =new CodeMemberField(ctr, name);
 				f.Attributes = _BuildMemberAttributes(attrs);
 				_AddCustomAttributes(customAttrs, null,f.CustomAttributes);
 				f.InitExpression = init;
 				if (null != ptr)
-					throw new ArgumentException("Fields cannot have a private implementation type.", "input");
+					_Error("Fields cannot have a private implementation type.", pc.Current);
 				f.Comments.AddRange(comments);
 				return f;
 
@@ -437,7 +438,7 @@ namespace CD
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated method declaration", "input");
+					_Error("Unterminated method declaration", pc.Current);
 				var parms = _ParseParamDecls(pc);
 				CodeMemberMethod m = new CodeMemberMethod();
 				m.UserData.Add("slang:unresolved",true);
@@ -458,20 +459,20 @@ namespace CD
 				if (attrs.Contains("abstract"))
 				{
 					if (ST.semi != pc.SymbolId)
-						throw new ArgumentException("Expecting ; to terminate abstract method definition", "input");
+						_Error("Expecting ; to terminate abstract method definition", pc.Current);
 					pc.Advance();
 					m.Comments.AddRange(comments);
 					return m;
 				}
 				if (ST.lbrace != pc.SymbolId)
-					throw new ArgumentException("Expecting method body for non abstract method", "input");
+					_Error("Expecting method body for non abstract method", pc.Current);
 				pc.Advance();
 				while (!pc.IsEnded && ST.rbrace != pc.SymbolId)
 				{
 					m.Statements.Add(_ParseStatement(pc,true));
 				}
 				if (ST.rbrace != pc.SymbolId)
-					throw new ArgumentException("Unterminated method body", "input");
+					_Error("Unterminated method body", pc.Current);
 				pc.Advance();
 				m.Comments.AddRange(comments);
 				return m;
@@ -494,91 +495,90 @@ namespace CD
 					pc.Advance();
 					_SkipComments(pc);
 					if (pc.IsEnded)
-						throw new ArgumentException("Unterminated indexer property declaration", "input");
+						_Error("Unterminated indexer property declaration", pc.Current);
 					else if (0 != string.Compare(name, "this"))
-						throw new ArgumentException("Only indexer properties can have arguments", "input");
+						_Error("Only indexer properties can have arguments", pc.Current);
 					p.Parameters.AddRange(_ParseParamDecls(pc, ST.rbracket));
 					p.Name = "Item";
 				}
 				if (ST.lbrace != pc.SymbolId)
-					throw new ArgumentException("Expecting body for property", "input");
+					_Error("Expecting body for property", pc.Current);
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated property body", "input");
+					_Error("Unterminated property body", pc.Current);
 				var sawGet = false;
 				var sawSet = false;
 				while (ST.rbrace != pc.SymbolId)
 				{
 					_SkipComments(pc);
 					if (pc.IsEnded)
-						throw new ArgumentException("Unterminated property body", "input");
+						_Error("Unterminated property body", pc.Current);
 					if (ST.keyword != pc.SymbolId)
-						throw new ArgumentException("Expecting get or set in property body.", "input");
+						_Error("Expecting get or set in property body.", pc.Current);
 
 					if ("get" == pc.Value)
 					{
 						if (sawGet)
-							throw new ArgumentException("Multiple property.get definitions are not allowed.", "input");
+							_Error("Multiple property.get definitions are not allowed.", pc.Current);
 						sawGet = true;
 						pc.Advance();
 						_SkipComments(pc);
 						if (pc.IsEnded)
-							throw new ArgumentException("Unterminated property.get", "input");
+							_Error("Unterminated property.get", pc.Current);
 						if (ST.lbrace == pc.SymbolId)
 						{
 							if (attrs.Contains("abstract"))
-								throw new ArgumentException("Abstract properties must not contain get bodies.", "input");
+								_Error("Abstract properties must not contain get bodies.", pc.Current);
 							pc.Advance();
 							while (!pc.IsEnded && ST.rbrace != pc.SymbolId)
 								p.GetStatements.Add(_ParseStatement(pc,true));
 							if (ST.rbrace != pc.SymbolId)
-								throw new ArgumentException("Unterminated property.get body", "input");
+								_Error("Unterminated property.get body", pc.Current);
 							pc.Advance();
 						}
 						else if (ST.semi == pc.SymbolId)
 						{
 							if (!attrs.Contains("abstract"))
-								throw new ArgumentException("Non abstract property.gets must have a body.", "input");
+								_Error("Non abstract property.gets must have a body.", pc.Current);
 							pc.Advance();
 						}
 					}
 					else if ("set" == pc.Value)
 					{
 						if (sawSet)
-							throw new ArgumentException("Multiple property.set definitions are not allowed.", "input");
+							_Error("Multiple property.set definitions are not allowed.", pc.Current);
 						sawSet = true;
 						pc.Advance();
 						_SkipComments(pc);
 						if (pc.IsEnded)
-							throw new ArgumentException("Unterminated property.set", "input");
+							_Error("Unterminated property.set", pc.Current);
 						if (ST.lbrace == pc.SymbolId)
 						{
 							if (attrs.Contains("abstract"))
-								throw new ArgumentException("Abstract properties must not contain set bodies.", "input");
+								_Error("Abstract properties must not contain set bodies.", pc.Current);
 							pc.Advance();
 							while (!pc.IsEnded && ST.rbrace != pc.SymbolId)
 								p.SetStatements.Add(_ParseStatement(pc,true));
 							if (ST.rbrace != pc.SymbolId)
-								throw new ArgumentException("Unterminated property.set body", "input");
+								_Error("Unterminated property.set body", pc.Current);
 							pc.Advance();
 						} else if(ST.semi==pc.SymbolId)
 						{
 							if (!attrs.Contains("abstract"))
-								throw new ArgumentException("Non abstract property.sets must have a body.", "input");
+								_Error("Non abstract property.sets must have a body.", pc.Current);
 							pc.Advance();
 						}
 					}
 					else
-						throw new ArgumentException(string.Format("Unrecognized keyword {0} in property body", pc.Value));
+						_Error(string.Format("Unrecognized keyword {0} in property body", pc.Value),pc.Current);
 				}
 				if (ST.rbrace != pc.SymbolId)
-					throw new ArgumentException("Invalid property body", "input");
+					_Error("Invalid property body", pc.Current);
 				pc.Advance();
 				p.Comments.AddRange(comments);
 				return p;
 			}
-			throw new ArgumentException("Illegal member declaration.", "input");
 		}
 		static void _AddCustomAttributes(IEnumerable<KeyValuePair<string, CodeAttributeDeclaration>> src,string target,CodeAttributeDeclarationCollection dst)
 		{
@@ -607,7 +607,7 @@ namespace CD
 			pc.Advance();
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated custom attribute declaration group");
+				_Error("Unterminated custom attribute declaration group",pc.Current);
 			var result = new List<KeyValuePair<string, CodeAttributeDeclaration>>();
 			var target = pc.Value;
 			var hasTarget = false;
@@ -623,7 +623,7 @@ namespace CD
 				pc.Advance();
 				_SkipComments(pc);
 				if(pc.IsEnded)
-					throw new ArgumentException("Unterminated custom attribute declaration group","input");
+					_Error("Unterminated custom attribute declaration group",pc.Current);
 			}
 			while(ST.rbracket!=pc.SymbolId)
 			{
@@ -634,23 +634,23 @@ namespace CD
 				else
 					result.Add(new KeyValuePair<string, CodeAttributeDeclaration>(target, attr));
 				if(pc.IsEnded)
-					throw new ArgumentException("Unterminated custom attribute declaration group","input");
+					_Error("Unterminated custom attribute declaration group",pc.Current);
 				if(ST.comma==pc.SymbolId)
 				{
 					pc.Advance();
 					_SkipComments(pc);
 					if (pc.IsEnded)
-						throw new ArgumentException("Unterminated custom attribute declaration group", "input");
+						_Error("Unterminated custom attribute declaration group", pc.Current);
 					if (ST.rbracket == pc.SymbolId)
-						throw new ArgumentException("Unexpected comma found in attribute declaration group", "input");
+						_Error("Unexpected comma found in attribute declaration group", pc.Current);
 				}
 			}
 			if(ST.rbracket!=pc.SymbolId)
-				throw new ArgumentException("Invalid custom attribute declaration", "input");
+				_Error("Invalid custom attribute declaration", pc.Current);
 			pc.Advance();
 			_SkipComments(pc);
 			if (0 == result.Count)
-				throw new ArgumentException("Attribute groups must not be empty.", "input");
+				_Error("Attribute groups must not be empty.", pc.Current);
 			return result;
 		}
 		static CodeAttributeArgumentCollection _ParseCustomAttributeArguments(_PC pc)
@@ -659,7 +659,7 @@ namespace CD
 			if (ST.lparen != pc.SymbolId)
 				return result;
 			if (!pc.Advance())
-				throw new ArgumentException("Unterminated argument list", "input");
+				_Error("Unterminated argument list", pc.Current);
 			var named = false;
 			while (ST.rparen != pc.SymbolId)
 			{
@@ -684,7 +684,7 @@ namespace CD
 					}
 				}
 				if (named)
-					throw new ArgumentException("Named custom attribute arguments must follow the unnamed arguments.", "input");
+					_Error("Named custom attribute arguments must follow the unnamed arguments.", pc.Current);
 				var exp = _ParseExpression(pc);
 				_SkipComments(pc);
 				arg.Value = exp;
@@ -692,12 +692,12 @@ namespace CD
 				if (ST.comma == pc.SymbolId)
 				{
 					if (!pc.Advance())
-						throw new ArgumentException("Unterminated argument list.", "input");
+						_Error("Unterminated argument list.", pc.Current);
 				}
 			}
 			if (ST.rparen!= pc.SymbolId)
 			{
-				throw new ArgumentException("Unterminated argument list.", "input");
+				_Error("Unterminated argument list.", pc.Current);
 			}
 			pc.Advance();
 			return result;
@@ -708,7 +708,7 @@ namespace CD
 			ctr.UserData.Add("slang:attribute", true);
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated custom attribute declaration","input");
+				_Error("Unterminated custom attribute declaration",pc.Current);
 			var exprs=_ParseCustomAttributeArguments(pc);
 			var result = new CodeAttributeDeclaration( ctr );
 			result.Arguments.AddRange(exprs);
@@ -727,7 +727,7 @@ namespace CD
 				_SkipComments(pc);
 			}
 			if (endSym != pc.SymbolId)
-				throw new ArgumentException("Unterminated parameter declarations", "input");
+				_Error("Unterminated parameter declarations", pc.Current);
 			pc.Advance();
 			return result;
 		}
@@ -764,7 +764,7 @@ namespace CD
 			var ctr = _ParseTypeRef(pc);
 			_SkipComments(pc);
 			if (ST.identifier != pc.SymbolId)
-				throw new ArgumentException("Expecting identifier in parameter declaration", "input");
+				_Error("Expecting identifier in parameter declaration", pc.Current);
 			var result = new CodeParameterDeclarationExpression(ctr, pc.Value);
 			result.Direction = d;
 			if (null != attrs)

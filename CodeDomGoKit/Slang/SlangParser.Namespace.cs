@@ -42,7 +42,7 @@ namespace CD
 				pc.EnsureStarted();
 				var result = _ParseNamespace(pc);
 				if (!pc.IsEnded)
-					throw new ArgumentException("Unrecognized remainder in namespace", "input");
+					throw new SlangSyntaxException("Unrecognized remainder in namespace", pc.Current.Line, pc.Current.Column, pc.Current.Position);
 				return result;
 			}
 		}
@@ -57,15 +57,15 @@ namespace CD
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated namespace declaration", "input");
+					_Error("Unterminated namespace declaration", pc.Current);
 				if (ST.identifier != pc.SymbolId)
-					throw new ArgumentException("Expected identifier in namespace declaration");
+					_Error("Expected identifier in namespace declaration",pc.Current);
 				result.Name = _ParseNamespaceName(pc);
 				if (ST.lbrace != pc.SymbolId)
-					throw new ArgumentException("Expecting { in namespace declaration");
+					_Error("Expecting { in namespace declaration",pc.Current);
 				pc.Advance();
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated namespace declaration", "input");
+					_Error("Unterminated namespace declaration", pc.Current);
 				// Use lookahead so we don't remove the comments of the first type
 				if (ST.lineComment == pc.SymbolId || ST.blockComment == pc.SymbolId)
 				{
@@ -80,9 +80,9 @@ namespace CD
 				while (ST.rbrace != pc.SymbolId)
 					result.Types.Add(_ParseType(pc));
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated namespace declaration", "input");
+					_Error("Unterminated namespace declaration", pc.Current);
 				if (ST.rbrace != pc.SymbolId)
-					throw new ArgumentException("Invalid type declaration in namespace", "input");
+					_Error("Invalid type declaration in namespace", pc.Current);
 				pc.Advance();
 				return result;
 			}
@@ -102,14 +102,14 @@ namespace CD
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated using declaration", "input");
+					_Error("Unterminated using declaration", pc.Current);
 				if (ST.identifier != pc.SymbolId)
-					throw new ArgumentException("Expecting identifier in using declaration", "input");
+					_Error("Expecting identifier in using declaration", pc.Current);
 				var ns = _ParseNamespaceName(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated using declaration", "input");
+					_Error("Unterminated using declaration", pc.Current);
 				if (ST.semi != pc.SymbolId)
-					throw new ArgumentException("Expecting ; in using declaration", "input");
+					_Error("Expecting ; in using declaration", pc.Current);
 				pc.Advance();
 				// Use lookahead so we don't remove the comments of the first type
 				if (ST.lineComment == pc.SymbolId || ST.blockComment == pc.SymbolId)

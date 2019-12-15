@@ -130,6 +130,9 @@
     <Compile Include="..\CodeDomGoKit\Slang\SlangPreprocessor.cs">
       <Link>CodeDomGoKit\Slang\SlangPreprocessor.cs</Link>
     </Compile>
+    <Compile Include="..\CodeDomGoKit\Slang\SlangSyntaxException.cs">
+      <Link>CodeDomGoKit\Slang\SlangSyntaxException.cs</Link>
+    </Compile>
     <Compile Include="..\CodeDomGoKit\Slang\SlangTokenizer.cs">
       <Link>CodeDomGoKit\Slang\SlangTokenizer.cs</Link>
     </Compile>

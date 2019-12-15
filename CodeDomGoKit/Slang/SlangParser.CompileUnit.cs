@@ -44,7 +44,7 @@ namespace CD
 				var result = _ParseCompileUnit(pc);
 				// should never happen
 				if (!pc.IsEnded)
-					throw new ArgumentException("Unrecognized remainder in namespace", "input");
+					throw new SlangSyntaxException("Unrecognized remainder in compile unit", pc.Current.Line,pc.Current.Column,pc.Current.Position);
 				return result;
 			}
 		}

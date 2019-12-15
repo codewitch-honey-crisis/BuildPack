@@ -46,7 +46,7 @@ namespace CD
 				pc.EnsureStarted();
 				var result = _ParseStatement(pc,includeComments);
 				if (!pc.IsEnded)
-					throw new ArgumentException("Unrecognized remainder in statement", "input");
+					throw new SlangSyntaxException("Unrecognized remainder in statement", pc.Current.Line, pc.Current.Column, pc.Current.Position);
 				return result;
 			}
 		}
@@ -110,7 +110,7 @@ namespace CD
 					var le = _ParseExpression(pc);
 					_SkipComments(pc);
 					if (pc.IsEnded)
-						throw new ArgumentException("Unterminated statement. Expecting ;", "input");
+						_Error("Unterminated statement. Expecting ;", pc.Current);
 					pc.Advance();
 					var v = e as CodeVariableReferenceExpression;
 					CodeEventReferenceExpression er =null;
@@ -124,7 +124,7 @@ namespace CD
 							er = new CodeEventReferenceExpression(f.TargetObject, f.FieldName);
 					}
 					if (null == er)
-						throw new ArgumentNullException("The attach/remove target does not refer to a valid event","input");
+						_Error("The attach/remove target does not refer to a valid event",pc.Current);
 					er.UserData.Add("slang:unresolved", true);
 					return isAttach ? new CodeAttachEventStatement(er, le) as CodeStatement : new CodeRemoveEventStatement(er, le);
 				}
@@ -183,7 +183,7 @@ namespace CD
 						pc.Advance();
 						_SkipComments(pc);
 						if (pc.IsEnded || ST.colon != pc.SymbolId)
-							throw new ArgumentException("Unterminated label. Expecting :", "input");
+							_Error("Unterminated label. Expecting :", pc.Current);
 						pc.Advance();
 						return ls;
 					}
@@ -191,8 +191,10 @@ namespace CD
 					throw new NotImplementedException("Not finished");
 				default:
 					
-					throw new ArgumentException(string.Format("Unexpected token {0} found statement.", pc.Value), "input");
+					_Error(string.Format("Unexpected token {0} found statement.", pc.Value), pc.Current);
+					break;
 			}
+			return null; // should never get here.
 		}
 		static CodeCommentStatement _ParseCommentStatement(_PC pc)
 		{
@@ -214,21 +216,21 @@ namespace CD
 			pc.Advance();
 			_SkipComments(pc);
 			if(pc.IsEnded)
-				throw new ArgumentException("Unterminated try statement", "input");
+				_Error("Unterminated try statement", pc.Current);
 			var result = new CodeTryCatchFinallyStatement();
 			if (ST.lbrace!=pc.SymbolId)
-				throw new ArgumentException("Unterminated try statement", "input");
+				_Error("Unterminated try statement", pc.Current);
 			pc.Advance();
 			while(!pc.IsEnded && ST.rbrace!=pc.SymbolId)
 			{
 				result.TryStatements.Add(_ParseStatement(pc,true));
 			}
 			if(pc.IsEnded)
-				throw new ArgumentException("Unterminated try statement", "input");
+				_Error("Unterminated try statement", pc.Current);
 			pc.Advance();
 			_SkipComments(pc);
 			if (ST.keyword!=pc.SymbolId)
-				throw new ArgumentException("Expecting catch or finally statement", "input");
+				_Error("Expecting catch or finally statement", pc.Current);
 			while("catch"==pc.Value)
 			{
 				pc.Advance();
@@ -237,17 +239,17 @@ namespace CD
 				if (ST.lparen == pc.SymbolId)
 				{
 					if (!pc.Advance())
-						throw new ArgumentException("Unterminated catch clause", "input");
+						_Error("Unterminated catch clause", pc.Current);
 					cc.CatchExceptionType = _ParseTypeRef(pc);
 					_SkipComments(pc);
 					if (ST.identifier == pc.SymbolId)
 					{
 						cc.LocalName = pc.Value;
 						if (!pc.Advance())
-							throw new ArgumentException("Unterminated catch clause", "input");
+							_Error("Unterminated catch clause", pc.Current);
 						_SkipComments(pc);
 						if (ST.rparen != pc.SymbolId)
-							throw new ArgumentException(string.Format("Unexpected token {0} in catch clause", pc.Value), "input");
+							_Error(string.Format("Unexpected token {0} in catch clause", pc.Value), pc.Current);
 						pc.Advance();
 						_SkipComments(pc);
 					}
@@ -256,20 +258,20 @@ namespace CD
 						pc.Advance();
 						_SkipComments(pc);
 					} else
-						throw new ArgumentException(string.Format("Unexpected token {0} in catch clause", pc.Value), "input");
+						_Error(string.Format("Unexpected token {0} in catch clause", pc.Value), pc.Current);
 				}
 				else
 					throw new NotSupportedException("You must specify an exception type to catch in each catch clause.");
 				
 				if (ST.lbrace != pc.SymbolId)
-					throw new ArgumentException("Expecting { in catch clause", "input");
+					_Error("Expecting { in catch clause", pc.Current);
 				pc.Advance();
 				while (!pc.IsEnded && ST.rbrace != pc.SymbolId)
 				{
 					cc.Statements.Add(_ParseStatement(pc,true));
 				}
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated catch clause", "input");
+					_Error("Unterminated catch clause", pc.Current);
 				pc.Advance();
 				_SkipComments(pc);
 				result.CatchClauses.Add(cc);
@@ -279,12 +281,12 @@ namespace CD
 				pc.Advance();
 				_SkipComments(pc);
 				if (ST.lbrace != pc.SymbolId)
-					throw new ArgumentException("Expecting { in finally clause", "input");
+					_Error("Expecting { in finally clause", pc.Current);
 				pc.Advance();
 				while (!pc.IsEnded && ST.rbrace != pc.SymbolId)
 					result.FinallyStatements.Add(_ParseStatement(pc,true));
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated finally clause", "input");
+					_Error("Unterminated finally clause", pc.Current);
 				pc.Advance();
 				if(0==result.FinallyStatements.Count)
 				{
@@ -303,39 +305,39 @@ namespace CD
 				pc.Advance();
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated variable declaration statement", "input");
+				_Error("Unterminated variable declaration statement", pc.Current);
 			if (ST.inc == pc.SymbolId)
 				throw new NotSupportedException("Postfix increment is not supported. Consider using prefix increment instead.");
 			if (ST.dec == pc.SymbolId)
 				throw new NotSupportedException("Postfix decrement is not supported. Consider using prefix decrement instead.");
 			if (ST.identifier != pc.SymbolId)
-				throw new ArgumentException("Expecting identifier in variable declaration");
+				_Error("Expecting identifier in variable declaration",pc.Current);
 			var result = new CodeVariableDeclarationStatement(ctr, pc.Value);
 			if (null == ctr)
 				result.UserData.Add("slang:unresolved", true);
 			pc.Advance();
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated variable declaration statement", "input");
+				_Error("Unterminated variable declaration statement", pc.Current);
 			if (ST.eq == pc.SymbolId)
 			{
 				
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated variable declaration initializer", "input");
+					_Error("Unterminated variable declaration initializer", pc.Current);
 				result.InitExpression = _ParseExpression(pc);
 				_SkipComments(pc);
 				if (ST.semi != pc.SymbolId)
-					throw new ArgumentException("Invalid expression in variable declaration initializer", "input");
+					_Error("Invalid expression in variable declaration initializer", pc.Current);
 				pc.Advance();
 				return result;
 			}
 			else if (null == ctr)
-				throw new ArgumentException("Var variable declarations must have an initializer");
+				_Error("Var variable declarations must have an initializer",pc.Current);
 			_SkipComments(pc);
 			if (ST.semi != pc.SymbolId)
-				throw new ArgumentException("Invalid expression in variable declaration initializer", "input");
+				_Error("Invalid expression in variable declaration initializer", pc.Current);
 			pc.Advance();
 			return result;
 		}
@@ -345,7 +347,7 @@ namespace CD
 			pc.Advance();
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated return statement", "input");
+				_Error("Unterminated return statement", pc.Current);
 			if (ST.semi == pc.SymbolId)
 			{
 				pc.Advance();
@@ -354,9 +356,9 @@ namespace CD
 			var e = _ParseExpression(pc);
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated return statement", "input");
+				_Error("Unterminated return statement", pc.Current);
 			if (ST.semi != pc.SymbolId)
-				throw new ArgumentException("Invalid expression in return statement", "input");
+				_Error("Invalid expression in return statement", pc.Current);
 			pc.Advance();
 			return new CodeMethodReturnStatement(e);
 		}
@@ -366,7 +368,7 @@ namespace CD
 			pc.Advance();
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated throw statement", "input");
+				_Error("Unterminated throw statement", pc.Current);
 			if (ST.semi == pc.SymbolId)
 			{
 				pc.Advance();
@@ -375,9 +377,9 @@ namespace CD
 			var e = _ParseExpression(pc);
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated throw statement", "input");
+				_Error("Unterminated throw statement", pc.Current);
 			if (ST.semi != pc.SymbolId)
-				throw new ArgumentException("Invalid expression in throw statement", "input");
+				_Error("Invalid expression in throw statement", pc.Current);
 			pc.Advance();
 			return new CodeThrowExceptionStatement(e);
 		}
@@ -387,16 +389,16 @@ namespace CD
 			pc.Advance();
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated goto statement", "input");
+				_Error("Unterminated goto statement", pc.Current);
 			if (ST.identifier != pc.SymbolId)
-				throw new ArgumentException("Expecting identifier in goto statement", "input");
+				_Error("Expecting identifier in goto statement", pc.Current);
 			var g = new CodeGotoStatement(pc.Value);
 			pc.Advance();
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated goto statement", "input");
+				_Error("Unterminated goto statement", pc.Current);
 			if (ST.semi != pc.SymbolId)
-				throw new ArgumentException("Expecting ; after goto statement", "input");
+				_Error("Expecting ; after goto statement", pc.Current);
 			pc.Advance();
 			return g;
 		}
@@ -405,29 +407,29 @@ namespace CD
 		{
 			// expects to be on if.
 			if (!pc.Advance())
-				throw new ArgumentException("Unterminated if statement", "input");
+				_Error("Unterminated if statement", pc.Current);
 			_SkipComments(pc);
 			if(ST.lparen!=pc.SymbolId || !pc.Advance())
-				throw new ArgumentException("Unterminated if statement", "input");
+				_Error("Unterminated if statement", pc.Current);
 			_SkipComments(pc);
 			if(pc.IsEnded)
-				throw new ArgumentException("Unterminated if statement", "input");
+				_Error("Unterminated if statement", pc.Current);
 			var cnd = _ParseExpression(pc);
 			_SkipComments(pc);
 			if (ST.rparen!=pc.SymbolId || !pc.Advance())
-				throw new ArgumentException("Unterminated if statement", "input");
+				_Error("Unterminated if statement", pc.Current);
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated if statement", "input");
+				_Error("Unterminated if statement", pc.Current);
 			var result = new CodeConditionStatement(cnd);
 			if (ST.lbrace==pc.SymbolId)
 			{
 				if(!pc.Advance())
-					throw new ArgumentException("Unterminated if statement", "input");
+					_Error("Unterminated if statement", pc.Current);
 				while(!pc.IsEnded && ST.rbrace!=pc.SymbolId)
 					result.TrueStatements.Add(_ParseStatement(pc,true));
 				if(ST.rbrace!=pc.SymbolId)
-					throw new ArgumentException("Unterminated if statement", "input");
+					_Error("Unterminated if statement", pc.Current);
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)
@@ -442,15 +444,15 @@ namespace CD
 				pc.Advance();
 				_SkipComments(pc);
 				if(pc.IsEnded)
-					throw new ArgumentException("Unterminated if/else statement", "input");
+					_Error("Unterminated if/else statement", pc.Current);
 				if (ST.lbrace == pc.SymbolId)
 				{
 					if (!pc.Advance())
-						throw new ArgumentException("Unterminated if/else statement", "input");
+						_Error("Unterminated if/else statement", pc.Current);
 					while (!pc.IsEnded && ST.rbrace != pc.SymbolId)
 						result.FalseStatements.Add(_ParseStatement(pc,true));
 					if (ST.rbrace != pc.SymbolId)
-						throw new ArgumentException("Unterminated if/else statement", "input");
+						_Error("Unterminated if/else statement", pc.Current);
 					pc.Advance();
 					_SkipComments(pc);
 					if (pc.IsEnded)
@@ -467,29 +469,29 @@ namespace CD
 		{
 			// expects to be on while.
 			if (!pc.Advance())
-				throw new ArgumentException("Unterminated while statement", "input");
+				_Error("Unterminated while statement", pc.Current);
 			_SkipComments(pc);
 			if (ST.lparen != pc.SymbolId || !pc.Advance())
-				throw new ArgumentException("Unterminated while statement", "input");
+				_Error("Unterminated while statement", pc.Current);
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated while statement", "input");
+				_Error("Unterminated while statement", pc.Current);
 			var cnd = _ParseExpression(pc);
 			_SkipComments(pc);
 			if (ST.rparen != pc.SymbolId || !pc.Advance())
-				throw new ArgumentException("Unterminated while statement", "input");
+				_Error("Unterminated while statement", pc.Current);
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated while statement", "input");
+				_Error("Unterminated while statement", pc.Current);
 			var result = new CodeIterationStatement(new CodeSnippetStatement(),cnd,new CodeSnippetStatement());
 			if (ST.lbrace == pc.SymbolId)
 			{
 				if (!pc.Advance())
-					throw new ArgumentException("Unterminated while statement", "input");
+					_Error("Unterminated while statement", pc.Current);
 				while (!pc.IsEnded && ST.rbrace != pc.SymbolId)
 					result.Statements.Add(_ParseStatement(pc,true));
 				if (ST.rbrace != pc.SymbolId)
-					throw new ArgumentException("Unterminated while statement", "input");
+					_Error("Unterminated while statement", pc.Current);
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)
@@ -505,14 +507,14 @@ namespace CD
 		{
 			// expects to be on for
 			if (!pc.Advance())
-				throw new ArgumentException("Unterminated for statement", "input");
+				_Error("Unterminated for statement", pc.Current);
 			_SkipComments(pc);
 			if (ST.lparen != pc.SymbolId || !pc.Advance())
-				throw new ArgumentException("Unterminated for statement", "input");
+				_Error("Unterminated for statement", pc.Current);
 			_SkipComments(pc);
 			CodeStatement init = null;
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated for statement", "input");
+				_Error("Unterminated for statement", pc.Current);
 			if (ST.semi != pc.SymbolId)
 			{
 				var pc2 = pc.GetLookAhead();
@@ -542,33 +544,33 @@ namespace CD
 						init = new CodeExpressionStatement(e);
 					_SkipComments(pc);
 					if (ST.semi != pc.SymbolId)
-						throw new ArgumentException("Invalid init statement in for statement", "input");
+						_Error("Invalid init statement in for statement", pc.Current);
 					if (pc.IsEnded)
-						throw new ArgumentException("Unterminated for statement", "input");
+						_Error("Unterminated for statement", pc.Current);
 				}
 			}
 			if (null == init)
 			{
 				if (ST.semi != pc.SymbolId)
-					throw new ArgumentException("Invalid for statement", "input");
+					_Error("Invalid for statement", pc.Current);
 				pc.Advance();
 				_SkipComments(pc);
 			}
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated for statement", "input");
+				_Error("Unterminated for statement", pc.Current);
 			CodeExpression test = null;
 			if (ST.semi != pc.SymbolId)
 			{
 				test = _ParseExpression(pc);
 				_SkipComments(pc);
 				if (ST.semi != pc.SymbolId)
-					throw new ArgumentException("Invalid test expression in for statement", "input");
+					_Error("Invalid test expression in for statement", pc.Current);
 				if (!pc.Advance())
-					throw new ArgumentException("Unterminated for statement", "input");
+					_Error("Unterminated for statement", pc.Current);
 			}
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated for statement", "input");
+				_Error("Unterminated for statement", pc.Current);
 			CodeExpression inc = null;
 			if (ST.rparen != pc.SymbolId)
 			{
@@ -578,10 +580,10 @@ namespace CD
 			if (ST.rparen != pc.SymbolId)
 				throw new ArgumentNullException("Invalid increment statement in for loop");
 			if (!pc.Advance())
-				throw new ArgumentException("Unterminated for statement", "input");
+				_Error("Unterminated for statement", pc.Current);
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Unterminated for statement", "input");
+				_Error("Unterminated for statement", pc.Current);
 			var bo = inc as CodeBinaryOperatorExpression;
 			CodeStatement incs = null;
 			if (null != inc)
@@ -601,11 +603,11 @@ namespace CD
 			if (ST.lbrace == pc.SymbolId)
 			{
 				if (!pc.Advance())
-					throw new ArgumentException("Unterminated for statement", "input");
+					_Error("Unterminated for statement", pc.Current);
 				while (!pc.IsEnded && ST.rbrace != pc.SymbolId)
 					result.Statements.Add(_ParseStatement(pc,true));
 				if (ST.rbrace != pc.SymbolId)
-					throw new ArgumentException("Unterminated for statement", "input");
+					_Error("Unterminated for statement", pc.Current);
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)

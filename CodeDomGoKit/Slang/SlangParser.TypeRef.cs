@@ -42,7 +42,7 @@ namespace CD
 				pc.EnsureStarted();
 				var result = _ParseTypeRef(pc);
 				if (!pc.IsEnded)
-					throw new ArgumentException("Unrecognized remainder in type reference", "input");
+					throw new SlangSyntaxException("Unrecognized remainder in type reference", pc.Current.Line, pc.Current.Column, pc.Current.Position);
 				return result;
 			}
 		}
@@ -56,16 +56,16 @@ namespace CD
 			{
 				_SkipComments(pc);
 				if (!pc.Advance())
-					throw new ArgumentException("Unterminated generic specification", "input");
+					_Error("Unterminated generic specification", pc.Current);
 				_SkipComments(pc);
 				var tp = _ParseTypeRef(pc);
 				tp.Options = CodeTypeReferenceOptions.GenericTypeParameter;
 				result.TypeArguments.Add(tp);
 				if (ST.gt != pc.SymbolId && ST.comma != pc.SymbolId)
-					throw new ArgumentException("Invalid token in generic specification", "input");
+					_Error("Invalid token in generic specification", pc.Current);
 			}
 			if (ST.gt != pc.SymbolId)
-				throw new ArgumentException("Unterminated generic specification", "input");
+				_Error("Unterminated generic specification", pc.Current);
 			_SkipComments(pc);
 			pc.Advance();
 			return result;
@@ -74,7 +74,7 @@ namespace CD
 		{
 			_SkipComments(pc);
 			if (pc.IsEnded)
-				throw new ArgumentException("Expecting a type reference", "input");
+				_Error("Expecting a type reference", pc.Current);
 			_PC pc2; // for lookahead
 			var isIntrinsic = false;
 			var result = new CodeTypeReference();
@@ -87,17 +87,17 @@ namespace CD
 				{
 					if (ST.keyword == pc.SymbolId)
 					{
-						s = _TranslateIntrinsicType(s);
+						s = _TranslateIntrinsicType(s,pc);
 						isIntrinsic = true;
 					}
 					else if (ST.identifier != pc.SymbolId)
-						throw new ArgumentException("An identifier was expected", "input");
+						_Error("An identifier was expected", pc.Current);
 					result.BaseType = s;
 				}
 				else
 				{
 					if (ST.identifier != pc.SymbolId)
-						throw new ArgumentException("An identifier was expected", "input");
+						_Error("An identifier was expected", pc.Current);
 					result.BaseType=string.Concat(result.BaseType, "+", s);
 				}
 				pc.Advance();
@@ -160,7 +160,7 @@ namespace CD
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)
-					throw new ArgumentException("Unterminated type reference", "input");
+					_Error("Unterminated type reference", pc.Current);
 				first = false;
 			}
 			return result;
@@ -210,7 +210,7 @@ namespace CD
 			}
 			return result;
 		}
-		static string _TranslateIntrinsicType(string s)
+		static string _TranslateIntrinsicType(string s,_PC pc)
 		{
 			switch (s)
 			{
@@ -260,7 +260,8 @@ namespace CD
 					s = typeof(decimal).FullName;
 					break;
 				default:
-					throw new ArgumentException(string.Format("Type expected but found {0}", s), "input");
+					_Error(string.Format("Type expected but found {0}", s), pc.Current);
+					break;
 			}
 
 			return s;

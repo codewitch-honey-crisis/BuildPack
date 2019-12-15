@@ -72,6 +72,7 @@
     <Compile Include="Slang\SlangParser.TypeRef.cs" />
     <Compile Include="Slang\SlangPatcher.cs" />
     <Compile Include="Slang\SlangPreprocessor.cs" />
+    <Compile Include="Slang\SlangSyntaxException.cs" />
     <Compile Include="Slang\SlangTokenizer.cs" />
     <Compile Include="Slang\TextReaderEnumerable.cs" />
   </ItemGroup>
