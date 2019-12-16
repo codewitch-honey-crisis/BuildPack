@@ -268,7 +268,9 @@ namespace CD
 				return new KeyValuePair<MemberInfo, object[]>(
 					tr.GetType().GetConstructor(new Type[] { typeof(CodeTypeReference), typeof(int) }),
 					new object[] { tr.ArrayElementType,tr.ArrayRank });
-			} else if(0!=(int)tr.Options)
+			}
+			
+			if (0!=(int)tr.Options)
 			{
 				if(0==tr.TypeArguments.Count)
 					return new KeyValuePair<MemberInfo, object[]>(
@@ -276,14 +278,25 @@ namespace CD
 					new object[] { tr.BaseType, tr.Options});
 			} else
 			{
+				
 				if (0 == tr.TypeArguments.Count)
+				{
+					var t = Type.GetType(tr.BaseType, false, false);
+					if (null == t)
+						return new KeyValuePair<MemberInfo, object[]>(
+						tr.GetType().GetConstructor(new Type[] { typeof(string) }),
+						new object[] { tr.BaseType });
 					return new KeyValuePair<MemberInfo, object[]>(
-					tr.GetType().GetConstructor(new Type[] { typeof(string)}),
-					new object[] { tr.BaseType});
+					tr.GetType().GetConstructor(new Type[] { typeof(Type) }),
+					new object[] { t });
+				}
 				else
+				{
+					
 					return new KeyValuePair<MemberInfo, object[]>(
-					tr.GetType().GetConstructor(new Type[] { typeof(string),typeof(CodeTypeReference[]) }),
-					new object[] { tr.BaseType,_ToArray(tr.TypeArguments) });
+						tr.GetType().GetConstructor(new Type[] { typeof(string), typeof(CodeTypeReference[]) }),
+						new object[] { tr.BaseType, _ToArray(tr.TypeArguments) });
+				}
 			}
 			return new KeyValuePair<MemberInfo, object[]>(typeof(CodeDomBuilder).GetMethod("TypeReference"),
 				new object[] { tr.BaseType, tr.Options, _ToArray(tr.TypeArguments),tr.ArrayElementType,tr.ArrayRank });

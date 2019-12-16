@@ -1313,6 +1313,11 @@ namespace CD
 		{
 			if (null == val)
 				return new CodePrimitiveExpression(null);
+			// we serialize type to a typeof expression because it makes sense
+			// and makes serializing arrays with types in them possible
+			var tt = val as Type;
+			if(null!=tt)
+				return new CodeTypeOfExpression(tt);
 			if (val is char) // special case for unicode nonsense
 			{
 				// console likes to cook unicode characters
