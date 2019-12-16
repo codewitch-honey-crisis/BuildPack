@@ -11,7 +11,8 @@ namespace DeslangDemo
 	{
 		static void Main(string[] args)
 		{
-			CodeDomVisitor.Visit(Deslanged.Widget, (ctx) =>
+			var widget = Deslanged.Widget;
+			CodeDomVisitor.Visit(widget, (ctx) =>
 			{
 				// look for our _payload field
 				var f = ctx.Target as CodeMemberField;
@@ -24,7 +25,7 @@ namespace DeslangDemo
 				}
 			});
 
-			Console.WriteLine(CodeDomUtility.ToString(Deslanged.Widget));
+			Console.WriteLine(CodeDomUtility.ToString(widget));
 		}
 		static byte[] _Hash(string text)
 		{

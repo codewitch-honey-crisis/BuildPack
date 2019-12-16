@@ -32,7 +32,7 @@ namespace Deslang
 			string codelanguage = null;
 			string t4language = null;
 			bool ifstale = false;
-
+			bool mutable = false;
 			TextReader input = null;
 			TextWriter output = null;
 			try
@@ -108,6 +108,9 @@ namespace Deslang
 								break;
 							case "/ifstale":
 								ifstale = true;
+								break;
+							case "/mutable":
+								mutable = true;
 								break;
 							default:
 								throw new ArgumentException(string.Format("Unknown switch {0}", args[i]));
@@ -236,8 +239,16 @@ namespace Deslang
 							}
 						});
 						var name = Path.GetFileNameWithoutExtension(inputs[i]);
-						var fld = C.Field(typeof(CodeCompileUnit), name, MemberAttributes.Public | MemberAttributes.Static, ccuInit);
-						cls.Members.Add(fld);
+						if (mutable)
+						{
+							var fld = C.Field(typeof(CodeCompileUnit), name, MemberAttributes.Public | MemberAttributes.Static, ccuInit);
+							cls.Members.Add(fld);
+						} else
+						{
+							var prop = C.Property(typeof(CodeCompileUnit), name, MemberAttributes.Public | MemberAttributes.Static);
+							prop.GetStatements.Add(C.Return(ccuInit));
+							cls.Members.Add(prop);
+						}
 					}
 					if (!string.IsNullOrEmpty(codenamespace))
 						ns.Name = codenamespace;
@@ -314,7 +325,7 @@ namespace Deslang
 			t.WriteLine();
 			t.WriteLine(" <inputfile> [/output <outputfile>] [/name <name>] [/class <codeclass>]");
 			t.WriteLine("	[/namespace <codenamespace>] [/language <codelanguage>] [/ifstale]");
-			t.WriteLine("	[/asms <assembly1> <assembly2> ... <assemblyN>]");
+			t.WriteLine("	[/mutable] [/asms <assembly1> <assembly2> ... <assemblyN>]");
 			t.WriteLine();
 			t.WriteLine("   <inputfile>     The input file to use.");
 			t.WriteLine("   <outputfile>    The output file to use - default stdout.");
@@ -324,6 +335,7 @@ namespace Deslang
 			t.WriteLine("   <codelanguage>  The code language - default based on output file - default C#");
 			t.WriteLine("   <t4language>	The t4 preprocessing language between <# and #> - default C#");
 			t.WriteLine("	<ifstale>       Do not generate unless <outputfile> is older than <inputfile>.");
+			t.WriteLine("	<mutable>       Generate output as fields instead of properties so their contents can be changed.");
 			t.WriteLine("	<assembly>		The assembly name or path to the assembly to reference.");
 			t.WriteLine();
 			t.WriteLine("Any other switch displays this screen and exits.");

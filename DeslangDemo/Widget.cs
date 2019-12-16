@@ -8,7 +8,7 @@ namespace CorporateHellscape
 	{
 		// our payload - to be filled
 		byte[] _payload;
-
+	
 		public override string ToString()
 		{
 			return "[Widget - " + Convert.ToBase64String(_payload) +"]";
