@@ -13,6 +13,5 @@ namespace CorporateHellscape
 		{
 			return "[Widget - " + Convert.ToBase64String(_payload) +"]";
 		}
-
 	}
 }

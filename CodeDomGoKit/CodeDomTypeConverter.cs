@@ -326,9 +326,13 @@ namespace CD
 						typeof(CodeDomBuilder).GetMethod(stmt.GetType().Name.Substring(4)),
 						new object[] { cm.Comment, _ToArray(a.StartDirectives), _ToArray(a.EndDirectives), a.LinePragma });
 				}
+				if (!cm.Comment.DocComment)
+					return new KeyValuePair<MemberInfo, object[]>(
+						stmt.GetType().GetConstructor(new Type[] { typeof(string) }),
+						new object[] { cm.Comment.Text });
 				return new KeyValuePair<MemberInfo, object[]>(
-					stmt.GetType().GetConstructor(new Type[] { typeof(CodeComment)}),
-					new object[] { cm.Comment});
+					stmt.GetType().GetConstructor(new Type[] { typeof(string), typeof(bool) }),
+					new object[] { cm.Comment.Text,cm.Comment.DocComment});
 			}
 			var c = stmt as CodeConditionStatement;
 			if (null != c)
