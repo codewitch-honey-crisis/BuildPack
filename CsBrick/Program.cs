@@ -129,39 +129,136 @@ namespace CSBrick
 		static List<string> _GetInputs(string projectFile,HashSet<string> excludedFiles)
 		{
 			string ns = null;
+			var isSdkProj = false;
 			using (var r = XmlReader.Create(projectFile))
 			{
 				while (r.Read() && XmlNodeType.Element != r.NodeType) ;
 				if (XmlNodeType.Element != r.NodeType)
 					throw new IOException("The project file does not contain a valid project.");
 				ns = r.NamespaceURI;
+				var s = r.GetAttribute("Sdk");
+				if (!string.IsNullOrEmpty(s))
+					isSdkProj = true;
 			}
 			var result = new List<string>();
-			using (var r = XmlReader.Create(projectFile))
+			if (!isSdkProj)
 			{
-				var d = new XPathDocument(r);
-				var nav = d.CreateNavigator();
-				var res = new XmlNamespaceManager(nav.NameTable);
-				res.AddNamespace("e", ns);
-				var iter = nav.Select("/e:Project/e:ItemGroup/e:Compile/@Include", res);
-				while (iter.MoveNext())
+				using (var r = XmlReader.Create(projectFile))
 				{
-					var s = iter.Current.Value;
-					if (!excludedFiles.Contains(s))
+					var d = new XPathDocument(r);
+					var nav = d.CreateNavigator();
+					var res = new XmlNamespaceManager(nav.NameTable);
+					res.AddNamespace("e", ns);
+					var iter = nav.Select("/e:Project/e:ItemGroup/e:Compile/@Include", res);
+					while (iter.MoveNext())
 					{
-						if (Path.IsPathRooted(s))
+						var s = iter.Current.Value;
+						if (!excludedFiles.Contains(s))
 							result.Add(s);
-						else
+						
+					}
+				}
+			} else // Core or Standard project
+			{
+				var dir = Path.GetDirectoryName(projectFile);
+				var files = Directory.GetFiles(dir, "*.cs");
+				for(var i = 0;i<files.Length;++i)
+				{
+					var f = Path.Combine(dir,files[i]);
+					f = Path.GetFullPath(f);
+					result.Add(f);
+				}
+				foreach (string d in Directory.GetDirectories(dir))
+				{
+					_DirSearch(dir, d, result);
+				}
+				using (var r = XmlReader.Create(projectFile))
+				{
+					var d = new XPathDocument(r);
+					var nav = d.CreateNavigator();
+					var res = new XmlNamespaceManager(nav.NameTable);
+					res.AddNamespace("e", ns);
+					var iter = nav.Select("/e:Project/e:ItemGroup/e:Compile/@Remove", res);
+					while (iter.MoveNext())
+					{
+						var s = iter.Current.Value;
+						s = Path.Combine(Path.GetDirectoryName(projectFile), s);
+						s = Path.GetFullPath(s);
+						result.Remove(s);
+					}
+					iter = nav.Select("/e:Project/e:ItemGroup/e:Compile/@Include", res);
+					while (iter.MoveNext())
+					{
+						var s = iter.Current.Value;
+						result.Add(s);
+					}
+				}
+				foreach(var e in excludedFiles)
+				{
+					var s = e;
+					if (!Path.IsPathRooted(s))
+						s = Path.Combine(Path.GetDirectoryName(projectFile), e);
+					try
+					{
+						// in case it doesn't exist
+						s = Path.GetFullPath(s);
+					}
+					catch { }
+					for(int ic=result.Count,i=0;i<ic;++i)
+					{
+						var sc = result[i];
+						sc = Path.Combine(Path.GetDirectoryName(projectFile), sc);
+						try
 						{
-							result.Add(Path.Combine(Path.GetDirectoryName(projectFile), s));
+							sc = Path.GetFullPath(sc);
+						}
+						catch { }
+						if (0==string.Compare(s,sc))
+						{
+							result.RemoveAt(i);
+							--i;
+							--ic;
 						}
 					}
 				}
 			}
 			if (0 == result.Count)
 				throw new IOException("The project file does not contain any valid source files.");
+			for (int ic = result.Count, i = 0; i < ic; ++i)
+			{
+				var s = result[i];
+				if (!Path.IsPathRooted(s))
+				{
+					s = Path.Combine(Path.GetDirectoryName(projectFile), s);
+				}
+				try
+				{
+					s = Path.GetFullPath(s);
+				}
+				catch { }
+				result[i] = s;
+			}
 			return result;
 		}
+		static void _DirSearch(string root,string currentDir,IList<string> result,bool first=true)
+		{
+			
+			foreach (string d in Directory.GetDirectories(currentDir))
+			{
+				foreach (string f in Directory.GetFiles(d,"*.cs"))
+				{
+					result.Add(f);
+				}
+				var s = currentDir;
+				var i = s.LastIndexOfAny(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });
+				if (-1 < i)
+					s = s.Substring(i + 1);
+				if (!first || (0 != string.Compare(s, "bin") && 0 != string.Compare(s, "obj")))
+					_DirSearch(root,d,result,false);
+			}
+			
+		}
+		
 		static string _GetName()
 		{
 			foreach (var attr in Assembly.GetEntryAssembly().CustomAttributes)

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="DontInclude1.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="bin\Class2.cs" />
+  </ItemGroup>
+
+</Project>
