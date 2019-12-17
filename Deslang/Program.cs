@@ -320,9 +320,9 @@ namespace Deslang
 			// write the name of our app. this actually uses the 
 			// name of the executable so it will always be correct
 			// even if the executable file was renamed.
-			t.Write(_File);
 			t.WriteLine("{0} cooks one or more input Slang files into static arrays of codedom structures", _Name);
 			t.WriteLine();
+			t.Write(_File);
 			t.WriteLine(" <inputfile> [/output <outputfile>] [/name <name>] [/class <codeclass>]");
 			t.WriteLine("	[/namespace <codenamespace>] [/language <codelanguage>] [/ifstale]");
 			t.WriteLine("	[/mutable] [/asms <assembly1> <assembly2> ... <assemblyN>]");

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace RE
 {
@@ -26,6 +27,108 @@ namespace RE
 		object ICloneable.Clone() => CloneImpl();
 	}
 	/// <summary>
+	/// Represents a unicode character category, such as \p{Lu} (uppercase letter)
+	/// </summary>
+#if REGEXLIB
+	public
+#endif
+	class RegexCharsetUnicodeCategoryEntry : RegexCharsetEntry
+	{
+		string _category;
+		/// <summary>
+		/// Initializes the charset entry with the specified unicode category
+		/// </summary>
+		/// <param name="category">The unicode category</param>
+		public RegexCharsetUnicodeCategoryEntry(string category)
+		{
+			Category = category;
+		}
+		/// <summary>
+		/// Indicates the Unicode category
+		/// </summary>
+		public string Category 
+		{
+			get {
+				return _category;
+			}
+			set {
+				if (!CharFA<string>.UnicodeCategories.ContainsKey(value))
+					throw new ArgumentException("The value was not a valid unicode category.");
+				_category = value;
+			}
+		}
+		/// <summary>
+		/// Returns a string indicating the string representation of this entry
+		/// </summary>
+		/// <returns>A string representing this entry</returns>
+		public override string ToString()
+		{
+			return string.Concat("\\p{", Category, "}");	
+		}
+		/// <summary>
+		/// Clones the object
+		/// </summary>
+		/// <returns>A clone of the object</returns>
+		protected override RegexCharsetEntry CloneImpl()
+		{
+			return new RegexCharsetUnicodeCategoryEntry(Category);
+		}
+
+		#region Value semantics
+		/// <summary>
+		/// Indicates whether this unicode category entry is the same as the right hand unicode category entry
+		/// </summary>
+		/// <param name="rhs">The unicode category entry to compare</param>
+		/// <returns>True if the unicode category entries are the same, otherwise false</returns>
+		public bool Equals(RegexCharsetUnicodeCategoryEntry rhs)
+		{
+			if (ReferenceEquals(rhs, this)) return true;
+			if (ReferenceEquals(rhs, null)) return false;
+			return 0 == string.Compare(Category, rhs.Category, StringComparison.InvariantCultureIgnoreCase);
+		}
+		/// <summary>
+		/// Indicates whether this unicode category entry is the same as the right hand unicode category entry
+		/// </summary>
+		/// <param name="rhs">The unicode category entry to compare</param>
+		/// <returns>True if the unicode category entries are the same, otherwise false</returns>
+		public override bool Equals(object rhs)
+			=> Equals(rhs as RegexCharsetUnicodeCategoryEntry);
+		/// <summary>
+		/// Computes a hash code for this unicode category entry
+		/// </summary>
+		/// <returns>A hash code for this unicode category entry</returns>
+		public override int GetHashCode()
+		{
+			if (null == Category) return 0;
+			return Category.ToUpperInvariant().GetHashCode();
+		}
+		/// <summary>
+		/// Indicates whether or not two unicode category entries are the same
+		/// </summary>
+		/// <param name="lhs">The left hand unicode category entry to compare</param>
+		/// <param name="rhs">The right hand unicode category entry to compare</param>
+		/// <returns>True if the unicode category entries are the same, otherwise false</returns>
+		public static bool operator ==(RegexCharsetUnicodeCategoryEntry lhs, RegexCharsetUnicodeCategoryEntry rhs)
+		{
+			if (ReferenceEquals(lhs, rhs)) return true;
+			if (ReferenceEquals(lhs, null)) return false;
+			return lhs.Equals(rhs);
+		}
+		/// <summary>
+		/// Indicates whether or not two unicode category entries are different
+		/// </summary>
+		/// <param name="lhs">The left hand unicode category entry to compare</param>
+		/// <param name="rhs">The right hand unicode category entry to compare</param>
+		/// <returns>True if the unicode category entries are different, otherwise false</returns>
+		public static bool operator !=(RegexCharsetUnicodeCategoryEntry lhs, RegexCharsetUnicodeCategoryEntry rhs)
+		{
+			if (ReferenceEquals(lhs, rhs)) return false;
+			if (ReferenceEquals(lhs, null)) return true;
+			return !lhs.Equals(rhs);
+		}
+		#endregion
+	}
+	/// <summary>
 	/// Represents a character class charset entry
 	/// </summary>
 #if REGEXLIB
@@ -34,7 +137,7 @@ namespace RE
 	class RegexCharsetClassEntry : RegexCharsetEntry
 	{
 		/// <summary>
-		/// Initializes a class entry with the specified character class
+		/// Initializes a charset entry with the specified character class
 		/// </summary>
 		/// <param name="name">The name of the character class</param>
 		public RegexCharsetClassEntry(string name)

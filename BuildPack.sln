@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deslang", "Deslang\Deslang.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeslangDemo", "DeslangDemo\DeslangDemo.csproj", "{687A2CA3-6111-4858-9D47-7A1A54BE5F69}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSBrick", "CsBrick\CSBrick.csproj", "{DBA55F69-0B8C-436C-ABCD-87DE38913AF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{687A2CA3-6111-4858-9D47-7A1A54BE5F69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{687A2CA3-6111-4858-9D47-7A1A54BE5F69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{687A2CA3-6111-4858-9D47-7A1A54BE5F69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBA55F69-0B8C-436C-ABCD-87DE38913AF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBA55F69-0B8C-436C-ABCD-87DE38913AF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBA55F69-0B8C-436C-ABCD-87DE38913AF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBA55F69-0B8C-436C-ABCD-87DE38913AF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

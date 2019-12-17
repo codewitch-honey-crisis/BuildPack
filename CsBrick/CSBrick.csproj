@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0286AC77-D7C2-4681-A319-E5C6A2B2B7C1}</ProjectGuid>
+    <ProjectGuid>{DBA55F69-0B8C-436C-ABCD-87DE38913AF4}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Deslang</RootNamespace>
-    <AssemblyName>deslang</AssemblyName>
+    <RootNamespace>CSBrick</RootNamespace>
+    <AssemblyName>csbrick</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -32,27 +32,26 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CodeDomGoKit.brick.cs" />
+    <Compile Include="Minifier.cs" />
+    <Compile Include="ParseContext.BaseExtensions.cs" />
+    <Compile Include="ParseContext.cs" />
+    <Compile Include="ParseContext.CSharp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Shared\CodeDomBuilder.cs" />
+    <Compile Include="StringUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Key.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>$(SolutionDir)CSBrick\bin\Release\csbrick.exe $(SolutionDir)CodeDomGoKit\CodeDomGoKit.csproj /output $(ProjectDir)CodeDomGoKit.brick.cs</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
 </Project>

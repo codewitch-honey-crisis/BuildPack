@@ -53,6 +53,9 @@ namespace RE
 				var crcl = entry as RegexCharsetClassEntry;
 				if (null != crcl)
 					ranges.AddRange(CharFA<TAccept>.CharacterClasses[crcl.Name]);
+				var cruc = entry as RegexCharsetUnicodeCategoryEntry;
+				if (null != cruc)
+					ranges.AddRange(CharFA<TAccept>.UnicodeCategories[cruc.Category]);
 			}
 			if (HasNegatedRanges)
 				return CharFA<TAccept>.Set(CharRange.NotRanges(ranges), accept);
@@ -75,13 +78,24 @@ namespace RE
 		/// <remarks>Used by ToString()</remarks>
 		protected internal override void AppendTo(StringBuilder sb)
 		{
-			// special case for "."
+			// special case for single entries
 			if(1==Entries.Count)
 			{
 				var dotE = Entries[0] as RegexCharsetRangeEntry;
 				if(!HasNegatedRanges && null !=dotE && dotE.First==char.MinValue && dotE.Last==char.MaxValue)
 				{
 					sb.Append(".");
+					return;
+				}
+				var uc = Entries[0] as RegexCharsetUnicodeCategoryEntry;
+				if(null!=uc)
+				{
+					if (!HasNegatedRanges)
+						sb.Append(@"\p{");
+					else
+						sb.Append(@"\P{");
+					sb.Append(uc.Category);
+					sb.Append("}");
 					return;
 				}
 				var cls = Entries[0] as RegexCharsetClassEntry;
@@ -119,11 +133,9 @@ namespace RE
 							else
 								sb.Append(@"\W");
 							return;
-
 					}
 				}
 			}
-			
 			sb.Append('[');
 			if (HasNegatedRanges)
 				sb.Append('^');

@@ -633,8 +633,28 @@ namespace RE
 						
 						pc.Advance();
 						pc.Expecting();
+						var isNot = false;
 						switch (pc.Current)
 						{
+							case 'P':
+								isNot = true;
+								goto case 'p';
+							case 'p':
+								pc.Advance();
+								pc.Expecting('{');
+								var uc = new StringBuilder();
+								int uli = pc.Line;
+								int uco = pc.Column;
+								long upo = pc.Position;
+								while (-1!=pc.Advance() && '}'!=pc.Current)
+									uc.Append((char)pc.Current);
+								pc.Expecting('}');
+								pc.Advance();
+								IList<CharRange> cr;
+								if (!CharFA<string>.UnicodeCategories.TryGetValue(uc.ToString(), out cr))
+									throw new ExpectingException(string.Format("Expecting a unicode category but found \"{0}\" at line {1}, column {2}, position {3}",uc.ToString(),uli,uco,upo), uli, uco, upo);
+								next = new RegexCharsetExpression(new RegexCharsetEntry[] { new RegexCharsetUnicodeCategoryEntry(uc.ToString())}, isNot);
+								break;
 							case 'd':
 								next = new RegexCharsetExpression(new RegexCharsetEntry[] { new RegexCharsetClassEntry("digit") });
 								pc.Advance();

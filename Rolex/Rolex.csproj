@@ -123,6 +123,9 @@
     <Compile Include="..\Regex\FA\CharFA.ThompsonConstruction.cs">
       <Link>Regex\FA\CharFA.ThompsonConstruction.cs</Link>
     </Compile>
+    <Compile Include="..\Regex\FA\CharFA.UnicodeCategories.cs">
+      <Link>Regex\FA\CharFA.UnicodeCategories.cs</Link>
+    </Compile>
     <Compile Include="..\Regex\FA\CharFAProgress.cs">
       <Link>Regex\FA\CharFAProgress.cs</Link>
     </Compile>
@@ -150,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="CSTokenizer.rl" />
     <None Include="Key.snk" />
     <None Include="SampleTokenizer.rl" />
     <None Include="SlangTokenizer.rl" />

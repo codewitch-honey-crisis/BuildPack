@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Diagnostics.Contracts;
-using CultureInfo = System.Globalization.CultureInfo;
+using System.Globalization;
 using System.ComponentModel;
 using System.CodeDom;
 using System.Collections.Generic;

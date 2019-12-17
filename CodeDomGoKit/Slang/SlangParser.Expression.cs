@@ -767,8 +767,8 @@ namespace CD
 				s = _ParseEscapeChar(e,pc.Current);
 				if (1 == s.Length)
 					return new CodePrimitiveExpression(s[0]);
-				else // for UTF-32 this has to be a string
-					return new CodePrimitiveExpression(s);
+				else 
+					return new CodePrimitiveExpression(s); // for UTF-32 this has to be a string
 			}
 			return new CodePrimitiveExpression(s[0]);
 		}
