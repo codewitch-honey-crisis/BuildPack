@@ -4,7 +4,7 @@
 
 ### Slang
 
-Slang is a miniature language. It's a subset of C# suitable for constructing CodeDOM trees. It obviates the need to build them by hand since you can do it by writing restricted C# code instead. The reason the language is restricted is the CodeDOM does not allow for full fidelity. Many features like read only fields, and even postfix increment/decrement can't be supported. Even with these limitations it doesn't matter as it makes using the CodeDOM pretty easy. Now you can include source files in your build as templates using T4 and C# syntax and generate CodeDOM graphs that way. Or you can simply render source dependencies in your target language even though you keep them in Slang/C# instead of CodeDOM graphs. It is included as part of the Go Kit.
+Slang is a miniature language. It's a subset of C# suitable for constructing CodeDOM trees. It obviates the need to build them by hand since you can do it by writing restricted C# code instead. The reason the language is restricted is the CodeDOM does not allow for full fidelity. Many features like read only fields, and even postfix increment/decrement can't be supported. Even with these limitations it doesn't matter as it makes using the CodeDOM pretty easy. Now you can include source files in your build as templates using T4 and C# syntax and generate CodeDOM graphs that way. Or you can simply render source dependencies in your target language even though you keep them in Slang/C# instead of CodeDOM graphs. It is included as part of the Go Kit. See the **SlangDemo** project and watch Slang convert your C# into VB and into CodeDOM graphs
 
 ### Other CodeDOM stuff in the Go Kit
 
@@ -48,6 +48,8 @@ This is helpful in conjunction with the use of CodeDomVisitor.cs (adds about 30k
 
 Or you can just use deslang to take any slang and turn it into static codedom for your own nefarious purposes. The sky is the limit.
 
+See the **DeslangDemo** project for a simple, contrived example, and **Rolex** for a more complicated real world example.
+
 ## CSBrick
 
-CSBrick takes a C# Visual Studio Project, gathering all compilable source files in the project (except AssemblyInfo.cs) and merges them all into one minified C# source file. The reason for this is as a workaround for lack of out of the box static linking in .NET. Basically, you can include this merged source file instead of referencing the project it came from so you can create a project without 3rd party dependencies on other non-system assemblies. This is important for build tools since nobody wants to drag DLL's around with their exe that performs a pre-build step. So use this to make your build tools when you must reference an external library (like **CodeDOM Go Kit**)
+CSBrick takes a C# Visual Studio Project, gathering all compilable source files in the project (except AssemblyInfo.cs) and merges them all into one minified C# source file. The reason for this is as a workaround for lack of out of the box static linking in .NET. Basically, you can include this merged source file instead of referencing the project it came from so you can create a project without 3rd party dependencies on other non-system assemblies. This is important for build tools since nobody wants to drag DLL's around with their exe that performs a pre-build step. So use this to make your build tools when you must reference an external library (like **CodeDOM Go Kit**). Just run **CSBrick** and watch it spit out the **scratch** project to the console, minified.
