@@ -151,11 +151,35 @@ namespace CSBrick
 					res.AddNamespace("e", ns);
 					var iter = nav.Select("/e:Project/e:ItemGroup/e:Compile/@Include", res);
 					while (iter.MoveNext())
+						result.Add(iter.Current.Value);
+				}
+				foreach (var e in excludedFiles)
+				{
+					var s = e;
+					if (!Path.IsPathRooted(s))
+						s = Path.Combine(Path.GetDirectoryName(projectFile), e);
+					try
 					{
-						var s = iter.Current.Value;
-						if (!excludedFiles.Contains(s))
-							result.Add(s);
-						
+						// in case it doesn't exist
+						s = Path.GetFullPath(s);
+					}
+					catch { }
+					for (int ic = result.Count, i = 0; i < ic; ++i)
+					{
+						var sc = result[i];
+						if(!Path.IsPathRooted(sc))
+							sc = Path.Combine(Path.GetDirectoryName(projectFile), sc);
+						try
+						{
+							sc = Path.GetFullPath(sc);
+						}
+						catch { }
+						if (0 == string.Compare(s, sc))
+						{
+							result.RemoveAt(i);
+							--i;
+							--ic;
+						}
 					}
 				}
 			} else // Core or Standard project
@@ -207,7 +231,8 @@ namespace CSBrick
 					for(int ic=result.Count,i=0;i<ic;++i)
 					{
 						var sc = result[i];
-						sc = Path.Combine(Path.GetDirectoryName(projectFile), sc);
+						if (!Path.IsPathRooted(sc))
+							sc = Path.Combine(Path.GetDirectoryName(projectFile), sc);
 						try
 						{
 							sc = Path.GetFullPath(sc);
