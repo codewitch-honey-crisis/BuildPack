@@ -57,7 +57,7 @@ namespace CSBrick
 					// gather usings
 					while('u'==pc.Current)
 					{
-						pc.TryReadCIdentifier();
+						pc.TryReadCSharpIdentifier();
 						if ("using" != pc.GetCapture())
 							break;
 						if (!pc.TrySkipCCommentsAndWhiteSpace())
@@ -134,7 +134,7 @@ namespace CSBrick
 					// gather usings
 					while ('u' == pc.Current)
 					{
-						pc.TryReadCIdentifier();
+						pc.TryReadCSharpIdentifier();
 						if ("using" != pc.GetCapture())
 							break;
 						if (!pc.TrySkipCCommentsAndWhiteSpace())
@@ -222,7 +222,7 @@ namespace CSBrick
 								break;
 							default:
 								pc.ClearCapture();
-								if (pc.TryReadCIdentifier())
+								if (pc.TryReadCSharpIdentifier())
 								{
 									if (isIdentOrNum)
 									{
