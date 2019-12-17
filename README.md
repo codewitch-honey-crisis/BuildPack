@@ -47,3 +47,7 @@ Deslang basically makes it so you can take some slang code and output it as a st
 This is helpful in conjunction with the use of CodeDomVisitor.cs (adds about 30k of compiled binary size) from the Go Kit, so that you can take that static tree and search and modify it, after the fact, inserting dynamic code. Rolex uses a simple variant of this approach to great effect. 2b startup time is lightning fast compared to 2a which had to resolve the slang code every time. Now it doesn't. Win.
 
 Or you can just use deslang to take any slang and turn it into static codedom for your own nefarious purposes. The sky is the limit.
+
+## CSBrick
+
+CSBrick takes a C# Visual Studio Project (Currently must be a Microsoft .NET Framework project), gathering all compilable source files in the project (except AssemblyInfo.cs) and merges them all into one minified C# source file. The reason for this is as a workaround for lack of out of the box static linking in .NET. Basically, you can include this merged source file instead of referencing the project it came from so you can create a project without 3rd party dependencies on other non-system assemblies. This is important for build tools since nobody wants to drag DLL's around with their exe that performs a pre-build step. So use this to make your build tools when you must reference an external library (like **CodeDOM Go Kit**)
