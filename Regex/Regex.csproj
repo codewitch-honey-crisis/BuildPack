@@ -1,25 +1,82 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>RE</RootNamespace>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
-    <DelaySign>false</DelaySign>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{42749316-2C30-48F4-95B5-4073F42CDB51}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Regex</RootNamespace>
+    <AssemblyName>Regex</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\dev\Regex\Regex\Regex.xml</DocumentationFile>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;REGEXLIB</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE;REGEXLIB</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\dev\Regex\Regex\Regex.xml</DocumentationFile>
-    <DefineConstants>TRACE;REGEXLIB</DefineConstants>
-  </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="System.CodeDom" Version="4.7.0-preview3.19551.4" />
+    <Reference Include="System" />
   </ItemGroup>
-
+  <ItemGroup>
+    <Compile Include="Ast\RegexBinaryExpression.cs" />
+    <Compile Include="Ast\RegexCharsetEntry.cs" />
+    <Compile Include="Ast\RegexCharsetExpression.cs" />
+    <Compile Include="Ast\RegexConcatExpression.cs" />
+    <Compile Include="Ast\RegexExpression.cs" />
+    <Compile Include="Ast\RegexLiteralExpression.cs" />
+    <Compile Include="Ast\RegexOptionalExpression.cs" />
+    <Compile Include="Ast\RegexOrExpression.cs" />
+    <Compile Include="Ast\RegexRepeatExpression.cs" />
+    <Compile Include="Ast\RegexUnaryExpression.cs" />
+    <Compile Include="CharRange.cs" />
+    <Compile Include="FA\CharDfaEntry.cs" />
+    <Compile Include="FA\CharFA.Accepting.cs" />
+    <Compile Include="FA\CharFA.Analysis.cs" />
+    <Compile Include="FA\CharFA.CharacterClasses.cs" />
+    <Compile Include="FA\CharFA.Clone.cs" />
+    <Compile Include="FA\CharFA.CodeGeneration.cs" />
+    <Compile Include="FA\CharFA.Computation.cs" />
+    <Compile Include="FA\CharFA.cs" />
+    <Compile Include="FA\CharFA.DfaStateTable.cs" />
+    <Compile Include="FA\CharFA.Duplicates.cs" />
+    <Compile Include="FA\CharFA.Final.cs" />
+    <Compile Include="FA\CharFA.GraphViz.cs" />
+    <Compile Include="FA\CharFA.InputTransitionDictionary.cs" />
+    <Compile Include="FA\CharFA.Lexer.cs" />
+    <Compile Include="FA\CharFA.Matcher.cs" />
+    <Compile Include="FA\CharFA.Neutral.cs" />
+    <Compile Include="FA\CharFA.ParseContextExtensions.cs" />
+    <Compile Include="FA\CharFA.PowersetConstruction.cs" />
+    <Compile Include="FA\CharFA.Reduce.cs" />
+    <Compile Include="FA\CharFA.SetComparer.cs" />
+    <Compile Include="FA\CharFA.ThompsonConstruction.cs" />
+    <Compile Include="FA\CharFA.UnicodeCategories.cs" />
+    <Compile Include="FA\CharFAMatch.cs" />
+    <Compile Include="FA\CharFAProgress.cs" />
+    <Compile Include="ListDictionary.cs" />
+    <Compile Include="ParseContext.BaseExtensions.cs" />
+    <Compile Include="ParseContext.cs" />
+    <Compile Include="ParseContext.Json.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Key.snk" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

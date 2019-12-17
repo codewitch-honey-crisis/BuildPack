@@ -4,7 +4,10 @@ namespace RE
 	/// <summary>
 	/// Extends the parse context
 	/// </summary>
-	public static partial class ParseContextExtensions
+#if REGEXLIB
+	public 
+#endif
+		static partial class ParseContextExtensions
 	{
 		/// <summary>
 		/// Lexes a token out of the input

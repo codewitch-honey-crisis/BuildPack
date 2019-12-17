@@ -48,102 +48,10 @@
     <Compile Include="..\CodeDomGoKit\CodeDomVisitor.cs">
       <Link>CodeDomGoKit\CodeDomVisitor.cs</Link>
     </Compile>
-    <Compile Include="..\Regex\Ast\RegexBinaryExpression.cs">
-      <Link>Regex\Ast\RegexBinaryExpression.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\Ast\RegexCharsetEntry.cs">
-      <Link>Regex\Ast\RegexCharsetEntry.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\Ast\RegexCharsetExpression.cs">
-      <Link>Regex\Ast\RegexCharsetExpression.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\Ast\RegexConcatExpression.cs">
-      <Link>Regex\Ast\RegexConcatExpression.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\Ast\RegexExpression.cs">
-      <Link>Regex\Ast\RegexExpression.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\Ast\RegexLiteralExpression.cs">
-      <Link>Regex\Ast\RegexLiteralExpression.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\Ast\RegexOptionalExpression.cs">
-      <Link>Regex\Ast\RegexOptionalExpression.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\Ast\RegexOrExpression.cs">
-      <Link>Regex\Ast\RegexOrExpression.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\Ast\RegexRepeatExpression.cs">
-      <Link>Regex\Ast\RegexRepeatExpression.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\Ast\RegexUnaryExpression.cs">
-      <Link>Regex\Ast\RegexUnaryExpression.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\CharRange.cs">
-      <Link>Regex\CharRange.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFA.Accepting.cs">
-      <Link>Regex\FA\CharFA.Accepting.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFA.Analysis.cs">
-      <Link>Regex\FA\CharFA.Analysis.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFA.CharacterClasses.cs">
-      <Link>Regex\FA\CharFA.CharacterClasses.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFA.Clone.cs">
-      <Link>Regex\FA\CharFA.Clone.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFA.Computation.cs">
-      <Link>Regex\FA\CharFA.Computation.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFA.cs">
-      <Link>Regex\FA\CharFA.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFA.Duplicates.cs">
-      <Link>Regex\FA\CharFA.Duplicates.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFA.Final.cs">
-      <Link>Regex\FA\CharFA.Final.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFA.InputTransitionDictionary.cs">
-      <Link>Regex\FA\CharFA.InputTransitionDictionary.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFA.Neutral.cs">
-      <Link>Regex\FA\CharFA.Neutral.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFA.PowersetConstruction.cs">
-      <Link>Regex\FA\CharFA.PowersetConstruction.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFA.Reduce.cs">
-      <Link>Regex\FA\CharFA.Reduce.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFA.SetComparer.cs">
-      <Link>Regex\FA\CharFA.SetComparer.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFA.ThompsonConstruction.cs">
-      <Link>Regex\FA\CharFA.ThompsonConstruction.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFA.UnicodeCategories.cs">
-      <Link>Regex\FA\CharFA.UnicodeCategories.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\FA\CharFAProgress.cs">
-      <Link>Regex\FA\CharFAProgress.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\ListDictionary.cs">
-      <Link>Regex\ListDictionary.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\ParseContext.BaseExtensions.cs">
-      <Link>Regex\ParseContext.BaseExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\ParseContext.cs">
-      <Link>Regex\ParseContext.cs</Link>
-    </Compile>
-    <Compile Include="..\Regex\ParseContext.Json.cs">
-      <Link>Regex\ParseContext.Json.cs</Link>
-    </Compile>
     <Compile Include="CodeGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Regex.brick.cs" />
     <Compile Include="Shared.cs" />
     <Content Include="Shared\CompiledTokenizerTemplate.cs" />
     <Content Include="Shared\TableTokenizerTemplate.cs" />
@@ -161,6 +69,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>$(SolutionDir)Deslang\bin\Release\deslang.exe $(ProjectDir)Shared\Token.cs $(ProjectDir)Shared\TableTokenizer.cs $(ProjectDir)Shared\CompiledTokenizer.cs $(ProjectDir)Shared\TableTokenizerTemplate.cs $(ProjectDir)Shared\CompiledTokenizerTemplate.cs /output $(ProjectDir)Shared.cs /namespace Rolex /class Shared /mutable /ifstale</PreBuildEvent>
+    <PreBuildEvent>$(SolutionDir)Deslang\bin\Release\deslang.exe $(ProjectDir)Shared\Token.cs $(ProjectDir)Shared\TableTokenizer.cs $(ProjectDir)Shared\CompiledTokenizer.cs $(ProjectDir)Shared\TableTokenizerTemplate.cs $(ProjectDir)Shared\CompiledTokenizerTemplate.cs /output $(ProjectDir)Shared.cs /namespace Rolex /class Shared /mutable /ifstale
+$(SolutionDir)CSBrick\bin\Release\csbrick.exe $(SolutionDir)Regex\Regex.csproj /output $(ProjectDir)Regex.brick.cs</PreBuildEvent>
   </PropertyGroup>
 </Project>
