@@ -1,5 +1,7 @@
 # Make Awesome Build Tools in C#
 
+**Note**: You must first build this solution a couple of times in Release mode to get the prebuild steps built. The reason you need to do it twice is because of circular dependencies. Switch to Debug once you're done
+
 ## CodeDom Go Kit
 
 ### Slang
