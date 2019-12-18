@@ -9,12 +9,12 @@ namespace CSBrick
 {
 	class Minifier
 	{
-		public static void MergeMinify(TextWriter writer, int lineWidth = 0, bool defineFiles=false,params string[] sourcePaths)
+		public static void MergeMinify(TextWriter writer, int lineWidth = 0, bool defineFiles = false, params string[] sourcePaths)
 		{
-			MergeMinifyPreamble(writer,defineFiles, sourcePaths);
+			MergeMinifyPreamble(writer, defineFiles, sourcePaths);
 			MergeMinifyBody(writer, lineWidth, sourcePaths);
 		}
-		public static void MergeMinifyPreamble(TextWriter writer,bool defineFiles=false, params string[] sourcePaths)
+		public static void MergeMinifyPreamble(TextWriter writer, bool defineFiles = false, params string[] sourcePaths)
 		{
 			var usings = new HashSet<string>();
 			var defines = new HashSet<string>();
@@ -22,7 +22,7 @@ namespace CSBrick
 			{
 				using (var pc = ParseContext.CreateFrom(new StreamReader(File.Open(fn, FileMode.Open, FileAccess.Read, FileShare.Read))))
 				{
-					if(defineFiles)
+					if (defineFiles)
 					{
 						defines.Add(string.Join("_", StringUtility.SplitWords(Path.GetFileName(fn).ToUpperInvariant())));
 					}
@@ -34,7 +34,7 @@ namespace CSBrick
 					}
 					pc.TrySkipWhiteSpace();
 					// gather defines
-					while ('#'==pc.Current)
+					while ('#' == pc.Current)
 					{
 						if (-1 == pc.Advance())
 							break;
@@ -55,9 +55,9 @@ namespace CSBrick
 					}
 					pc.ClearCapture();
 					// gather usings
-					while('u'==pc.Current)
+					while ('u' == pc.Current)
 					{
-						pc.TryReadCSharpIdentifier();
+						pc.TryReadCIdentifier();
 						if ("using" != pc.GetCapture())
 							break;
 						if (!pc.TrySkipCCommentsAndWhiteSpace())
@@ -84,7 +84,7 @@ namespace CSBrick
 					}
 				}
 			}
-			foreach(string def in defines)
+			foreach (string def in defines)
 			{
 				writer.Write("#define ");
 				writer.WriteLine(def);
@@ -96,8 +96,8 @@ namespace CSBrick
 				writer.WriteLine(";");
 			}
 		}
-		
-		public static void MergeMinifyBody(TextWriter writer, int lineWidth=0, params string[] sourcePaths)
+
+		public static void MergeMinifyBody(TextWriter writer, int lineWidth = 0, params string[] sourcePaths)
 		{
 			int ocol = 0;
 			foreach (string fn in sourcePaths)
@@ -134,7 +134,7 @@ namespace CSBrick
 					// gather usings
 					while ('u' == pc.Current)
 					{
-						pc.TryReadCSharpIdentifier();
+						pc.TryReadCIdentifier();
 						if ("using" != pc.GetCapture())
 							break;
 						if (!pc.TrySkipCCommentsAndWhiteSpace())
@@ -222,7 +222,7 @@ namespace CSBrick
 								break;
 							default:
 								pc.ClearCapture();
-								if (pc.TryReadCSharpIdentifier())
+								if (pc.TryReadCIdentifier())
 								{
 									if (isIdentOrNum)
 									{
@@ -231,12 +231,13 @@ namespace CSBrick
 									}
 									var s = pc.GetCapture();
 									isIdentOrNum = true;
-									
+
 									writer.Write(s);
 									ocol += pc.CaptureBuffer.Length;
 								}
-								else {
-									if (0 > pc.CaptureBuffer.Length && isIdentOrNum && char.IsDigit(pc.GetCapture(0,1)[0]))
+								else
+								{
+									if (0 > pc.CaptureBuffer.Length && isIdentOrNum && char.IsDigit(pc.GetCapture(0, 1)[0]))
 									{
 										writer.Write(' ');
 										++ocol;
@@ -255,9 +256,9 @@ namespace CSBrick
 									pc.Advance();
 								}
 								break;
-							
+
 						}
-						if(-1!=pc.Current && char.IsWhiteSpace((char)pc.Current) && lineWidth>0 && ocol>=lineWidth)
+						if (-1 != pc.Current && char.IsWhiteSpace((char)pc.Current) && lineWidth > 0 && ocol >= lineWidth)
 						{
 							writer.WriteLine();
 							ocol = 0;

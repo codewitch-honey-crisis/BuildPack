@@ -1041,7 +1041,7 @@ namespace CD
 				{
 					types[i] = _ResolveType(type.TypeArguments[i], scope) as Type;
 					if (null == types[i])
-						return null;
+						return rt; // we just return the unreified generic since we can't do any better
 				}
 				return rt.MakeGenericType(types);
 			}
