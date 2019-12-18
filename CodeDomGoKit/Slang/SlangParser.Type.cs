@@ -52,6 +52,8 @@ namespace CD
 
 		static CodeTypeDeclaration _ParseType(_PC pc, bool isNested=false)
 		{
+			var dirs = _ParseDirectives(pc);
+
 			var result = new CodeTypeDeclaration();
 			IList<KeyValuePair<string,CodeAttributeDeclaration>> custAttrs=null;
 			HashSet<string> attrs = null;
@@ -60,6 +62,7 @@ namespace CD
 				var comments = new CodeCommentStatementCollection();
 				while (ST.lineComment == pc.SymbolId || ST.blockComment == pc.SymbolId)
 					comments.Add(_ParseCommentStatement(pc));
+				dirs.AddRange(_ParseDirectives(pc));
 				custAttrs = _ParseCustomAttributes(pc);
 				attrs = _ParseTypeAttributes(pc);
 				if (attrs.Contains("static"))
@@ -81,6 +84,7 @@ namespace CD
 				_AddCustomAttributes(custAttrs, null, result.CustomAttributes);
 				if (null!=custAttrs && custAttrs.Count > result.CustomAttributes.Count)
 					_Error("Invalid custom attribute targets", pc.Current);
+				_AddStartDirs(result, dirs);
 			}
 			if (ST.keyword != pc.SymbolId)
 				_Error("Expecting class, struct, enum, or interface",pc.Current);
@@ -115,8 +119,12 @@ namespace CD
 			_SkipComments(pc);
 			if (pc.IsEnded)
 				_Error("Unterminated type declaration", pc.Current);
-			if(result.IsEnum)
-				return _ParseEnum(pc, result);
+			if (result.IsEnum)
+			{
+				var e = _ParseEnum(pc, result);
+				dirs.AddRange(_ParseDirectives(pc, true));
+				_AddEndDirs(e, dirs);
+			}
 			if (ST.lt==pc.SymbolId)
 			{
 				// parse the generic type arguments
@@ -227,6 +235,9 @@ namespace CD
 			if (ST.rbrace != pc.SymbolId)
 				_Error("Illegal member declaration in type", pc.Current);
 			pc.Advance();
+			_SkipComments(pc);
+			dirs.AddRange(_ParseDirectives(pc, true));
+			_AddEndDirs(result,dirs);
 			return result;
 		}
 		
@@ -243,6 +254,7 @@ namespace CD
 			var bt = new CodeTypeReference(typeof(int));
 			if (ST.colon == pc.SymbolId)
 			{
+				
 				pc.Advance();
 				_SkipComments(pc);
 				if (pc.IsEnded)

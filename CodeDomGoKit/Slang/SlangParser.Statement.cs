@@ -50,13 +50,106 @@ namespace CD
 				return result;
 			}
 		}
-		
+		static object _ParseDirective(_PC pc)
+		{
+			var s = pc.Value;
+			var i = s.IndexOfAny(new char[] { ' ', '\t' });
+			if(0>i)
+				i = s.Length;
+			var type = s.Substring(1, i - 1).Trim();
+			switch(type)
+			{
+				case "region":
+					pc.Advance();
+					return new CodeRegionDirective(CodeRegionMode.Start, s.Substring(i).Trim());
+				case "endregion":
+					pc.Advance();
+					return new CodeRegionDirective(CodeRegionMode.End, s.Substring(i).Trim());
+				case "line":
+					pc.Advance();
+					s = s.Substring(i).Trim();
+					i = s.LastIndexOfAny(new char[] { ' ', '\t' });
+					if(-1<i)
+					{
+						var num = s.Substring(0,i).Trim();
+						int n;
+						if(int.TryParse(num, out n))
+						{
+							s = s.Substring(i).Trim();
+							if('\"'==s[0])
+								s = s.Substring(1, s.Length - 2).Replace("\"\"", "\"");
+							return new CodeLinePragma(s, n);
+						}
+					}
+					break;
+			}
+			_Error(string.Format("Invalid or unsupported directive ", pc.Value), pc.Current);
+			return null;
+		}
+		static List<object> _ParseDirectives(_PC pc,bool endDirectives=false)
+		{
+			var result = new List<object>();
+			while(ST.directive==pc.SymbolId)
+			{
+				if (endDirectives && !pc.Value.Trim().StartsWith("#endregion"))
+					break;
+				else if (!endDirectives && pc.Value.Trim().StartsWith("#endregion"))
+					break;
+				result.Add(_ParseDirective(pc));
+			}
+			return result;
+		}
+		static void _AddStartDirs(CodeStatement stmt,IList<object> dirs)
+		{
+			for (int ic = dirs.Count, i = 0; i < ic; ++i)
+			{
+				var dir = dirs[i];
+				var l = dir as CodeLinePragma;
+				if (null != l)
+				{
+					stmt.LinePragma = l;
+					dirs.RemoveAt(i);
+					--i;
+					--ic;
+					continue;
+				}
+				var d = dir as CodeDirective;
+				if (null != d)
+				{
+					stmt.StartDirectives.Add(d);
+					dirs.RemoveAt(i);
+					--i;
+					--ic;
+				}
+			}
+		}
+		static void _AddEndDirs(CodeStatement stmt, IList<object> dirs)
+		{
+			for (int ic = dirs.Count, i = 0; i < ic; ++i)
+			{
+				var dir = dirs[i];
+				var d = dir as CodeDirective;
+				if (null != d)
+				{
+					stmt.EndDirectives.Add(d);
+					dirs.RemoveAt(i);
+					--i;
+					--ic;
+				}
+			}
+		}
 		static CodeStatement _ParseStatement(_PC pc,bool includeComments=false)
 		{
-			if(includeComments && (ST.lineComment==pc.SymbolId || ST.blockComment==pc.SymbolId))
-				return _ParseCommentStatement(pc);
-			
+			var dirs = _ParseDirectives(pc);
+			if (includeComments && (ST.lineComment == pc.SymbolId || ST.blockComment == pc.SymbolId))
+			{
+				var c= _ParseCommentStatement(pc);
+				_AddStartDirs(c, dirs);
+				dirs.AddRange(_ParseDirectives(pc,true));
+				_AddEndDirs(c, dirs);
+			}
 			_SkipComments(pc);
+			dirs.AddRange(_ParseDirectives(pc));
 			var pc2 = pc.GetLookAhead();
 			pc2.EnsureStarted();
 			CodeVariableDeclarationStatement vs = null;
@@ -69,6 +162,9 @@ namespace CD
 			{
 				// advance 
 				_ParseVariableDeclaration(pc);
+				_AddStartDirs(vs,dirs);
+				_SkipComments(pc);
+				dirs.AddRange(_ParseDirectives(pc,true));
 				return vs;
 			}
 			pc2 = pc.GetLookAhead();
@@ -76,6 +172,8 @@ namespace CD
 			CodeExpression e;
 			try
 			{
+				_ParseDirectives(pc2, false);
+				_SkipComments(pc);
 				e = _ParseExpression(pc2);
 
 			}
@@ -89,15 +187,22 @@ namespace CD
 					_ParseExpression(pc);
 					_SkipComments(pc);
 					pc.Advance();
+
 					// c# treats a=1; as an expression-statement using an assign expression, linguistically
 					// so that's how we parsed it. However, CodeDOM has a special case object for this
 					// called CodeAssignStatement. For maximum language portability, we don't want to rely
 					// on assign expressions when we don't have to as they can get weird. So what we do is
 					// whenever we parse one of these we detect it and turn it into an assign statement
+					CodeStatement r = null;
 					var bo = e as CodeBinaryOperatorExpression;
 					if (null!=bo && CodeBinaryOperatorType.Assign == bo.Operator)
-						return new CodeAssignStatement(bo.Left, bo.Right);
-					return new CodeExpressionStatement(e);
+						r=new CodeAssignStatement(bo.Left, bo.Right);
+					else
+						r=new CodeExpressionStatement(e);
+					_AddStartDirs(r,dirs);
+					dirs.AddRange(_ParseDirectives(pc, true));
+					_AddEndDirs(r, dirs);
+					return r;
 				} else if(ST.addAssign==pc2.SymbolId || ST.subAssign==pc2.SymbolId)
 				{
 					bool isAttach = ST.addAssign == pc2.SymbolId;
@@ -126,28 +231,40 @@ namespace CD
 					if (null == er)
 						_Error("The attach/remove target does not refer to a valid event",pc.Current);
 					er.UserData.Add("slang:unresolved", true);
-					return isAttach ? new CodeAttachEventStatement(er, le) as CodeStatement : new CodeRemoveEventStatement(er, le);
+					var r = isAttach ? new CodeAttachEventStatement(er, le) as CodeStatement : new CodeRemoveEventStatement(er, le);
+					_AddStartDirs(r, dirs);
+					_ParseDirectives(pc, true);
+					_AddEndDirs(r, dirs);
+					return r;
 				}
 			}
 			switch (pc.SymbolId)
 			{
 				case ST.keyword:
+					CodeStatement r=null;
 					switch(pc.Value)
 					{
 						case "if":
-							return _ParseIfStatement(pc);
+							r=_ParseIfStatement(pc);
+							break;
 						case "goto":
-							return _ParseGotoStatement(pc);
+							r=_ParseGotoStatement(pc);
+							break;
 						case "for":
-							return _ParseForStatement(pc);
+							r= _ParseForStatement(pc);
+							break;
 						case "while":
-							return _ParseWhileStatement(pc);
+							r= _ParseWhileStatement(pc);
+							break;
 						case "return":
-							return _ParseReturnStatement(pc);
+							r= _ParseReturnStatement(pc);
+							break;
 						case "throw":
-							return _ParseThrowStatement(pc);
+							r= _ParseThrowStatement(pc);
+							break;
 						case "try":
-							return _ParseTryCatchFinallyStatement(pc);
+							r= _ParseTryCatchFinallyStatement(pc);
+							break;
 						case "var":
 						case "bool":
 						case "char":
@@ -163,13 +280,16 @@ namespace CD
 						case "float":
 						case "double":
 						case "decimal":
-							return _ParseVariableDeclaration(pc);
+							r= _ParseVariableDeclaration(pc);
+							break;
 						default:
 							
 							throw new NotSupportedException(string.Format("The keyword {0} is not supported", pc.Value));
-							
-							
 					}
+					_AddStartDirs(r, dirs);
+					dirs.AddRange(_ParseDirectives(pc, true));
+					_AddEndDirs(r, dirs);
+					return r;
 				case ST.identifier: // we already know it isn't an expression
 					var s = pc.Value;
 					pc2 = pc.GetLookAhead();
@@ -185,6 +305,9 @@ namespace CD
 						if (pc.IsEnded || ST.colon != pc.SymbolId)
 							_Error("Unterminated label. Expecting :", pc.Current);
 						pc.Advance();
+						_AddStartDirs(ls, dirs);
+						dirs.AddRange(_ParseDirectives(pc, true));
+						_AddEndDirs(ls, dirs);
 						return ls;
 					}
 					

@@ -3271,17 +3271,17 @@ _SkipComments(pc);if(ST.keyword==pc.SymbolId&&"this"==pc.Value){pc.Advance();ret
 pc.Current);}}name=ptr.BaseType.Substring(idx+1);ptr.BaseType=ptr.BaseType.Substring(0,idx);_ParseTypeRef(pc,false); return new KeyValuePair<CodeTypeReference,
 string>(ptr,name);}var n=pc.Value;pc.Advance();return new KeyValuePair<CodeTypeReference,string>(null,n);}static CodeTypeMember _ParseMember(_PC pc,string
  typeName=null){var comments=new CodeCommentStatementCollection();while(ST.lineComment==pc.SymbolId||ST.blockComment==pc.SymbolId){comments.Add(_ParseCommentStatement(pc));
-} IList<KeyValuePair<string,CodeAttributeDeclaration>>customAttrs=null;if(ST.lbracket==pc.SymbolId)customAttrs=_ParseCustomAttributes(pc);var attrs=_ParseMemberAttributes(pc);
+}IList<KeyValuePair<string,CodeAttributeDeclaration>>customAttrs=null;if(ST.lbracket==pc.SymbolId)customAttrs=_ParseCustomAttributes(pc);var attrs=_ParseMemberAttributes(pc);
 var isEvent=false;if(ST.keyword==pc.SymbolId&&("partial"==pc.Value||"class"==pc.Value||"struct"==pc.Value||"enum"==pc.Value)){var ctd=_ParseType(pc,true);
 for(var i=comments.Count-1;0<=i;--i)ctd.Comments.Insert(0,comments[i]);return ctd;}if(ST.keyword==pc.SymbolId&&pc.Value=="event"){pc.Advance();_SkipComments(pc);
-isEvent=true;}else{ if(ST.identifier==pc.SymbolId&&(string.IsNullOrEmpty(typeName)||typeName==pc.Value)){if(attrs.Contains("abstract"))_Error("Constructors cannot be abstract",
-pc.Current);if(attrs.Contains("const"))_Error("Constructors cannot be const",pc.Current); var ctorName=pc.Value;pc.Advance();_SkipComments(pc);if(pc.IsEnded)
-_Error("Unterminated constructor",pc.Current);if(ST.lparen!=pc.SymbolId)_Error("Expecting ( in constructor declaration",pc.Current);pc.Advance();_SkipComments(pc);
-if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);var parms=_ParseParamDecls(pc,ST.rparen,false);CodeTypeMember mctor=null;_SkipComments(pc);
-if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);if(!attrs.Contains("static")){var ctor=new CodeConstructor();mctor=ctor;ctor.Name=ctorName;
-ctor.Attributes=_BuildMemberAttributes(attrs);_AddCustomAttributes(customAttrs,null,ctor.CustomAttributes);ctor.Parameters.AddRange(parms);if(ST.colon==pc.SymbolId)
-{pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor - expecting chained or base constructor args",pc.Current);if(ST.keyword
-==pc.SymbolId){switch(pc.Value){case"base":pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor - expecting base constructor args",
+isEvent=true;}else{var pc2=pc.GetLookAhead();pc2.EnsureStarted();pc2.Advance();_SkipComments(pc2); if(ST.identifier==pc.SymbolId&&(string.IsNullOrEmpty(typeName)||typeName==pc.Value)
+&&ST.lparen==pc2.SymbolId){if(attrs.Contains("abstract"))_Error("Constructors cannot be abstract",pc.Current);if(attrs.Contains("const"))_Error("Constructors cannot be const",
+pc.Current); var ctorName=pc.Value;pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);if(ST.lparen!=pc.SymbolId)
+_Error("Expecting ( in constructor declaration",pc.Current);pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);
+var parms=_ParseParamDecls(pc,ST.rparen,false);CodeTypeMember mctor=null;_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);
+if(!attrs.Contains("static")){var ctor=new CodeConstructor();mctor=ctor;ctor.Name=ctorName;ctor.Attributes=_BuildMemberAttributes(attrs);_AddCustomAttributes(customAttrs,
+null,ctor.CustomAttributes);ctor.Parameters.AddRange(parms);if(ST.colon==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor - expecting chained or base constructor args",
+pc.Current);if(ST.keyword==pc.SymbolId){switch(pc.Value){case"base":pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor - expecting base constructor args",
 pc.Current);if(ST.lparen!=pc.SymbolId)_Error("Expecting ( in base constructor args",pc.Current); if(pc.IsEnded)_Error("Unterminated constructor - expecting base constructor args",
 pc.Current);ctor.BaseConstructorArgs.AddRange(_ParseArguments(pc,ST.rparen,false));break;case"this":pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor - expecting chained constructor args",
 pc.Current);if(ST.lparen!=pc.SymbolId)_Error("Expecting ( in chained constructor args",pc.Current); if(pc.IsEnded)_Error("Unterminated constructor - expecting chained constructor args",

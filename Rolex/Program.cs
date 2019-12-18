@@ -104,7 +104,14 @@ namespace Rolex
 					}
 					// now build it
 					if (string.IsNullOrEmpty(name))
-						name = Path.GetFileNameWithoutExtension(inputfile);
+					{
+						// default we want it to be named after the code file
+						// otherwise we'll use inputfile
+						if (null != outputfile)
+							name = Path.GetFileNameWithoutExtension(outputfile);
+						else
+							name = Path.GetFileNameWithoutExtension(inputfile);
+					}
 					if (string.IsNullOrEmpty(codelanguage))
 					{
 						if (!string.IsNullOrEmpty(outputfile))

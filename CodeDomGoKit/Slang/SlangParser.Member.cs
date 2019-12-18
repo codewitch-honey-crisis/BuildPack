@@ -219,11 +219,12 @@ namespace CD
 		static CodeTypeMember _ParseMember(_PC pc,string typeName=null)
 		{
 			var comments = new CodeCommentStatementCollection();
-			while(ST.lineComment==pc.SymbolId || ST.blockComment==pc.SymbolId)
+			var dirs = _ParseDirectives(pc);
+			while (ST.lineComment==pc.SymbolId || ST.blockComment==pc.SymbolId)
 			{
 				comments.Add(_ParseCommentStatement(pc));
 			}
-			// TODO: First check for class/enum/struct and if we find that, forward the parse
+			dirs.AddRange(_ParseDirectives(pc));
 			IList<KeyValuePair<string, CodeAttributeDeclaration>> customAttrs = null;
 			if (ST.lbracket==pc.SymbolId)
 				customAttrs = _ParseCustomAttributes(pc);
@@ -233,6 +234,7 @@ namespace CD
 				var ctd = _ParseType(pc, true);
 				for(var i = comments.Count-1;0<=i;--i)
 					ctd.Comments.Insert(0, comments[i]);
+				_AddStartDirs(ctd, dirs);
 				return ctd;
 			}
 			if(ST.keyword==pc.SymbolId && pc.Value=="event")
@@ -242,8 +244,12 @@ namespace CD
 				isEvent = true;
 			} else
 			{
+				var pc2 = pc.GetLookAhead();
+				pc2.EnsureStarted();
+				pc2.Advance();
+				_SkipComments(pc2);
 				// this is a constructor
-				if(ST.identifier== pc.SymbolId && (string.IsNullOrEmpty(typeName)||typeName==pc.Value))
+				if(ST.identifier== pc.SymbolId && (string.IsNullOrEmpty(typeName)||typeName==pc.Value) &&ST.lparen==pc2.SymbolId)
 				{
 					if (attrs.Contains("abstract"))
 						_Error("Constructors cannot be abstract", pc.Current);
@@ -273,6 +279,7 @@ namespace CD
 						mctor = ctor;
 						ctor.Name = ctorName;
 						ctor.Attributes = _BuildMemberAttributes(attrs);
+						_AddStartDirs(ctor, dirs);
 						_AddCustomAttributes(customAttrs, null, ctor.CustomAttributes);
 						ctor.Parameters.AddRange(parms);
 						if(ST.colon==pc.SymbolId)
@@ -328,12 +335,15 @@ namespace CD
 						if (ST.rbrace != pc.SymbolId)
 							_Error("Unterminated method body", pc.Current);
 						pc.Advance();
+						dirs.AddRange(_ParseDirectives(pc, true));
+						_AddEndDirs(ctor, dirs);
 					} else
 					{
 						var ctor = new CodeTypeConstructor();
 						mctor = ctor;
 						ctor.Name = ctorName;
 						ctor.Attributes = _BuildMemberAttributes(attrs);
+						_AddStartDirs(ctor, dirs);
 						_AddCustomAttributes(customAttrs, null, ctor.CustomAttributes);
 						if (0 < parms.Count)
 							_Error("Type constructors cannot have parameters.", pc.Current);
@@ -348,6 +358,8 @@ namespace CD
 						pc.Advance();
 					}
 					mctor.Comments.AddRange(comments);
+					dirs.AddRange(_ParseDirectives(pc, true));
+					_AddEndDirs(mctor, dirs);
 					return mctor;
 				}
 			}
@@ -387,6 +399,7 @@ namespace CD
 					e.Name = name;
 					e.Attributes = _BuildMemberAttributes(attrs);
 					_AddCustomAttributes(customAttrs, null, e.CustomAttributes);
+					_AddStartDirs(e, dirs);
 					if (attrs.Contains("public"))
 					{
 						// this potentially implements one or more interfaces but we don't know what they are yet
@@ -394,6 +407,8 @@ namespace CD
 					}
 					pc.Advance();
 					e.Comments.AddRange(comments);
+					dirs.AddRange(_ParseDirectives(pc, true));
+					_AddEndDirs(e, dirs);
 					return e;
 				}
 				_Error(string.Format("Unexpected token {0} found in event.",pc.Value),pc.Current);
@@ -407,10 +422,13 @@ namespace CD
 				var f = new CodeMemberField(ctr, name);
 				f.Attributes = _BuildMemberAttributes(attrs);
 				_AddCustomAttributes(customAttrs, null, f.CustomAttributes);
+				_AddStartDirs(f, dirs);
 				if (null != ptr)
 					_Error("Fields cannot have a private implementation type.",pc.Current);
 				pc.Advance();
 				f.Comments.AddRange(comments);
+				dirs.AddRange(_ParseDirectives(pc, true));
+				_AddEndDirs(f, dirs);
 				return f;
 			} else if(ST.eq==pc.SymbolId) // this is a field with a value
 			{
@@ -427,12 +445,14 @@ namespace CD
 				var f =new CodeMemberField(ctr, name);
 				f.Attributes = _BuildMemberAttributes(attrs);
 				_AddCustomAttributes(customAttrs, null,f.CustomAttributes);
+				_AddStartDirs(f, dirs);
 				f.InitExpression = init;
 				if (null != ptr)
 					_Error("Fields cannot have a private implementation type.", pc.Current);
 				f.Comments.AddRange(comments);
+				dirs.AddRange(_ParseDirectives(pc, true));
+				_AddEndDirs(f, dirs);
 				return f;
-
 			} else if(ST.lparen==pc.SymbolId) // this is a method
 			{
 				pc.Advance();
@@ -447,6 +467,7 @@ namespace CD
 				m.Attributes = _BuildMemberAttributes(attrs);
 				_AddCustomAttributes(customAttrs, null, m.CustomAttributes);
 				_AddCustomAttributes(customAttrs, "return", m.ReturnTypeCustomAttributes);
+				_AddStartDirs(m, dirs);
 				m.Parameters.AddRange(parms);
 				if (isPriv)
 					m.PrivateImplementationType = ptr;
@@ -475,6 +496,8 @@ namespace CD
 					_Error("Unterminated method body", pc.Current);
 				pc.Advance();
 				m.Comments.AddRange(comments);
+				dirs.AddRange(_ParseDirectives(pc, true));
+				_AddEndDirs(m, dirs);
 				return m;
 			} else // must be a property
 			{
@@ -483,6 +506,7 @@ namespace CD
 				p.Name = name;
 				p.Attributes = _BuildMemberAttributes(attrs);
 				_AddCustomAttributes(customAttrs, null, p.CustomAttributes);
+				_AddStartDirs(p, dirs);
 				if (isPriv)
 					p.PrivateImplementationType = ptr;
 				else if (attrs.Contains("public"))
@@ -577,7 +601,48 @@ namespace CD
 					_Error("Invalid property body", pc.Current);
 				pc.Advance();
 				p.Comments.AddRange(comments);
+				dirs.AddRange(_ParseDirectives(pc, true));
+				_AddEndDirs(p, dirs);
 				return p;
+			}
+		}
+		static void _AddStartDirs(CodeTypeMember mem, IList<object> dirs)
+		{
+			for (int ic = dirs.Count, i = 0; i < ic; ++i)
+			{
+				var dir = dirs[i];
+				var l = dir as CodeLinePragma;
+				if (null != l)
+				{
+					mem.LinePragma = l;
+					dirs.RemoveAt(i);
+					--i;
+					--ic;
+					continue;
+				}
+				var d = dir as CodeDirective;
+				if (null != d)
+				{
+					mem.StartDirectives.Add(d);
+					dirs.RemoveAt(i);
+					--i;
+					--ic;
+				}
+			}
+		}
+		static void _AddEndDirs(CodeTypeMember mem, IList<object> dirs)
+		{
+			for (int ic = dirs.Count, i = 0; i < ic; ++i)
+			{
+				var dir = dirs[i];
+				var d = dir as CodeDirective;
+				if (null != d)
+				{
+					mem.EndDirectives.Add(d);
+					dirs.RemoveAt(i);
+					--i;
+					--ic;
+				}
 			}
 		}
 		static void _AddCustomAttributes(IEnumerable<KeyValuePair<string, CodeAttributeDeclaration>> src,string target,CodeAttributeDeclarationCollection dst)
