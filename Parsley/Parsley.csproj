@@ -50,6 +50,7 @@
     <Compile Include="Cfg\CfgMessage.cs" />
     <Compile Include="Cfg\CfgNode.cs" />
     <Compile Include="Cfg\CfgRule.cs" />
+    <Compile Include="CodeDomGoKit\CodeDomGoKit.brick.cs" />
     <Compile Include="CodeGenerator.cs" />
     <Compile Include="Collections\CollectionUtility.cs" />
     <Compile Include="Common\IMessage.cs" />
@@ -96,15 +97,7 @@
     <None Include="Expression.xbnf" />
     <None Include="Key.snk" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CodeDomGoKit\CodeDomGoKit.csproj">
-      <Project>{f1935a78-6eca-4aa9-9be2-0c64be4297c7}</Project>
-      <Name>CodeDomGoKit</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CodeDomGoKit\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(SolutionDir)CSBrick\bin\Release\csbrick.exe" "$(SolutionDir)CodeDomGoKit\CodeDomGoKit.csproj" /output "$(ProjectDir)CodeDomGoKit\CodeDomGoKit.brick.cs"
