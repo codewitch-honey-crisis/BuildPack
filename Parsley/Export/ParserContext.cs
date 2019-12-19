@@ -61,9 +61,6 @@ namespace Parsley
 			_e.Dispose();
 			_state = -3;
 		}
-		void IDisposable.Dispose()
-		{
-			Dispose();
-		}
+		
 	}
 }

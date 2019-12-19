@@ -62,9 +62,6 @@ namespace CD {
             this.AcceptSymbolId = acceptSymbolId;
         }
     }
-    /// <summary>
-    /// The state transition entry
-    /// </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal struct DfaTransitionEntry {
         /// <summary>
@@ -85,20 +82,17 @@ namespace CD {
             this.Destination = destination;
         }
     }
-    /// <summary>
-    /// Reference Implementation for generated shared code
-    /// </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
-    internal class TableTokenizer : IEnumerable<Token> {
+    internal class TableTokenizer : object, IEnumerable<Token> {
         public const int ErrorSymbol = -1;
         // our state table
-        DfaEntry[] _dfaTable;
+        private DfaEntry[] _dfaTable;
         // our block ends (specified like comment<blockEnd="*/">="/*" in a rolex spec file)
-        string[] _blockEnds;
+        private string[] _blockEnds;
         // our node flags. Currently only used for the hidden attribute
-        int[] _nodeFlags;
+        private int[] _nodeFlags;
         // the input cursor. We can get this from a string, a char array, or some other source.
-        IEnumerable<char> _input;
+        private IEnumerable<char> _input;
         /// <summary>
         /// Retrieves an enumerator that can be used to iterate over the tokens
         /// </summary>
@@ -107,12 +101,6 @@ namespace CD {
             // just create our table tokenizer's enumerator, passing all of the relevant stuff
             // it's the real workhorse.
             return new TableTokenizerEnumerator(this._dfaTable, this._blockEnds, this._nodeFlags, this._input.GetEnumerator());
-        }
-        // we have to implement this explicitly for language independence because Slang
-        // will not set PublicImplementationTypes on public methods which some languages
-        // require
-        IEnumerator<Token> IEnumerable<Token>.GetEnumerator() {
-            return this.GetEnumerator();
         }
         // legacy collection support (required)
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
@@ -145,43 +133,43 @@ namespace CD {
         }
     }
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
-    internal class TableTokenizerEnumerator : IEnumerator<Token> {
+    internal class TableTokenizerEnumerator : object, IEnumerator<Token> {
         // our error symbol. Always -1
         public const int ErrorSymbol = -1;
         // our end of stream symbol - returned by _Lex() and used internally but not reported
-        const int _EosSymbol = -2;
+        private const int _EosSymbol = -2;
         // our disposed state indicator
-        const int _Disposed = -4;
+        private const int _Disposed = -4;
         // the state indicates the cursor is before the beginning (initial state)
-        const int _BeforeBegin = -3;
+        private const int _BeforeBegin = -3;
         // the state indicates the cursor is after the end
-        const int _AfterEnd = -2;
+        private const int _AfterEnd = -2;
         // the state indicates that the inner input enumeration has finished (we still have one more token to report)
-        const int _InnerFinished = -1;
+        private const int _InnerFinished = -1;
         // indicates we're currently enumerating. We spend most of our time and effort in this state
-        const int _Enumerating = 0;
+        private const int _Enumerating = 0;
         // indicates the tab width, used for updating the Column property when we encounter a tab
-        const int _TabWidth = 4;
+        private const int _TabWidth = 4;
         // the DFA state table to use.
-        DfaEntry[] _dfaTable;
+        private DfaEntry[] _dfaTable;
         // the blockEnds to use
-        string[] _blockEnds;
+        private string[] _blockEnds;
         // the nodeFlags to use
-        int[] _nodeFlags;
+        private int[] _nodeFlags;
         // the input cursor
-        IEnumerator<char> _input;
+        private IEnumerator<char> _input;
         // our state
-        int _state;
+        private int _state;
         // the current token
-        Token _current;
+        private Token _current;
         // a buffer used primarily by _Lex() to capture matched input
-        StringBuilder _buffer;
+        private StringBuilder _buffer;
         // the one based line
-        int _line;
+        private int _line;
         // the one based column
-        int _column;
+        private int _column;
         // the zero based position
-        long _position;
+        private long _position;
         public TableTokenizerEnumerator(DfaEntry[] dfaTable, string[] blockEnds, int[] nodeFlags, IEnumerator<char> input) {
             // just set up our initial values
             this._dfaTable = dfaTable;
@@ -210,11 +198,6 @@ namespace CD {
                     }
                 }
                 return this._current;
-            }
-        }
-        Token IEnumerator<Token>.Current {
-            get {
-                return this.Current;
             }
         }
         object System.Collections.IEnumerator.Current {
@@ -262,9 +245,7 @@ namespace CD {
                 if ((TableTokenizerEnumerator.ErrorSymbol < this._current.SymbolId)) {
                     // get the block end for our symbol
                     string be = this._blockEnds[this._current.SymbolId];
-                    // if it's valid
-                    if (((false 
-                                == (null == be)) 
+                    if (((null != be) 
                                 && (false 
                                 == (0 == be.Length)))) {
                         // read until we find it or end of input
@@ -390,9 +371,7 @@ namespace CD {
         int _Lex() {
             // our accepting symbol id
             int acceptSymbolId;
-            // the DFA state we're currently in (start at zero)
             int dfaState = 0;
-            // corner case for beginning
             if ((TableTokenizerEnumerator._BeforeBegin == this._state)) {
                 if ((false == this._MoveNextInput())) {
                     // if we're on an accepting state, return that
@@ -420,18 +399,14 @@ namespace CD {
             ; (false == done); 
             ) {
                 int nextDfaState = -1;
-                // go through all the transitions
                 for (int i = 0; (i < this._dfaTable[dfaState].Transitions.Length); i = (i + 1)) {
                     DfaTransitionEntry entry = this._dfaTable[dfaState].Transitions[i];
                     bool found = false;
-                    // go through all the ranges to see if we matched anything.
                     for (int j = 0; (j < entry.PackedRanges.Length); j = (j + 1)) {
                         char ch = this._input.Current;
-                        // grab our range from the packed ranges into first and last
                         char first = entry.PackedRanges[j];
                         j = (j + 1);
                         char last = entry.PackedRanges[j];
-                        // do a quick search through our ranges
                         if ((ch <= last)) {
                             if ((first <= ch)) {
                                 found = true;

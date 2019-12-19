@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Text;
 
@@ -309,6 +310,7 @@ namespace Parsley
 			IDictionary<string, ICollection<string>> follows
 			)
 		{
+			var hasChangeType = false;
 			var syms = cfg.FillSymbols();
 			var node = C.ArgRef("node");
 			for(int ic=doc.Productions.Count,i=0;i<ic;++i)
@@ -317,12 +319,31 @@ namespace Parsley
 				var isStart = ReferenceEquals(doc.StartProduction, prod);
 				if (null!=prod.Code)
 				{
+					var type = new CodeTypeReference(typeof(object));
+					CodeTypeReference typeConverter = null;
+
+					var ti = prod.Attributes.IndexOf("type");
+					if (-1<ti)
+					{
+						var s = prod.Attributes[ti].Value as string;
+						if (!string.IsNullOrEmpty(s))
+							type = new CodeTypeReference(CD.CodeDomResolver.TranslateIntrinsicType(s));
+
+						ti = prod.Attributes.IndexOf("typeConverter");
+						if (-1 < ti)
+						{
+							s = prod.Attributes[ti].Value as string;
+							if (!string.IsNullOrEmpty(s))
+								typeConverter = new CodeTypeReference(s);
+						}
+					}
+
 					MemberAttributes attrs; 
 					if (isStart)
 						attrs = MemberAttributes.Public | MemberAttributes.Static;
 					else
 						attrs = MemberAttributes.FamilyAndAssembly | MemberAttributes.Static;
-					var m = C.Method(typeof(object), string.Concat("Evaluate", prod.Name), attrs, C.Param("ParseNode", "node"), C.Param(typeof(object), "state"));
+					var m = C.Method(type, string.Concat("Evaluate", prod.Name), attrs, C.Param("ParseNode", "node"), C.Param(typeof(object), "state"));
 					var cnst = consts[syms.IndexOf(prod.Name)];
 					var fr = C.FieldRef(C.TypeRef("Parser"), cnst);
 					var cnd = C.If(C.Eq(fr, C.PropRef(node, "SymbolId")));
@@ -338,15 +359,49 @@ namespace Parsley
 						var r = ctx.Target as CodeMethodReturnStatement;
 						if (null != r)
 						{
+							if (null != type) {
+								var hasVoid = false;
+								if (null != r.Expression)
+								{
+									var p = r.Expression as CodePrimitiveExpression;
+									if (null != p)
+									{
+										if (null == p.Value)
+											hasVoid = true;
+									}
+								}
+								if (null== r.Expression || hasVoid)
+								{
+									r.Expression = C.Default(type);
+								} else
+								{
+									hasChangeType = true;
+									r.Expression = C.Cast(type,C.Invoke(C.TypeRef("Parser"), "_ChangeType", r.Expression,C.TypeOf(type)));
+								}
+							}
 							hasReturn = true;
-							ctx.Cancel = true;
 						}
 					});
 					if(!hasReturn)
 					{
-						cnd.TrueStatements.Add(C.Return(C.Null));
+						if (!CD.CodeDomResolver.IsNullOrVoidType(type))
+							cnd.TrueStatements.Add(C.Return(C.Default(type)));
+						else
+							cnd.TrueStatements.Add(C.Return(C.Null));
 					}
 				}
+			}
+			if (hasChangeType)
+			{
+
+				var m = C.Method(C.Type(typeof(object)), "_ChangeType", MemberAttributes.Static | MemberAttributes.Private, C.Param(typeof(object), "obj"), C.Param(typeof(Type), "type"));
+				m.Statements.Add(C.Var(typeof(TypeConverter), "typeConverter", C.Invoke(C.TypeRef(typeof(TypeDescriptor)), "GetConverter", C.ArgRef("obj"))));
+				// if(null!=typeConverter || !typeConverter.CanConvertTo(type))
+				m.Statements.Add(C.If(C.Or(C.IdentEq(C.Null, C.VarRef("typeConverter")), C.Not(C.Invoke(C.VarRef("typeConverter"), "CanConvertTo", C.ArgRef("type")))),
+					C.Return(C.Invoke(C.TypeRef(typeof(Convert)), "ChangeType", C.ArgRef("obj"), C.ArgRef("type")))
+					));
+				m.Statements.Add(C.Return(C.Invoke(C.VarRef("typeConverter"), "ConvertTo", C.ArgRef("obj"), C.ArgRef("type"))));
+				parser.Members.Add(m);
 			}
 		}
 

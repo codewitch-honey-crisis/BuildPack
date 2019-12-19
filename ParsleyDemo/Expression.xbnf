@@ -1,4 +1,4 @@
-﻿Expression<start>=Term => { return EvaluateTerm(node.Children[0],state);}
+﻿Expression<start,type="int">=Term => { return EvaluateTerm(node.Children[0],state);}
 Term= Factor ("+"|"-") Factor | Factor => {
 	if(1==node.Children.Length)
 		return EvaluateFactor(node.Children[0],state);
@@ -7,7 +7,7 @@ Term= Factor ("+"|"-") Factor | Factor => {
 	else
 		return ((int)EvaluateFactor(node.Children[0],state)) - ((int)EvaluateFactor(node.Children[2],state));
 }
-Factor= Unary ("*"|"/") Unary | Unary => {
+Factor<type="int">= Unary ("*"|"/") Unary | Unary => {
 	if(1==node.Children.Length)
 		return EvaluateUnary(node.Children[0],state);
 	else if(node.Children[1].SymbolId==mul)
@@ -15,7 +15,7 @@ Factor= Unary ("*"|"/") Unary | Unary => {
 	else
 		return ((int)EvaluateUnary(node.Children[0],state)) / ((int)EvaluateUnary(node.Children[2],state));
 }
-Unary= ("+"|"-") Unary | Leaf => {
+Unary<type="int">= ("+"|"-") Unary | Leaf => {
 	if (1 == node.Children.Length)
 		return EvaluateLeaf(node.Children[0],state);
 	else if (node.Children[0].SymbolId == add)
@@ -23,7 +23,7 @@ Unary= ("+"|"-") Unary | Leaf => {
 	else
 		return -(int)EvaluateUnary(node.Children[1],state);
 }
-Leaf= identifier | integer | "(" Expression ")" => {
+Leaf<type="int">= identifier | integer | "(" Expression ")" => {
 	var n = node.Children[0];
 	if (identifier == n.SymbolId) {
 		if(null==state)

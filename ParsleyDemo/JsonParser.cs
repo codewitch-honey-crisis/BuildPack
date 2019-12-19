@@ -298,9 +298,9 @@ namespace ParsleyDemo {
     /// 
     /// </summary>
     internal class SyntaxException : Exception {
-        int _line;
-        int _column;
-        long _position;
+        private int _line;
+        private int _column;
+        private long _position;
         /// <summary>
         /// Creates a syntax exception with the specified arguments
         /// </summary>
@@ -343,13 +343,13 @@ namespace ParsleyDemo {
         }
     }
     internal partial class ParseNode {
-        int _symbolId;
-        string _symbol;
-        string _value;
-        int _line;
-        int _column;
-        long _position;
-        ParseNode[] _children;
+        private int _symbolId;
+        private string _symbol;
+        private string _value;
+        private int _line;
+        private int _column;
+        private long _position;
+        private ParseNode[] _children;
         public ParseNode(int symbolId, string symbol, ParseNode[] children, int line, int column, long position) {
             this._symbolId = symbolId;
             this._symbol = symbol;
@@ -370,8 +370,7 @@ namespace ParsleyDemo {
         }
         public bool IsNonTerminal {
             get {
-                return (false 
-                            == (null == this._children));
+                return (null != this._children);
             }
         }
         public ParseNode[] Children {
@@ -410,10 +409,10 @@ namespace ParsleyDemo {
             }
         }
     }
-    internal partial class ParserContext : IDisposable {
-        int _state;
-        IEnumerator<Token> _e;
-        Token _t;
+    internal partial class ParserContext : Object, IDisposable {
+        private int _state;
+        private IEnumerator<Token> _e;
+        private Token _t;
         public ParserContext(IEnumerable<Token> tokenizer) {
             this._e = tokenizer.GetEnumerator();
             this._state = -1;

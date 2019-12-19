@@ -211,26 +211,26 @@ namespace ParsleyDemo {
             context.EnsureStarted();
             return ExpressionParser._ParseExpression(context);
         }
-        public static object EvaluateExpression(ParseNode node, object state) {
+        public static int EvaluateExpression(ParseNode node, object state) {
             if ((ExpressionParser.Expression == node.SymbolId)) {
-                return ParsleyDemo.ExpressionParser.EvaluateTerm(node.Children[0], state);
+                return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateTerm(node.Children[0], state), typeof(int))));
             }
             throw new SyntaxException("Expecting Expression", node.Line, node.Column, node.Position);
         }
-        public static object EvaluateExpression(ParseNode node) {
+        public static int EvaluateExpression(ParseNode node) {
             return ExpressionParser.EvaluateExpression(node, null);
         }
         internal static object EvaluateTerm(ParseNode node, object state) {
             if ((ExpressionParser.Term == node.SymbolId)) {
                 if ((1 == node.Children.Length)) {
-                    return ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[0], state);
+                    return ((object)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[0], state), typeof(object))));
                 }
                 else {
                     if ((node.Children[1].SymbolId == ParsleyDemo.ExpressionParser.add)) {
-                        return (((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[0], state))) + ((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[2], state))));
+                        return ((object)(ExpressionParser._ChangeType((((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[0], state))) + ((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[2], state)))), typeof(object))));
                     }
                     else {
-                        return (((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[0], state))) - ((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[2], state))));
+                        return ((object)(ExpressionParser._ChangeType((((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[0], state))) - ((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[2], state)))), typeof(object))));
                     }
                 }
             }
@@ -239,66 +239,74 @@ namespace ParsleyDemo {
         internal static object EvaluateTerm(ParseNode node) {
             return ExpressionParser.EvaluateTerm(node, null);
         }
-        internal static object EvaluateFactor(ParseNode node, object state) {
+        internal static int EvaluateFactor(ParseNode node, object state) {
             if ((ExpressionParser.Factor == node.SymbolId)) {
                 if ((1 == node.Children.Length)) {
-                    return ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[0], state);
+                    return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[0], state), typeof(int))));
                 }
                 else {
                     if ((node.Children[1].SymbolId == ParsleyDemo.ExpressionParser.mul)) {
-                        return (((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[0], state))) * ((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[2], state))));
+                        return ((int)(ExpressionParser._ChangeType((((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[0], state))) * ((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[2], state)))), typeof(int))));
                     }
                     else {
-                        return (((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[0], state))) / ((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[2], state))));
+                        return ((int)(ExpressionParser._ChangeType((((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[0], state))) / ((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[2], state)))), typeof(int))));
                     }
                 }
             }
             throw new SyntaxException("Expecting Factor", node.Line, node.Column, node.Position);
         }
-        internal static object EvaluateFactor(ParseNode node) {
+        internal static int EvaluateFactor(ParseNode node) {
             return ExpressionParser.EvaluateFactor(node, null);
         }
-        internal static object EvaluateUnary(ParseNode node, object state) {
+        internal static int EvaluateUnary(ParseNode node, object state) {
             if ((ExpressionParser.Unary == node.SymbolId)) {
                 if ((1 == node.Children.Length)) {
-                    return ParsleyDemo.ExpressionParser.EvaluateLeaf(node.Children[0], state);
+                    return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateLeaf(node.Children[0], state), typeof(int))));
                 }
                 else {
                     if ((node.Children[0].SymbolId == ParsleyDemo.ExpressionParser.add)) {
-                        return ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[1], state);
+                        return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[1], state), typeof(int))));
                     }
                     else {
-                        return (0 - ((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[1], state))));
+                        return ((int)(ExpressionParser._ChangeType((0 - ((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[1], state)))), typeof(int))));
                     }
                 }
             }
             throw new SyntaxException("Expecting Unary", node.Line, node.Column, node.Position);
         }
-        internal static object EvaluateUnary(ParseNode node) {
+        internal static int EvaluateUnary(ParseNode node) {
             return ExpressionParser.EvaluateUnary(node, null);
         }
-        internal static object EvaluateLeaf(ParseNode node, object state) {
+        internal static int EvaluateLeaf(ParseNode node, object state) {
             if ((ExpressionParser.Leaf == node.SymbolId)) {
                 ParseNode n = node.Children[0];
                 if ((ParsleyDemo.ExpressionParser.identifier == n.SymbolId)) {
                     if ((null == state)) {
                         throw new InvalidOperationException("Variables were not defined.");
                     }
-                    return ((IDictionary<string, int>)(state))[n.Value];
+                    return ((int)(ExpressionParser._ChangeType(((IDictionary<string, int>)(state))[n.Value], typeof(int))));
                 }
                 else {
                     if ((ParsleyDemo.ExpressionParser.integer == n.SymbolId)) {
-                        return int.Parse(n.Value);
+                        return ((int)(ExpressionParser._ChangeType(int.Parse(n.Value), typeof(int))));
                     }
                     else {
-                        return ParsleyDemo.ExpressionParser.EvaluateExpression(n.Children[1], state);
+                        return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateExpression(n.Children[1], state), typeof(int))));
                     }
                 }
             }
             throw new SyntaxException("Expecting Leaf", node.Line, node.Column, node.Position);
         }
-        internal static object EvaluateLeaf(ParseNode node) {
+        internal static int EvaluateLeaf(ParseNode node) {
             return ExpressionParser.EvaluateLeaf(node, null);
+        }
+        private static object _ChangeType(object obj, System.Type type) {
+            System.ComponentModel.TypeConverter typeConverter = System.ComponentModel.TypeDescriptor.GetConverter(obj);
+            if (((null == typeConverter) 
+                        || (false == typeConverter.CanConvertTo(type)))) {
+                return System.Convert.ChangeType(obj, type);
+            }
+            return typeConverter.ConvertTo(obj, type);
         }
     }
 }

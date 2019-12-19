@@ -46,7 +46,7 @@ Namespace ParsleyDemo
                     node = childStack(0)
                     childStack.RemoveAt(0)
                     Dim indent As String = ""
-                    For i As Integer = 0 To childListStack.Count - 1
+                    For i As Integer = 0 To childListStack.Count - 2
                         If childListStack(i).Count > 0 Then
                             indent = indent + "|  "
                         Else

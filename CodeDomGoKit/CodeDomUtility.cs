@@ -203,6 +203,29 @@ namespace CD
 		public static CodeTypeReferenceExpression TypeRef(string typeName)
 			=> new CodeTypeReferenceExpression(typeName);
 		/// <summary>
+		/// Returns a <see cref="CodeTypeOfExpression"/> with the specified type
+		/// </summary>
+		/// <param name="type">The type</param>
+		/// <returns>A <see cref="CodeTypeOfExpression"/> with the specified type</returns>
+		public static CodeTypeOfExpression TypeOf(CodeTypeReference type)
+			=> new CodeTypeOfExpression(type);
+		/// <summary>
+		/// Returns a <see cref="CodeTypeOfExpression"/> with the specified type
+		/// </summary>
+		/// <param name="typeName">The type name</param>
+		/// <returns>A <see cref="CodeTypeOfExpression"/> with the specified type</returns>
+		public static CodeTypeOfExpression TypeOf(string typeName)
+			=> new CodeTypeOfExpression(typeName);
+		/// <summary>
+		/// Returns a <see cref="CodeTypeOfExpression"/> with the specified type
+		/// </summary>
+		/// <param name="type">The type</param>
+		/// <returns>A <see cref="CodeTypeOfExpression"/> with the specified type</returns>
+		public static CodeTypeOfExpression TypeOf(Type type)
+			=> new CodeTypeOfExpression(type);
+
+
+		/// <summary>
 		/// Creates one or more potentially nested <see cref="CodeBinaryOperatorExpression"/> objects with the specified parameters
 		/// </summary>
 		/// <param name="left">The left hand side expression</param>

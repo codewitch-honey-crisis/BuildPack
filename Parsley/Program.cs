@@ -2,6 +2,7 @@
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -149,7 +150,7 @@ namespace Parsley
 					ccuNS.Types.Add(syntaxException);
 					ccuNS.Types.Add(parseNode);
 					ccuNS.Types.Add(parserContext);
-					
+					ccu.ReferencedAssemblies.Add(typeof(TypeConverter).Assembly.GetName().ToString());
 					CD.SlangPatcher.Patch(ccu, ccuShared);
 					var co = CD.SlangPatcher.GetNextUnresolvedElement(ccu);
 					if(null!=co)

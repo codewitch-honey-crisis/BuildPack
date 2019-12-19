@@ -198,6 +198,44 @@ namespace CD
 			return false;
 		}
 		/// <summary>
+		/// Translates an intrinsic Slang/C# type into a .NET type, or pass through
+		/// </summary>
+		/// <param name="typeName">The type name</param>
+		/// <returns>A system type name</returns>
+		public static string TranslateIntrinsicType(string typeName)
+		{
+			switch(typeName)
+			{
+				case "char":
+					return "System.Char";
+				case "string":
+					return "System.String";
+				case "sbyte":
+					return "System.SByte";
+				case "byte":
+					return "System.Byte";
+				case "short":
+					return "System.Int16";
+				case "ushort":
+					return "System.UInt16";
+				case "int":
+					return "System.Int32";
+				case "uint":
+					return "System.UInt32";
+				case "long":
+					return "System.Int64";
+				case "ulong":
+					return "System.UInt64";
+				case "float":
+					return "System.Single";
+				case "double":
+					return "System.Double";
+				case "decimal":
+					return "System.Decimal";
+			}
+			return typeName;
+		}
+		/// <summary>
 		/// Indicates whether or not one type can be converted to another
 		/// </summary>
 		/// <param name="from">The type to convert from</param>

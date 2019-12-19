@@ -754,6 +754,14 @@ public static bool IsPrimitiveType(CodeTypeReference type){if(0<type.ArrayRank&&
 return false;switch(type.BaseType){case"System.Boolean":case"System.Char":case"System.String":case"System.SByte":case"System.Byte":case"System.Int16":
 case"System.UInt16":case"System.Int32":case"System.UInt32":case"System.Int64":case"System.UInt64":case"System.Single":case"System.Double":case"System.Decimal":
 return true;}return false;}/// <summary>
+/// Translates an intrinsic Slang/C# type into a .NET type, or pass through
+/// </summary>
+/// <param name="typeName">The type name</param>
+/// <returns>A system type name</returns>
+public static string TranslateIntrinsicType(string typeName){switch(typeName){case"char":return"System.Char";case"string":return"System.String";case"sbyte":
+return"System.SByte";case"byte":return"System.Byte";case"short":return"System.Int16";case"ushort":return"System.UInt16";case"int":return"System.Int32";
+case"uint":return"System.UInt32";case"long":return"System.Int64";case"ulong":return"System.UInt64";case"float":return"System.Single";case"double":return
+"System.Double";case"decimal":return"System.Decimal";}return typeName;}/// <summary>
 /// Indicates whether or not one type can be converted to another
 /// </summary>
 /// <param name="from">The type to convert from</param>
@@ -1616,6 +1624,21 @@ public static CodeTypeReferenceExpression TypeRef(Type type)=>new CodeTypeRefere
 /// <param name="typeName">The type name</param>
 /// <returns>A <see cref="CodeTypeReferenceExpression"/> with the specified type</returns>
 public static CodeTypeReferenceExpression TypeRef(string typeName)=>new CodeTypeReferenceExpression(typeName);/// <summary>
+/// Returns a <see cref="CodeTypeOfExpression"/> with the specified type
+/// </summary>
+/// <param name="type">The type</param>
+/// <returns>A <see cref="CodeTypeOfExpression"/> with the specified type</returns>
+public static CodeTypeOfExpression TypeOf(CodeTypeReference type)=>new CodeTypeOfExpression(type);/// <summary>
+/// Returns a <see cref="CodeTypeOfExpression"/> with the specified type
+/// </summary>
+/// <param name="typeName">The type name</param>
+/// <returns>A <see cref="CodeTypeOfExpression"/> with the specified type</returns>
+public static CodeTypeOfExpression TypeOf(string typeName)=>new CodeTypeOfExpression(typeName);/// <summary>
+/// Returns a <see cref="CodeTypeOfExpression"/> with the specified type
+/// </summary>
+/// <param name="type">The type</param>
+/// <returns>A <see cref="CodeTypeOfExpression"/> with the specified type</returns>
+public static CodeTypeOfExpression TypeOf(Type type)=>new CodeTypeOfExpression(type);/// <summary>
 /// Creates one or more potentially nested <see cref="CodeBinaryOperatorExpression"/> objects with the specified parameters
 /// </summary>
 /// <param name="left">The left hand side expression</param>
@@ -3898,10 +3921,8 @@ public int AcceptSymbolId;/// <summary>
 /// </summary>
 /// <param name="transitions">The state transitions</param>
 /// <param name="acceptSymbolId">The accept symbol id</param>
-public DfaEntry(DfaTransitionEntry[]transitions,int acceptSymbolId){this.Transitions=transitions;this.AcceptSymbolId=acceptSymbolId;}}/// <summary>
-/// The state transition entry
-/// </summary>
-[System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex","0.2.0.0")]internal struct DfaTransitionEntry{/// <summary>
+public DfaEntry(DfaTransitionEntry[]transitions,int acceptSymbolId){this.Transitions=transitions;this.AcceptSymbolId=acceptSymbolId;}}[System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex",
+"0.2.0.0")]internal struct DfaTransitionEntry{/// <summary>
 /// The character ranges, packed as adjacent pairs.
 /// </summary>
 public char[]PackedRanges;/// <summary>
@@ -3912,17 +3933,14 @@ public int Destination;/// <summary>
 /// </summary>
 /// <param name="packedRanges">The packed character ranges</param>
 /// <param name="destination">The destination state</param>
-public DfaTransitionEntry(char[]packedRanges,int destination){this.PackedRanges=packedRanges;this.Destination=destination;}}/// <summary>
-/// Reference Implementation for generated shared code
-/// </summary>
-[System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex","0.2.0.0")]internal class TableTokenizer:IEnumerable<Token>{public const int ErrorSymbol=-1; DfaEntry[]
-_dfaTable; string[]_blockEnds; int[]_nodeFlags; IEnumerable<char>_input;/// <summary>
+public DfaTransitionEntry(char[]packedRanges,int destination){this.PackedRanges=packedRanges;this.Destination=destination;}}[System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex",
+"0.2.0.0")]internal class TableTokenizer:object,IEnumerable<Token>{public const int ErrorSymbol=-1; private DfaEntry[]_dfaTable; private string[]_blockEnds;
+ private int[]_nodeFlags; private IEnumerable<char>_input;/// <summary>
 /// Retrieves an enumerator that can be used to iterate over the tokens
 /// </summary>
 /// <returns>An enumerator that can be used to iterate over the tokens</returns>
 public IEnumerator<Token>GetEnumerator(){ return new TableTokenizerEnumerator(this._dfaTable,this._blockEnds,this._nodeFlags,this._input.GetEnumerator());
-} IEnumerator<Token>IEnumerable<Token>.GetEnumerator(){return this.GetEnumerator();} System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-{return this.GetEnumerator();}/// <summary>
+} System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator(){return this.GetEnumerator();}/// <summary>
 /// Constructs a new instance
 /// </summary>
 /// <param name="dfaTable">The DFA state table to use</param>
@@ -3932,23 +3950,23 @@ public IEnumerator<Token>GetEnumerator(){ return new TableTokenizerEnumerator(th
 public TableTokenizer(DfaEntry[]dfaTable,string[]blockEnds,int[]nodeFlags,IEnumerable<char>input){if((null==dfaTable)){throw new ArgumentNullException("dfaTable");
 }if((null==blockEnds)){throw new ArgumentNullException("blockEnds");}if((null==nodeFlags)){throw new ArgumentNullException("nodeFlags");}if((null==input))
 {throw new ArgumentNullException("input");}this._dfaTable=dfaTable;this._blockEnds=blockEnds;this._nodeFlags=nodeFlags;this._input=input;}}[System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex",
-"0.2.0.0")]internal class TableTokenizerEnumerator:IEnumerator<Token>{ public const int ErrorSymbol=-1; const int _EosSymbol=-2; const int _Disposed=-4;
- const int _BeforeBegin=-3; const int _AfterEnd=-2; const int _InnerFinished=-1; const int _Enumerating=0; const int _TabWidth=4; DfaEntry[]_dfaTable;
- string[]_blockEnds; int[]_nodeFlags; IEnumerator<char>_input; int _state; Token _current; StringBuilder _buffer; int _line; int _column; long _position;
-public TableTokenizerEnumerator(DfaEntry[]dfaTable,string[]blockEnds,int[]nodeFlags,IEnumerator<char>input){ this._dfaTable=dfaTable;this._blockEnds=blockEnds;
-this._nodeFlags=nodeFlags;this._input=input;this._state=TableTokenizerEnumerator._BeforeBegin;this._buffer=new StringBuilder();this._line=1;this._column
-=1;this._position=0;}public Token Current{get{ if((TableTokenizerEnumerator._Enumerating>this._state)){ if((TableTokenizerEnumerator._BeforeBegin==this._state))
-{throw new InvalidOperationException("The cursor is before the start of the enumeration");}if((TableTokenizerEnumerator._AfterEnd==this._state)){throw
- new InvalidOperationException("The cursor is after the end of the enumeration");}if((TableTokenizerEnumerator._Disposed==this._state)){TableTokenizerEnumerator._ThrowDisposed();
-}}return this._current;}}Token IEnumerator<Token>.Current{get{return this.Current;}}object System.Collections.IEnumerator.Current{get{return this.Current;
+"0.2.0.0")]internal class TableTokenizerEnumerator:object,IEnumerator<Token>{ public const int ErrorSymbol=-1; private const int _EosSymbol=-2; private
+ const int _Disposed=-4; private const int _BeforeBegin=-3; private const int _AfterEnd=-2; private const int _InnerFinished=-1; private const int _Enumerating
+=0; private const int _TabWidth=4; private DfaEntry[]_dfaTable; private string[]_blockEnds; private int[]_nodeFlags; private IEnumerator<char>_input; private
+ int _state; private Token _current; private StringBuilder _buffer; private int _line; private int _column; private long _position;public TableTokenizerEnumerator(DfaEntry[]
+dfaTable,string[]blockEnds,int[]nodeFlags,IEnumerator<char>input){ this._dfaTable=dfaTable;this._blockEnds=blockEnds;this._nodeFlags=nodeFlags;this._input
+=input;this._state=TableTokenizerEnumerator._BeforeBegin;this._buffer=new StringBuilder();this._line=1;this._column=1;this._position=0;}public Token Current
+{get{ if((TableTokenizerEnumerator._Enumerating>this._state)){ if((TableTokenizerEnumerator._BeforeBegin==this._state)){throw new InvalidOperationException("The cursor is before the start of the enumeration");
+}if((TableTokenizerEnumerator._AfterEnd==this._state)){throw new InvalidOperationException("The cursor is after the end of the enumeration");}if((TableTokenizerEnumerator._Disposed
+==this._state)){TableTokenizerEnumerator._ThrowDisposed();}}return this._current;}}object System.Collections.IEnumerator.Current{get{return this.Current;
 }}void System.Collections.IEnumerator.Reset(){if((TableTokenizerEnumerator._Disposed==this._state)){TableTokenizerEnumerator._ThrowDisposed();}if((false
 ==(TableTokenizerEnumerator._BeforeBegin==this._state))){this._input.Reset();}this._state=TableTokenizerEnumerator._BeforeBegin;this._line=1;this._column
 =1;this._position=0;}bool System.Collections.IEnumerator.MoveNext(){ if((TableTokenizerEnumerator._Enumerating>this._state)){if((TableTokenizerEnumerator._Disposed
 ==this._state)){TableTokenizerEnumerator._ThrowDisposed();}if((TableTokenizerEnumerator._AfterEnd==this._state)){return false;}}this._current=default(Token);
 this._current.Line=this._line;this._current.Column=this._column;this._current.Position=this._position;this._buffer.Clear(); this._current.SymbolId=this._Lex();
  bool done=false;for(;(false==done);){done=true; if((TableTokenizerEnumerator.ErrorSymbol<this._current.SymbolId)){ string be=this._blockEnds[this._current.SymbolId];
- if(((false==(null==be))&&(false==(0==be.Length)))){ if((false==this._TryReadUntilBlockEnd(be))){this._current.SymbolId=TableTokenizerEnumerator.ErrorSymbol;
-}}if(((TableTokenizerEnumerator.ErrorSymbol<this._current.SymbolId)&&(false==(0==(this._nodeFlags[this._current.SymbolId]&1))))){ done=false;this._current.Line
+if(((null!=be)&&(false==(0==be.Length)))){ if((false==this._TryReadUntilBlockEnd(be))){this._current.SymbolId=TableTokenizerEnumerator.ErrorSymbol;}}if
+(((TableTokenizerEnumerator.ErrorSymbol<this._current.SymbolId)&&(false==(0==(this._nodeFlags[this._current.SymbolId]&1))))){ done=false;this._current.Line
 =this._line;this._current.Column=this._column;this._current.Position=this._position;this._buffer.Clear();this._current.SymbolId=this._Lex();}}}this._current.Value
 =this._buffer.ToString(); if((TableTokenizerEnumerator._EosSymbol==this._current.SymbolId)){this._state=TableTokenizerEnumerator._AfterEnd;}return(false
 ==(TableTokenizerEnumerator._AfterEnd==this._state));}void IDisposable.Dispose(){this._input.Dispose();this._state=TableTokenizerEnumerator._Disposed;
@@ -3962,15 +3980,15 @@ if(('\n'==this._input.Current)){this._column=1;this._line=(this._line+1);}else{i
 ==(TableTokenizerEnumerator._InnerFinished==this._state))&&this._TryReadUntil(blockEnd[0]));){bool found=true;for(int i=1;(found&&(i<blockEnd.Length));
 i=(i+1)){if((false==(this._MoveNextInput()||(false==(this._input.Current==blockEnd[i]))))){found=false;}else{if((false==(TableTokenizerEnumerator._InnerFinished
 ==this._state))){this._buffer.Append(this._input.Current);}}}if(found){this._MoveNextInput();return true;}}return false;} int _Lex(){ int acceptSymbolId;
- int dfaState=0; if((TableTokenizerEnumerator._BeforeBegin==this._state)){if((false==this._MoveNextInput())){ acceptSymbolId=this._dfaTable[dfaState].AcceptSymbolId;
+int dfaState=0;if((TableTokenizerEnumerator._BeforeBegin==this._state)){if((false==this._MoveNextInput())){ acceptSymbolId=this._dfaTable[dfaState].AcceptSymbolId;
 if((false==(-1==acceptSymbolId))){return acceptSymbolId;}else{return TableTokenizerEnumerator.ErrorSymbol;}}this._state=TableTokenizerEnumerator._Enumerating;
 }else{if(((TableTokenizerEnumerator._InnerFinished==this._state)||(TableTokenizerEnumerator._AfterEnd==this._state))){ return TableTokenizerEnumerator._EosSymbol;
-}}bool done=false;for(;(false==done);){int nextDfaState=-1; for(int i=0;(i<this._dfaTable[dfaState].Transitions.Length);i=(i+1)){DfaTransitionEntry entry
-=this._dfaTable[dfaState].Transitions[i];bool found=false; for(int j=0;(j<entry.PackedRanges.Length);j=(j+1)){char ch=this._input.Current; char first=
-entry.PackedRanges[j];j=(j+1);char last=entry.PackedRanges[j]; if((ch<=last)){if((first<=ch)){found=true;}j=(int.MaxValue-1);}}if(found){ nextDfaState
-=entry.Destination;i=(int.MaxValue-1);}}if((false==(-1==nextDfaState))){ this._buffer.Append(this._input.Current); dfaState=nextDfaState;if((false==this._MoveNextInput()))
-{ acceptSymbolId=this._dfaTable[dfaState].AcceptSymbolId;if((false==(-1==acceptSymbolId))){return acceptSymbolId;}else{return TableTokenizerEnumerator.ErrorSymbol;
-}}}else{done=true;}}acceptSymbolId=this._dfaTable[dfaState].AcceptSymbolId;if((false==(-1==acceptSymbolId))){return acceptSymbolId;}else{ this._buffer.Append(this._input.Current);
+}}bool done=false;for(;(false==done);){int nextDfaState=-1;for(int i=0;(i<this._dfaTable[dfaState].Transitions.Length);i=(i+1)){DfaTransitionEntry entry
+=this._dfaTable[dfaState].Transitions[i];bool found=false;for(int j=0;(j<entry.PackedRanges.Length);j=(j+1)){char ch=this._input.Current;char first=entry.PackedRanges[j];
+j=(j+1);char last=entry.PackedRanges[j];if((ch<=last)){if((first<=ch)){found=true;}j=(int.MaxValue-1);}}if(found){ nextDfaState=entry.Destination;i=(int.MaxValue
+-1);}}if((false==(-1==nextDfaState))){ this._buffer.Append(this._input.Current); dfaState=nextDfaState;if((false==this._MoveNextInput())){ acceptSymbolId
+=this._dfaTable[dfaState].AcceptSymbolId;if((false==(-1==acceptSymbolId))){return acceptSymbolId;}else{return TableTokenizerEnumerator.ErrorSymbol;}}}
+else{done=true;}}acceptSymbolId=this._dfaTable[dfaState].AcceptSymbolId;if((false==(-1==acceptSymbolId))){return acceptSymbolId;}else{ this._buffer.Append(this._input.Current);
 this._MoveNextInput();return TableTokenizerEnumerator.ErrorSymbol;}}static void _ThrowDisposed(){throw new ObjectDisposedException("TableTokenizerEnumerator");
 }}internal class SlangTokenizer:TableTokenizer{internal static DfaEntry[]DfaTable=new DfaEntry[]{new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new
  char[]{'a','a'},1),new DfaTransitionEntry(new char[]{'b','b'},25),new DfaTransitionEntry(new char[]{'c','c'},39),new DfaTransitionEntry(new char[]{'d',

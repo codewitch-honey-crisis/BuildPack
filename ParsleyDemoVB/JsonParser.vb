@@ -485,12 +485,9 @@ Namespace ParsleyDemo
         Public Overloads Sub [Error](ByVal message As String)
             Throw New SyntaxException(message, Me.Line, Me.Column, Me.Position)
         End Sub
-        Public Sub Dispose()
+        Public Sub Dispose() Implements IDisposable.Dispose
             Me._e.Dispose
             Me._state = -3
-        End Sub
-        Sub IDisposable_Dispose() Implements IDisposable.Dispose
-            Me.Dispose
         End Sub
     End Class
 End Namespace
