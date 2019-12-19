@@ -55,6 +55,8 @@ namespace ParsleyDemo {
                                         ','}, 37),
                             new DfaTransitionEntry(new char[] {
                                         '\t',
+                                        '\n',
+                                        '\r',
                                         '\r',
                                         ' ',
                                         ' '}, 38)}, -1),
@@ -251,6 +253,8 @@ namespace ParsleyDemo {
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         '\t',
+                                        '\n',
+                                        '\r',
                                         '\r',
                                         ' ',
                                         ' '}, 38)}, 25)};

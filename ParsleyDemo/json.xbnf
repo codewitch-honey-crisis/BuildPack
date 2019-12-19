@@ -1,7 +1,8 @@
-﻿Json<start>= Object | Array;
-Object= "{" "}" | "{" Field { "," Field } "}";
+﻿// based on spec @ json.org
+Json<start>= Object | Array;
+Object= "{" [ Field { "," Field } ] "}";
 Field= string ":" Value;
-Array= "[" "]" | "[" Value { "," Value } "]";
+Array= "[" [ Value { "," Value } ] "]";
 Value<collapsed>= string |
 	number	|
     Object	|
@@ -20,4 +21,4 @@ lbrace<collapsed>="{";
 rbrace<collapsed>="}";
 colon<collapsed>=":";
 comma<collapsed>=",";
-whitespace<hidden>='[ \t\r\n\f\v]+';
+whitespace<hidden>='[\n\r\t ]+';
