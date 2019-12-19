@@ -533,6 +533,8 @@ namespace Rolex
 			// write the name of our app. this actually uses the 
 			// name of the executable so it will always be correct
 			// even if the executable file was renamed.
+			t.WriteLine("{0} generates a lexer/tokenizer", _Name);
+			t.WriteLine();
 			t.Write(_File);
 			t.WriteLine(" <inputfile> [/output <outputfile>] [/name <name>]");
 			t.WriteLine("   [/namespace <codenamespace>] [/language <codelanguage>]");

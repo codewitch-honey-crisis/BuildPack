@@ -36,7 +36,10 @@ namespace Parsley
 			try
 			{
 				if (0 == args.Length)
-					throw new ArgumentException("No arguments specified");
+				{
+					_PrintUsage();
+					return -1;
+				}
 				if (args[0].StartsWith("/"))
 					throw new ArgumentException("Missing input file.");
 
