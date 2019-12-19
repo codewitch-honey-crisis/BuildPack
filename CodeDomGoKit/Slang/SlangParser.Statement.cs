@@ -50,6 +50,58 @@ namespace CD
 				return result;
 			}
 		}
+
+		/// <summary>
+		/// Reads a <see cref="CodeStatementCollection"/> from the specified <see cref="TextReader"/>
+		/// </summary>
+		/// <param name="reader">The reader to read from</param>
+		/// <param name="includeComments">True to include comments, or false to skip them</param>
+		/// <returns>A <see cref="CodeStatementCollection"/> representing the parsed code</returns>
+		public static CodeStatementCollection ReadStatementsFrom(TextReader reader, bool includeComments = false)
+			=> ParseStatements(TextReaderEnumerable.FromReader(reader), includeComments);
+		/// <summary>
+		/// Reads a <see cref="CodeStatementCollection"/> from the specified file
+		/// </summary>
+		/// <param name="filename">The file to read</param>
+		/// <param name="includeComments">True if comments should be returned as statements, or false to skip them</param>
+		/// <returns>A <see cref="CodeStatementCollection"/> representing the parsed code</returns>
+		public static CodeStatementCollection ReadStatementsFrom(string filename, bool includeComments = false)
+			=> ParseStatements(new FileReaderEnumerable(filename), includeComments);
+		/// <summary>
+		/// Reads a <see cref="CodeStatementCollection"/> from the specified URL
+		/// </summary>
+		/// <param name="url">The URL to read</param>
+		/// <param name="includeComments">True to return parsed comments as statements, or false to skip them</param>
+		/// <returns>A <see cref="CodeStatementCollection"/> representing the parsed code</returns>
+
+		public static CodeStatementCollection ReadStatementsFromUrl(string url, bool includeComments = false)
+			=> ParseStatements(new UrlReaderEnumerable(url), includeComments);
+		/// <summary>
+		/// Parses a <see cref="CodeStatementCollection"/> from the specified input
+		/// </summary>
+		/// <param name="input">The input to parse</param>
+		/// <param name="includeComments">True to return parsed comments as statements, or false to skip them</param>
+		/// <returns>A <see cref="CodeStatementCollection"/> representing the parsed code</returns>
+		public static CodeStatementCollection ParseStatements(IEnumerable<char> input, bool includeComments = false)
+		{
+			using (var e = new ST(input).GetEnumerator())
+			{
+				var pc = new _PC(e);
+				pc.EnsureStarted();
+				var result = _ParseStatements(pc, includeComments);
+				if (!pc.IsEnded && ST.rbrace!=pc.SymbolId)
+					throw new SlangSyntaxException("Unrecognized remainder in statements", pc.Current.Line, pc.Current.Column, pc.Current.Position);
+				return result;
+			}
+		}
+
+		static CodeStatementCollection _ParseStatements(_PC pc,bool includeComments=false)
+		{
+			var result = new CodeStatementCollection();
+			while(ST.rbrace!=pc.SymbolId && !pc.IsEnded)
+				result.Add(_ParseStatement(pc, includeComments));
+			return result;
+		}
 		static object _ParseDirective(_PC pc)
 		{
 			var s = pc.Value;

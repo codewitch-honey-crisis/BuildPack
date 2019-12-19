@@ -3078,8 +3078,8 @@ _state=-2;}public _PC GetLookAhead(){var e=new ConcatEnumerator<Token>(new Token
 public string Value=>Current.Value;public Token Current{get{if(0>_state){var t=default(Token);t.SymbolId=-1==_state?-2:-1;return t;}return _e.Current;
 }}public void EnsureStarted(){if(-2==_state)Advance();}public bool IsEnded{get{return-1==_state;}}public bool Advance(){if(!_e.MoveNext())_state=-1;else
 {_state=0;return true;}return false;}}static void _SkipComments(_PC pc){Token t;while((ST.blockComment==(t=pc.Current).SymbolId||ST.lineComment==t.SymbolId)
-&&pc.Advance());}static void _Error(string message,Token tok){throw new SlangSyntaxException(message,tok.Line,tok.Column,tok.Position);}}}namespace CD
-{using ST=SlangTokenizer;partial class SlangParser{/// <summary>
+&&pc.Advance());}[System.Diagnostics.DebuggerNonUserCode()]static void _Error(string message,Token tok){throw new SlangSyntaxException(message,tok.Line,
+tok.Column,tok.Position);}}}namespace CD{using ST=SlangTokenizer;partial class SlangParser{/// <summary>
 /// Reads a <see cref="CodeExpression"/> from the specified <see cref="TextReader"/>
 /// </summary>
 /// <param name="reader">The reader to read from</param>
@@ -3270,17 +3270,18 @@ _Error("Missing member name on private member declaration",pc.Current);return ne
 _SkipComments(pc);if(ST.keyword==pc.SymbolId&&"this"==pc.Value){pc.Advance();return new KeyValuePair<CodeTypeReference,string>(ptr,"this");}_Error("Illegal private member implementation type.",
 pc.Current);}}name=ptr.BaseType.Substring(idx+1);ptr.BaseType=ptr.BaseType.Substring(0,idx);_ParseTypeRef(pc,false); return new KeyValuePair<CodeTypeReference,
 string>(ptr,name);}var n=pc.Value;pc.Advance();return new KeyValuePair<CodeTypeReference,string>(null,n);}static CodeTypeMember _ParseMember(_PC pc,string
- typeName=null){var comments=new CodeCommentStatementCollection();while(ST.lineComment==pc.SymbolId||ST.blockComment==pc.SymbolId){comments.Add(_ParseCommentStatement(pc));
-}IList<KeyValuePair<string,CodeAttributeDeclaration>>customAttrs=null;if(ST.lbracket==pc.SymbolId)customAttrs=_ParseCustomAttributes(pc);var attrs=_ParseMemberAttributes(pc);
-var isEvent=false;if(ST.keyword==pc.SymbolId&&("partial"==pc.Value||"class"==pc.Value||"struct"==pc.Value||"enum"==pc.Value)){var ctd=_ParseType(pc,true);
-for(var i=comments.Count-1;0<=i;--i)ctd.Comments.Insert(0,comments[i]);return ctd;}if(ST.keyword==pc.SymbolId&&pc.Value=="event"){pc.Advance();_SkipComments(pc);
-isEvent=true;}else{var pc2=pc.GetLookAhead();pc2.EnsureStarted();pc2.Advance();_SkipComments(pc2); if(ST.identifier==pc.SymbolId&&(string.IsNullOrEmpty(typeName)||typeName==pc.Value)
-&&ST.lparen==pc2.SymbolId){if(attrs.Contains("abstract"))_Error("Constructors cannot be abstract",pc.Current);if(attrs.Contains("const"))_Error("Constructors cannot be const",
-pc.Current); var ctorName=pc.Value;pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);if(ST.lparen!=pc.SymbolId)
-_Error("Expecting ( in constructor declaration",pc.Current);pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);
-var parms=_ParseParamDecls(pc,ST.rparen,false);CodeTypeMember mctor=null;_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);
-if(!attrs.Contains("static")){var ctor=new CodeConstructor();mctor=ctor;ctor.Name=ctorName;ctor.Attributes=_BuildMemberAttributes(attrs);_AddCustomAttributes(customAttrs,
-null,ctor.CustomAttributes);ctor.Parameters.AddRange(parms);if(ST.colon==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor - expecting chained or base constructor args",
+ typeName=null){var comments=new CodeCommentStatementCollection();var dirs=_ParseDirectives(pc);while(ST.lineComment==pc.SymbolId||ST.blockComment==pc.SymbolId)
+{comments.Add(_ParseCommentStatement(pc));}dirs.AddRange(_ParseDirectives(pc));IList<KeyValuePair<string,CodeAttributeDeclaration>>customAttrs=null;if
+(ST.lbracket==pc.SymbolId)customAttrs=_ParseCustomAttributes(pc);var attrs=_ParseMemberAttributes(pc);var isEvent=false;if(ST.keyword==pc.SymbolId&&("partial"==pc.Value
+||"class"==pc.Value||"struct"==pc.Value||"enum"==pc.Value)){var ctd=_ParseType(pc,true);for(var i=comments.Count-1;0<=i;--i)ctd.Comments.Insert(0,comments[i]);
+_AddStartDirs(ctd,dirs);return ctd;}if(ST.keyword==pc.SymbolId&&pc.Value=="event"){pc.Advance();_SkipComments(pc);isEvent=true;}else{var pc2=pc.GetLookAhead();
+pc2.EnsureStarted();pc2.Advance();_SkipComments(pc2); if(ST.identifier==pc.SymbolId&&(string.IsNullOrEmpty(typeName)||typeName==pc.Value)&&ST.lparen==pc2.SymbolId)
+{if(attrs.Contains("abstract"))_Error("Constructors cannot be abstract",pc.Current);if(attrs.Contains("const"))_Error("Constructors cannot be const",pc.Current);
+ var ctorName=pc.Value;pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);if(ST.lparen!=pc.SymbolId)_Error("Expecting ( in constructor declaration",
+pc.Current);pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);var parms=_ParseParamDecls(pc,ST.rparen,false);
+CodeTypeMember mctor=null;_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);if(!attrs.Contains("static")){var ctor=new CodeConstructor();
+mctor=ctor;ctor.Name=ctorName;ctor.Attributes=_BuildMemberAttributes(attrs);_AddStartDirs(ctor,dirs);_AddCustomAttributes(customAttrs,null,ctor.CustomAttributes);
+ctor.Parameters.AddRange(parms);if(ST.colon==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor - expecting chained or base constructor args",
 pc.Current);if(ST.keyword==pc.SymbolId){switch(pc.Value){case"base":pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor - expecting base constructor args",
 pc.Current);if(ST.lparen!=pc.SymbolId)_Error("Expecting ( in base constructor args",pc.Current); if(pc.IsEnded)_Error("Unterminated constructor - expecting base constructor args",
 pc.Current);ctor.BaseConstructorArgs.AddRange(_ParseArguments(pc,ST.rparen,false));break;case"this":pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor - expecting chained constructor args",
@@ -3288,45 +3289,52 @@ pc.Current);if(ST.lparen!=pc.SymbolId)_Error("Expecting ( in chained constructor
 pc.Current);ctor.ChainedConstructorArgs.AddRange(_ParseArguments(pc,ST.rparen,false));break;default:_Error("Expecting chained or base constructor call",
 pc.Current);break;}}else _Error("Expecting chained or base constructor call",pc.Current);}_SkipComments(pc);if(pc.IsEnded||ST.lbrace!=pc.SymbolId)_Error("Expecting a constructor body",
 pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId)ctor.Statements.Add(_ParseStatement(pc,true));if(ST.rbrace!=pc.SymbolId)_Error("Unterminated method body",
-pc.Current);pc.Advance();}else{var ctor=new CodeTypeConstructor();mctor=ctor;ctor.Name=ctorName;ctor.Attributes=_BuildMemberAttributes(attrs);_AddCustomAttributes(customAttrs,
-null,ctor.CustomAttributes);if(0<parms.Count)_Error("Type constructors cannot have parameters.",pc.Current);_SkipComments(pc);if(pc.IsEnded||ST.lbrace
-!=pc.SymbolId)_Error("Expecting a constructor body",pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId)ctor.Statements.Add(_ParseStatement(pc,true));
-if(ST.rbrace!=pc.SymbolId)_Error("Unterminated method body",pc.Current);pc.Advance();}mctor.Comments.AddRange(comments);return mctor;}} CodeTypeReference
+pc.Current);pc.Advance();dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(ctor,dirs);}else{var ctor=new CodeTypeConstructor();mctor=ctor;ctor.Name
+=ctorName;ctor.Attributes=_BuildMemberAttributes(attrs);_AddStartDirs(ctor,dirs);_AddCustomAttributes(customAttrs,null,ctor.CustomAttributes);if(0<parms.Count)
+_Error("Type constructors cannot have parameters.",pc.Current);_SkipComments(pc);if(pc.IsEnded||ST.lbrace!=pc.SymbolId)_Error("Expecting a constructor body",
+pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId)ctor.Statements.Add(_ParseStatement(pc,true));if(ST.rbrace!=pc.SymbolId)_Error("Unterminated method body",
+pc.Current);pc.Advance();}mctor.Comments.AddRange(comments);dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(mctor,dirs);return mctor;}} CodeTypeReference
  ctr=null; if(!(ST.keyword==pc.SymbolId&&"void"==pc.Value)){ctr=_ParseTypeRef(pc);}else pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated member declaration",
 pc.Current);if(ST.identifier!=pc.SymbolId&&!(ST.keyword==pc.SymbolId&&"this"==pc.Value))_Error("Expecting identifier in member declaration",pc.Current);
  var kvp=_ParsePrivateImplementationType(pc);var name=kvp.Value;var ptr=kvp.Key;var isPriv=!(attrs.Contains("public")||attrs.Contains("protected")||attrs.Contains("internal"));
 _SkipComments(pc);if(pc.IsEnded)_Error("Unterminated member declaration",pc.Current);if(isEvent){if(ST.semi==pc.SymbolId){if(null==ctr)_Error("Events must not have a void type.",
 pc.Current);var e=new CodeMemberEvent();e.Type=ctr;if(isPriv)e.PrivateImplementationType=ptr;e.Name=name;e.Attributes=_BuildMemberAttributes(attrs);_AddCustomAttributes(customAttrs,
-null,e.CustomAttributes);if(attrs.Contains("public")){ e.UserData.Add("slang:unresolved",true);}pc.Advance();e.Comments.AddRange(comments);return e;}_Error(string.Format("Unexpected token {0} found in event.",pc.Value),pc.Current);
+null,e.CustomAttributes);_AddStartDirs(e,dirs);if(attrs.Contains("public")){ e.UserData.Add("slang:unresolved",true);}pc.Advance();e.Comments.AddRange(comments);
+dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(e,dirs);return e;}_Error(string.Format("Unexpected token {0} found in event.",pc.Value),pc.Current);
 }if(ST.semi==pc.SymbolId){if(attrs.Contains("abstract"))_Error("Fields cannot be abstract.",pc.Current);if(null==ctr)_Error("Fields must not have a void type.",
-pc.Current);var f=new CodeMemberField(ctr,name);f.Attributes=_BuildMemberAttributes(attrs);_AddCustomAttributes(customAttrs,null,f.CustomAttributes);if
-(null!=ptr)_Error("Fields cannot have a private implementation type.",pc.Current);pc.Advance();f.Comments.AddRange(comments);return f;}else if(ST.eq==pc.SymbolId)
-{if(null==ctr)_Error("Fields must not have a void type.",pc.Current);pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated field initializer",
-pc.Current);var init=_ParseExpression(pc);if(ST.semi!=pc.SymbolId)_Error("Invalid expression in field initializer",pc.Current);pc.Advance();var f=new CodeMemberField(ctr,
-name);f.Attributes=_BuildMemberAttributes(attrs);_AddCustomAttributes(customAttrs,null,f.CustomAttributes);f.InitExpression=init;if(null!=ptr)_Error("Fields cannot have a private implementation type.",
-pc.Current);f.Comments.AddRange(comments);return f;}else if(ST.lparen==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated method declaration",
+pc.Current);var f=new CodeMemberField(ctr,name);f.Attributes=_BuildMemberAttributes(attrs);_AddCustomAttributes(customAttrs,null,f.CustomAttributes);_AddStartDirs(f,
+dirs);if(null!=ptr)_Error("Fields cannot have a private implementation type.",pc.Current);pc.Advance();f.Comments.AddRange(comments);dirs.AddRange(_ParseDirectives(pc,
+true));_AddEndDirs(f,dirs);return f;}else if(ST.eq==pc.SymbolId){if(null==ctr)_Error("Fields must not have a void type.",pc.Current);pc.Advance();_SkipComments(pc);
+if(pc.IsEnded)_Error("Unterminated field initializer",pc.Current);var init=_ParseExpression(pc);if(ST.semi!=pc.SymbolId)_Error("Invalid expression in field initializer",
+pc.Current);pc.Advance();var f=new CodeMemberField(ctr,name);f.Attributes=_BuildMemberAttributes(attrs);_AddCustomAttributes(customAttrs,null,f.CustomAttributes);
+_AddStartDirs(f,dirs);f.InitExpression=init;if(null!=ptr)_Error("Fields cannot have a private implementation type.",pc.Current);f.Comments.AddRange(comments);
+dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(f,dirs);return f;}else if(ST.lparen==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated method declaration",
 pc.Current);var parms=_ParseParamDecls(pc);CodeMemberMethod m=new CodeMemberMethod();m.UserData.Add("slang:unresolved",true);m.ReturnType=ctr;m.Name=name;
 m.Attributes=_BuildMemberAttributes(attrs);_AddCustomAttributes(customAttrs,null,m.CustomAttributes);_AddCustomAttributes(customAttrs,"return",m.ReturnTypeCustomAttributes);
-m.Parameters.AddRange(parms);if(isPriv)m.PrivateImplementationType=ptr;_SkipComments(pc);if(attrs.Contains("public")){}if(attrs.Contains("abstract")){
-if(ST.semi!=pc.SymbolId)_Error("Expecting ; to terminate abstract method definition",pc.Current);pc.Advance();m.Comments.AddRange(comments);return m;}
-if(ST.lbrace!=pc.SymbolId)_Error("Expecting method body for non abstract method",pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId){m.Statements.Add(_ParseStatement(pc,true));
-}if(ST.rbrace!=pc.SymbolId)_Error("Unterminated method body",pc.Current);pc.Advance();m.Comments.AddRange(comments);return m;}else{var p=new CodeMemberProperty();
-p.Type=ctr;p.Name=name;p.Attributes=_BuildMemberAttributes(attrs);_AddCustomAttributes(customAttrs,null,p.CustomAttributes);if(isPriv)p.PrivateImplementationType
-=ptr;else if(attrs.Contains("public")){ p.UserData.Add("slang:unresolved",true);}if(ST.lbracket==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)
-_Error("Unterminated indexer property declaration",pc.Current);else if(0!=string.Compare(name,"this"))_Error("Only indexer properties can have arguments",
-pc.Current);p.Parameters.AddRange(_ParseParamDecls(pc,ST.rbracket));p.Name="Item";}if(ST.lbrace!=pc.SymbolId)_Error("Expecting body for property",pc.Current);
-pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated property body",pc.Current);var sawGet=false;var sawSet=false;while(ST.rbrace!=pc.SymbolId)
-{_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated property body",pc.Current);if(ST.keyword!=pc.SymbolId)_Error("Expecting get or set in property body.",
-pc.Current);if("get"==pc.Value){if(sawGet)_Error("Multiple property.get definitions are not allowed.",pc.Current);sawGet=true;pc.Advance();_SkipComments(pc);
-if(pc.IsEnded)_Error("Unterminated property.get",pc.Current);if(ST.lbrace==pc.SymbolId){if(attrs.Contains("abstract"))_Error("Abstract properties must not contain get bodies.",
-pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId)p.GetStatements.Add(_ParseStatement(pc,true));if(ST.rbrace!=pc.SymbolId)_Error("Unterminated property.get body",
-pc.Current);pc.Advance();}else if(ST.semi==pc.SymbolId){if(!attrs.Contains("abstract"))_Error("Non abstract property.gets must have a body.",pc.Current);
-pc.Advance();}}else if("set"==pc.Value){if(sawSet)_Error("Multiple property.set definitions are not allowed.",pc.Current);sawSet=true;pc.Advance();_SkipComments(pc);
-if(pc.IsEnded)_Error("Unterminated property.set",pc.Current);if(ST.lbrace==pc.SymbolId){if(attrs.Contains("abstract"))_Error("Abstract properties must not contain set bodies.",
-pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId)p.SetStatements.Add(_ParseStatement(pc,true));if(ST.rbrace!=pc.SymbolId)_Error("Unterminated property.set body",
-pc.Current);pc.Advance();}else if(ST.semi==pc.SymbolId){if(!attrs.Contains("abstract"))_Error("Non abstract property.sets must have a body.",pc.Current);
-pc.Advance();}}else _Error(string.Format("Unrecognized keyword {0} in property body",pc.Value),pc.Current);}if(ST.rbrace!=pc.SymbolId)_Error("Invalid property body",
-pc.Current);pc.Advance();p.Comments.AddRange(comments);return p;}}static void _AddCustomAttributes(IEnumerable<KeyValuePair<string,CodeAttributeDeclaration>>
+_AddStartDirs(m,dirs);m.Parameters.AddRange(parms);if(isPriv)m.PrivateImplementationType=ptr;_SkipComments(pc);if(attrs.Contains("public")){}if(attrs.Contains("abstract"))
+{if(ST.semi!=pc.SymbolId)_Error("Expecting ; to terminate abstract method definition",pc.Current);pc.Advance();m.Comments.AddRange(comments);return m;
+}if(ST.lbrace!=pc.SymbolId)_Error("Expecting method body for non abstract method",pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId){
+m.Statements.Add(_ParseStatement(pc,true));}if(ST.rbrace!=pc.SymbolId)_Error("Unterminated method body",pc.Current);pc.Advance();m.Comments.AddRange(comments);
+dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(m,dirs);return m;}else{var p=new CodeMemberProperty();p.Type=ctr;p.Name=name;p.Attributes=_BuildMemberAttributes(attrs);
+_AddCustomAttributes(customAttrs,null,p.CustomAttributes);_AddStartDirs(p,dirs);if(isPriv)p.PrivateImplementationType=ptr;else if(attrs.Contains("public"))
+{ p.UserData.Add("slang:unresolved",true);}if(ST.lbracket==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated indexer property declaration",
+pc.Current);else if(0!=string.Compare(name,"this"))_Error("Only indexer properties can have arguments",pc.Current);p.Parameters.AddRange(_ParseParamDecls(pc,
+ST.rbracket));p.Name="Item";}if(ST.lbrace!=pc.SymbolId)_Error("Expecting body for property",pc.Current);pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated property body",
+pc.Current);var sawGet=false;var sawSet=false;while(ST.rbrace!=pc.SymbolId){_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated property body",pc.Current);
+if(ST.keyword!=pc.SymbolId)_Error("Expecting get or set in property body.",pc.Current);if("get"==pc.Value){if(sawGet)_Error("Multiple property.get definitions are not allowed.",
+pc.Current);sawGet=true;pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated property.get",pc.Current);if(ST.lbrace==pc.SymbolId){if(attrs.Contains("abstract"))
+_Error("Abstract properties must not contain get bodies.",pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId)p.GetStatements.Add(_ParseStatement(pc,true));
+if(ST.rbrace!=pc.SymbolId)_Error("Unterminated property.get body",pc.Current);pc.Advance();}else if(ST.semi==pc.SymbolId){if(!attrs.Contains("abstract"))
+_Error("Non abstract property.gets must have a body.",pc.Current);pc.Advance();}}else if("set"==pc.Value){if(sawSet)_Error("Multiple property.set definitions are not allowed.",
+pc.Current);sawSet=true;pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated property.set",pc.Current);if(ST.lbrace==pc.SymbolId){if(attrs.Contains("abstract"))
+_Error("Abstract properties must not contain set bodies.",pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId)p.SetStatements.Add(_ParseStatement(pc,true));
+if(ST.rbrace!=pc.SymbolId)_Error("Unterminated property.set body",pc.Current);pc.Advance();}else if(ST.semi==pc.SymbolId){if(!attrs.Contains("abstract"))
+_Error("Non abstract property.sets must have a body.",pc.Current);pc.Advance();}}else _Error(string.Format("Unrecognized keyword {0} in property body",
+pc.Value),pc.Current);}if(ST.rbrace!=pc.SymbolId)_Error("Invalid property body",pc.Current);pc.Advance();p.Comments.AddRange(comments);dirs.AddRange(_ParseDirectives(pc,
+true));_AddEndDirs(p,dirs);return p;}}static void _AddStartDirs(CodeTypeMember mem,IList<object>dirs){for(int ic=dirs.Count,i=0;i<ic;++i){var dir=dirs[i];
+var l=dir as CodeLinePragma;if(null!=l){mem.LinePragma=l;dirs.RemoveAt(i);--i;--ic;continue;}var d=dir as CodeDirective;if(null!=d){mem.StartDirectives.Add(d);
+dirs.RemoveAt(i);--i;--ic;}}}static void _AddEndDirs(CodeTypeMember mem,IList<object>dirs){for(int ic=dirs.Count,i=0;i<ic;++i){var dir=dirs[i];var d=dir
+ as CodeDirective;if(null!=d){mem.EndDirectives.Add(d);dirs.RemoveAt(i);--i;--ic;}}}static void _AddCustomAttributes(IEnumerable<KeyValuePair<string,CodeAttributeDeclaration>>
 src,string target,CodeAttributeDeclarationCollection dst){if(null!=src)foreach(var kvp in src)if(kvp.Key==target)dst.Add(kvp.Value);}static IList<KeyValuePair<string,
 CodeAttributeDeclaration>>_ParseCustomAttributes(_PC pc){ var result=new List<KeyValuePair<string,CodeAttributeDeclaration>>();while(ST.lbracket==pc.SymbolId)
 {foreach(var kvp in _ParseCustomAttributeGroup(pc))result.Add(kvp);_SkipComments(pc);}return result;}static IList<KeyValuePair<string,CodeAttributeDeclaration>>
@@ -3419,49 +3427,94 @@ public static CodeStatement ReadStatementFromUrl(string url,bool includeComments
 /// <returns>A <see cref="CodeStatement"/> representing the parsed code</returns>
 public static CodeStatement ParseStatement(IEnumerable<char>input,bool includeComments=false){using(var e=new ST(input).GetEnumerator()){var pc=new _PC(e);
 pc.EnsureStarted();var result=_ParseStatement(pc,includeComments);if(!pc.IsEnded)throw new SlangSyntaxException("Unrecognized remainder in statement",
-pc.Current.Line,pc.Current.Column,pc.Current.Position);return result;}}static CodeStatement _ParseStatement(_PC pc,bool includeComments=false){if(includeComments
-&&(ST.lineComment==pc.SymbolId||ST.blockComment==pc.SymbolId))return _ParseCommentStatement(pc);_SkipComments(pc);var pc2=pc.GetLookAhead();pc2.EnsureStarted();
-CodeVariableDeclarationStatement vs=null;try{vs=_ParseVariableDeclaration(pc2);}catch{vs=null;}if(null!=vs){ _ParseVariableDeclaration(pc);return vs;}
-pc2=pc.GetLookAhead();pc2.EnsureStarted();CodeExpression e;try{e=_ParseExpression(pc2);}catch{e=null;}if(null!=e){_SkipComments(pc2);if(ST.semi==pc2.SymbolId)
-{pc2.Advance();_ParseExpression(pc);_SkipComments(pc);pc.Advance(); var bo=e as CodeBinaryOperatorExpression;if(null!=bo&&CodeBinaryOperatorType.Assign
-==bo.Operator)return new CodeAssignStatement(bo.Left,bo.Right);return new CodeExpressionStatement(e);}else if(ST.addAssign==pc2.SymbolId||ST.subAssign==pc2.SymbolId)
+pc.Current.Line,pc.Current.Column,pc.Current.Position);return result;}}/// <summary>
+/// Reads a <see cref="CodeStatementCollection"/> from the specified <see cref="TextReader"/>
+/// </summary>
+/// <param name="reader">The reader to read from</param>
+/// <param name="includeComments">True to include comments, or false to skip them</param>
+/// <returns>A <see cref="CodeStatementCollection"/> representing the parsed code</returns>
+public static CodeStatementCollection ReadStatementsFrom(TextReader reader,bool includeComments=false)=>ParseStatements(TextReaderEnumerable.FromReader(reader),
+includeComments);/// <summary>
+/// Reads a <see cref="CodeStatementCollection"/> from the specified file
+/// </summary>
+/// <param name="filename">The file to read</param>
+/// <param name="includeComments">True if comments should be returned as statements, or false to skip them</param>
+/// <returns>A <see cref="CodeStatementCollection"/> representing the parsed code</returns>
+public static CodeStatementCollection ReadStatementsFrom(string filename,bool includeComments=false)=>ParseStatements(new FileReaderEnumerable(filename),
+includeComments);/// <summary>
+/// Reads a <see cref="CodeStatementCollection"/> from the specified URL
+/// </summary>
+/// <param name="url">The URL to read</param>
+/// <param name="includeComments">True to return parsed comments as statements, or false to skip them</param>
+/// <returns>A <see cref="CodeStatementCollection"/> representing the parsed code</returns>
+public static CodeStatementCollection ReadStatementsFromUrl(string url,bool includeComments=false)=>ParseStatements(new UrlReaderEnumerable(url),includeComments);
+/// <summary>
+/// Parses a <see cref="CodeStatementCollection"/> from the specified input
+/// </summary>
+/// <param name="input">The input to parse</param>
+/// <param name="includeComments">True to return parsed comments as statements, or false to skip them</param>
+/// <returns>A <see cref="CodeStatementCollection"/> representing the parsed code</returns>
+public static CodeStatementCollection ParseStatements(IEnumerable<char>input,bool includeComments=false){using(var e=new ST(input).GetEnumerator()){var
+ pc=new _PC(e);pc.EnsureStarted();var result=_ParseStatements(pc,includeComments);if(!pc.IsEnded&&ST.rbrace!=pc.SymbolId)throw new SlangSyntaxException("Unrecognized remainder in statements",
+pc.Current.Line,pc.Current.Column,pc.Current.Position);return result;}}static CodeStatementCollection _ParseStatements(_PC pc,bool includeComments=false)
+{var result=new CodeStatementCollection();while(ST.rbrace!=pc.SymbolId&&!pc.IsEnded)result.Add(_ParseStatement(pc,includeComments));return result;}static
+ object _ParseDirective(_PC pc){var s=pc.Value;var i=s.IndexOfAny(new char[]{' ','\t'});if(0>i)i=s.Length;var type=s.Substring(1,i-1).Trim();switch(type)
+{case"region":pc.Advance();return new CodeRegionDirective(CodeRegionMode.Start,s.Substring(i).Trim());case"endregion":pc.Advance();return new CodeRegionDirective(CodeRegionMode.End,
+s.Substring(i).Trim());case"line":pc.Advance();s=s.Substring(i).Trim();i=s.LastIndexOfAny(new char[]{' ','\t'});if(-1<i){var num=s.Substring(0,i).Trim();
+int n;if(int.TryParse(num,out n)){s=s.Substring(i).Trim();if('\"'==s[0])s=s.Substring(1,s.Length-2).Replace("\"\"","\"");return new CodeLinePragma(s,n);
+}}break;}_Error(string.Format("Invalid or unsupported directive ",pc.Value),pc.Current);return null;}static List<object>_ParseDirectives(_PC pc,bool endDirectives=false)
+{var result=new List<object>();while(ST.directive==pc.SymbolId){if(endDirectives&&!pc.Value.Trim().StartsWith("#endregion"))break;else if(!endDirectives
+&&pc.Value.Trim().StartsWith("#endregion"))break;result.Add(_ParseDirective(pc));}return result;}static void _AddStartDirs(CodeStatement stmt,IList<object>
+dirs){for(int ic=dirs.Count,i=0;i<ic;++i){var dir=dirs[i];var l=dir as CodeLinePragma;if(null!=l){stmt.LinePragma=l;dirs.RemoveAt(i);--i;--ic;continue;
+}var d=dir as CodeDirective;if(null!=d){stmt.StartDirectives.Add(d);dirs.RemoveAt(i);--i;--ic;}}}static void _AddEndDirs(CodeStatement stmt,IList<object>
+dirs){for(int ic=dirs.Count,i=0;i<ic;++i){var dir=dirs[i];var d=dir as CodeDirective;if(null!=d){stmt.EndDirectives.Add(d);dirs.RemoveAt(i);--i;--ic;}
+}}static CodeStatement _ParseStatement(_PC pc,bool includeComments=false){var dirs=_ParseDirectives(pc);if(includeComments&&(ST.lineComment==pc.SymbolId
+||ST.blockComment==pc.SymbolId)){var c=_ParseCommentStatement(pc);_AddStartDirs(c,dirs);dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(c,dirs);}
+_SkipComments(pc);dirs.AddRange(_ParseDirectives(pc));var pc2=pc.GetLookAhead();pc2.EnsureStarted();CodeVariableDeclarationStatement vs=null;try{vs=_ParseVariableDeclaration(pc2);
+}catch{vs=null;}if(null!=vs){ _ParseVariableDeclaration(pc);_AddStartDirs(vs,dirs);_SkipComments(pc);dirs.AddRange(_ParseDirectives(pc,true));return vs;
+}pc2=pc.GetLookAhead();pc2.EnsureStarted();CodeExpression e;try{_ParseDirectives(pc2,false);_SkipComments(pc);e=_ParseExpression(pc2);}catch{e=null;}if
+(null!=e){_SkipComments(pc2);if(ST.semi==pc2.SymbolId){pc2.Advance();_ParseExpression(pc);_SkipComments(pc);pc.Advance(); CodeStatement r=null;var bo=
+e as CodeBinaryOperatorExpression;if(null!=bo&&CodeBinaryOperatorType.Assign==bo.Operator)r=new CodeAssignStatement(bo.Left,bo.Right);else r=new CodeExpressionStatement(e);
+_AddStartDirs(r,dirs);dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(r,dirs);return r;}else if(ST.addAssign==pc2.SymbolId||ST.subAssign==pc2.SymbolId)
 {bool isAttach=ST.addAssign==pc2.SymbolId;_ParseExpression(pc);_SkipComments(pc);pc.Advance();pc2.Advance();_SkipComments(pc);var le=_ParseExpression(pc);
 _SkipComments(pc);if(pc.IsEnded)_Error("Unterminated statement. Expecting ;",pc.Current);pc.Advance();var v=e as CodeVariableReferenceExpression;CodeEventReferenceExpression
  er=null;if(null!=v){er=new CodeEventReferenceExpression(null,v.VariableName);}else{var f=e as CodeFieldReferenceExpression;if(null!=f)er=new CodeEventReferenceExpression(f.TargetObject,
-f.FieldName);}if(null==er)_Error("The attach/remove target does not refer to a valid event",pc.Current);er.UserData.Add("slang:unresolved",true);return
- isAttach?new CodeAttachEventStatement(er,le)as CodeStatement:new CodeRemoveEventStatement(er,le);}}switch(pc.SymbolId){case ST.keyword:switch(pc.Value)
-{case"if":return _ParseIfStatement(pc);case"goto":return _ParseGotoStatement(pc);case"for":return _ParseForStatement(pc);case"while":return _ParseWhileStatement(pc);
-case"return":return _ParseReturnStatement(pc);case"throw":return _ParseThrowStatement(pc);case"try":return _ParseTryCatchFinallyStatement(pc);case"var":
-case"bool":case"char":case"string":case"sbyte":case"byte":case"short":case"ushort":case"int":case"uint":case"long":case"ulong":case"float":case"double":
-case"decimal":return _ParseVariableDeclaration(pc);default:throw new NotSupportedException(string.Format("The keyword {0} is not supported",pc.Value));
-}case ST.identifier: var s=pc.Value;pc2=pc.GetLookAhead();pc2.EnsureStarted();pc2.Advance();if(ST.colon==pc2.SymbolId){ var ls=new CodeLabeledStatement(pc.Value);
-pc.Advance();_SkipComments(pc);if(pc.IsEnded||ST.colon!=pc.SymbolId)_Error("Unterminated label. Expecting :",pc.Current);pc.Advance();return ls;}throw
- new NotImplementedException("Not finished");default:_Error(string.Format("Unexpected token {0} found statement.",pc.Value),pc.Current);break;}return null;
-}static CodeCommentStatement _ParseCommentStatement(_PC pc){ var s=pc.Value;if(ST.lineComment==pc.SymbolId){pc.Advance();if(s.StartsWith("///"))return
- new CodeCommentStatement(s.Substring(3).Trim(),true);return new CodeCommentStatement(s.Substring(2).Trim());}pc.Advance();return new CodeCommentStatement(s.Substring(2,
-s.Length-4).Trim());}static CodeTryCatchFinallyStatement _ParseTryCatchFinallyStatement(_PC pc){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated try statement",
-pc.Current);var result=new CodeTryCatchFinallyStatement();if(ST.lbrace!=pc.SymbolId)_Error("Unterminated try statement",pc.Current);pc.Advance();while(!pc.IsEnded
-&&ST.rbrace!=pc.SymbolId){result.TryStatements.Add(_ParseStatement(pc,true));}if(pc.IsEnded)_Error("Unterminated try statement",pc.Current);pc.Advance();
-_SkipComments(pc);if(ST.keyword!=pc.SymbolId)_Error("Expecting catch or finally statement",pc.Current);while("catch"==pc.Value){pc.Advance();_SkipComments(pc);
-var cc=new CodeCatchClause();if(ST.lparen==pc.SymbolId){if(!pc.Advance())_Error("Unterminated catch clause",pc.Current);cc.CatchExceptionType=_ParseTypeRef(pc);
-_SkipComments(pc);if(ST.identifier==pc.SymbolId){cc.LocalName=pc.Value;if(!pc.Advance())_Error("Unterminated catch clause",pc.Current);_SkipComments(pc);
-if(ST.rparen!=pc.SymbolId)_Error(string.Format("Unexpected token {0} in catch clause",pc.Value),pc.Current);pc.Advance();_SkipComments(pc);}else if(ST.rparen
-==pc.SymbolId){pc.Advance();_SkipComments(pc);}else _Error(string.Format("Unexpected token {0} in catch clause",pc.Value),pc.Current);}else throw new NotSupportedException("You must specify an exception type to catch in each catch clause.");
-if(ST.lbrace!=pc.SymbolId)_Error("Expecting { in catch clause",pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId){cc.Statements.Add(_ParseStatement(pc,true));
-}if(pc.IsEnded)_Error("Unterminated catch clause",pc.Current);pc.Advance();_SkipComments(pc);result.CatchClauses.Add(cc);}if(ST.keyword==pc.SymbolId&&
-"finally"==pc.Value){pc.Advance();_SkipComments(pc);if(ST.lbrace!=pc.SymbolId)_Error("Expecting { in finally clause",pc.Current);pc.Advance();while(!pc.IsEnded
-&&ST.rbrace!=pc.SymbolId)result.FinallyStatements.Add(_ParseStatement(pc,true));if(pc.IsEnded)_Error("Unterminated finally clause",pc.Current);pc.Advance();
-if(0==result.FinallyStatements.Count){ result.FinallyStatements.Add(new CodeSnippetStatement());}}return result;}static CodeVariableDeclarationStatement
- _ParseVariableDeclaration(_PC pc){CodeTypeReference ctr=null;if(!(ST.keyword==pc.SymbolId&&"var"==pc.Value))ctr=_ParseTypeRef(pc);else pc.Advance();_SkipComments(pc);
-if(pc.IsEnded)_Error("Unterminated variable declaration statement",pc.Current);if(ST.inc==pc.SymbolId)throw new NotSupportedException("Postfix increment is not supported. Consider using prefix increment instead.");
-if(ST.dec==pc.SymbolId)throw new NotSupportedException("Postfix decrement is not supported. Consider using prefix decrement instead.");if(ST.identifier
-!=pc.SymbolId)_Error("Expecting identifier in variable declaration",pc.Current);var result=new CodeVariableDeclarationStatement(ctr,pc.Value);if(null==
-ctr)result.UserData.Add("slang:unresolved",true);pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated variable declaration statement",pc.Current);
-if(ST.eq==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated variable declaration initializer",pc.Current);result.InitExpression
-=_ParseExpression(pc);_SkipComments(pc);if(ST.semi!=pc.SymbolId)_Error("Invalid expression in variable declaration initializer",pc.Current);pc.Advance();
-return result;}else if(null==ctr)_Error("Var variable declarations must have an initializer",pc.Current);_SkipComments(pc);if(ST.semi!=pc.SymbolId)_Error("Invalid expression in variable declaration initializer",
-pc.Current);pc.Advance();return result;}static CodeMethodReturnStatement _ParseReturnStatement(_PC pc){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated return statement",
-pc.Current);if(ST.semi==pc.SymbolId){pc.Advance();return new CodeMethodReturnStatement();}var e=_ParseExpression(pc);_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated return statement",
+f.FieldName);}if(null==er)_Error("The attach/remove target does not refer to a valid event",pc.Current);er.UserData.Add("slang:unresolved",true);var r
+=isAttach?new CodeAttachEventStatement(er,le)as CodeStatement:new CodeRemoveEventStatement(er,le);_AddStartDirs(r,dirs);_ParseDirectives(pc,true);_AddEndDirs(r,
+dirs);return r;}}switch(pc.SymbolId){case ST.keyword:CodeStatement r=null;switch(pc.Value){case"if":r=_ParseIfStatement(pc);break;case"goto":r=_ParseGotoStatement(pc);
+break;case"for":r=_ParseForStatement(pc);break;case"while":r=_ParseWhileStatement(pc);break;case"return":r=_ParseReturnStatement(pc);break;case"throw":
+r=_ParseThrowStatement(pc);break;case"try":r=_ParseTryCatchFinallyStatement(pc);break;case"var":case"bool":case"char":case"string":case"sbyte":case"byte":
+case"short":case"ushort":case"int":case"uint":case"long":case"ulong":case"float":case"double":case"decimal":r=_ParseVariableDeclaration(pc);break;default:
+throw new NotSupportedException(string.Format("The keyword {0} is not supported",pc.Value));}_AddStartDirs(r,dirs);dirs.AddRange(_ParseDirectives(pc,true));
+_AddEndDirs(r,dirs);return r;case ST.identifier: var s=pc.Value;pc2=pc.GetLookAhead();pc2.EnsureStarted();pc2.Advance();if(ST.colon==pc2.SymbolId){ var
+ ls=new CodeLabeledStatement(pc.Value);pc.Advance();_SkipComments(pc);if(pc.IsEnded||ST.colon!=pc.SymbolId)_Error("Unterminated label. Expecting :",pc.Current);
+pc.Advance();_AddStartDirs(ls,dirs);dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(ls,dirs);return ls;}throw new NotImplementedException("Not finished");
+default:_Error(string.Format("Unexpected token {0} found statement.",pc.Value),pc.Current);break;}return null;}static CodeCommentStatement _ParseCommentStatement(_PC
+ pc){ var s=pc.Value;if(ST.lineComment==pc.SymbolId){pc.Advance();if(s.StartsWith("///"))return new CodeCommentStatement(s.Substring(3).Trim(),true);return
+ new CodeCommentStatement(s.Substring(2).Trim());}pc.Advance();return new CodeCommentStatement(s.Substring(2,s.Length-4).Trim());}static CodeTryCatchFinallyStatement
+ _ParseTryCatchFinallyStatement(_PC pc){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated try statement",pc.Current);var result=new CodeTryCatchFinallyStatement();
+if(ST.lbrace!=pc.SymbolId)_Error("Unterminated try statement",pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId){result.TryStatements.Add(_ParseStatement(pc,true));
+}if(pc.IsEnded)_Error("Unterminated try statement",pc.Current);pc.Advance();_SkipComments(pc);if(ST.keyword!=pc.SymbolId)_Error("Expecting catch or finally statement",
+pc.Current);while("catch"==pc.Value){pc.Advance();_SkipComments(pc);var cc=new CodeCatchClause();if(ST.lparen==pc.SymbolId){if(!pc.Advance())_Error("Unterminated catch clause",
+pc.Current);cc.CatchExceptionType=_ParseTypeRef(pc);_SkipComments(pc);if(ST.identifier==pc.SymbolId){cc.LocalName=pc.Value;if(!pc.Advance())_Error("Unterminated catch clause",
+pc.Current);_SkipComments(pc);if(ST.rparen!=pc.SymbolId)_Error(string.Format("Unexpected token {0} in catch clause",pc.Value),pc.Current);pc.Advance();
+_SkipComments(pc);}else if(ST.rparen==pc.SymbolId){pc.Advance();_SkipComments(pc);}else _Error(string.Format("Unexpected token {0} in catch clause",pc.Value),
+pc.Current);}else throw new NotSupportedException("You must specify an exception type to catch in each catch clause.");if(ST.lbrace!=pc.SymbolId)_Error("Expecting { in catch clause",
+pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId){cc.Statements.Add(_ParseStatement(pc,true));}if(pc.IsEnded)_Error("Unterminated catch clause",
+pc.Current);pc.Advance();_SkipComments(pc);result.CatchClauses.Add(cc);}if(ST.keyword==pc.SymbolId&&"finally"==pc.Value){pc.Advance();_SkipComments(pc);
+if(ST.lbrace!=pc.SymbolId)_Error("Expecting { in finally clause",pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId)result.FinallyStatements.Add(_ParseStatement(pc,true));
+if(pc.IsEnded)_Error("Unterminated finally clause",pc.Current);pc.Advance();if(0==result.FinallyStatements.Count){ result.FinallyStatements.Add(new CodeSnippetStatement());
+}}return result;}static CodeVariableDeclarationStatement _ParseVariableDeclaration(_PC pc){CodeTypeReference ctr=null;if(!(ST.keyword==pc.SymbolId&&"var"
+==pc.Value))ctr=_ParseTypeRef(pc);else pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated variable declaration statement",pc.Current);if
+(ST.inc==pc.SymbolId)throw new NotSupportedException("Postfix increment is not supported. Consider using prefix increment instead.");if(ST.dec==pc.SymbolId)
+throw new NotSupportedException("Postfix decrement is not supported. Consider using prefix decrement instead.");if(ST.identifier!=pc.SymbolId)_Error("Expecting identifier in variable declaration",pc.Current);
+var result=new CodeVariableDeclarationStatement(ctr,pc.Value);if(null==ctr)result.UserData.Add("slang:unresolved",true);pc.Advance();_SkipComments(pc);
+if(pc.IsEnded)_Error("Unterminated variable declaration statement",pc.Current);if(ST.eq==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated variable declaration initializer",
+pc.Current);result.InitExpression=_ParseExpression(pc);_SkipComments(pc);if(ST.semi!=pc.SymbolId)_Error("Invalid expression in variable declaration initializer",
+pc.Current);pc.Advance();return result;}else if(null==ctr)_Error("Var variable declarations must have an initializer",pc.Current);_SkipComments(pc);if
+(ST.semi!=pc.SymbolId)_Error("Invalid expression in variable declaration initializer",pc.Current);pc.Advance();return result;}static CodeMethodReturnStatement
+ _ParseReturnStatement(_PC pc){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated return statement",pc.Current);if(ST.semi==pc.SymbolId)
+{pc.Advance();return new CodeMethodReturnStatement();}var e=_ParseExpression(pc);_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated return statement",
 pc.Current);if(ST.semi!=pc.SymbolId)_Error("Invalid expression in return statement",pc.Current);pc.Advance();return new CodeMethodReturnStatement(e);}
 static CodeThrowExceptionStatement _ParseThrowStatement(_PC pc){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated throw statement",pc.Current);
 if(ST.semi==pc.SymbolId){pc.Advance();return new CodeThrowExceptionStatement();}var e=_ParseExpression(pc);_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated throw statement",
@@ -3523,22 +3576,23 @@ public static CodeTypeDeclaration ReadTypeFromUrl(string url)=>ParseType(new Url
 /// <returns>A <see cref="CodeTypeDeclaration"/> representing the parsed code</returns>
 public static CodeTypeDeclaration ParseType(IEnumerable<char>input){using(var e=new ST(input).GetEnumerator()){var pc=new _PC(e);pc.EnsureStarted();var
  result=_ParseType(pc);if(!pc.IsEnded)throw new SlangSyntaxException("Unrecognized remainder in type",pc.Current.Line,pc.Current.Column,pc.Current.Position);
-return result;}}static CodeTypeDeclaration _ParseType(_PC pc,bool isNested=false){var result=new CodeTypeDeclaration();IList<KeyValuePair<string,CodeAttributeDeclaration>>
+return result;}}static CodeTypeDeclaration _ParseType(_PC pc,bool isNested=false){var dirs=_ParseDirectives(pc);var result=new CodeTypeDeclaration();IList<KeyValuePair<string,CodeAttributeDeclaration>>
 custAttrs=null;HashSet<string>attrs=null;if(!isNested){var comments=new CodeCommentStatementCollection();while(ST.lineComment==pc.SymbolId||ST.blockComment
-==pc.SymbolId)comments.Add(_ParseCommentStatement(pc));custAttrs=_ParseCustomAttributes(pc);attrs=_ParseTypeAttributes(pc);if(attrs.Contains("static"))
-throw new NotSupportedException("Explicitly static classes are not supported.");result.Attributes=_BuildMemberAttributes(attrs);result.TypeAttributes=
-(isNested)?_BuildNestedTypeAttributes(attrs):_BuildTopLevelTypeAttributes(attrs,pc);result.Comments.AddRange(comments);_SkipComments(pc);if(pc.IsEnded)
-_Error("Unterminated type declaration",pc.Current);if(ST.keyword==pc.SymbolId&&"partial"==pc.Value){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated type declaration",
-pc.Current);result.IsPartial=true;}_AddCustomAttributes(custAttrs,null,result.CustomAttributes);if(null!=custAttrs&&custAttrs.Count>result.CustomAttributes.Count)
-_Error("Invalid custom attribute targets",pc.Current);}if(ST.keyword!=pc.SymbolId)_Error("Expecting class, struct, enum, or interface",pc.Current);switch(pc.Value)
-{case"class":result.IsClass=true;break;case"struct":result.IsStruct=true;break;case"enum":if(result.IsPartial)_Error("Enums cannot be partial",pc.Current);
-result.IsEnum=true;break;case"interface":result.IsInterface=true;break;default:_Error("Expecting class, struct, enum, or interface",pc.Current);break;
-}pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated type declaration",pc.Current);if(ST.identifier!=pc.SymbolId)_Error("Expecting identifier in type declaration",
-pc.Current);result.Name=pc.Value;pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated type declaration",pc.Current);if(result.IsEnum)return
- _ParseEnum(pc,result);if(ST.lt==pc.SymbolId){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated generic type parameter specification",
-pc.Current);if(ST.gt==pc.SymbolId)_Error("Generic type parameter specification cannot be empty",pc.Current);while(!pc.IsEnded&&ST.gt!=pc.SymbolId){var
- custAttrs2=_ParseCustomAttributes(pc);if(ST.identifier!=pc.SymbolId)_Error("Expecting identifier in type parameter specification",pc.Current);var tp=
-new CodeTypeParameter(pc.Value);_AddCustomAttributes(custAttrs2,null,tp.CustomAttributes);if(tp.CustomAttributes.Count<custAttrs2.Count)_Error("Invalid target in custom attribute declaration on generic type parameter",
+==pc.SymbolId)comments.Add(_ParseCommentStatement(pc));dirs.AddRange(_ParseDirectives(pc));custAttrs=_ParseCustomAttributes(pc);attrs=_ParseTypeAttributes(pc);
+if(attrs.Contains("static"))throw new NotSupportedException("Explicitly static classes are not supported.");result.Attributes=_BuildMemberAttributes(attrs);
+result.TypeAttributes=(isNested)?_BuildNestedTypeAttributes(attrs):_BuildTopLevelTypeAttributes(attrs,pc);result.Comments.AddRange(comments);_SkipComments(pc);
+if(pc.IsEnded)_Error("Unterminated type declaration",pc.Current);if(ST.keyword==pc.SymbolId&&"partial"==pc.Value){pc.Advance();_SkipComments(pc);if(pc.IsEnded)
+_Error("Unterminated type declaration",pc.Current);result.IsPartial=true;}_AddCustomAttributes(custAttrs,null,result.CustomAttributes);if(null!=custAttrs
+&&custAttrs.Count>result.CustomAttributes.Count)_Error("Invalid custom attribute targets",pc.Current);_AddStartDirs(result,dirs);}if(ST.keyword!=pc.SymbolId)
+_Error("Expecting class, struct, enum, or interface",pc.Current);switch(pc.Value){case"class":result.IsClass=true;break;case"struct":result.IsStruct=true;
+break;case"enum":if(result.IsPartial)_Error("Enums cannot be partial",pc.Current);result.IsEnum=true;break;case"interface":result.IsInterface=true;break;
+default:_Error("Expecting class, struct, enum, or interface",pc.Current);break;}pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated type declaration",
+pc.Current);if(ST.identifier!=pc.SymbolId)_Error("Expecting identifier in type declaration",pc.Current);result.Name=pc.Value;pc.Advance();_SkipComments(pc);
+if(pc.IsEnded)_Error("Unterminated type declaration",pc.Current);if(result.IsEnum){var e=_ParseEnum(pc,result);dirs.AddRange(_ParseDirectives(pc,true));
+_AddEndDirs(e,dirs);}if(ST.lt==pc.SymbolId){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated generic type parameter specification",pc.Current);
+if(ST.gt==pc.SymbolId)_Error("Generic type parameter specification cannot be empty",pc.Current);while(!pc.IsEnded&&ST.gt!=pc.SymbolId){var custAttrs2=
+_ParseCustomAttributes(pc);if(ST.identifier!=pc.SymbolId)_Error("Expecting identifier in type parameter specification",pc.Current);var tp=new CodeTypeParameter(pc.Value);
+_AddCustomAttributes(custAttrs2,null,tp.CustomAttributes);if(tp.CustomAttributes.Count<custAttrs2.Count)_Error("Invalid target in custom attribute declaration on generic type parameter",
 pc.Current);result.TypeParameters.Add(tp);pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated generic type parameter specification",pc.Current);
 if(ST.comma!=pc.SymbolId)break;pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated generic type parameter specification",pc.Current);}if
 (pc.IsEnded)_Error("Unterminated generic type parameter specification",pc.Current);if(ST.gt!=pc.SymbolId)_Error("Illegal generic type parameter specification",
@@ -3554,33 +3608,33 @@ pc.Current);cp.Constraints.Add(_ParseTypeRef(pc));_SkipComments(pc);if(pc.IsEnde
 {pc.Advance();_SkipComments(pc);if(ST.lbrace==pc.SymbolId)_Error("Unterminated type constraint",pc.Current);}}if(!moved)_Error("Unterminated type constraint",
 pc.Current);}if(ST.lbrace!=pc.SymbolId)_Error("Expecting { in type definition",pc.Current);pc.Advance();if(pc.IsEnded)_Error("Unterminated type declaration",
 pc.Current);while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId){result.Members.Add(_ParseMember(pc,result.Name));}if(pc.IsEnded)_Error("Unterminated type declaration",
-pc.Current);if(ST.rbrace!=pc.SymbolId)_Error("Illegal member declaration in type",pc.Current);pc.Advance();return result;}static CodeTypeParameter _LookupTypeParameter(CodeTypeParameterCollection
- parms,string name,_PC pc){foreach(CodeTypeParameter tp in parms)if(tp.Name==name)return tp;_Error("Undeclared type parameter",pc.Current);return null;
-}static CodeTypeDeclaration _ParseEnum(_PC pc,CodeTypeDeclaration result){var bt=new CodeTypeReference(typeof(int));if(ST.colon==pc.SymbolId){pc.Advance();
-_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated enum declaration",pc.Current);bt=_ParseTypeRef(pc);result.BaseTypes.Add(bt);_SkipComments(pc);if(pc.IsEnded)
-_Error("Unterminated enum declaration",pc.Current);}if(ST.lbrace!=pc.SymbolId)_Error("Expecting enum body",pc.Current);pc.Advance();_SkipComments(pc);
-if(pc.IsEnded)_Error("Unterminated enum declaration",pc.Current);while(ST.rbrace!=pc.SymbolId){_SkipComments(pc);result.Members.Add(_ParseEnumField(pc,
-bt));}if(ST.rbrace!=pc.SymbolId)_Error("Unterminated enum declaration",pc.Current);pc.Advance();return result;}static CodeMemberField _ParseEnumField(_PC
- pc,CodeTypeReference enumType){_SkipComments(pc);if(pc.IsEnded)_Error("Expecting enum field declaration",pc.Current);IList<KeyValuePair<string,CodeAttributeDeclaration>>
-custAttrs=null;if(ST.lbracket==pc.SymbolId)custAttrs=_ParseCustomAttributes(pc);_SkipComments(pc);if(pc.IsEnded||ST.identifier!=pc.SymbolId)_Error("Expecting enum field declaration",
-pc.Current);var result=new CodeMemberField();result.Name=pc.Value;_AddCustomAttributes(custAttrs,null,result.CustomAttributes);_AddCustomAttributes(custAttrs,
-"field",result.CustomAttributes);if(null!=custAttrs&&custAttrs.Count>result.CustomAttributes.Count)_Error("Invalid custom attribute targets",pc.Current);
-pc.Advance();_SkipComments(pc);if(pc.IsEnded||(ST.eq!=pc.SymbolId&&ST.comma!=pc.SymbolId&&ST.rbrace!=pc.SymbolId))_Error("Expecting enum field value, }, or ,",
-pc.Current);if(ST.eq==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Expecting enum field value",pc.Current);result.InitExpression=
-_ParseExpression(pc);_SkipComments(pc);if(pc.IsEnded)_Error("Expecting , or } in enum declaration",pc.Current);}if(ST.comma==pc.SymbolId){pc.Advance();
-_SkipComments(pc);if(pc.IsEnded)_Error("Expecting enum field value",pc.Current);}return result;}static TypeAttributes _BuildTopLevelTypeAttributes(ICollection<string>
-attrs,_PC pc){var result=(TypeAttributes)0;foreach(var attr in attrs){switch(attr){case"public":result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.Public;
-break;case"internal":result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NotPublic;break;case"abstract":result|=TypeAttributes.Abstract;break;
-case"private":_Error("Top level types cannot be private",pc.Current);break;case"protected":_Error("Top level types cannot be protected",pc.Current);break;
-}}return result;}static TypeAttributes _BuildNestedTypeAttributes(ICollection<string>attrs){ var result=TypeAttributes.NestedFamORAssem;foreach(var attr
- in attrs){switch(attr){case"protected":if(attrs.Contains("internal"))result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedFamORAssem|TypeAttributes.NotPublic;
-else result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedFamily|TypeAttributes.NotPublic;break;case"internal":if(attrs.Contains("protected"))
-result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedFamORAssem|TypeAttributes.NotPublic;else result=(result&~TypeAttributes.VisibilityMask)
-|TypeAttributes.NestedFamANDAssem|TypeAttributes.NotPublic;break;case"public":result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedPublic;
-break;case"private":result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedPrivate|TypeAttributes.NotPublic;break;}}return result;}static
- HashSet<string>_ParseTypeAttributes(_PC pc){var result=new HashSet<string>();_SkipComments(pc);var more=true;while(more&&!pc.IsEnded&&ST.keyword==pc.SymbolId)
-{switch(pc.Value){case"static":case"abstract":case"protected":case"internal":case"public":case"private":result.Add(pc.Value);pc.Advance();_SkipComments(pc);
-break;default:more=false;break;}}return result;}}}namespace CD{using ST=SlangTokenizer;partial class SlangParser{/// <summary>
+pc.Current);if(ST.rbrace!=pc.SymbolId)_Error("Illegal member declaration in type",pc.Current);pc.Advance();_SkipComments(pc);dirs.AddRange(_ParseDirectives(pc,
+true));_AddEndDirs(result,dirs);return result;}static CodeTypeParameter _LookupTypeParameter(CodeTypeParameterCollection parms,string name,_PC pc){foreach
+(CodeTypeParameter tp in parms)if(tp.Name==name)return tp;_Error("Undeclared type parameter",pc.Current);return null;}static CodeTypeDeclaration _ParseEnum(_PC
+ pc,CodeTypeDeclaration result){var bt=new CodeTypeReference(typeof(int));if(ST.colon==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated enum declaration",
+pc.Current);bt=_ParseTypeRef(pc);result.BaseTypes.Add(bt);_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated enum declaration",pc.Current);}if(ST.lbrace
+!=pc.SymbolId)_Error("Expecting enum body",pc.Current);pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated enum declaration",pc.Current);
+while(ST.rbrace!=pc.SymbolId){_SkipComments(pc);result.Members.Add(_ParseEnumField(pc,bt));}if(ST.rbrace!=pc.SymbolId)_Error("Unterminated enum declaration",
+pc.Current);pc.Advance();return result;}static CodeMemberField _ParseEnumField(_PC pc,CodeTypeReference enumType){_SkipComments(pc);if(pc.IsEnded)_Error("Expecting enum field declaration",
+pc.Current);IList<KeyValuePair<string,CodeAttributeDeclaration>>custAttrs=null;if(ST.lbracket==pc.SymbolId)custAttrs=_ParseCustomAttributes(pc);_SkipComments(pc);
+if(pc.IsEnded||ST.identifier!=pc.SymbolId)_Error("Expecting enum field declaration",pc.Current);var result=new CodeMemberField();result.Name=pc.Value;
+_AddCustomAttributes(custAttrs,null,result.CustomAttributes);_AddCustomAttributes(custAttrs,"field",result.CustomAttributes);if(null!=custAttrs&&custAttrs.Count
+>result.CustomAttributes.Count)_Error("Invalid custom attribute targets",pc.Current);pc.Advance();_SkipComments(pc);if(pc.IsEnded||(ST.eq!=pc.SymbolId
+&&ST.comma!=pc.SymbolId&&ST.rbrace!=pc.SymbolId))_Error("Expecting enum field value, }, or ,",pc.Current);if(ST.eq==pc.SymbolId){pc.Advance();_SkipComments(pc);
+if(pc.IsEnded)_Error("Expecting enum field value",pc.Current);result.InitExpression=_ParseExpression(pc);_SkipComments(pc);if(pc.IsEnded)_Error("Expecting , or } in enum declaration",
+pc.Current);}if(ST.comma==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Expecting enum field value",pc.Current);}return result;}static
+ TypeAttributes _BuildTopLevelTypeAttributes(ICollection<string>attrs,_PC pc){var result=(TypeAttributes)0;foreach(var attr in attrs){switch(attr){case
+"public":result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.Public;break;case"internal":result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NotPublic;
+break;case"abstract":result|=TypeAttributes.Abstract;break;case"private":_Error("Top level types cannot be private",pc.Current);break;case"protected":
+_Error("Top level types cannot be protected",pc.Current);break;}}return result;}static TypeAttributes _BuildNestedTypeAttributes(ICollection<string>attrs)
+{ var result=TypeAttributes.NestedFamORAssem;foreach(var attr in attrs){switch(attr){case"protected":if(attrs.Contains("internal"))result=(result&~TypeAttributes.VisibilityMask)
+|TypeAttributes.NestedFamORAssem|TypeAttributes.NotPublic;else result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedFamily|TypeAttributes.NotPublic;
+break;case"internal":if(attrs.Contains("protected"))result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedFamORAssem|TypeAttributes.NotPublic;
+else result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedFamANDAssem|TypeAttributes.NotPublic;break;case"public":result=(result&~TypeAttributes.VisibilityMask)
+|TypeAttributes.NestedPublic;break;case"private":result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedPrivate|TypeAttributes.NotPublic;
+break;}}return result;}static HashSet<string>_ParseTypeAttributes(_PC pc){var result=new HashSet<string>();_SkipComments(pc);var more=true;while(more&&
+!pc.IsEnded&&ST.keyword==pc.SymbolId){switch(pc.Value){case"static":case"abstract":case"protected":case"internal":case"public":case"private":result.Add(pc.Value);
+pc.Advance();_SkipComments(pc);break;default:more=false;break;}}return result;}}}namespace CD{using ST=SlangTokenizer;partial class SlangParser{/// <summary>
 /// Reads a <see cref="CodeTypeReference"/> from the specified <see cref="TextReader"/>
 /// </summary>
 /// <param name="reader">The reader to read from</param>
@@ -3834,8 +3888,8 @@ public int Destination;/// <summary>
 public DfaTransitionEntry(char[]packedRanges,int destination){this.PackedRanges=packedRanges;this.Destination=destination;}}/// <summary>
 /// Reference Implementation for generated shared code
 /// </summary>
-[System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex","0.2.0.0")]internal class TableTokenizer:IEnumerable<Token>{ DfaEntry[]_dfaTable; string[]_blockEnds;
- int[]_nodeFlags; IEnumerable<char>_input;/// <summary>
+[System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex","0.2.0.0")]internal class TableTokenizer:IEnumerable<Token>{public const int ErrorSymbol=-1; DfaEntry[]
+_dfaTable; string[]_blockEnds; int[]_nodeFlags; IEnumerable<char>_input;/// <summary>
 /// Retrieves an enumerator that can be used to iterate over the tokens
 /// </summary>
 /// <returns>An enumerator that can be used to iterate over the tokens</returns>
@@ -3855,71 +3909,71 @@ public TableTokenizer(DfaEntry[]dfaTable,string[]blockEnds,int[]nodeFlags,IEnume
  const int _BeforeBegin=-3; const int _AfterEnd=-2; const int _InnerFinished=-1; const int _Enumerating=0; const int _TabWidth=4; DfaEntry[]_dfaTable;
  string[]_blockEnds; int[]_nodeFlags; IEnumerator<char>_input; int _state; Token _current; StringBuilder _buffer; int _line; int _column; long _position;
 public TableTokenizerEnumerator(DfaEntry[]dfaTable,string[]blockEnds,int[]nodeFlags,IEnumerator<char>input){ this._dfaTable=dfaTable;this._blockEnds=blockEnds;
-this._nodeFlags=nodeFlags;this._input=input;this._state=CD.TableTokenizerEnumerator._BeforeBegin;this._buffer=new StringBuilder();this._line=1;this._column
-=1;this._position=0;}public Token Current{get{ if((CD.TableTokenizerEnumerator._Enumerating>this._state)){ if((CD.TableTokenizerEnumerator._BeforeBegin
-==this._state)){throw new InvalidOperationException("The cursor is before the start of the enumeration");}if((CD.TableTokenizerEnumerator._AfterEnd==this._state))
-{throw new InvalidOperationException("The cursor is after the end of the enumeration");}if((CD.TableTokenizerEnumerator._Disposed==this._state)){CD.TableTokenizerEnumerator._ThrowDisposed();
+this._nodeFlags=nodeFlags;this._input=input;this._state=TableTokenizerEnumerator._BeforeBegin;this._buffer=new StringBuilder();this._line=1;this._column
+=1;this._position=0;}public Token Current{get{ if((TableTokenizerEnumerator._Enumerating>this._state)){ if((TableTokenizerEnumerator._BeforeBegin==this._state))
+{throw new InvalidOperationException("The cursor is before the start of the enumeration");}if((TableTokenizerEnumerator._AfterEnd==this._state)){throw
+ new InvalidOperationException("The cursor is after the end of the enumeration");}if((TableTokenizerEnumerator._Disposed==this._state)){TableTokenizerEnumerator._ThrowDisposed();
 }}return this._current;}}Token IEnumerator<Token>.Current{get{return this.Current;}}object System.Collections.IEnumerator.Current{get{return this.Current;
-}}void System.Collections.IEnumerator.Reset(){if((CD.TableTokenizerEnumerator._Disposed==this._state)){CD.TableTokenizerEnumerator._ThrowDisposed();}if
-((false==(CD.TableTokenizerEnumerator._BeforeBegin==this._state))){this._input.Reset();}this._state=CD.TableTokenizerEnumerator._BeforeBegin;this._line
-=1;this._column=1;this._position=0;}bool System.Collections.IEnumerator.MoveNext(){ if((CD.TableTokenizerEnumerator._Enumerating>this._state)){if((CD.TableTokenizerEnumerator._Disposed
-==this._state)){CD.TableTokenizerEnumerator._ThrowDisposed();}if((CD.TableTokenizerEnumerator._AfterEnd==this._state)){return false;}}this._current=default(Token);
+}}void System.Collections.IEnumerator.Reset(){if((TableTokenizerEnumerator._Disposed==this._state)){TableTokenizerEnumerator._ThrowDisposed();}if((false
+==(TableTokenizerEnumerator._BeforeBegin==this._state))){this._input.Reset();}this._state=TableTokenizerEnumerator._BeforeBegin;this._line=1;this._column
+=1;this._position=0;}bool System.Collections.IEnumerator.MoveNext(){ if((TableTokenizerEnumerator._Enumerating>this._state)){if((TableTokenizerEnumerator._Disposed
+==this._state)){TableTokenizerEnumerator._ThrowDisposed();}if((TableTokenizerEnumerator._AfterEnd==this._state)){return false;}}this._current=default(Token);
 this._current.Line=this._line;this._current.Column=this._column;this._current.Position=this._position;this._buffer.Clear(); this._current.SymbolId=this._Lex();
- bool done=false;for(;(false==done);){done=true; if((CD.TableTokenizerEnumerator.ErrorSymbol<this._current.SymbolId)){ string be=this._blockEnds[this._current.SymbolId];
- if(((false==(null==be))&&(false==(0==be.Length)))){ if((false==this._TryReadUntilBlockEnd(be))){this._current.SymbolId=CD.TableTokenizerEnumerator.ErrorSymbol;
-}}if(((CD.TableTokenizerEnumerator.ErrorSymbol<this._current.SymbolId)&&(false==(0==(this._nodeFlags[this._current.SymbolId]&1))))){ done=false;this._current.Line
+ bool done=false;for(;(false==done);){done=true; if((TableTokenizerEnumerator.ErrorSymbol<this._current.SymbolId)){ string be=this._blockEnds[this._current.SymbolId];
+ if(((false==(null==be))&&(false==(0==be.Length)))){ if((false==this._TryReadUntilBlockEnd(be))){this._current.SymbolId=TableTokenizerEnumerator.ErrorSymbol;
+}}if(((TableTokenizerEnumerator.ErrorSymbol<this._current.SymbolId)&&(false==(0==(this._nodeFlags[this._current.SymbolId]&1))))){ done=false;this._current.Line
 =this._line;this._current.Column=this._column;this._current.Position=this._position;this._buffer.Clear();this._current.SymbolId=this._Lex();}}}this._current.Value
-=this._buffer.ToString(); if((CD.TableTokenizerEnumerator._EosSymbol==this._current.SymbolId)){this._state=CD.TableTokenizerEnumerator._AfterEnd;}return
-(false==(CD.TableTokenizerEnumerator._AfterEnd==this._state));}void IDisposable.Dispose(){this._input.Dispose();this._state=CD.TableTokenizerEnumerator._Disposed;
-} bool _MoveNextInput(){if(this._input.MoveNext()){if((false==(CD.TableTokenizerEnumerator._BeforeBegin==this._state))){this._position=(this._position
-+1);if(('\n'==this._input.Current)){this._column=1;this._line=(this._line+1);}else{if(('\t'==this._input.Current)){this._column=(this._column+CD.TableTokenizerEnumerator._TabWidth);
+=this._buffer.ToString(); if((TableTokenizerEnumerator._EosSymbol==this._current.SymbolId)){this._state=TableTokenizerEnumerator._AfterEnd;}return(false
+==(TableTokenizerEnumerator._AfterEnd==this._state));}void IDisposable.Dispose(){this._input.Dispose();this._state=TableTokenizerEnumerator._Disposed;
+} bool _MoveNextInput(){if(this._input.MoveNext()){if((false==(TableTokenizerEnumerator._BeforeBegin==this._state))){this._position=(this._position+1);
+if(('\n'==this._input.Current)){this._column=1;this._line=(this._line+1);}else{if(('\t'==this._input.Current)){this._column=(this._column+TableTokenizerEnumerator._TabWidth);
 }else{this._column=(this._column+1);}}}else{ if(('\n'==this._input.Current)){this._column=1;this._line=(this._line+1);}else{if(('\t'==this._input.Current))
-{this._column=(this._column+(CD.TableTokenizerEnumerator._TabWidth-1));}}}return true;}this._state=CD.TableTokenizerEnumerator._InnerFinished;return false;
-} bool _TryReadUntil(char character){char ch=this._input.Current;this._buffer.Append(ch);if((ch==character)){return true;}for(;(this._MoveNextInput()&&
-(false==(this._input.Current==character)));){this._buffer.Append(this._input.Current);}if((false==(this._state==CD.TableTokenizerEnumerator._InnerFinished)))
+{this._column=(this._column+(TableTokenizerEnumerator._TabWidth-1));}}}return true;}this._state=TableTokenizerEnumerator._InnerFinished;return false;}
+ bool _TryReadUntil(char character){char ch=this._input.Current;this._buffer.Append(ch);if((ch==character)){return true;}for(;(this._MoveNextInput()&&
+(false==(this._input.Current==character)));){this._buffer.Append(this._input.Current);}if((false==(this._state==TableTokenizerEnumerator._InnerFinished)))
 {this._buffer.Append(this._input.Current);return(this._input.Current==character);}return false;} bool _TryReadUntilBlockEnd(string blockEnd){for(;((false
-==(CD.TableTokenizerEnumerator._InnerFinished==this._state))&&this._TryReadUntil(blockEnd[0]));){bool found=true;for(int i=1;(found&&(i<blockEnd.Length));
-i=(i+1)){if((false==(this._MoveNextInput()||(false==(this._input.Current==blockEnd[i]))))){found=false;}else{if((false==(CD.TableTokenizerEnumerator._InnerFinished
+==(TableTokenizerEnumerator._InnerFinished==this._state))&&this._TryReadUntil(blockEnd[0]));){bool found=true;for(int i=1;(found&&(i<blockEnd.Length));
+i=(i+1)){if((false==(this._MoveNextInput()||(false==(this._input.Current==blockEnd[i]))))){found=false;}else{if((false==(TableTokenizerEnumerator._InnerFinished
 ==this._state))){this._buffer.Append(this._input.Current);}}}if(found){this._MoveNextInput();return true;}}return false;} int _Lex(){ int acceptSymbolId;
- int dfaState=0; if((CD.TableTokenizerEnumerator._BeforeBegin==this._state)){if((false==this._MoveNextInput())){ acceptSymbolId=this._dfaTable[dfaState].AcceptSymbolId;
-if((false==(-1==acceptSymbolId))){return acceptSymbolId;}else{return CD.TableTokenizerEnumerator.ErrorSymbol;}}this._state=CD.TableTokenizerEnumerator._Enumerating;
-}else{if(((CD.TableTokenizerEnumerator._InnerFinished==this._state)||(CD.TableTokenizerEnumerator._AfterEnd==this._state))){ return CD.TableTokenizerEnumerator._EosSymbol;
+ int dfaState=0; if((TableTokenizerEnumerator._BeforeBegin==this._state)){if((false==this._MoveNextInput())){ acceptSymbolId=this._dfaTable[dfaState].AcceptSymbolId;
+if((false==(-1==acceptSymbolId))){return acceptSymbolId;}else{return TableTokenizerEnumerator.ErrorSymbol;}}this._state=TableTokenizerEnumerator._Enumerating;
+}else{if(((TableTokenizerEnumerator._InnerFinished==this._state)||(TableTokenizerEnumerator._AfterEnd==this._state))){ return TableTokenizerEnumerator._EosSymbol;
 }}bool done=false;for(;(false==done);){int nextDfaState=-1; for(int i=0;(i<this._dfaTable[dfaState].Transitions.Length);i=(i+1)){DfaTransitionEntry entry
 =this._dfaTable[dfaState].Transitions[i];bool found=false; for(int j=0;(j<entry.PackedRanges.Length);j=(j+1)){char ch=this._input.Current; char first=
 entry.PackedRanges[j];j=(j+1);char last=entry.PackedRanges[j]; if((ch<=last)){if((first<=ch)){found=true;}j=(int.MaxValue-1);}}if(found){ nextDfaState
 =entry.Destination;i=(int.MaxValue-1);}}if((false==(-1==nextDfaState))){ this._buffer.Append(this._input.Current); dfaState=nextDfaState;if((false==this._MoveNextInput()))
-{ acceptSymbolId=this._dfaTable[dfaState].AcceptSymbolId;if((false==(-1==acceptSymbolId))){return acceptSymbolId;}else{return CD.TableTokenizerEnumerator.ErrorSymbol;
+{ acceptSymbolId=this._dfaTable[dfaState].AcceptSymbolId;if((false==(-1==acceptSymbolId))){return acceptSymbolId;}else{return TableTokenizerEnumerator.ErrorSymbol;
 }}}else{done=true;}}acceptSymbolId=this._dfaTable[dfaState].AcceptSymbolId;if((false==(-1==acceptSymbolId))){return acceptSymbolId;}else{ this._buffer.Append(this._input.Current);
-this._MoveNextInput();return CD.TableTokenizerEnumerator.ErrorSymbol;}}static void _ThrowDisposed(){throw new ObjectDisposedException("TableTokenizerEnumerator");
-}}[System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex","0.2.0.0")]internal partial class SlangTokenizer:TableTokenizer{internal static DfaEntry[]DfaTable
-=new DfaEntry[]{new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new char[]{'a','a'},1),new DfaTransitionEntry(new char[]{'b','b'},25),new
- DfaTransitionEntry(new char[]{'c','c'},39),new DfaTransitionEntry(new char[]{'d','d'},67),new DfaTransitionEntry(new char[]{'e','e'},104),new DfaTransitionEntry(new
- char[]{'f','f'},131),new DfaTransitionEntry(new char[]{'g','g'},155),new DfaTransitionEntry(new char[]{'i','i'},166),new DfaTransitionEntry(new char[]
-{'l','l'},187),new DfaTransitionEntry(new char[]{'n','n'},193),new DfaTransitionEntry(new char[]{'o','o'},207),new DfaTransitionEntry(new char[]{'p','p'},
-229),new DfaTransitionEntry(new char[]{'r','r'},257),new DfaTransitionEntry(new char[]{'s','s'},270),new DfaTransitionEntry(new char[]{'t','t'},314),new
- DfaTransitionEntry(new char[]{'u','u'},330),new DfaTransitionEntry(new char[]{'v','v'},358),new DfaTransitionEntry(new char[]{'w','w'},376),new DfaTransitionEntry(new
- char[]{'y','y'},381),new DfaTransitionEntry(new char[]{'A','Z','_','_','h','h','j','k','m','m','q','q','x','x','z','z'},386),new DfaTransitionEntry(new
- char[]{'/','/'},387),new DfaTransitionEntry(new char[]{'\"','\"'},391),new DfaTransitionEntry(new char[]{'\'','\''},394),new DfaTransitionEntry(new char[]
-{'\t','\r',' ',' '},398),new DfaTransitionEntry(new char[]{'<','<'},399),new DfaTransitionEntry(new char[]{'>','>'},401),new DfaTransitionEntry(new char[]
-{'=','='},403),new DfaTransitionEntry(new char[]{'!','!'},405),new DfaTransitionEntry(new char[]{'+','+'},407),new DfaTransitionEntry(new char[]{'-','-'},
-410),new DfaTransitionEntry(new char[]{'*','*'},413),new DfaTransitionEntry(new char[]{'%','%'},415),new DfaTransitionEntry(new char[]{'&','&'},417),new
- DfaTransitionEntry(new char[]{'|','|'},420),new DfaTransitionEntry(new char[]{'[','['},423),new DfaTransitionEntry(new char[]{']',']'},424),new DfaTransitionEntry(new
- char[]{'(','('},425),new DfaTransitionEntry(new char[]{')',')'},426),new DfaTransitionEntry(new char[]{'{','{'},427),new DfaTransitionEntry(new char[]
-{'}','}'},428),new DfaTransitionEntry(new char[]{',',','},429),new DfaTransitionEntry(new char[]{':',':'},430),new DfaTransitionEntry(new char[]{';',';'},
-432),new DfaTransitionEntry(new char[]{'.','.'},433),new DfaTransitionEntry(new char[]{'0','0'},439),new DfaTransitionEntry(new char[]{'1','9'},558)},
--1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new char[]{'b','b'},2),new DfaTransitionEntry(new char[]{'s','s'},10),new DfaTransitionEntry(new
- char[]{'w','w'},21),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','a','c','r','t','v','x','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]
-{new DfaTransitionEntry(new char[]{'s','s'},3),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','r','t','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]
-{new DfaTransitionEntry(new char[]{'t','t'},4),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','s','u','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]
-{new DfaTransitionEntry(new char[]{'r','r'},5),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','q','s','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]
-{new DfaTransitionEntry(new char[]{'a','a'},6),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','b','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]
-{new DfaTransitionEntry(new char[]{'c','c'},7),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','b','d','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]
-{new DfaTransitionEntry(new char[]{'t','t'},8),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','s','u','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]
-{new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','z'},9)},0),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new char[]{'0',
-'9','A','Z','_','_','a','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new char[]{'c','c'},11),new DfaTransitionEntry(new char[]
-{'y','y'},18),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','b','d','x','z','z'},9)},0),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new
- char[]{'e','e'},12),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','d','f','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new
- char[]{'n','n'},13),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','m','o','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new
+this._MoveNextInput();return TableTokenizerEnumerator.ErrorSymbol;}}static void _ThrowDisposed(){throw new ObjectDisposedException("TableTokenizerEnumerator");
+}}internal class SlangTokenizer:TableTokenizer{internal static DfaEntry[]DfaTable=new DfaEntry[]{new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new
+ char[]{'a','a'},1),new DfaTransitionEntry(new char[]{'b','b'},25),new DfaTransitionEntry(new char[]{'c','c'},39),new DfaTransitionEntry(new char[]{'d',
+'d'},67),new DfaTransitionEntry(new char[]{'e','e'},104),new DfaTransitionEntry(new char[]{'f','f'},131),new DfaTransitionEntry(new char[]{'g','g'},155),
+new DfaTransitionEntry(new char[]{'i','i'},166),new DfaTransitionEntry(new char[]{'l','l'},187),new DfaTransitionEntry(new char[]{'n','n'},193),new DfaTransitionEntry(new
+ char[]{'o','o'},207),new DfaTransitionEntry(new char[]{'p','p'},229),new DfaTransitionEntry(new char[]{'r','r'},257),new DfaTransitionEntry(new char[]
+{'s','s'},270),new DfaTransitionEntry(new char[]{'t','t'},314),new DfaTransitionEntry(new char[]{'u','u'},330),new DfaTransitionEntry(new char[]{'v','v'},
+358),new DfaTransitionEntry(new char[]{'w','w'},376),new DfaTransitionEntry(new char[]{'y','y'},381),new DfaTransitionEntry(new char[]{'A','Z','_','_',
+'h','h','j','k','m','m','q','q','x','x','z','z'},386),new DfaTransitionEntry(new char[]{'/','/'},387),new DfaTransitionEntry(new char[]{'\"','\"'},391),
+new DfaTransitionEntry(new char[]{'\'','\''},394),new DfaTransitionEntry(new char[]{'\t','\r',' ',' '},398),new DfaTransitionEntry(new char[]{'<','<'},
+399),new DfaTransitionEntry(new char[]{'>','>'},401),new DfaTransitionEntry(new char[]{'=','='},403),new DfaTransitionEntry(new char[]{'!','!'},405),new
+ DfaTransitionEntry(new char[]{'+','+'},407),new DfaTransitionEntry(new char[]{'-','-'},410),new DfaTransitionEntry(new char[]{'*','*'},413),new DfaTransitionEntry(new
+ char[]{'%','%'},415),new DfaTransitionEntry(new char[]{'&','&'},417),new DfaTransitionEntry(new char[]{'|','|'},420),new DfaTransitionEntry(new char[]
+{'[','['},423),new DfaTransitionEntry(new char[]{']',']'},424),new DfaTransitionEntry(new char[]{'(','('},425),new DfaTransitionEntry(new char[]{')',')'},
+426),new DfaTransitionEntry(new char[]{'{','{'},427),new DfaTransitionEntry(new char[]{'}','}'},428),new DfaTransitionEntry(new char[]{',',','},429),new
+ DfaTransitionEntry(new char[]{':',':'},430),new DfaTransitionEntry(new char[]{';',';'},432),new DfaTransitionEntry(new char[]{'.','.'},433),new DfaTransitionEntry(new
+ char[]{'0','0'},439),new DfaTransitionEntry(new char[]{'1','9'},558),new DfaTransitionEntry(new char[]{'#','#'},560)},-1),new DfaEntry(new DfaTransitionEntry[]
+{new DfaTransitionEntry(new char[]{'b','b'},2),new DfaTransitionEntry(new char[]{'s','s'},10),new DfaTransitionEntry(new char[]{'w','w'},21),new DfaTransitionEntry(new
+ char[]{'0','9','A','Z','_','_','a','a','c','r','t','v','x','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new char[]{'s','s'},
+3),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','r','t','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new char[]
+{'t','t'},4),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','s','u','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new
+ char[]{'r','r'},5),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','q','s','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new
+ char[]{'a','a'},6),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','b','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new
+ char[]{'c','c'},7),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','b','d','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new
+ char[]{'t','t'},8),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','s','u','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new
+ char[]{'0','9','A','Z','_','_','a','z'},9)},0),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','z'},
+9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new char[]{'c','c'},11),new DfaTransitionEntry(new char[]{'y','y'},18),new DfaTransitionEntry(new
+ char[]{'0','9','A','Z','_','_','a','b','d','x','z','z'},9)},0),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new char[]{'e','e'},12),new
+ DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','d','f','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new char[]
+{'n','n'},13),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','m','o','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new
  char[]{'d','d'},14),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','c','e','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new
  char[]{'i','i'},15),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','h','j','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new
  char[]{'n','n'},16),new DfaTransitionEntry(new char[]{'0','9','A','Z','_','_','a','m','o','z'},9)},1),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new
@@ -4498,23 +4552,27 @@ new DfaEntry(new DfaTransitionEntry[0],9),new DfaEntry(new DfaTransitionEntry[]{
  char[]{'D','D','F','F','M','M','d','d','f','f','m','m'},557)},44),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new char[]{'0','9'},559),
 new DfaTransitionEntry(new char[]{'U','U','u','u'},548),new DfaTransitionEntry(new char[]{'L','L','l','l'},550),new DfaTransitionEntry(new char[]{'.',
 '.'},552),new DfaTransitionEntry(new char[]{'E','E','e','e'},554),new DfaTransitionEntry(new char[]{'D','D','F','F','M','M','d','d','f','f','m','m'},557)},
-44)};internal static string[]BlockEnds=new string[]{null,null,null,"*/",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null};internal static int[]
-NodeFlags=new int[]{0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};public SlangTokenizer(System.Collections.Generic.IEnumerable<char>
-input):base(DfaTable,BlockEnds,NodeFlags,input){}public const int keyword=0;public const int identifier=1;public const int lineComment=2;public const int
- blockComment=3;public const int stringLiteral=4;public const int characterLiteral=5;public const int whitespace=6;public const int lte=7;public const
- int lt=8;public const int gte=9;public const int gt=10;public const int eqEq=11;public const int notEq=12;public const int eq=13;public const int inc
-=14;public const int addAssign=15;public const int add=16;public const int dec=17;public const int subAssign=18;public const int sub=19;public const int
- mulAssign=20;public const int mul=21;public const int divAssign=22;public const int div=23;public const int modAssign=24;public const int mod=25;public
- const int and=26;public const int bitwiseAndAssign=27;public const int bitwiseAnd=28;public const int or=29;public const int bitwiseOrAssign=30;public
- const int bitwiseOr=31;public const int not=32;public const int lbracket=33;public const int rbracket=34;public const int lparen=35;public const int rparen
-=36;public const int lbrace=37;public const int rbrace=38;public const int comma=39;public const int colonColon=40;public const int colon=41;public const
- int semi=42;public const int dot=43;public const int integerLiteral=44;public const int floatLiteral=45;}}namespace CD{sealed class FileReaderEnumerable
-:TextReaderEnumerable{protected override bool CanCreateReader=>true;readonly string _filename;public FileReaderEnumerable(string filename){if(null==filename)
-throw new ArgumentNullException("filename");if(0==filename.Length)throw new ArgumentException("The filename must not be empty.","filename");_filename=
-filename;}protected override TextReader CreateTextReader(){return File.OpenText(_filename);}}sealed class ConsoleReaderEnumerable:TextReaderEnumerable
-{protected override bool CanCreateReader=>false;public ConsoleReaderEnumerable(){}protected override TextReader CreateTextReader(){return Console.In;}
-}sealed class UrlReaderEnumerable:TextReaderEnumerable{protected override bool CanCreateReader=>true;readonly string _url;public UrlReaderEnumerable(string
+44),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new char[]{'\t','\t',' ',' '},560),new DfaTransitionEntry(new char[]{'a','z'},561)},-1),
+new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new char[]{'a','z'},561),new DfaTransitionEntry(new char[]{'\t','\t',' ',' '},562),new DfaTransitionEntry(new
+ char[]{'\0','','','','!','`','{','￿'},563)},46),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new char[]{'\t','\t',' ',' '},562),new
+ DfaTransitionEntry(new char[]{'\0','','','','!','￿'},563)},46),new DfaEntry(new DfaTransitionEntry[]{new DfaTransitionEntry(new char[]{'\0','\t','',
+'￿'},563)},46)};internal static int[]NodeFlags=new int[]{0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+internal static string[]BlockEnds=new string[]{null,null,null,"*/",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
+null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null};public SlangTokenizer(IEnumerable<char>
+input):base(SlangTokenizer.DfaTable,SlangTokenizer.BlockEnds,SlangTokenizer.NodeFlags,input){}public const int keyword=0;public const int identifier=1;
+public const int lineComment=2;public const int blockComment=3;public const int stringLiteral=4;public const int characterLiteral=5;public const int whitespace
+=6;public const int lte=7;public const int lt=8;public const int gte=9;public const int gt=10;public const int eqEq=11;public const int notEq=12;public
+ const int eq=13;public const int inc=14;public const int addAssign=15;public const int add=16;public const int dec=17;public const int subAssign=18;public
+ const int sub=19;public const int mulAssign=20;public const int mul=21;public const int divAssign=22;public const int div=23;public const int modAssign
+=24;public const int mod=25;public const int and=26;public const int bitwiseAndAssign=27;public const int bitwiseAnd=28;public const int or=29;public const
+ int bitwiseOrAssign=30;public const int bitwiseOr=31;public const int not=32;public const int lbracket=33;public const int rbracket=34;public const int
+ lparen=35;public const int rparen=36;public const int lbrace=37;public const int rbrace=38;public const int comma=39;public const int colonColon=40;public
+ const int colon=41;public const int semi=42;public const int dot=43;public const int integerLiteral=44;public const int floatLiteral=45;public const int
+ directive=46;}}namespace CD{sealed class FileReaderEnumerable:TextReaderEnumerable{protected override bool CanCreateReader=>true;readonly string _filename;
+public FileReaderEnumerable(string filename){if(null==filename)throw new ArgumentNullException("filename");if(0==filename.Length)throw new ArgumentException("The filename must not be empty.",
+"filename");_filename=filename;}protected override TextReader CreateTextReader(){return File.OpenText(_filename);}}sealed class ConsoleReaderEnumerable
+:TextReaderEnumerable{protected override bool CanCreateReader=>false;public ConsoleReaderEnumerable(){}protected override TextReader CreateTextReader()
+{return Console.In;}}sealed class UrlReaderEnumerable:TextReaderEnumerable{protected override bool CanCreateReader=>true;readonly string _url;public UrlReaderEnumerable(string
  url){if(null==url)throw new ArgumentNullException("url");if(0==url.Length)throw new ArgumentException("The url must not be empty.","url");_url=url;}protected
  override TextReader CreateTextReader(){var wq=WebRequest.Create(_url);var wr=wq.GetResponse();return new StreamReader(wr.GetResponseStream());}}abstract
  class TextReaderEnumerable:IEnumerable<char>{

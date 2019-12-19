@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{DD05A876-2846-43F3-B14A-E919D22C20DD}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Parsley</RootNamespace>
+    <AssemblyName>Parsley</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Numerics" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Cfg\CfgAttribute.cs" />
+    <Compile Include="Cfg\CfgAttributeList.cs" />
+    <Compile Include="Cfg\CfgDocument.cs" />
+    <Compile Include="Cfg\CfgException.cs" />
+    <Compile Include="Cfg\CfgMessage.cs" />
+    <Compile Include="Cfg\CfgNode.cs" />
+    <Compile Include="Cfg\CfgRule.cs" />
+    <Compile Include="CodeGenerator.cs" />
+    <Compile Include="Collections\CollectionUtility.cs" />
+    <Compile Include="Common\IMessage.cs" />
+    <Compile Include="Collections\ListDictionary.cs" />
+    <Compile Include="DeslangedExport.cs" />
+    <Content Include="Export\ParseNode.cs" />
+    <Content Include="Export\ParserContext.cs" />
+    <Content Include="Export\SyntaxException.cs" />
+    <Content Include="Export\Token.cs" />
+    <Compile Include="LL1\CfgLL1Conflict.cs" />
+    <Compile Include="LL1\CfgLL1ParseTable.cs" />
+    <Compile Include="LL1\CfgLL1Progress.cs" />
+    <Compile Include="LL1\LL1.cs" />
+    <Compile Include="Collections\OrderedCollectionEqualityComparer.cs" />
+    <Compile Include="ParseContext\ParseContext.BaseExtensions.cs" />
+    <Compile Include="ParseContext\ParseContext.cs" />
+    <Compile Include="ParseContext\ParseContext.Json.cs" />
+    <Content Include="Export\Parser.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="IO\TextReaderEnumerable.cs" />
+    <Compile Include="Xbnf\XbnfAttribute.cs" />
+    <Compile Include="Xbnf\XbnfAttributeList.cs" />
+    <Compile Include="Xbnf\XbnfBinaryExpression.cs" />
+    <Compile Include="Xbnf\XbnfConcatExpression.cs" />
+    <Compile Include="Xbnf\XbnfDocument.cs" />
+    <Compile Include="Xbnf\XbnfException.cs" />
+    <Compile Include="Xbnf\XbnfExpression.cs" />
+    <Compile Include="Xbnf\XbnfLiteralExpression.cs" />
+    <Compile Include="Xbnf\XbnfMessage.cs" />
+    <Compile Include="Xbnf\XbnfNode.cs" />
+    <Compile Include="Xbnf\XbnfOptionalExpression.cs" />
+    <Compile Include="Xbnf\XbnfOrExpression.cs" />
+    <Compile Include="Xbnf\XbnfProduction.cs" />
+    <Compile Include="Xbnf\XbnfProductionList.cs" />
+    <Compile Include="Xbnf\XbnfRefExpression.cs" />
+    <Compile Include="Xbnf\XbnfRegexExpression.cs" />
+    <Compile Include="Xbnf\XbnfRepeatExpression.cs" />
+    <Compile Include="Xbnf\XbnfConvert.cs" />
+    <Compile Include="Xbnf\XbnfUnaryExpression.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="Expression.xbnf" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CodeDomGoKit\CodeDomGoKit.csproj">
+      <Project>{f1935a78-6eca-4aa9-9be2-0c64be4297c7}</Project>
+      <Name>CodeDomGoKit</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="CodeDomGoKit\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>"$(SolutionDir)Deslang\bin\Release\deslang.exe" "$(ProjectDir)Export\Parser.cs" "$(ProjectDir)Export\Token.cs" "$(ProjectDir)Export\ParserContext.cs" "$(ProjectDir)Export\ParseNode.cs" "$(ProjectDir)Export\SyntaxException.cs" /output "$(ProjectDir)DeslangedExport.cs" /ifstale
+</PreBuildEvent>
+  </PropertyGroup>
+</Project>

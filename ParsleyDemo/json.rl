@@ -1,0 +1,13 @@
+number<id=14>= '\-?(0|[1-9][0-9]*)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?'
+string<id=12>= '"([^"\\]|\\.)*"'
+true<id=16>= 'true'
+false<id=17>= 'false'
+null<id=15>= 'null'
+lbracket<id=21, collapsed>= '\['
+rbracket<id=22, collapsed>= '\]'
+lbrace<id=18, collapsed>= '\{'
+rbrace<id=19, collapsed>= '\}'
+colon<id=13, collapsed>= ':'
+comma<id=20, collapsed>= ','
+whitespace<id=23, hidden>= '[ \t\r\n\f\v]+'
+

@@ -1,0 +1,26 @@
+﻿Json<start>= Object | Array;
+Object= "{" "}" | "{" Fields "}";
+Fields<collapsed>= Field "," Fields | Field;
+Field= string ":" Value;
+Array= "[" "]" | "[" Values "]";
+Values<collapsed>= Value "," Values | Value;
+Value<collapsed>= string |
+	number	|
+    Object	|
+	Array	|
+    Boolean |
+    null	;
+Boolean= true|false;
+number= '\-?(0|[1-9][0-9]*)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?';
+// below: string is not compliant, should make sure the escapes are valid JSON escapes rather than accepting everything and should stop at line breaks
+string = '"([^"\\]|\\.)*"';
+true="true";
+false="false";
+null="null";
+lbracket<collapsed>="[";
+rbracket<collapsed>="]";
+lbrace<collapsed>="{";
+rbrace<collapsed>="}";
+colon<collapsed>=":";
+comma<collapsed>=",";
+whitespace<hidden>='[ \t\r\n\f\v]+';

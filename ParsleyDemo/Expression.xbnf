@@ -1,0 +1,43 @@
+﻿Expression<start>=Term => { return EvaluateTerm(node.Children[0]);}
+Term= Factor ("+"|"-") Factor | Factor => {
+	if(1==node.Children.Length)
+		return EvaluateFactor(node.Children[0]);
+	else if(node.Children[1].SymbolId==add)
+		return ((int)EvaluateFactor(node.Children[0])) + ((int)EvaluateFactor(node.Children[2]));
+	else
+		return ((int)EvaluateFactor(node.Children[0])) - ((int)EvaluateFactor(node.Children[2]));
+}
+Factor= Unary ("*"|"/") Unary | Unary => {
+	if(1==node.Children.Length)
+		return EvaluateUnary(node.Children[0]);
+	else if(node.Children[1].SymbolId==mul)
+		return ((int)EvaluateUnary(node.Children[0])) * ((int)EvaluateUnary(node.Children[2]));
+	else
+		return ((int)EvaluateUnary(node.Children[0])) / ((int)EvaluateUnary(node.Children[2]));
+}
+Unary= ("+"|"-") Unary | Leaf => {
+	if (1 == node.Children.Length)
+		return EvaluateLeaf(node.Children[0]);
+	else if (node.Children[0].SymbolId == add)
+		return EvaluateUnary(node.Children[1]);
+	else
+		return -(int)EvaluateUnary(node.Children[1]);
+}
+Leaf= identifier | integer | "(" Expression ")" => {
+	var n = node.Children[0];
+	if (identifier == n.SymbolId)
+		throw new NotImplementedException("Variables are not implemented");
+	else if (integer == n.SymbolId)
+		return int.Parse(n.Value);
+	else 
+		return EvaluateExpression(n.Children[1]);
+}
+add= "+";
+sub= "-";
+mul= "*";
+div= "/";
+lparen= "(";
+rparen= ")";
+integer= '[0-9]+';
+identifier= '[A-Z_a-z][0-9A-Z_a-z]*';
+whitespace<hidden>= '\s+';
