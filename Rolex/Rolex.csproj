@@ -69,7 +69,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>$(SolutionDir)Deslang\bin\Release\deslang.exe $(ProjectDir)Shared\Token.cs $(ProjectDir)Shared\TableTokenizer.cs $(ProjectDir)Shared\CompiledTokenizer.cs $(ProjectDir)Shared\TableTokenizerTemplate.cs $(ProjectDir)Shared\CompiledTokenizerTemplate.cs /output $(ProjectDir)Shared.cs /namespace Rolex /class Shared /mutable /ifstale
-$(SolutionDir)CSBrick\bin\Release\csbrick.exe $(SolutionDir)Regex\Regex.csproj /output $(ProjectDir)Regex.brick.cs</PreBuildEvent>
+    <PreBuildEvent>"$(SolutionDir)Deslang\bin\Release\deslang.exe" "$(ProjectDir)Shared\Token.cs" "$(ProjectDir)Shared\TableTokenizer.cs" "$(ProjectDir)Shared\CompiledTokenizer.cs" "$(ProjectDir)Shared\TableTokenizerTemplate.cs" "$(ProjectDir)Shared\CompiledTokenizerTemplate.cs" /output "$(ProjectDir)Shared.cs" /namespace Rolex /class Shared /mutable /ifstale
+"$(SolutionDir)CSBrick\bin\Release\csbrick.exe" "$(SolutionDir)Regex\Regex.csproj" /output "$(ProjectDir)Regex.brick.cs"</PreBuildEvent>
   </PropertyGroup>
 </Project>

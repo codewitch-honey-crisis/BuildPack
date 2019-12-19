@@ -54,6 +54,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>$(SolutionDir)CSBrick\bin\Release\csbrick.exe $(SolutionDir)CodeDomGoKit\CodeDomGoKit.csproj /output $(ProjectDir)CodeDomGoKit.brick.cs</PreBuildEvent>
+    <PreBuildEvent>"$(SolutionDir)CSBrick\bin\Release\csbrick.exe" "$(SolutionDir)CodeDomGoKit\CodeDomGoKit.csproj" /output "$(ProjectDir)CodeDomGoKit.brick.cs"</PreBuildEvent>
   </PropertyGroup>
 </Project>
