@@ -325,6 +325,7 @@ namespace CD
 						if(found)
 						{
 							CodeDomVisitor.ReplaceTarget(ctx, new CodePropertySetValueReferenceExpression());
+							return;
 						}
 					}
 				}
