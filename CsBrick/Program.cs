@@ -9,7 +9,8 @@ namespace CSBrick
 {
 	class Program
 	{
-		static readonly string _File = Assembly.GetEntryAssembly().GetModules()[0].Name;
+		static readonly string _CodeBase = Assembly.GetEntryAssembly().GetModules()[0].FullyQualifiedName;
+		static readonly string _File = Path.GetFileName(_CodeBase);
 		static readonly string _Name = _GetName();
 		
 		static int Main(string[] args)
@@ -75,10 +76,10 @@ namespace CSBrick
 				{
 					stale = false;
 					if (_IsStale(inputfile, outputfile))
-					{
 						stale = true;
-					}
-					else
+					if (!stale)
+						stale = _IsStale(_CodeBase, outputfile);
+					if (!stale) 
 					{
 						foreach (var f in inputs)
 						{

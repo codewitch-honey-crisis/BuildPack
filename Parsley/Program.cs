@@ -14,7 +14,8 @@ namespace Parsley
 	using V = CD.CodeDomVisitor;
 	class Program
 	{
-		static readonly string _File = Assembly.GetEntryAssembly().GetModules()[0].Name;
+		static readonly string _CodeBase = Assembly.GetEntryAssembly().GetModules()[0].FullyQualifiedName;
+		static readonly string _File = Path.GetFileName(_CodeBase);
 		static readonly string _Name = _GetName();
 
 		static int Main(string[] args)
@@ -94,12 +95,13 @@ namespace Parsley
 				{
 					stale = false;
 					if (_IsStale(inputfile, outputfile))
-					{
 						stale = true;
-					}
 					if (!stale && null != rolexfile)
 						if (_IsStale(inputfile, rolexfile))
 							stale = true;
+					// see if our exe has changed
+					if (!stale && _IsStale(_CodeBase, outputfile))
+						stale = true;
 				}
 
 				if (!stale)

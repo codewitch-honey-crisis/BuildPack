@@ -19,17 +19,8 @@ namespace Rolex
 {
 	class Program
 	{
-		static string _GetName() {
-			foreach(var attr in Assembly.GetEntryAssembly().CustomAttributes)
-			{
-				if(typeof(AssemblyTitleAttribute)==attr.AttributeType)
-				{
-					return attr.ConstructorArguments[0].Value as string;
-				}
-			}
-			return Path.GetFileNameWithoutExtension(_File);
-		}
-		static readonly string _File = Assembly.GetEntryAssembly().GetModules()[0].Name;
+		static readonly string _CodeBase = Assembly.GetEntryAssembly().GetModules()[0].FullyQualifiedName;
+		static readonly string _File = Path.GetFileName(_CodeBase);
 		static readonly string _Name = _GetName();
 		static int Main(string[] args)
 		{
@@ -126,13 +117,9 @@ namespace Rolex
 					var stale = true;
 					if (ifstale && null!=outputfile)
 					{
-						// File.Exists doesn't always work right
-						try
-						{
-							if (File.GetLastWriteTimeUtc(outputfile) >= File.GetLastWriteTimeUtc(inputfile))
-								stale = false;
-						}
-						catch { }
+						stale=_IsStale(inputfile, outputfile);
+						if (!stale)
+							stale = _IsStale(_CodeBase, outputfile);
 					}
 					if (!stale)
 					{
@@ -229,9 +216,6 @@ namespace Rolex
 										tr.BaseType = name + "Enumerator";
 								}
 							});
-							
-							//cns.Types.Add(CodeGenerator.GenerateCompiledTokenizer(name, symbolTable));
-							//cns.Types.Add(CodeGenerator.GenerateCompiledTokenizerEnumerator(name, symbolTable, dfaTable, blockEnds, nodeFlags));
 						}
 						var hasColNS = false;
 						foreach (CodeNamespaceImport nsi in cns.Imports)
@@ -280,7 +264,18 @@ namespace Rolex
 			}
 			return result;
 		}
-
+		static bool _IsStale(string inputfile, string outputfile)
+		{
+			var result = true;
+			// File.Exists doesn't always work right
+			try
+			{
+				if (File.GetLastWriteTimeUtc(outputfile) >= File.GetLastWriteTimeUtc(inputfile))
+					result = false;
+			}
+			catch { }
+			return result;
+		}
 		private static void _ImportCompileUnit(CodeCompileUnit fromCcu,CodeNamespace dst)
 		{
 			CD.CodeDomVisitor.Visit(fromCcu, (ctx) => {
@@ -562,6 +557,17 @@ namespace Rolex
 			t.WriteLine();
 			t.WriteLine("Any other switch displays this screen and exits.");
 			t.WriteLine();
+		}
+		static string _GetName()
+		{
+			foreach (var attr in Assembly.GetEntryAssembly().CustomAttributes)
+			{
+				if (typeof(AssemblyTitleAttribute) == attr.AttributeType)
+				{
+					return attr.ConstructorArguments[0].Value as string;
+				}
+			}
+			return Path.GetFileNameWithoutExtension(_File);
 		}
 		static DfaEntry[] _ToDfaStateTable<TAccept>(CharFA<TAccept> fsm,IList<TAccept> symbolTable = null, IProgress<CharFAProgress> progress = null)
 		{

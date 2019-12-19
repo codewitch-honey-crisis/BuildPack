@@ -20,7 +20,8 @@ namespace Deslang
 	using V = CodeDomVisitor;
 	class Program
 	{
-		static readonly string _File = Assembly.GetEntryAssembly().GetModules()[0].Name;
+		static readonly string _CodeBase = Assembly.GetEntryAssembly().GetModules()[0].FullyQualifiedName;
+		static readonly string _File = Path.GetFileName(_CodeBase);
 		static readonly string _Name = _GetName();
 		static int Main(string[] args)
 		{
@@ -137,7 +138,7 @@ namespace Deslang
 					stale = false;
 					foreach(var f in inputs)
 					{
-						if(_IsStale(f,outputfile))
+						if(_IsStale(f,outputfile) || _IsStale(_CodeBase,outputfile))
 						{
 							stale = true;
 							break;
