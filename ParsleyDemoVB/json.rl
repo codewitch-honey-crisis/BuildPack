@@ -9,5 +9,5 @@ lbrace<id=23, collapsed>= '\{'
 rbrace<id=21, collapsed>= '\}'
 colon<id=15, collapsed>= ':'
 comma<id=20, collapsed>= ','
-whitespace<id=25, hidden>= '[ \t\r\n\f\v]+'
+whitespace<id=25, hidden>= '[\n\r\t ]+'
 

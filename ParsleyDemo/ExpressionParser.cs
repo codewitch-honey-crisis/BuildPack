@@ -12,6 +12,7 @@ namespace ParsleyDemo {
     using System;
     using System.Collections.Generic;
     
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
     internal partial class ExpressionParser {
         internal const int ErrorSymbol = -1;
         internal const int EosSymbol = -2;
@@ -31,6 +32,8 @@ namespace ParsleyDemo {
         public const int mul = 13;
         public const int div = 14;
         public const int whitespace = 15;
+        
+        #line 1 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         private static ParseNode _ParseExpression(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -48,6 +51,11 @@ namespace ParsleyDemo {
             context.Error("Expecting add, sub, identifier, integer, or lparen");
             return null;
         }
+        
+        #line default
+        #line hidden
+        
+        #line 18 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         private static ParseNode _ParseUnary(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -79,6 +87,11 @@ namespace ParsleyDemo {
             context.Error("Expecting add, sub, identifier, integer, or lparen");
             return null;
         }
+        
+        #line default
+        #line hidden
+        
+        #line 26 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         private static ParseNode _ParseLeaf(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -110,6 +123,11 @@ namespace ParsleyDemo {
             context.Error("Expecting identifier, integer, or lparen");
             return null;
         }
+        
+        #line default
+        #line hidden
+        
+        #line 2 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         private static ParseNode _ParseTerm(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -128,6 +146,9 @@ namespace ParsleyDemo {
             context.Error("Expecting add, sub, identifier, integer, or lparen");
             return null;
         }
+        
+        #line default
+        #line hidden
         private static ParseNode _ParseTermPart(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -157,6 +178,8 @@ namespace ParsleyDemo {
             context.Error("Expecting add, sub, #EOS, or rparen");
             return null;
         }
+        
+        #line 10 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         private static ParseNode _ParseFactor(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -175,6 +198,9 @@ namespace ParsleyDemo {
             context.Error("Expecting add, sub, identifier, integer, or lparen");
             return null;
         }
+        
+        #line default
+        #line hidden
         private static ParseNode _ParseFactorPart(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -206,51 +232,93 @@ namespace ParsleyDemo {
             context.Error("Expecting mul, div, add, sub, #EOS, or rparen");
             return null;
         }
+        
+        #line 1 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static ParseNode ParseExpression(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return ExpressionParser._ParseExpression(context);
         }
+        
+        #line default
+        #line hidden
+        
+        #line 2 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static ParseNode ParseTerm(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return ExpressionParser._ParseTerm(context);
         }
+        
+        #line default
+        #line hidden
+        
+        #line 10 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static ParseNode ParseFactor(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return ExpressionParser._ParseFactor(context);
         }
+        
+        #line default
+        #line hidden
+        
+        #line 18 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static ParseNode ParseUnary(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return ExpressionParser._ParseUnary(context);
         }
+        
+        #line default
+        #line hidden
+        
+        #line 26 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static ParseNode ParseLeaf(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return ExpressionParser._ParseLeaf(context);
         }
+        
+        #line default
+        #line hidden
         public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return ExpressionParser._ParseExpression(context);
         }
+        
+        #line 1 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int Evaluate(ParseNode node) {
             return ExpressionParser.EvaluateExpression(node);
         }
+        
+        #line default
+        #line hidden
+        
+        #line 1 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int Evaluate(ParseNode node, object state) {
             return ExpressionParser.EvaluateExpression(node, state);
         }
+        
+        #line default
+        #line hidden
+        
+        #line 1 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int EvaluateExpression(ParseNode node, object state) {
             if ((ExpressionParser.Expression == node.SymbolId)) {
                 return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateTerm(node.Children[0], state), typeof(int))));
             }
             throw new SyntaxException("Expecting Expression", node.Line, node.Column, node.Position);
         }
+        
+        #line default
+        #line hidden
         public static int EvaluateExpression(ParseNode node) {
             return ExpressionParser.EvaluateExpression(node, null);
         }
+        
+        #line 2 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static object EvaluateTerm(ParseNode node, object state) {
             if ((ExpressionParser.Term == node.SymbolId)) {
                 if ((1 == node.Children.Length)) {
@@ -267,9 +335,14 @@ namespace ParsleyDemo {
             }
             throw new SyntaxException("Expecting Term", node.Line, node.Column, node.Position);
         }
+        
+        #line default
+        #line hidden
         public static object EvaluateTerm(ParseNode node) {
             return ExpressionParser.EvaluateTerm(node, null);
         }
+        
+        #line 10 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int EvaluateFactor(ParseNode node, object state) {
             if ((ExpressionParser.Factor == node.SymbolId)) {
                 if ((1 == node.Children.Length)) {
@@ -286,9 +359,14 @@ namespace ParsleyDemo {
             }
             throw new SyntaxException("Expecting Factor", node.Line, node.Column, node.Position);
         }
+        
+        #line default
+        #line hidden
         public static int EvaluateFactor(ParseNode node) {
             return ExpressionParser.EvaluateFactor(node, null);
         }
+        
+        #line 18 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int EvaluateUnary(ParseNode node, object state) {
             if ((ExpressionParser.Unary == node.SymbolId)) {
                 if ((1 == node.Children.Length)) {
@@ -305,9 +383,14 @@ namespace ParsleyDemo {
             }
             throw new SyntaxException("Expecting Unary", node.Line, node.Column, node.Position);
         }
+        
+        #line default
+        #line hidden
         public static int EvaluateUnary(ParseNode node) {
             return ExpressionParser.EvaluateUnary(node, null);
         }
+        
+        #line 26 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int EvaluateLeaf(ParseNode node, object state) {
             if ((ExpressionParser.Leaf == node.SymbolId)) {
                 ParseNode n = node.Children[0];
@@ -328,6 +411,9 @@ namespace ParsleyDemo {
             }
             throw new SyntaxException("Expecting Leaf", node.Line, node.Column, node.Position);
         }
+        
+        #line default
+        #line hidden
         public static int EvaluateLeaf(ParseNode node) {
             return ExpressionParser.EvaluateLeaf(node, null);
         }

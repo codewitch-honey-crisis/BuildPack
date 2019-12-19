@@ -15,9 +15,9 @@ namespace Parsley
 	using V = CD.CodeDomVisitor;
 	class Program
 	{
-		static readonly string _CodeBase = Assembly.GetEntryAssembly().GetModules()[0].FullyQualifiedName;
-		static readonly string _File = Path.GetFileName(_CodeBase);
-		static readonly string _Name = _GetName();
+		internal static readonly string CodeBase = Assembly.GetEntryAssembly().GetModules()[0].FullyQualifiedName;
+		internal static readonly string File = Path.GetFileName(CodeBase);
+		internal static readonly string Name = _GetName();
 
 		static int Main(string[] args)
 		{
@@ -101,25 +101,25 @@ namespace Parsley
 						if (_IsStale(inputfile, rolexfile))
 							stale = true;
 					// see if our exe has changed
-					if (!stale && _IsStale(_CodeBase, outputfile))
+					if (!stale && _IsStale(CodeBase, outputfile))
 						stale = true;
 				}
 
 				if (!stale)
 				{
 					if (null == rolexfile)
-						Console.Error.WriteLine("{0} skipped {1} because it was not stale.", _Name, outputfile);
+						Console.Error.WriteLine("{0} skipped {1} because it was not stale.", Name, outputfile);
 					else
-						Console.Error.WriteLine("{0} skipped {1} and {2} because they were not stale.", _Name, outputfile, rolexfile);
+						Console.Error.WriteLine("{0} skipped {1} and {2} because they were not stale.", Name, outputfile, rolexfile);
 				}
 				else
 				{
 					if (null != outputfile)
 					{
 						if (null == rolexfile)
-							Console.Error.WriteLine("{0} is building {1}.", _Name, outputfile);
+							Console.Error.WriteLine("{0} is building {1}.", Name, outputfile);
 						else
-							Console.Error.WriteLine("{0} is building {1} and {2}.", _Name, outputfile, rolexfile);
+							Console.Error.WriteLine("{0} is building {1} and {2}.", Name, outputfile, rolexfile);
 					}
 					if (string.IsNullOrEmpty(codelanguage))
 					{
@@ -236,7 +236,7 @@ namespace Parsley
 					return attr.ConstructorArguments[0].Value as string;
 				}
 			}
-			return Path.GetFileNameWithoutExtension(_File);
+			return Path.GetFileNameWithoutExtension(File);
 		}
 		// do our error handling here (release builds)
 		static int _ReportError(Exception ex)
@@ -251,9 +251,9 @@ namespace Parsley
 			// write the name of our app. this actually uses the 
 			// name of the executable so it will always be correct
 			// even if the executable file was renamed.
-			t.WriteLine("{0} generates a recursive descent parser and optional lexer spec", _Name);
+			t.WriteLine("{0} generates a recursive descent parser and optional lexer spec", Name);
 			t.WriteLine();
-			t.Write(_File);
+			t.Write(File);
 			t.WriteLine(" <inputfile> [/output <outputfile>] [/rolex <rolexfile>]");
 			t.WriteLine("   [/namespace <codenamespace>] [/name <classname>]");
 			t.WriteLine("	[/langage <codelanguage>] [/noshared] [/ifstale]");
@@ -276,7 +276,7 @@ namespace Parsley
 			// File.Exists doesn't always work right
 			try
 			{
-				if (File.GetLastWriteTimeUtc(outputfile) >= File.GetLastWriteTimeUtc(inputfile))
+				if (System.IO.File.GetLastWriteTimeUtc(outputfile) >= System.IO.File.GetLastWriteTimeUtc(inputfile))
 					result = false;
 			}
 			catch { }

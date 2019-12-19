@@ -127,8 +127,12 @@ namespace Parsley
 			=> Parse(ParseContext.CreateFrom(reader));
 		public static XbnfDocument ReadFrom(string file)
 		{
-			using(var pc = ParseContext.CreateFrom(file))
-				return Parse(pc);
+			using (var pc = ParseContext.CreateFrom(file))
+			{
+				var result = Parse(pc);
+				result._filename = Path.GetFullPath(file);
+				return result;
+			}
 		}
 		public static XbnfDocument ReadFromUrl(string url)
 		{

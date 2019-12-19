@@ -15,6 +15,7 @@ Imports System
 Imports System.Collections.Generic
 
 Namespace ParsleyDemo
+    <System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")>  _
     Partial Friend Class JsonParser
         Friend Const ErrorSymbol As Integer = -1
         Friend Const EosSymbol As Integer = -2
@@ -44,6 +45,8 @@ Namespace ParsleyDemo
         Public Const lbrace As Integer = 23
         Public Const lbracket As Integer = 24
         Public Const whitespace As Integer = 25
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",2)
         Private Shared Function _ParseJson(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -63,6 +66,10 @@ Namespace ParsleyDemo
             context.Error("Expecting lbrace or lbracket")
             Return Nothing
         End Function
+        
+        #End ExternalSource
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",4)
         Private Shared Function _ParseField(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -79,6 +86,10 @@ Namespace ParsleyDemo
             context.Error("Expecting string")
             Return Nothing
         End Function
+        
+        #End ExternalSource
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",6)
         Private Shared Function _ParseValue(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -126,6 +137,10 @@ Namespace ParsleyDemo
             context.Error("Expecting string, number, lbrace, lbracket, true, false, or null")
             Return Nothing
         End Function
+        
+        #End ExternalSource
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",12)
         Private Shared Function _ParseBoolean(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -147,6 +162,8 @@ Namespace ParsleyDemo
             context.Error("Expecting true or false")
             Return Nothing
         End Function
+        
+        #End ExternalSource
         Private Shared Function _ParseImplicitList(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -257,6 +274,8 @@ Namespace ParsleyDemo
             context.Error("Expecting comma or rbracket")
             Return Nothing
         End Function
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",3)
         Private Shared Function _ParseObject(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -271,6 +290,8 @@ Namespace ParsleyDemo
             context.Error("Expecting lbrace")
             Return Nothing
         End Function
+        
+        #End ExternalSource
         Private Shared Function _ParseObjectPart2(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -291,6 +312,8 @@ Namespace ParsleyDemo
             context.Error("Expecting rbrace or string")
             Return Nothing
         End Function
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",5)
         Private Shared Function _ParseArray(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -305,6 +328,8 @@ Namespace ParsleyDemo
             context.Error("Expecting lbracket")
             Return Nothing
         End Function
+        
+        #End ExternalSource
         Private Shared Function _ParseArrayPart2(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -331,36 +356,60 @@ Namespace ParsleyDemo
             context.Error("Expecting rbracket, string, number, lbrace, lbracket, true, false, or null")
             Return Nothing
         End Function
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",2)
         Public Shared Function ParseJson(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return JsonParser._ParseJson(context)
         End Function
+        
+        #End ExternalSource
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",3)
         Public Shared Function ParseObject(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return JsonParser._ParseObject(context)
         End Function
+        
+        #End ExternalSource
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",4)
         Public Shared Function ParseField(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return JsonParser._ParseField(context)
         End Function
+        
+        #End ExternalSource
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",5)
         Public Shared Function ParseArray(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return JsonParser._ParseArray(context)
         End Function
+        
+        #End ExternalSource
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",6)
         Public Shared Function ParseValue(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return JsonParser._ParseValue(context)
         End Function
+        
+        #End ExternalSource
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",12)
         Public Shared Function ParseBoolean(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return JsonParser._ParseBoolean(context)
         End Function
+        
+        #End ExternalSource
         Public Shared Function Parse(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
@@ -370,6 +419,7 @@ Namespace ParsleyDemo
     '''<summary>
     '''
     '''</summary>
+    <System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")>  _
     Friend Class SyntaxException
         Inherits Exception
         Private _line As Integer
@@ -416,6 +466,7 @@ Namespace ParsleyDemo
             Return String.Format("{0} at line {1}, column {2}, position {3}", message, line, column, position)
         End Function
     End Class
+    <System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")>  _
     Partial Friend Class ParseNode
         Private _symbolId As Integer
         Private _symbol As String
@@ -485,6 +536,7 @@ Namespace ParsleyDemo
             End Get
         End Property
     End Class
+    <System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")>  _
     Partial Friend Class ParserContext
         Inherits [Object]
         Implements IDisposable

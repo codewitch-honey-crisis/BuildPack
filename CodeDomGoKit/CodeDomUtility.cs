@@ -1444,6 +1444,21 @@ namespace CD
 						val.GetType().FullName));
 		}
 		#endregion
+		/// <summary>
+		/// Returns a collection of comments, one for each line of text
+		/// </summary>
+		/// <param name="text">The comment text</param>
+		/// <param name="docComment">True if these should be rendered as a doc comment, otherwise false</param>
+		/// <returns></returns>
+		public static CodeCommentStatementCollection ToComments(string text,bool docComment = false)
+		{
+			var result = new CodeCommentStatementCollection();
+			var sr = new StringReader(text);
+			string line;
+			while (null != (line = sr.ReadLine()))
+				result.Add(new CodeCommentStatement(line, docComment));
+			return result;
+		} 
 	}
 
 }

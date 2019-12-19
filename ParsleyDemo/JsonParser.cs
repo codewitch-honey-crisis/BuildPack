@@ -12,6 +12,7 @@ namespace ParsleyDemo {
     using System;
     using System.Collections.Generic;
     
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
     internal partial class JsonParser {
         internal const int ErrorSymbol = -1;
         internal const int EosSymbol = -2;
@@ -41,6 +42,8 @@ namespace ParsleyDemo {
         public const int lbrace = 23;
         public const int lbracket = 24;
         public const int whitespace = 25;
+        
+        #line 2 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         private static ParseNode _ParseJson(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -60,6 +63,11 @@ namespace ParsleyDemo {
             context.Error("Expecting lbrace or lbracket");
             return null;
         }
+        
+        #line default
+        #line hidden
+        
+        #line 4 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         private static ParseNode _ParseField(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -76,6 +84,11 @@ namespace ParsleyDemo {
             context.Error("Expecting string");
             return null;
         }
+        
+        #line default
+        #line hidden
+        
+        #line 6 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         private static ParseNode _ParseValue(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -123,6 +136,11 @@ namespace ParsleyDemo {
             context.Error("Expecting string, number, lbrace, lbracket, true, false, or null");
             return null;
         }
+        
+        #line default
+        #line hidden
+        
+        #line 12 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         private static ParseNode _ParseBoolean(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -144,6 +162,9 @@ namespace ParsleyDemo {
             context.Error("Expecting true or false");
             return null;
         }
+        
+        #line default
+        #line hidden
         private static ParseNode _ParseImplicitList(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -254,6 +275,8 @@ namespace ParsleyDemo {
             context.Error("Expecting comma or rbracket");
             return null;
         }
+        
+        #line 3 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         private static ParseNode _ParseObject(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -268,6 +291,9 @@ namespace ParsleyDemo {
             context.Error("Expecting lbrace");
             return null;
         }
+        
+        #line default
+        #line hidden
         private static ParseNode _ParseObjectPart2(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -288,6 +314,8 @@ namespace ParsleyDemo {
             context.Error("Expecting rbrace or string");
             return null;
         }
+        
+        #line 5 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         private static ParseNode _ParseArray(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -302,6 +330,9 @@ namespace ParsleyDemo {
             context.Error("Expecting lbracket");
             return null;
         }
+        
+        #line default
+        #line hidden
         private static ParseNode _ParseArrayPart2(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -328,36 +359,66 @@ namespace ParsleyDemo {
             context.Error("Expecting rbracket, string, number, lbrace, lbracket, true, false, or null");
             return null;
         }
+        
+        #line 2 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         public static ParseNode ParseJson(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return JsonParser._ParseJson(context);
         }
+        
+        #line default
+        #line hidden
+        
+        #line 3 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         public static ParseNode ParseObject(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return JsonParser._ParseObject(context);
         }
+        
+        #line default
+        #line hidden
+        
+        #line 4 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         public static ParseNode ParseField(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return JsonParser._ParseField(context);
         }
+        
+        #line default
+        #line hidden
+        
+        #line 5 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         public static ParseNode ParseArray(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return JsonParser._ParseArray(context);
         }
+        
+        #line default
+        #line hidden
+        
+        #line 6 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         public static ParseNode ParseValue(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return JsonParser._ParseValue(context);
         }
+        
+        #line default
+        #line hidden
+        
+        #line 12 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         public static ParseNode ParseBoolean(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return JsonParser._ParseBoolean(context);
         }
+        
+        #line default
+        #line hidden
         public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
@@ -367,6 +428,7 @@ namespace ParsleyDemo {
     /// <summary>
     /// 
     /// </summary>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
     internal class SyntaxException : Exception {
         private int _line;
         private int _column;
@@ -412,6 +474,7 @@ namespace ParsleyDemo {
             return string.Format("{0} at line {1}, column {2}, position {3}", message, line, column, position);
         }
     }
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
     internal partial class ParseNode {
         private int _symbolId;
         private string _symbol;
@@ -479,6 +542,7 @@ namespace ParsleyDemo {
             }
         }
     }
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
     internal partial class ParserContext : Object, IDisposable {
         private int _state;
         private IEnumerator<Token> _e;

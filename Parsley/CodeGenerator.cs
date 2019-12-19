@@ -1,8 +1,10 @@
 ﻿using System;
 using System.CodeDom;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace Parsley
@@ -11,14 +13,19 @@ namespace Parsley
 	using V = CD.CodeDomVisitor;
 	static class CodeGenerator
 	{
+		public static readonly CodeAttributeDeclaration GeneratedCodeAttribute
+			= new CodeAttributeDeclaration(C.Type(typeof(GeneratedCodeAttribute)), new CodeAttributeArgument(C.Literal(Program.Name)), new CodeAttributeArgument(C.Literal(Assembly.GetExecutingAssembly().GetName().Version.ToString())));
 		public static CodeCompileUnit GenerateSharedCompileUnit(string @namespace)
 		{
 			var ns = new CodeNamespace();
 			if (!string.IsNullOrEmpty(@namespace))
 				ns.Name = @namespace;
 			var parserContext = Deslanged.ParserContext.Namespaces[Deslanged.ParserContext.Namespaces.Count - 1].Types[0];
+			parserContext.CustomAttributes.Add(GeneratedCodeAttribute);
 			var parseNode = Deslanged.ParseNode.Namespaces[Deslanged.ParseNode.Namespaces.Count - 1].Types[0];
+			parseNode.CustomAttributes.Add(GeneratedCodeAttribute);
 			var syntaxException = Deslanged.SyntaxException.Namespaces[Deslanged.SyntaxException.Namespaces.Count - 1].Types[0];
+			syntaxException.CustomAttributes.Add(GeneratedCodeAttribute);
 			_FixParserContext(parserContext);
 			ns.Types.Add(syntaxException);
 			ns.Types.Add(parseNode);
@@ -52,7 +59,7 @@ namespace Parsley
 				name = cfg.StartSymbol + "Parser";
 			}
 			var parser = Deslanged.Parser.Namespaces[Deslanged.Parser.Namespaces.Count - 1].Types[0];
-
+			parser.CustomAttributes.Add(GeneratedCodeAttribute);
 			var hasColNS = false;
 			foreach(CodeNamespaceImport nsi in ns.Imports)
 			{
@@ -240,6 +247,13 @@ namespace Parsley
 					else
 						cs.TrueStatements.Add(C.Return(C.New(C.Type("ParseNode"), ffr, C.Literal(nt), C.Invoke(C.VarRef("children"),"ToArray"),l,c,p)));
 					m.Statements.Add(cs);
+					var ppi = doc.Productions.IndexOf(nt);
+					if(-1<ppi)
+					{
+						var prod = doc.Productions[i];
+						if (0 < prod.Line && !string.IsNullOrEmpty(doc.Filename))
+							m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
+					}
 
 				}
 
@@ -301,6 +315,8 @@ namespace Parsley
 					m.Statements.Add(C.Var(C.Type("ParserContext"), "context", C.New(C.Type("ParserContext"), C.ArgRef("tokenizer"))));
 					m.Statements.Add(C.Call(C.VarRef("context"), "EnsureStarted"));
 					m.Statements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), string.Concat("_Parse", s), C.VarRef("context"))));
+					if (!string.IsNullOrEmpty(doc.Filename) && 0 != prod.Line)
+						m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
 					parser.Members.Add(m);
 				}
 			}
@@ -356,13 +372,20 @@ namespace Parsley
 					if (isStart)
 					{
 						var ms = C.Method(type, "Evaluate", attrs, C.Param(C.Type("ParseNode"), "node"));
+						if (0 != prod.Line)
+							ms.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
 						ms.Statements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), string.Concat("Evaluate", prod.Name), C.ArgRef("node"))));
 						parser.Members.Add(ms);
 						ms = C.Method(type, "Evaluate", attrs, C.Param(C.Type("ParseNode"), "node"),C.Param(C.Type(typeof(object)),"state"));
+						if (0 != prod.Line)
+							ms.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
 						ms.Statements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), string.Concat("Evaluate", prod.Name), C.ArgRef("node"),C.ArgRef("state"))));
 						parser.Members.Add(ms);
 					}
 					var m = C.Method(type, string.Concat("Evaluate", prod.Name), attrs, C.Param("ParseNode", "node"), C.Param(typeof(object), "state"));
+					if (0 != prod.Line)
+						m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
+					
 					var cnst = consts[syms.IndexOf(prod.Name)];
 					var fr = C.FieldRef(C.TypeRef("Parser"), cnst);
 					var cnd = C.If(C.Eq(fr, C.PropRef(node, "SymbolId")));
