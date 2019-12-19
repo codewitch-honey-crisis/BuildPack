@@ -9,8 +9,7 @@ namespace ParsleyDemo
 	{
 		static void Main(string[] args)
 		{
-			string text;
-			text = "3*5+7*2"; 
+			var text = "3*5+7*2"; 
 			var exprTokenizer = new ExpressionTokenizer(text);
 			var pt = ExpressionParser.ParseExpression(exprTokenizer);
 			Console.WriteLine("{0} = {1}",text,ExpressionParser.EvaluateExpression(pt));

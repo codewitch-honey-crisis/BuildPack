@@ -33,14 +33,15 @@ Namespace ParsleyDemo
         Public Const rparen As Integer = 12
         Public Const mul As Integer = 13
         Public Const div As Integer = 14
+        Public Const whitespace As Integer = 15
         Private Shared Function _ParseExpression(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
             Dim position As Long = context.Position
-            If (((((ExpressionParser.add = context.SymbolId)  _
-                        OrElse (ExpressionParser.[sub] = context.SymbolId))  _
-                        OrElse (ExpressionParser.identifier = context.SymbolId))  _
-                        OrElse (ExpressionParser.[integer] = context.SymbolId))  _
+            If (((((ExpressionParser.add = context.SymbolId) _
+                        OrElse (ExpressionParser.[sub] = context.SymbolId)) _
+                        OrElse (ExpressionParser.identifier = context.SymbolId)) _
+                        OrElse (ExpressionParser.[integer] = context.SymbolId)) _
                         OrElse (ExpressionParser.lparen = context.SymbolId)) Then
                 'Expression -> Term
                 Dim children(0) As ParseNode
@@ -58,7 +59,7 @@ Namespace ParsleyDemo
                 'Unary -> add Unary
                 Dim children(1) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.add, "add", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 children(1) = ExpressionParser._ParseUnary(context)
                 Return New ParseNode(ExpressionParser.Unary, "Unary", children, line, column, position)
             End If
@@ -66,12 +67,12 @@ Namespace ParsleyDemo
                 'Unary -> sub Unary
                 Dim children(1) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.[sub], "sub", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 children(1) = ExpressionParser._ParseUnary(context)
                 Return New ParseNode(ExpressionParser.Unary, "Unary", children, line, column, position)
             End If
-            If (((ExpressionParser.identifier = context.SymbolId)  _
-                        OrElse (ExpressionParser.[integer] = context.SymbolId))  _
+            If (((ExpressionParser.identifier = context.SymbolId) _
+                        OrElse (ExpressionParser.[integer] = context.SymbolId)) _
                         OrElse (ExpressionParser.lparen = context.SymbolId)) Then
                 'Unary -> Leaf
                 Dim children(0) As ParseNode
@@ -89,24 +90,24 @@ Namespace ParsleyDemo
                 'Leaf -> identifier
                 Dim children(0) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.identifier, "identifier", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 Return New ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position)
             End If
             If (ExpressionParser.[integer] = context.SymbolId) Then
                 'Leaf -> integer
                 Dim children(0) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.[integer], "integer", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 Return New ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position)
             End If
             If (ExpressionParser.lparen = context.SymbolId) Then
                 'Leaf -> lparen Expression rparen
                 Dim children(2) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.lparen, "lparen", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 children(1) = ExpressionParser._ParseExpression(context)
                 children(2) = New ParseNode(ExpressionParser.rparen, "rparen", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 Return New ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position)
             End If
             context.Error("Expecting identifier, integer, or lparen")
@@ -116,10 +117,10 @@ Namespace ParsleyDemo
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
             Dim position As Long = context.Position
-            If (((((ExpressionParser.add = context.SymbolId)  _
-                        OrElse (ExpressionParser.[sub] = context.SymbolId))  _
-                        OrElse (ExpressionParser.identifier = context.SymbolId))  _
-                        OrElse (ExpressionParser.[integer] = context.SymbolId))  _
+            If (((((ExpressionParser.add = context.SymbolId) _
+                        OrElse (ExpressionParser.[sub] = context.SymbolId)) _
+                        OrElse (ExpressionParser.identifier = context.SymbolId)) _
+                        OrElse (ExpressionParser.[integer] = context.SymbolId)) _
                         OrElse (ExpressionParser.lparen = context.SymbolId)) Then
                 'Term -> Factor TermPart
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -138,7 +139,7 @@ Namespace ParsleyDemo
                 'TermPart -> add Factor
                 Dim children(1) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.add, "add", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 children(1) = ExpressionParser._ParseFactor(context)
                 Return New ParseNode(ExpressionParser.TermPart, "TermPart", children, line, column, position)
             End If
@@ -146,11 +147,11 @@ Namespace ParsleyDemo
                 'TermPart -> sub Factor
                 Dim children(1) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.[sub], "sub", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 children(1) = ExpressionParser._ParseFactor(context)
                 Return New ParseNode(ExpressionParser.TermPart, "TermPart", children, line, column, position)
             End If
-            If ((ExpressionParser.EosSymbol = context.SymbolId)  _
+            If ((ExpressionParser.EosSymbol = context.SymbolId) _
                         OrElse (ExpressionParser.rparen = context.SymbolId)) Then
                 'TermPart ->
                 Dim children(-1) As ParseNode
@@ -163,10 +164,10 @@ Namespace ParsleyDemo
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
             Dim position As Long = context.Position
-            If (((((ExpressionParser.add = context.SymbolId)  _
-                        OrElse (ExpressionParser.[sub] = context.SymbolId))  _
-                        OrElse (ExpressionParser.identifier = context.SymbolId))  _
-                        OrElse (ExpressionParser.[integer] = context.SymbolId))  _
+            If (((((ExpressionParser.add = context.SymbolId) _
+                        OrElse (ExpressionParser.[sub] = context.SymbolId)) _
+                        OrElse (ExpressionParser.identifier = context.SymbolId)) _
+                        OrElse (ExpressionParser.[integer] = context.SymbolId)) _
                         OrElse (ExpressionParser.lparen = context.SymbolId)) Then
                 'Factor -> Unary FactorPart
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -185,7 +186,7 @@ Namespace ParsleyDemo
                 'FactorPart -> mul Unary
                 Dim children(1) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.mul, "mul", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 children(1) = ExpressionParser._ParseUnary(context)
                 Return New ParseNode(ExpressionParser.FactorPart, "FactorPart", children, line, column, position)
             End If
@@ -193,13 +194,13 @@ Namespace ParsleyDemo
                 'FactorPart -> div Unary
                 Dim children(1) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.div, "div", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 children(1) = ExpressionParser._ParseUnary(context)
                 Return New ParseNode(ExpressionParser.FactorPart, "FactorPart", children, line, column, position)
             End If
-            If ((((ExpressionParser.add = context.SymbolId)  _
-                        OrElse (ExpressionParser.[sub] = context.SymbolId))  _
-                        OrElse (ExpressionParser.EosSymbol = context.SymbolId))  _
+            If ((((ExpressionParser.add = context.SymbolId) _
+                        OrElse (ExpressionParser.[sub] = context.SymbolId)) _
+                        OrElse (ExpressionParser.EosSymbol = context.SymbolId)) _
                         OrElse (ExpressionParser.rparen = context.SymbolId)) Then
                 'FactorPart ->
                 Dim children(-1) As ParseNode
@@ -210,41 +211,267 @@ Namespace ParsleyDemo
         End Function
         Public Shared Function ParseExpression(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
-            context.EnsureStarted
+            context.EnsureStarted()
             Return ExpressionParser._ParseExpression(context)
         End Function
         Public Shared Function EvaluateExpression(ByVal node As ParseNode) As Object
             If (ExpressionParser.Expression = node.SymbolId) Then
-                Return Nothing
+                Return ParsleyDemo.ExpressionParser.EvaluateTerm(node.Children(0))
             End If
             Throw New SyntaxException("Expecting Expression", node.Line, node.Column, node.Position)
         End Function
         Friend Shared Function EvaluateTerm(ByVal node As ParseNode) As Object
             If (ExpressionParser.Term = node.SymbolId) Then
-                Return Nothing
+                If (1 = node.Children.Length) Then
+                    Return ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0))
+                Else
+                    If (node.Children(1).SymbolId = ParsleyDemo.ExpressionParser.add) Then
+                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0)), Integer) + CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(2)), Integer))
+                    Else
+                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0)), Integer) - CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(2)), Integer))
+                    End If
+                End If
             End If
             Throw New SyntaxException("Expecting Term", node.Line, node.Column, node.Position)
         End Function
         Friend Shared Function EvaluateFactor(ByVal node As ParseNode) As Object
             If (ExpressionParser.Factor = node.SymbolId) Then
-                System.Console.WriteLine("Factor")
-                Return Nothing
+                If (1 = node.Children.Length) Then
+                    Return ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(0))
+                Else
+                    If (node.Children(1).SymbolId = ParsleyDemo.ExpressionParser.mul) Then
+                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(0)), Integer) * CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(2)), Integer))
+                    Else
+                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(0)), Integer) / CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(2)), Integer))
+                    End If
+                End If
             End If
             Throw New SyntaxException("Expecting Factor", node.Line, node.Column, node.Position)
         End Function
         Friend Shared Function EvaluateUnary(ByVal node As ParseNode) As Object
             If (ExpressionParser.Unary = node.SymbolId) Then
-                System.Console.WriteLine("Unary")
-                Return Nothing
+                If (1 = node.Children.Length) Then
+                    Return ParsleyDemo.ExpressionParser.EvaluateLeaf(node.Children(0))
+                Else
+                    If (node.Children(0).SymbolId = ParsleyDemo.ExpressionParser.add) Then
+                        Return ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(1))
+                    Else
+                        Return (0 - CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(1)), Integer))
+                    End If
+                End If
             End If
             Throw New SyntaxException("Expecting Unary", node.Line, node.Column, node.Position)
         End Function
         Friend Shared Function EvaluateLeaf(ByVal node As ParseNode) As Object
             If (ExpressionParser.Leaf = node.SymbolId) Then
-                System.Console.WriteLine("Leaf")
-                Return Nothing
+                Dim n As ParseNode = node.Children(0)
+                If (ParsleyDemo.ExpressionParser.identifier = n.SymbolId) Then
+                    Throw New NotImplementedException("Variables are not implemented")
+                Else
+                    If (ParsleyDemo.ExpressionParser.[integer] = n.SymbolId) Then
+                        Return Integer.Parse(n.Value)
+                    Else
+                        Return ParsleyDemo.ExpressionParser.EvaluateExpression(n.Children(1))
+                    End If
+                End If
             End If
             Throw New SyntaxException("Expecting Leaf", node.Line, node.Column, node.Position)
         End Function
+    End Class
+    '''<summary>
+    '''
+    '''</summary>
+    Friend Class SyntaxException
+        Inherits Exception
+        _line As Integer
+        _column As Integer
+        _position As Long
+        '''<summary>
+        '''Creates a syntax exception with the specified arguments
+        '''</summary>
+        '''<param name="message">The error message</param>
+        '''<param name="line">The line where the error occurred</param>
+        '''<param name="column">The column where the error occured</param>
+        '''<param name="position">The position where the error occured</param>
+        Public Sub New(ByVal message As String, ByVal line As Integer, ByVal column As Integer, ByVal position As Long)
+            MyBase.New(SyntaxException._GetMessage(message, line, column, position))
+            Me._line = line
+            Me._column = column
+            Me._position = position
+        End Sub
+        '''<summary>
+        '''The line where the error occurred
+        '''</summary>
+        Public ReadOnly Property Line() As Integer
+            Get
+                Return Me._line
+            End Get
+        End Property
+        '''<summary>
+        '''The column where the error occurred
+        '''</summary>
+        Public ReadOnly Property Column() As Integer
+            Get
+                Return Me._column
+            End Get
+        End Property
+        '''<summary>
+        '''The position where the error occurred
+        '''</summary>
+        Public ReadOnly Property Position() As Long
+            Get
+                Return Me._position
+            End Get
+        End Property
+        Shared Function _GetMessage(ByVal message As String, ByVal line As Integer, ByVal column As Integer, ByVal position As Long) As String
+            Return String.Format("{0} at line {1}, column {2}, position {3}", message, line, column, position)
+        End Function
+    End Class
+    Partial Friend Class ParseNode
+        _symbolId As Integer
+        _symbol As String
+        _value As String
+        _line As Integer
+        _column As Integer
+        _position As Long
+        _children() As ParseNode
+        Public Sub New(ByVal symbolId As Integer, ByVal symbol As String, ByVal children() As ParseNode, ByVal line As Integer, ByVal column As Integer, ByVal position As Long)
+            MyBase.New
+            Me._symbolId = symbolId
+            Me._symbol = symbol
+            Me._value = Nothing
+            Me._children = children
+            Me._line = line
+            Me._column = column
+            Me._position = position
+        End Sub
+        Public Sub New(ByVal symbolId As Integer, ByVal symbol As String, ByVal value As String, ByVal line As Integer, ByVal column As Integer, ByVal position As Long)
+            MyBase.New
+            Me._symbolId = symbolId
+            Me._symbol = symbol
+            Me._value = value
+            Me._children = Nothing
+            Me._line = line
+            Me._column = column
+            Me._position = position
+        End Sub
+        Public ReadOnly Property IsNonTerminal() As Boolean
+            Get
+                Return (False _
+                            = (Nothing = Me._children))
+            End Get
+        End Property
+        Public ReadOnly Property Children() As ParseNode()
+            Get
+                Return Me._children
+            End Get
+        End Property
+        Public ReadOnly Property SymbolId() As Integer
+            Get
+                Return Me._symbolId
+            End Get
+        End Property
+        Public ReadOnly Property Symbol() As String
+            Get
+                Return Me._symbol
+            End Get
+        End Property
+        Public ReadOnly Property Value() As String
+            Get
+                Return Me._value
+            End Get
+        End Property
+        Public ReadOnly Property Line() As Integer
+            Get
+                Return Me._line
+            End Get
+        End Property
+        Public ReadOnly Property Column() As Integer
+            Get
+                Return Me._column
+            End Get
+        End Property
+        Public ReadOnly Property Position() As Long
+            Get
+                Return Me._position
+            End Get
+        End Property
+    End Class
+    Partial Friend Class ParserContext
+        Inherits IDisposable
+        _state As Integer
+        _e As IEnumerator(Of Token)
+        _t As Token
+        Public Sub New(ByVal tokenizer As IEnumerable(Of Token))
+            MyBase.New
+            Me._e = tokenizer.GetEnumerator
+            Me._state = -1
+            Me._t.SymbolId = -1
+        End Sub
+        Public Sub EnsureStarted()
+            If (-1 = Me._state) Then
+                Me.Advance()
+            End If
+        End Sub
+        Public ReadOnly Property SymbolId() As Integer
+            Get
+                Return Me._t.SymbolId
+            End Get
+        End Property
+        Public ReadOnly Property Value() As String
+            Get
+                Return Me._t.Value
+            End Get
+        End Property
+        Public ReadOnly Property Line() As Integer
+            Get
+                Return Me._t.Line
+            End Get
+        End Property
+        Public ReadOnly Property Column() As Integer
+            Get
+                Return Me._t.Column
+            End Get
+        End Property
+        Public ReadOnly Property Position() As Long
+            Get
+                Return Me._t.Position
+            End Get
+        End Property
+        Public ReadOnly Property IsEnded() As Boolean
+            Get
+                Return (-2 = Me._state)
+            End Get
+        End Property
+        Public Function Advance() As Boolean
+            If (False = Me._e.MoveNext) Then
+                Me._t.SymbolId = -2
+                Me._state = -2
+            Else
+                Me._state = 0
+                Me._t = Me._e.Current
+                Return True
+            End If
+            Return False
+        End Function
+        Public Overloads Sub [Error](ByVal message As String, ByVal arg1 As Object, ByVal arg2 As Object, ByVal arg3 As Object)
+            Throw New SyntaxException(String.Format(message, arg1, arg2, arg3), Me.Line, Me.Column, Me.Position)
+        End Sub
+        Public Overloads Sub [Error](ByVal message As String, ByVal arg1 As Object, ByVal arg2 As Object)
+            Throw New SyntaxException(String.Format(message, arg1, arg2), Me.Line, Me.Column, Me.Position)
+        End Sub
+        Public Overloads Sub [Error](ByVal message As String, ByVal arg As Object)
+            Throw New SyntaxException(String.Format(message, arg), Me.Line, Me.Column, Me.Position)
+        End Sub
+        Public Overloads Sub [Error](ByVal message As String)
+            Throw New SyntaxException(message, Me.Line, Me.Column, Me.Position)
+        End Sub
+        Public Sub Dispose()
+            Me._e.Dispose
+            Me._state = -3
+        End Sub
+        Sub IDisposable_Dispose() Implements IDisposable.Dispose
+            Me.Dispose()
+        End Sub
     End Class
 End Namespace
