@@ -301,9 +301,33 @@ namespace CD
 		{
 			if(null!=vr)
 			{
-				if (vr.VariableName == "done")
-					System.Diagnostics.Debug.WriteLine("done var ref hit");
 				var scope = resolver.GetScope(vr);
+				if (0==string.Compare("value",vr.VariableName,StringComparison.InvariantCulture))
+				{
+					// this could be a property set value reference
+					var p = scope.Member as CodeMemberProperty;
+					if(null!=p)
+					{
+						var found = false;
+						for (int ic=p.SetStatements.Count,i=0;i<ic;++i)
+						{
+							found = false;
+							CodeDomVisitor.Visit(p.SetStatements[i], (ctx2) => {
+								if(ctx2.Target==vr)
+								{
+									found = true;
+									ctx2.Cancel = true;
+								}
+							});
+							if (found)
+								break;
+						}
+						if(found)
+						{
+							CodeDomVisitor.ReplaceTarget(ctx, new CodePropertySetValueReferenceExpression());
+						}
+					}
+				}
 				CodeTypeReference ctr;
 				if (scope.VariableTypes.TryGetValue(vr.VariableName, out ctr))
 				{

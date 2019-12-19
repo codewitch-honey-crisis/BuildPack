@@ -3754,9 +3754,11 @@ epm.Comments.AddRange(meth.Comments);epm.CustomAttributes.AddRange(meth.CustomAt
 epm.TypeParameters.AddRange(meth.TypeParameters);epm.PrivateImplementationType=meth.PrivateImplementationType;epm.ImplementationTypes.AddRange(meth.ImplementationTypes);
 epm.Name=meth.Name;epm.Statements.AddRange(meth.Statements);CodeDomVisitor.ReplaceTarget(ctx,epm);}}}}static CodeTypeReference[]_GetParameterTypes(CodeParameterDeclarationExpressionCollection
  parms){var result=new CodeTypeReference[parms.Count];for(var i=0;i<result.Length;i++)result[i]=parms[i].Type;return result;}static void _Patch(CodeVariableReferenceExpression
- vr,CodeDomVisitContext ctx,CodeDomResolver resolver){if(null!=vr){if(vr.VariableName=="done")System.Diagnostics.Debug.WriteLine("done var ref hit");var
- scope=resolver.GetScope(vr);CodeTypeReference ctr;if(scope.VariableTypes.TryGetValue(vr.VariableName,out ctr)){if(!CodeDomResolver.IsNullOrVoidType(ctr))
-{if(vr.VariableName=="done")System.Diagnostics.Debug.WriteLine("done var resolved to var");vr.UserData.Remove("slang:unresolved");return;}} if(scope.ArgumentTypes.ContainsKey(vr.VariableName))
+ vr,CodeDomVisitContext ctx,CodeDomResolver resolver){if(null!=vr){var scope=resolver.GetScope(vr);if(0==string.Compare("value",vr.VariableName,StringComparison.InvariantCulture))
+{ var p=scope.Member as CodeMemberProperty;if(null!=p){var found=false;for(int ic=p.SetStatements.Count,i=0;i<ic;++i){found=false;CodeDomVisitor.Visit(p.SetStatements[i],
+(ctx2)=>{if(ctx2.Target==vr){found=true;ctx2.Cancel=true;}});if(found)break;}if(found){CodeDomVisitor.ReplaceTarget(ctx,new CodePropertySetValueReferenceExpression());
+}}}CodeTypeReference ctr;if(scope.VariableTypes.TryGetValue(vr.VariableName,out ctr)){if(!CodeDomResolver.IsNullOrVoidType(ctr)){if(vr.VariableName=="done")
+System.Diagnostics.Debug.WriteLine("done var resolved to var");vr.UserData.Remove("slang:unresolved");return;}} if(scope.ArgumentTypes.ContainsKey(vr.VariableName))
 {var a=new CodeArgumentReferenceExpression(vr.VariableName);CodeDomVisitor.ReplaceTarget(ctx,a);return;}else if(scope.FieldNames.Contains(vr.VariableName))
 {CodeTypeReference tref; if(scope.ThisTargets.Contains(vr.VariableName)){var f=new CodeFieldReferenceExpression(new CodeThisReferenceExpression(),vr.VariableName);
 CodeDomVisitor.ReplaceTarget(ctx,f);}else if(scope.TypeTargets.TryGetValue(vr.VariableName,out tref)){var f=new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(tref),
