@@ -2361,7 +2361,14 @@ var result=new CodeObjectCreateExpression(kvpType);for(int ic=kvpType.TypeArgume
 "Value");result.Parameters.Add(_Serialize(prop.GetValue(val),typeConv));}return result;}throw new NotSupportedException(string.Format("The type \"{0}\" could not be serialized.",
 val.GetType().FullName));}}else throw new NotSupportedException(string.Format("The type \"{0}\" could not be serialized.",val.GetType().FullName));}
 #endregion
-}}namespace CD{/// <summary>
+/// <summary>
+/// Returns a collection of comments, one for each line of text
+/// </summary>
+/// <param name="text">The comment text</param>
+/// <param name="docComment">True if these should be rendered as a doc comment, otherwise false</param>
+/// <returns></returns>
+public static CodeCommentStatementCollection ToComments(string text,bool docComment=false){var result=new CodeCommentStatementCollection();var sr=new StringReader(text);
+string line;while(null!=(line=sr.ReadLine()))result.Add(new CodeCommentStatement(line,docComment));return result;}}}namespace CD{/// <summary>
 /// Traces variable declarations throughout a method
 /// </summary>
 public static class CodeDomVariableTracer{static readonly object _catchClauseKey=new object();/// <summary>

@@ -320,13 +320,17 @@ namespace Parsley
 					parser.Members.Add(m);
 				}
 			}
-			var ss = doc.StartProduction.Name;
+			var pprod = doc.StartProduction;
+			var ss = pprod.Name;
 			var et = new CodeTypeReference(typeof(IEnumerable<>));
 			et.TypeArguments.Add(C.Type("Token"));
 			var sm = C.Method(C.Type("ParseNode"), "Parse", MemberAttributes.Static | MemberAttributes.Public, C.Param(et, "tokenizer"));
 			sm.Statements.Add(C.Var(C.Type("ParserContext"), "context", C.New(C.Type("ParserContext"), C.ArgRef("tokenizer"))));
 			sm.Statements.Add(C.Call(C.VarRef("context"), "EnsureStarted"));
 			sm.Statements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), string.Concat("_Parse", ss), C.VarRef("context"))));
+			if (!string.IsNullOrEmpty(doc.Filename) && 0 != pprod.Line)
+				sm.LinePragma = new CodeLinePragma(doc.Filename, pprod.Line);
+
 			parser.Members.Add(sm);
 
 		}
