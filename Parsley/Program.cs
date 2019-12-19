@@ -137,13 +137,44 @@ namespace Parsley
 					var doc = XbnfDocument.ReadFrom(inputfile);
 					var cfg = XbnfConvert.ToCfg(doc);
 					cfg.PrepareLL1();
-					var ccu = CodeGenerator.GenerateCompileUnit(doc,cfg,name,codenamespace,!noshared);
-					CD.SlangPatcher.Patch(ccu);
+					var ccu = CodeGenerator.GenerateCompileUnit(doc,cfg,name,codenamespace);
+					var ccuNS = ccu.Namespaces[ccu.Namespaces.Count - 1];
+					var ccuShared = CodeGenerator.GenerateSharedCompileUnit(codenamespace);
+					var sNS = ccuShared.Namespaces[ccuShared.Namespaces.Count - 1];
+					var parserContext = C.GetByName("ParserContext",sNS.Types);
+					var parseNode = C.GetByName("ParseNode", sNS.Types);
+					var syntaxException = C.GetByName("SyntaxException", sNS.Types);
+					ccuNS.Types.Add(syntaxException);
+					ccuNS.Types.Add(parseNode);
+					ccuNS.Types.Add(parserContext);
+					
+					CD.SlangPatcher.Patch(ccu, ccuShared);
 					var co = CD.SlangPatcher.GetNextUnresolvedElement(ccu);
 					if(null!=co)
 					{
 						Console.Error.WriteLine("Warning: Not all of the elements could be resolved. The generated code may not be correct in all languages.");
 						Console.Error.WriteLine("  Next unresolved: {0}", C.ToString(co).Trim());
+					}
+					if(!noshared)
+					{
+						// we just needed these for slang resolution
+						ccuNS.Types.Remove(syntaxException);
+						ccuNS.Types.Remove(parseNode);
+						ccuNS.Types.Remove(parserContext);
+					}
+					foreach (CodeNamespace ns in ccu.Namespaces)
+					{
+						var hasColNS = false;
+						foreach (CodeNamespaceImport nsi in ns.Imports)
+						{
+							if (0 == string.Compare(nsi.Namespace, "System.Collections.Generic",StringComparison.InvariantCulture))
+							{
+								hasColNS = true;
+								break;
+							}
+						}
+						if (!hasColNS)
+							ns.Imports.Add(new CodeNamespaceImport("System.Collections.Generic"));
 					}
 					var prov = CodeDomProvider.CreateProvider(codelanguage);
 					

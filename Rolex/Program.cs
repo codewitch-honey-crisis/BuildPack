@@ -233,6 +233,17 @@ namespace Rolex
 							//cns.Types.Add(CodeGenerator.GenerateCompiledTokenizer(name, symbolTable));
 							//cns.Types.Add(CodeGenerator.GenerateCompiledTokenizerEnumerator(name, symbolTable, dfaTable, blockEnds, nodeFlags));
 						}
+						var hasColNS = false;
+						foreach (CodeNamespaceImport nsi in cns.Imports)
+						{
+							if (0 == string.Compare(nsi.Namespace, "System.Collections.Generic", StringComparison.InvariantCulture))
+							{
+								hasColNS = true;
+								break;
+							}
+						}
+						if (!hasColNS)
+							cns.Imports.Add(new CodeNamespaceImport("System.Collections.Generic"));
 						Console.Error.WriteLine();
 						var prov = CodeDomProvider.CreateProvider(codelanguage);
 						var opts = new CodeGeneratorOptions();

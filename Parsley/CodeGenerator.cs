@@ -10,7 +10,31 @@ namespace Parsley
 	using V = CD.CodeDomVisitor;
 	static class CodeGenerator
 	{
-		public static CodeCompileUnit GenerateCompileUnit(XbnfDocument doc, CfgDocument cfg,string name = null,string @namespace=null, bool withShared=true)
+		public static CodeCompileUnit GenerateSharedCompileUnit(string @namespace)
+		{
+			var ns = new CodeNamespace();
+			if (!string.IsNullOrEmpty(@namespace))
+				ns.Name = @namespace;
+			var parserContext = Deslanged.ParserContext.Namespaces[Deslanged.ParserContext.Namespaces.Count - 1].Types[0];
+			var parseNode = Deslanged.ParseNode.Namespaces[Deslanged.ParseNode.Namespaces.Count - 1].Types[0];
+			var syntaxException = Deslanged.SyntaxException.Namespaces[Deslanged.SyntaxException.Namespaces.Count - 1].Types[0];
+			_FixParserContext(parserContext);
+			ns.Types.Add(syntaxException);
+			ns.Types.Add(parseNode);
+			ns.Types.Add(parserContext);
+			var result = new CodeCompileUnit();
+			result.Namespaces.Add(ns);
+			V.Visit(result, (ctx) => {
+				var ctr = ctx.Target as CodeTypeReference;
+				if (null != ctr)
+				{
+					if (ctr.BaseType.StartsWith("Parsley."))
+						ctr.BaseType = ctr.BaseType.Substring(8);
+				}
+			});
+			return result;
+		}
+		public static CodeCompileUnit GenerateCompileUnit(XbnfDocument doc, CfgDocument cfg,string name = null,string @namespace=null)
 		{
 			if (0 == cfg.Rules.Count)
 				throw new ArgumentException("The CFG document contains no rules.", nameof(cfg));
@@ -27,16 +51,7 @@ namespace Parsley
 				name = cfg.StartSymbol + "Parser";
 			}
 			var parser = Deslanged.Parser.Namespaces[Deslanged.Parser.Namespaces.Count - 1].Types[0];
-			if (withShared)
-			{
-				var parserContext = Deslanged.ParserContext.Namespaces[Deslanged.ParserContext.Namespaces.Count - 1].Types[0];
-				var parseNode = Deslanged.ParseNode.Namespaces[Deslanged.ParseNode.Namespaces.Count - 1].Types[0];
-				var syntaxException = Deslanged.SyntaxException.Namespaces[Deslanged.SyntaxException.Namespaces.Count - 1].Types[0];
-				_FixParserContext(parserContext);
-				ns.Types.Add(syntaxException);
-				ns.Types.Add(parseNode);
-				ns.Types.Add(parserContext);
-			}
+
 			var hasColNS = false;
 			foreach(CodeNamespaceImport nsi in ns.Imports)
 			{
@@ -306,7 +321,7 @@ namespace Parsley
 					if (isStart)
 						attrs = MemberAttributes.Public | MemberAttributes.Static;
 					else
-						attrs = MemberAttributes.FamilyOrAssembly | MemberAttributes.Static;
+						attrs = MemberAttributes.FamilyAndAssembly | MemberAttributes.Static;
 					var m = C.Method(typeof(object), string.Concat("Evaluate", prod.Name), attrs, C.Param("ParseNode", "node"));
 					var cnst = consts[syms.IndexOf(prod.Name)];
 					var fr = C.FieldRef(C.TypeRef("Parser"), cnst);

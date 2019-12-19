@@ -7,8 +7,9 @@
 //     the code is regenerated.
 // </auto-generated>
 //------------------------------------------------------------------------------
-using System.Collections.Generic;
+
 namespace ParsleyDemo {
+    using System.Collections.Generic;
     
     internal class JsonTokenizer : TableTokenizer {
         internal static DfaEntry[] DfaTable = new DfaEntry[] {
