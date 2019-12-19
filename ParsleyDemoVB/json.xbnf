@@ -1,9 +1,7 @@
 ﻿Json<start>= Object | Array;
-Object= "{" "}" | "{" Fields "}";
-Fields<collapsed>= Field "," Fields | Field;
+Object= "{" "}" | "{" Field { "," Field } "}";
 Field= string ":" Value;
-Array= "[" "]" | "[" Values "]";
-Values<collapsed>= Value "," Values | Value;
+Array= "[" "]" | "[" Value { "," Value } "]";
 Value<collapsed>= string |
 	number	|
     Object	|
@@ -12,8 +10,7 @@ Value<collapsed>= string |
     null	;
 Boolean= true|false;
 number= '\-?(0|[1-9][0-9]*)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?';
-// below: string is not compliant, should make sure the escapes are valid JSON escapes rather than accepting everything and should stop at line breaks
-string = '"([^"\\]|\\.)*"';
+string = '"([^\n"\\]|\\([btrnf"\\/]|(u[A-Fa-f]{4})))*"';
 true="true";
 false="false";
 null="null";

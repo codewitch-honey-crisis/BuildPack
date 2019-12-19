@@ -28,36 +28,36 @@ namespace ParsleyDemo {
                                         '\"'}, 9),
                             new DfaTransitionEntry(new char[] {
                                         't',
-                                        't'}, 12),
+                                        't'}, 19),
                             new DfaTransitionEntry(new char[] {
                                         'f',
-                                        'f'}, 16),
+                                        'f'}, 23),
                             new DfaTransitionEntry(new char[] {
                                         'n',
-                                        'n'}, 21),
+                                        'n'}, 28),
                             new DfaTransitionEntry(new char[] {
                                         '[',
-                                        '['}, 25),
+                                        '['}, 32),
                             new DfaTransitionEntry(new char[] {
                                         ']',
-                                        ']'}, 26),
+                                        ']'}, 33),
                             new DfaTransitionEntry(new char[] {
                                         '{',
-                                        '{'}, 27),
+                                        '{'}, 34),
                             new DfaTransitionEntry(new char[] {
                                         '}',
-                                        '}'}, 28),
+                                        '}'}, 35),
                             new DfaTransitionEntry(new char[] {
                                         ':',
-                                        ':'}, 29),
+                                        ':'}, 36),
                             new DfaTransitionEntry(new char[] {
                                         ',',
-                                        ','}, 30),
+                                        ','}, 37),
                             new DfaTransitionEntry(new char[] {
                                         '\t',
                                         '\r',
                                         ' ',
-                                        ' '}, 31)}, -1),
+                                        ' '}, 38)}, -1),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         '0',
@@ -76,7 +76,7 @@ namespace ParsleyDemo {
                                         'E',
                                         'E',
                                         'e',
-                                        'e'}, 5)}, 14),
+                                        'e'}, 5)}, 16),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         '0',
@@ -89,7 +89,7 @@ namespace ParsleyDemo {
                                         'E',
                                         'E',
                                         'e',
-                                        'e'}, 5)}, 14),
+                                        'e'}, 5)}, 16),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         '+',
@@ -106,7 +106,7 @@ namespace ParsleyDemo {
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         '0',
-                                        '9'}, 7)}, 14),
+                                        '9'}, 7)}, 16),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         '0',
@@ -118,10 +118,12 @@ namespace ParsleyDemo {
                                         'E',
                                         'E',
                                         'e',
-                                        'e'}, 5)}, 14),
+                                        'e'}, 5)}, 16),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         '\0',
+                                        '\t',
+                                        '',
                                         '!',
                                         '#',
                                         '[',
@@ -132,68 +134,129 @@ namespace ParsleyDemo {
                                         '\\'}, 10),
                             new DfaTransitionEntry(new char[] {
                                         '\"',
-                                        '\"'}, 11)}, -1),
+                                        '\"'}, 18)}, -1),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
-                                        '\0',
-                                        '￿'}, 9)}, -1),
-                new DfaEntry(new DfaTransitionEntry[0], 12),
+                                        '\"',
+                                        '\"',
+                                        '/',
+                                        '/',
+                                        '\\',
+                                        '\\',
+                                        'b',
+                                        'b',
+                                        'f',
+                                        'f',
+                                        'n',
+                                        'n',
+                                        'r',
+                                        'r',
+                                        't',
+                                        't'}, 9),
+                            new DfaTransitionEntry(new char[] {
+                                        'u',
+                                        'u'}, 11)}, -1),
+                new DfaEntry(new DfaTransitionEntry[] {
+                            new DfaTransitionEntry(new char[] {
+                                        'A',
+                                        'F',
+                                        'a',
+                                        'f'}, 12)}, -1),
+                new DfaEntry(new DfaTransitionEntry[] {
+                            new DfaTransitionEntry(new char[] {
+                                        'A',
+                                        'F',
+                                        'a',
+                                        'f'}, 13)}, -1),
+                new DfaEntry(new DfaTransitionEntry[] {
+                            new DfaTransitionEntry(new char[] {
+                                        'A',
+                                        'F',
+                                        'a',
+                                        'f'}, 14)}, -1),
+                new DfaEntry(new DfaTransitionEntry[] {
+                            new DfaTransitionEntry(new char[] {
+                                        'A',
+                                        'F',
+                                        'a',
+                                        'f'}, 15)}, -1),
+                new DfaEntry(new DfaTransitionEntry[] {
+                            new DfaTransitionEntry(new char[] {
+                                        'A',
+                                        'F',
+                                        'a',
+                                        'f'}, 16)}, -1),
+                new DfaEntry(new DfaTransitionEntry[] {
+                            new DfaTransitionEntry(new char[] {
+                                        'A',
+                                        'F',
+                                        'a',
+                                        'f'}, 17)}, -1),
+                new DfaEntry(new DfaTransitionEntry[] {
+                            new DfaTransitionEntry(new char[] {
+                                        'A',
+                                        'F',
+                                        'a',
+                                        'f'}, 9)}, -1),
+                new DfaEntry(new DfaTransitionEntry[0], 14),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         'r',
-                                        'r'}, 13)}, -1),
+                                        'r'}, 20)}, -1),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         'u',
-                                        'u'}, 14)}, -1),
+                                        'u'}, 21)}, -1),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         'e',
-                                        'e'}, 15)}, -1),
-                new DfaEntry(new DfaTransitionEntry[0], 16),
+                                        'e'}, 22)}, -1),
+                new DfaEntry(new DfaTransitionEntry[0], 18),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         'a',
-                                        'a'}, 17)}, -1),
+                                        'a'}, 24)}, -1),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         'l',
-                                        'l'}, 18)}, -1),
+                                        'l'}, 25)}, -1),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         's',
-                                        's'}, 19)}, -1),
+                                        's'}, 26)}, -1),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         'e',
-                                        'e'}, 20)}, -1),
-                new DfaEntry(new DfaTransitionEntry[0], 17),
+                                        'e'}, 27)}, -1),
+                new DfaEntry(new DfaTransitionEntry[0], 19),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         'u',
-                                        'u'}, 22)}, -1),
+                                        'u'}, 29)}, -1),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         'l',
-                                        'l'}, 23)}, -1),
+                                        'l'}, 30)}, -1),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         'l',
-                                        'l'}, 24)}, -1),
-                new DfaEntry(new DfaTransitionEntry[0], 15),
-                new DfaEntry(new DfaTransitionEntry[0], 21),
+                                        'l'}, 31)}, -1),
+                new DfaEntry(new DfaTransitionEntry[0], 17),
+                new DfaEntry(new DfaTransitionEntry[0], 24),
                 new DfaEntry(new DfaTransitionEntry[0], 22),
-                new DfaEntry(new DfaTransitionEntry[0], 18),
-                new DfaEntry(new DfaTransitionEntry[0], 19),
-                new DfaEntry(new DfaTransitionEntry[0], 13),
+                new DfaEntry(new DfaTransitionEntry[0], 23),
+                new DfaEntry(new DfaTransitionEntry[0], 21),
+                new DfaEntry(new DfaTransitionEntry[0], 15),
                 new DfaEntry(new DfaTransitionEntry[0], 20),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         '\t',
                                         '\r',
                                         ' ',
-                                        ' '}, 31)}, 23)};
+                                        ' '}, 38)}, 25)};
         internal static int[] NodeFlags = new int[] {
+                0,
+                0,
                 0,
                 0,
                 0,
@@ -242,21 +305,23 @@ namespace ParsleyDemo {
                 null,
                 null,
                 null,
+                null,
+                null,
                 null};
         public JsonTokenizer(IEnumerable<char> input) : 
                 base(JsonTokenizer.DfaTable, JsonTokenizer.BlockEnds, JsonTokenizer.NodeFlags, input) {
         }
-        public const int @string = 12;
-        public const int colon = 13;
-        public const int number = 14;
-        public const int @null = 15;
-        public const int @true = 16;
-        public const int @false = 17;
-        public const int lbrace = 18;
-        public const int rbrace = 19;
+        public const int @string = 14;
+        public const int colon = 15;
+        public const int number = 16;
+        public const int @null = 17;
+        public const int @true = 18;
+        public const int @false = 19;
         public const int comma = 20;
-        public const int lbracket = 21;
+        public const int rbrace = 21;
         public const int rbracket = 22;
-        public const int whitespace = 23;
+        public const int lbrace = 23;
+        public const int lbracket = 24;
+        public const int whitespace = 25;
     }
 }

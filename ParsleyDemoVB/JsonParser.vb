@@ -22,26 +22,30 @@ Namespace ParsleyDemo
         Public Const Field As Integer = 1
         Public Const Value As Integer = 2
         Public Const [Boolean] As Integer = 3
-        Public Const [Object] As Integer = 4
-        Public Const ObjectPart As Integer = 5
-        Public Const Fields As Integer = 6
-        Public Const FieldsPart As Integer = 7
-        Public Const Array As Integer = 8
-        Public Const ArrayPart As Integer = 9
-        Public Const Values As Integer = 10
-        Public Const ValuesPart As Integer = 11
-        Public Const [string] As Integer = 12
-        Public Const colon As Integer = 13
-        Public Const number As Integer = 14
-        Public Const null As Integer = 15
-        Public Const [true] As Integer = 16
-        Public Const [false] As Integer = 17
-        Public Const lbrace As Integer = 18
-        Public Const rbrace As Integer = 19
-        Public Const comma As Integer = 20
-        Public Const lbracket As Integer = 21
-        Public Const rbracket As Integer = 22
-        Public Const whitespace As Integer = 23
+        Public Const ImplicitList As Integer = 4
+        Public Const ImplicitList2 As Integer = 5
+        Public Const ImplicitListRightAssoc As Integer = 6
+        Public Const ImplicitList2RightAssoc As Integer = 7
+        Public Const [Object] As Integer = 8
+        Public Const ObjectPart As Integer = 9
+        Public Const Fields As Integer = 10
+        Public Const FieldsPart As Integer = 11
+        Public Const Array As Integer = 12
+        Public Const ArrayPart As Integer = 13
+        Public Const Values As Integer = 14
+        Public Const ValuesPart As Integer = 15
+        Public Const [string] As Integer = 16
+        Public Const colon As Integer = 17
+        Public Const number As Integer = 18
+        Public Const null As Integer = 19
+        Public Const [true] As Integer = 20
+        Public Const [false] As Integer = 21
+        Public Const comma As Integer = 22
+        Public Const lbrace As Integer = 23
+        Public Const rbrace As Integer = 24
+        Public Const lbracket As Integer = 25
+        Public Const rbracket As Integer = 26
+        Public Const whitespace As Integer = 27
         Private Shared Function _ParseJson(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -145,6 +149,76 @@ Namespace ParsleyDemo
             context.Error("Expecting true or false")
             Return Nothing
         End Function
+        Private Shared Function _ParseImplicitList(ByVal context As ParserContext) As ParseNode
+            Dim line As Integer = context.Line
+            Dim column As Integer = context.Column
+            Dim position As Long = context.Position
+            If (JsonParser.comma = context.SymbolId) Then
+                'ImplicitList -> comma Field ImplicitListRightAssoc
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                context.Advance
+                children.Add(JsonParser._ParseField(context))
+                children.AddRange(JsonParser._ParseImplicitListRightAssoc(context).Children)
+                Return New ParseNode(JsonParser.ImplicitList, "ImplicitList", children.ToArray, line, column, position)
+            End If
+            context.Error("Expecting comma")
+            Return Nothing
+        End Function
+        Private Shared Function _ParseImplicitList2(ByVal context As ParserContext) As ParseNode
+            Dim line As Integer = context.Line
+            Dim column As Integer = context.Column
+            Dim position As Long = context.Position
+            If (JsonParser.comma = context.SymbolId) Then
+                'ImplicitList2 -> comma Value ImplicitList2RightAssoc
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                context.Advance
+                children.AddRange(JsonParser._ParseValue(context).Children)
+                children.AddRange(JsonParser._ParseImplicitList2RightAssoc(context).Children)
+                Return New ParseNode(JsonParser.ImplicitList2, "ImplicitList2", children.ToArray, line, column, position)
+            End If
+            context.Error("Expecting comma")
+            Return Nothing
+        End Function
+        Private Shared Function _ParseImplicitListRightAssoc(ByVal context As ParserContext) As ParseNode
+            Dim line As Integer = context.Line
+            Dim column As Integer = context.Column
+            Dim position As Long = context.Position
+            If (JsonParser.comma = context.SymbolId) Then
+                'ImplicitListRightAssoc -> comma Field ImplicitListRightAssoc
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                context.Advance
+                children.Add(JsonParser._ParseField(context))
+                children.AddRange(JsonParser._ParseImplicitListRightAssoc(context).Children)
+                Return New ParseNode(JsonParser.ImplicitListRightAssoc, "ImplicitListRightAssoc", children.ToArray, line, column, position)
+            End If
+            If (JsonParser.rbrace = context.SymbolId) Then
+                'ImplicitListRightAssoc ->
+                Dim children(-1) As ParseNode
+                Return New ParseNode(JsonParser.ImplicitListRightAssoc, "ImplicitListRightAssoc", children, line, column, position)
+            End If
+            context.Error("Expecting comma or rbrace")
+            Return Nothing
+        End Function
+        Private Shared Function _ParseImplicitList2RightAssoc(ByVal context As ParserContext) As ParseNode
+            Dim line As Integer = context.Line
+            Dim column As Integer = context.Column
+            Dim position As Long = context.Position
+            If (JsonParser.comma = context.SymbolId) Then
+                'ImplicitList2RightAssoc -> comma Value ImplicitList2RightAssoc
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                context.Advance
+                children.AddRange(JsonParser._ParseValue(context).Children)
+                children.AddRange(JsonParser._ParseImplicitList2RightAssoc(context).Children)
+                Return New ParseNode(JsonParser.ImplicitList2RightAssoc, "ImplicitList2RightAssoc", children.ToArray, line, column, position)
+            End If
+            If (JsonParser.rbracket = context.SymbolId) Then
+                'ImplicitList2RightAssoc ->
+                Dim children(-1) As ParseNode
+                Return New ParseNode(JsonParser.ImplicitList2RightAssoc, "ImplicitList2RightAssoc", children, line, column, position)
+            End If
+            context.Error("Expecting comma or rbracket")
+            Return Nothing
+        End Function
         Private Shared Function _ParseObject(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -198,10 +272,9 @@ Namespace ParsleyDemo
             Dim column As Integer = context.Column
             Dim position As Long = context.Position
             If (JsonParser.comma = context.SymbolId) Then
-                'FieldsPart -> comma Fields
+                'FieldsPart -> ImplicitList
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
-                context.Advance
-                children.AddRange(JsonParser._ParseFields(context).Children)
+                children.AddRange(JsonParser._ParseImplicitList(context).Children)
                 Return New ParseNode(JsonParser.FieldsPart, "FieldsPart", children.ToArray, line, column, position)
             End If
             If (JsonParser.rbrace = context.SymbolId) Then
@@ -277,10 +350,9 @@ Namespace ParsleyDemo
             Dim column As Integer = context.Column
             Dim position As Long = context.Position
             If (JsonParser.comma = context.SymbolId) Then
-                'ValuesPart -> comma Values
+                'ValuesPart -> ImplicitList2
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
-                context.Advance
-                children.AddRange(JsonParser._ParseValues(context).Children)
+                children.AddRange(JsonParser._ParseImplicitList2(context).Children)
                 Return New ParseNode(JsonParser.ValuesPart, "ValuesPart", children.ToArray, line, column, position)
             End If
             If (JsonParser.rbracket = context.SymbolId) Then

@@ -19,26 +19,28 @@ namespace ParsleyDemo {
         public const int Field = 1;
         public const int Value = 2;
         public const int Boolean = 3;
-        public const int Object = 4;
-        public const int ObjectPart = 5;
-        public const int Fields = 6;
-        public const int FieldsPart = 7;
-        public const int Array = 8;
+        public const int ImplicitList = 4;
+        public const int ImplicitList2 = 5;
+        public const int ImplicitListRightAssoc = 6;
+        public const int ImplicitList2RightAssoc = 7;
+        public const int ObjectPart = 8;
         public const int ArrayPart = 9;
-        public const int Values = 10;
-        public const int ValuesPart = 11;
-        public const int @string = 12;
-        public const int colon = 13;
-        public const int number = 14;
-        public const int @null = 15;
-        public const int @true = 16;
-        public const int @false = 17;
-        public const int lbrace = 18;
-        public const int rbrace = 19;
+        public const int Object = 10;
+        public const int ObjectPart2 = 11;
+        public const int Array = 12;
+        public const int ArrayPart2 = 13;
+        public const int @string = 14;
+        public const int colon = 15;
+        public const int number = 16;
+        public const int @null = 17;
+        public const int @true = 18;
+        public const int @false = 19;
         public const int comma = 20;
-        public const int lbracket = 21;
+        public const int rbrace = 21;
         public const int rbracket = 22;
-        public const int whitespace = 23;
+        public const int lbrace = 23;
+        public const int lbracket = 24;
+        public const int whitespace = 25;
         private static ParseNode _ParseJson(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -142,71 +144,148 @@ namespace ParsleyDemo {
             context.Error("Expecting true or false");
             return null;
         }
-        private static ParseNode _ParseObject(ParserContext context) {
+        private static ParseNode _ParseImplicitList(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
-            if ((JsonParser.lbrace == context.SymbolId)) {
-                // Object -> lbrace ObjectPart
+            if ((JsonParser.comma == context.SymbolId)) {
+                // ImplicitList -> comma Field ImplicitListRightAssoc
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 context.Advance();
-                children.AddRange(JsonParser._ParseObjectPart(context).Children);
-                return new ParseNode(JsonParser.Object, "Object", children.ToArray(), line, column, position);
+                children.Add(JsonParser._ParseField(context));
+                children.AddRange(JsonParser._ParseImplicitListRightAssoc(context).Children);
+                return new ParseNode(JsonParser.ImplicitList, "ImplicitList", children.ToArray(), line, column, position);
             }
-            context.Error("Expecting lbrace");
+            context.Error("Expecting comma");
+            return null;
+        }
+        private static ParseNode _ParseImplicitList2(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            if ((JsonParser.comma == context.SymbolId)) {
+                // ImplicitList2 -> comma Value ImplicitList2RightAssoc
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                context.Advance();
+                children.AddRange(JsonParser._ParseValue(context).Children);
+                children.AddRange(JsonParser._ParseImplicitList2RightAssoc(context).Children);
+                return new ParseNode(JsonParser.ImplicitList2, "ImplicitList2", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting comma");
+            return null;
+        }
+        private static ParseNode _ParseImplicitListRightAssoc(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            if ((JsonParser.comma == context.SymbolId)) {
+                // ImplicitListRightAssoc -> comma Field ImplicitListRightAssoc
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                context.Advance();
+                children.Add(JsonParser._ParseField(context));
+                children.AddRange(JsonParser._ParseImplicitListRightAssoc(context).Children);
+                return new ParseNode(JsonParser.ImplicitListRightAssoc, "ImplicitListRightAssoc", children.ToArray(), line, column, position);
+            }
+            if ((JsonParser.rbrace == context.SymbolId)) {
+                // ImplicitListRightAssoc ->
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(JsonParser.ImplicitListRightAssoc, "ImplicitListRightAssoc", children, line, column, position);
+            }
+            context.Error("Expecting comma or rbrace");
+            return null;
+        }
+        private static ParseNode _ParseImplicitList2RightAssoc(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            if ((JsonParser.comma == context.SymbolId)) {
+                // ImplicitList2RightAssoc -> comma Value ImplicitList2RightAssoc
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                context.Advance();
+                children.AddRange(JsonParser._ParseValue(context).Children);
+                children.AddRange(JsonParser._ParseImplicitList2RightAssoc(context).Children);
+                return new ParseNode(JsonParser.ImplicitList2RightAssoc, "ImplicitList2RightAssoc", children.ToArray(), line, column, position);
+            }
+            if ((JsonParser.rbracket == context.SymbolId)) {
+                // ImplicitList2RightAssoc ->
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(JsonParser.ImplicitList2RightAssoc, "ImplicitList2RightAssoc", children, line, column, position);
+            }
+            context.Error("Expecting comma or rbracket");
             return null;
         }
         private static ParseNode _ParseObjectPart(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
+            if ((JsonParser.comma == context.SymbolId)) {
+                // ObjectPart -> ImplicitList rbrace
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(JsonParser._ParseImplicitList(context).Children);
+                context.Advance();
+                return new ParseNode(JsonParser.ObjectPart, "ObjectPart", children.ToArray(), line, column, position);
+            }
             if ((JsonParser.rbrace == context.SymbolId)) {
                 // ObjectPart -> rbrace
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 context.Advance();
                 return new ParseNode(JsonParser.ObjectPart, "ObjectPart", children.ToArray(), line, column, position);
             }
-            if ((JsonParser.@string == context.SymbolId)) {
-                // ObjectPart -> Fields rbrace
-                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.AddRange(JsonParser._ParseFields(context).Children);
-                context.Advance();
-                return new ParseNode(JsonParser.ObjectPart, "ObjectPart", children.ToArray(), line, column, position);
-            }
-            context.Error("Expecting rbrace or string");
+            context.Error("Expecting comma or rbrace");
             return null;
         }
-        private static ParseNode _ParseFields(ParserContext context) {
-            int line = context.Line;
-            int column = context.Column;
-            long position = context.Position;
-            if ((JsonParser.@string == context.SymbolId)) {
-                // Fields -> Field FieldsPart
-                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(JsonParser._ParseField(context));
-                children.AddRange(JsonParser._ParseFieldsPart(context).Children);
-                return new ParseNode(JsonParser.Fields, "Fields", children.ToArray(), line, column, position);
-            }
-            context.Error("Expecting string");
-            return null;
-        }
-        private static ParseNode _ParseFieldsPart(ParserContext context) {
+        private static ParseNode _ParseArrayPart(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             if ((JsonParser.comma == context.SymbolId)) {
-                // FieldsPart -> comma Fields
+                // ArrayPart -> ImplicitList2 rbracket
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(JsonParser._ParseImplicitList2(context).Children);
+                context.Advance();
+                return new ParseNode(JsonParser.ArrayPart, "ArrayPart", children.ToArray(), line, column, position);
+            }
+            if ((JsonParser.rbracket == context.SymbolId)) {
+                // ArrayPart -> rbracket
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 context.Advance();
-                children.AddRange(JsonParser._ParseFields(context).Children);
-                return new ParseNode(JsonParser.FieldsPart, "FieldsPart", children.ToArray(), line, column, position);
+                return new ParseNode(JsonParser.ArrayPart, "ArrayPart", children.ToArray(), line, column, position);
             }
+            context.Error("Expecting comma or rbracket");
+            return null;
+        }
+        private static ParseNode _ParseObject(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            if ((JsonParser.lbrace == context.SymbolId)) {
+                // Object -> lbrace ObjectPart2
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                context.Advance();
+                children.AddRange(JsonParser._ParseObjectPart2(context).Children);
+                return new ParseNode(JsonParser.Object, "Object", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting lbrace");
+            return null;
+        }
+        private static ParseNode _ParseObjectPart2(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
             if ((JsonParser.rbrace == context.SymbolId)) {
-                // FieldsPart ->
-                ParseNode[] children = new ParseNode[0];
-                return new ParseNode(JsonParser.FieldsPart, "FieldsPart", children, line, column, position);
+                // ObjectPart2 -> rbrace
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                context.Advance();
+                return new ParseNode(JsonParser.ObjectPart2, "ObjectPart2", children.ToArray(), line, column, position);
             }
-            context.Error("Expecting comma or rbrace");
+            if ((JsonParser.@string == context.SymbolId)) {
+                // ObjectPart2 -> Field ObjectPart
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(JsonParser._ParseField(context));
+                children.AddRange(JsonParser._ParseObjectPart(context).Children);
+                return new ParseNode(JsonParser.ObjectPart2, "ObjectPart2", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting rbrace or string");
             return null;
         }
         private static ParseNode _ParseArray(ParserContext context) {
@@ -214,24 +293,24 @@ namespace ParsleyDemo {
             int column = context.Column;
             long position = context.Position;
             if ((JsonParser.lbracket == context.SymbolId)) {
-                // Array -> lbracket ArrayPart
+                // Array -> lbracket ArrayPart2
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 context.Advance();
-                children.AddRange(JsonParser._ParseArrayPart(context).Children);
+                children.AddRange(JsonParser._ParseArrayPart2(context).Children);
                 return new ParseNode(JsonParser.Array, "Array", children.ToArray(), line, column, position);
             }
             context.Error("Expecting lbracket");
             return null;
         }
-        private static ParseNode _ParseArrayPart(ParserContext context) {
+        private static ParseNode _ParseArrayPart2(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             if ((JsonParser.rbracket == context.SymbolId)) {
-                // ArrayPart -> rbracket
+                // ArrayPart2 -> rbracket
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 context.Advance();
-                return new ParseNode(JsonParser.ArrayPart, "ArrayPart", children.ToArray(), line, column, position);
+                return new ParseNode(JsonParser.ArrayPart2, "ArrayPart2", children.ToArray(), line, column, position);
             }
             if ((((((((JsonParser.@string == context.SymbolId) 
                         || (JsonParser.number == context.SymbolId)) 
@@ -240,52 +319,13 @@ namespace ParsleyDemo {
                         || (JsonParser.@true == context.SymbolId)) 
                         || (JsonParser.@false == context.SymbolId)) 
                         || (JsonParser.@null == context.SymbolId))) {
-                // ArrayPart -> Values rbracket
-                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.AddRange(JsonParser._ParseValues(context).Children);
-                context.Advance();
-                return new ParseNode(JsonParser.ArrayPart, "ArrayPart", children.ToArray(), line, column, position);
-            }
-            context.Error("Expecting rbracket, string, number, lbrace, lbracket, true, false, or null");
-            return null;
-        }
-        private static ParseNode _ParseValues(ParserContext context) {
-            int line = context.Line;
-            int column = context.Column;
-            long position = context.Position;
-            if ((((((((JsonParser.@string == context.SymbolId) 
-                        || (JsonParser.number == context.SymbolId)) 
-                        || (JsonParser.lbrace == context.SymbolId)) 
-                        || (JsonParser.lbracket == context.SymbolId)) 
-                        || (JsonParser.@true == context.SymbolId)) 
-                        || (JsonParser.@false == context.SymbolId)) 
-                        || (JsonParser.@null == context.SymbolId))) {
-                // Values -> Value ValuesPart
+                // ArrayPart2 -> Value ArrayPart
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 children.AddRange(JsonParser._ParseValue(context).Children);
-                children.AddRange(JsonParser._ParseValuesPart(context).Children);
-                return new ParseNode(JsonParser.Values, "Values", children.ToArray(), line, column, position);
+                children.AddRange(JsonParser._ParseArrayPart(context).Children);
+                return new ParseNode(JsonParser.ArrayPart2, "ArrayPart2", children.ToArray(), line, column, position);
             }
-            context.Error("Expecting string, number, lbrace, lbracket, true, false, or null");
-            return null;
-        }
-        private static ParseNode _ParseValuesPart(ParserContext context) {
-            int line = context.Line;
-            int column = context.Column;
-            long position = context.Position;
-            if ((JsonParser.comma == context.SymbolId)) {
-                // ValuesPart -> comma Values
-                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                context.Advance();
-                children.AddRange(JsonParser._ParseValues(context).Children);
-                return new ParseNode(JsonParser.ValuesPart, "ValuesPart", children.ToArray(), line, column, position);
-            }
-            if ((JsonParser.rbracket == context.SymbolId)) {
-                // ValuesPart ->
-                ParseNode[] children = new ParseNode[0];
-                return new ParseNode(JsonParser.ValuesPart, "ValuesPart", children, line, column, position);
-            }
-            context.Error("Expecting comma or rbracket");
+            context.Error("Expecting rbracket, string, number, lbrace, lbracket, true, false, or null");
             return null;
         }
         public static ParseNode ParseJson(System.Collections.Generic.IEnumerable<Token> tokenizer) {
@@ -298,11 +338,6 @@ namespace ParsleyDemo {
             context.EnsureStarted();
             return JsonParser._ParseObject(context);
         }
-        public static ParseNode ParseFields(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return JsonParser._ParseFields(context);
-        }
         public static ParseNode ParseField(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
@@ -312,11 +347,6 @@ namespace ParsleyDemo {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return JsonParser._ParseArray(context);
-        }
-        public static ParseNode ParseValues(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return JsonParser._ParseValues(context);
         }
         public static ParseNode ParseValue(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
