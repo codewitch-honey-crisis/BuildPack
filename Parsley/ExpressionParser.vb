@@ -38,10 +38,10 @@ Namespace ParsleyDemo
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
             Dim position As Long = context.Position
-            If (((((ExpressionParser.add = context.SymbolId)  _
-                        OrElse (ExpressionParser.[sub] = context.SymbolId))  _
-                        OrElse (ExpressionParser.identifier = context.SymbolId))  _
-                        OrElse (ExpressionParser.[integer] = context.SymbolId))  _
+            If (((((ExpressionParser.add = context.SymbolId) _
+                        OrElse (ExpressionParser.[sub] = context.SymbolId)) _
+                        OrElse (ExpressionParser.identifier = context.SymbolId)) _
+                        OrElse (ExpressionParser.[integer] = context.SymbolId)) _
                         OrElse (ExpressionParser.lparen = context.SymbolId)) Then
                 'Expression -> Term
                 Dim children(0) As ParseNode
@@ -59,7 +59,7 @@ Namespace ParsleyDemo
                 'Unary -> add Unary
                 Dim children(1) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.add, "add", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 children(1) = ExpressionParser._ParseUnary(context)
                 Return New ParseNode(ExpressionParser.Unary, "Unary", children, line, column, position)
             End If
@@ -67,12 +67,12 @@ Namespace ParsleyDemo
                 'Unary -> sub Unary
                 Dim children(1) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.[sub], "sub", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 children(1) = ExpressionParser._ParseUnary(context)
                 Return New ParseNode(ExpressionParser.Unary, "Unary", children, line, column, position)
             End If
-            If (((ExpressionParser.identifier = context.SymbolId)  _
-                        OrElse (ExpressionParser.[integer] = context.SymbolId))  _
+            If (((ExpressionParser.identifier = context.SymbolId) _
+                        OrElse (ExpressionParser.[integer] = context.SymbolId)) _
                         OrElse (ExpressionParser.lparen = context.SymbolId)) Then
                 'Unary -> Leaf
                 Dim children(0) As ParseNode
@@ -90,24 +90,24 @@ Namespace ParsleyDemo
                 'Leaf -> identifier
                 Dim children(0) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.identifier, "identifier", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 Return New ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position)
             End If
             If (ExpressionParser.[integer] = context.SymbolId) Then
                 'Leaf -> integer
                 Dim children(0) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.[integer], "integer", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 Return New ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position)
             End If
             If (ExpressionParser.lparen = context.SymbolId) Then
                 'Leaf -> lparen Expression rparen
                 Dim children(2) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.lparen, "lparen", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 children(1) = ExpressionParser._ParseExpression(context)
                 children(2) = New ParseNode(ExpressionParser.rparen, "rparen", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 Return New ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position)
             End If
             context.Error("Expecting identifier, integer, or lparen")
@@ -117,10 +117,10 @@ Namespace ParsleyDemo
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
             Dim position As Long = context.Position
-            If (((((ExpressionParser.add = context.SymbolId)  _
-                        OrElse (ExpressionParser.[sub] = context.SymbolId))  _
-                        OrElse (ExpressionParser.identifier = context.SymbolId))  _
-                        OrElse (ExpressionParser.[integer] = context.SymbolId))  _
+            If (((((ExpressionParser.add = context.SymbolId) _
+                        OrElse (ExpressionParser.[sub] = context.SymbolId)) _
+                        OrElse (ExpressionParser.identifier = context.SymbolId)) _
+                        OrElse (ExpressionParser.[integer] = context.SymbolId)) _
                         OrElse (ExpressionParser.lparen = context.SymbolId)) Then
                 'Term -> Factor TermPart
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -139,7 +139,7 @@ Namespace ParsleyDemo
                 'TermPart -> add Factor
                 Dim children(1) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.add, "add", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 children(1) = ExpressionParser._ParseFactor(context)
                 Return New ParseNode(ExpressionParser.TermPart, "TermPart", children, line, column, position)
             End If
@@ -147,11 +147,11 @@ Namespace ParsleyDemo
                 'TermPart -> sub Factor
                 Dim children(1) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.[sub], "sub", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 children(1) = ExpressionParser._ParseFactor(context)
                 Return New ParseNode(ExpressionParser.TermPart, "TermPart", children, line, column, position)
             End If
-            If ((ExpressionParser.EosSymbol = context.SymbolId)  _
+            If ((ExpressionParser.EosSymbol = context.SymbolId) _
                         OrElse (ExpressionParser.rparen = context.SymbolId)) Then
                 'TermPart ->
                 Dim children(-1) As ParseNode
@@ -164,10 +164,10 @@ Namespace ParsleyDemo
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
             Dim position As Long = context.Position
-            If (((((ExpressionParser.add = context.SymbolId)  _
-                        OrElse (ExpressionParser.[sub] = context.SymbolId))  _
-                        OrElse (ExpressionParser.identifier = context.SymbolId))  _
-                        OrElse (ExpressionParser.[integer] = context.SymbolId))  _
+            If (((((ExpressionParser.add = context.SymbolId) _
+                        OrElse (ExpressionParser.[sub] = context.SymbolId)) _
+                        OrElse (ExpressionParser.identifier = context.SymbolId)) _
+                        OrElse (ExpressionParser.[integer] = context.SymbolId)) _
                         OrElse (ExpressionParser.lparen = context.SymbolId)) Then
                 'Factor -> Unary FactorPart
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -186,7 +186,7 @@ Namespace ParsleyDemo
                 'FactorPart -> mul Unary
                 Dim children(1) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.mul, "mul", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 children(1) = ExpressionParser._ParseUnary(context)
                 Return New ParseNode(ExpressionParser.FactorPart, "FactorPart", children, line, column, position)
             End If
@@ -194,13 +194,13 @@ Namespace ParsleyDemo
                 'FactorPart -> div Unary
                 Dim children(1) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.div, "div", context.Value, line, column, position)
-                context.Advance
+                context.Advance()
                 children(1) = ExpressionParser._ParseUnary(context)
                 Return New ParseNode(ExpressionParser.FactorPart, "FactorPart", children, line, column, position)
             End If
-            If ((((ExpressionParser.add = context.SymbolId)  _
-                        OrElse (ExpressionParser.[sub] = context.SymbolId))  _
-                        OrElse (ExpressionParser.EosSymbol = context.SymbolId))  _
+            If ((((ExpressionParser.add = context.SymbolId) _
+                        OrElse (ExpressionParser.[sub] = context.SymbolId)) _
+                        OrElse (ExpressionParser.EosSymbol = context.SymbolId)) _
                         OrElse (ExpressionParser.rparen = context.SymbolId)) Then
                 'FactorPart ->
                 Dim children(-1) As ParseNode
@@ -211,7 +211,7 @@ Namespace ParsleyDemo
         End Function
         Public Shared Function ParseExpression(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
-            context.EnsureStarted
+            context.EnsureStarted()
             Return ExpressionParser._ParseExpression(context)
         End Function
         Public Shared Function EvaluateExpression(ByVal node As ParseNode) As Object
@@ -226,9 +226,9 @@ Namespace ParsleyDemo
                     Return ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0))
                 Else
                     If (node.Children(1).SymbolId = ParsleyDemo.ExpressionParser.add) Then
-                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0)),Integer) + CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(2)),Integer))
+                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0)), Integer) + CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(2)), Integer))
                     Else
-                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0)),Integer) - CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(2)),Integer))
+                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0)), Integer) - CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(2)), Integer))
                     End If
                 End If
             End If
@@ -240,9 +240,9 @@ Namespace ParsleyDemo
                     Return ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(0))
                 Else
                     If (node.Children(1).SymbolId = ParsleyDemo.ExpressionParser.mul) Then
-                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(0)),Integer) * CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(2)),Integer))
+                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(0)), Integer) * CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(2)), Integer))
                     Else
-                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(0)),Integer) / CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(2)),Integer))
+                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(0)), Integer) / CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(2)), Integer))
                     End If
                 End If
             End If
@@ -256,7 +256,7 @@ Namespace ParsleyDemo
                     If (node.Children(0).SymbolId = ParsleyDemo.ExpressionParser.add) Then
                         Return ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(1))
                     Else
-                        Return (0 - CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(1)),Integer))
+                        Return (0 - CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(1)), Integer))
                     End If
                 End If
             End If
@@ -410,7 +410,7 @@ Namespace ParsleyDemo
         End Sub
         Public Sub EnsureStarted()
             If (-1 = Me._state) Then
-                Me.Advance
+                Me.Advance()
             End If
         End Sub
         Public ReadOnly Property SymbolId() As Integer
@@ -444,15 +444,15 @@ Namespace ParsleyDemo
             End Get
         End Property
         Public Function Advance() As Boolean
-            If (false = Me._e.MoveNext) Then
+            If (False = Me._e.MoveNext) Then
                 Me._t.SymbolId = -2
                 Me._state = -2
             Else
                 Me._state = 0
                 Me._t = Me._e.Current
-                Return true
+                Return True
             End If
-            Return false
+            Return False
         End Function
         Public Overloads Sub [Error](ByVal message As String, ByVal arg1 As Object, ByVal arg2 As Object, ByVal arg3 As Object)
             Throw New SyntaxException(String.Format(message, arg1, arg2, arg3), Me.Line, Me.Column, Me.Position)
@@ -467,11 +467,11 @@ Namespace ParsleyDemo
             Throw New SyntaxException(message, Me.Line, Me.Column, Me.Position)
         End Sub
         Public Sub Dispose()
-            Me._e.Dispose
+            Me._e.Dispose()
             Me._state = -3
         End Sub
         Sub IDisposable_Dispose() Implements IDisposable.Dispose
-            Me.Dispose
+            Me.Dispose()
         End Sub
     End Class
 End Namespace

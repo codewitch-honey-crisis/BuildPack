@@ -833,12 +833,12 @@ BindingFlags.Instance|BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPu
 result.Add(pi.Name);}}}return result;}internal IDictionary<string,CodeTypeReference>GetTypeTargets(CodeDomResolverScope scope){var result=new Dictionary<string,
 CodeTypeReference>();var t=scope.DeclaringType;if(null!=t){var binder=new CodeDomBinder(scope);var members=binder.GetMembers(t,MemberTypes.All,BindingFlags.Public
 |BindingFlags.NonPublic|BindingFlags.Static);foreach(var m in members){var ctm=m as CodeTypeMember;if(null!=ctm){ var cttr=new CodeTypeReference(GetBaseNameOfType(t,
-scope));foreach(CodeTypeParameter ctp in t.TypeParameters)cttr.TypeArguments.Add(new CodeTypeReference(ctp));result.Add(ctm.Name,cttr);}}}return result;
-}internal HashSet<string>GetBaseTargets(CodeDomResolverScope scope){ throw new NotImplementedException("Base references need to be implemented");}internal
- HashSet<string>GetThisTargets(CodeDomResolverScope scope){var result=new HashSet<string>();var t=scope.DeclaringType;if(null!=t){var binder=new CodeDomBinder(scope);
-var members=binder.GetMembers(t,MemberTypes.All,BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance);foreach(var m in members){var ctm=m as
- CodeTypeMember;if(null!=ctm){ result.Add(ctm.Name);}}}return result;}internal HashSet<string>GetMemberNames(CodeDomResolverScope scope){var result=new
- HashSet<string>();var t=scope.DeclaringType;if(null!=t){var binder=new CodeDomBinder(scope);var members=binder.GetMembers(t,MemberTypes.All,BindingFlags.Instance
+scope));foreach(CodeTypeParameter ctp in t.TypeParameters)cttr.TypeArguments.Add(new CodeTypeReference(ctp)); if(!result.ContainsKey(ctm.Name))result.Add(ctm.Name,
+cttr);}}}return result;}internal HashSet<string>GetBaseTargets(CodeDomResolverScope scope){ throw new NotImplementedException("Base references need to be implemented");
+}internal HashSet<string>GetThisTargets(CodeDomResolverScope scope){var result=new HashSet<string>();var t=scope.DeclaringType;if(null!=t){var binder=
+new CodeDomBinder(scope);var members=binder.GetMembers(t,MemberTypes.All,BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance);foreach(var
+ m in members){var ctm=m as CodeTypeMember;if(null!=ctm){ result.Add(ctm.Name);}}}return result;}internal HashSet<string>GetMemberNames(CodeDomResolverScope
+ scope){var result=new HashSet<string>();var t=scope.DeclaringType;if(null!=t){var binder=new CodeDomBinder(scope);var members=binder.GetMembers(t,MemberTypes.All,BindingFlags.Instance
 |BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic);foreach(var m in members){var ctm=m as CodeTypeMember;if(null!=ctm){result.Add(ctm.Name);
 }else{var mi=m as MemberInfo;result.Add(mi.Name);}}}return result;}/// <summary>
 /// Gets the scope for the specified object

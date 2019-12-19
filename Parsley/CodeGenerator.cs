@@ -322,13 +322,16 @@ namespace Parsley
 						attrs = MemberAttributes.Public | MemberAttributes.Static;
 					else
 						attrs = MemberAttributes.FamilyAndAssembly | MemberAttributes.Static;
-					var m = C.Method(typeof(object), string.Concat("Evaluate", prod.Name), attrs, C.Param("ParseNode", "node"));
+					var m = C.Method(typeof(object), string.Concat("Evaluate", prod.Name), attrs, C.Param("ParseNode", "node"), C.Param(typeof(object), "state"));
 					var cnst = consts[syms.IndexOf(prod.Name)];
 					var fr = C.FieldRef(C.TypeRef("Parser"), cnst);
 					var cnd = C.If(C.Eq(fr, C.PropRef(node, "SymbolId")));
 					cnd.TrueStatements.AddRange(CD.SlangParser.ParseStatements(prod.Code, true));
 					m.Statements.Add(cnd);
 					m.Statements.Add(C.Throw(C.New(C.Type("SyntaxException"), C.Literal(string.Concat("Expecting ", prod.Name)), C.PropRef(node, "Line"), C.PropRef(node, "Column"), C.PropRef(node, "Position"))));
+					parser.Members.Add(m);
+					m = C.Method(m.ReturnType, m.Name, attrs, C.Param("ParseNode", "node"));
+					m.Statements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), m.Name, C.ArgRef("node"), C.Null)));
 					parser.Members.Add(m);
 					var hasReturn = false;
 					V.Visit(cnd, (ctx) => {

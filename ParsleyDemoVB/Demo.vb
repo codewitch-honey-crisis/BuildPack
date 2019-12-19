@@ -3,10 +3,12 @@ Namespace ParsleyDemo
     Module Demo
 
         Public Sub RunDemo()
-            Dim text As String = "3*5+7*2"
+            Dim text As String = "3*5+a*2"
+            Dim vars As IDictionary(Of String, Integer) = New Dictionary(Of String, Integer)()
+            vars("a") = 1
             Dim exprTokenizer As ExpressionTokenizer = New ExpressionTokenizer(text)
             Dim pt As ParseNode = ExpressionParser.ParseExpression(exprTokenizer)
-            Console.WriteLine("{0} = {1}", text, ExpressionParser.EvaluateExpression(pt))
+            Console.WriteLine("{0} = {1}", text, ExpressionParser.EvaluateExpression(pt, vars))
             Console.WriteLine()
             _WriteTree(pt, Console.Out)
             Console.WriteLine("Press any key...")

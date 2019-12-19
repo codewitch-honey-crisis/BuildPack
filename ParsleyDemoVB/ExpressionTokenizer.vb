@@ -65,7 +65,7 @@ Namespace ParsleyDemo
             Me.AcceptSymbolId = acceptSymbolId
         End Sub
     End Structure
-    <System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")>
+    <System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")>  _
     Friend Structure DfaTransitionEntry
         '''<summary>
         '''The character ranges, packed as adjacent pairs.
@@ -85,7 +85,7 @@ Namespace ParsleyDemo
             Me.Destination = destination
         End Sub
     End Structure
-    <System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")>
+    <System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")>  _
     Friend Class TableTokenizer
         Inherits Object
         Implements IEnumerable(Of Token)
@@ -138,7 +138,7 @@ Namespace ParsleyDemo
             Me._input = input
         End Sub
     End Class
-    <System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")>
+    <System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")>  _
     Friend Class TableTokenizerEnumerator
         Inherits Object
         Implements IEnumerator(Of Token)
@@ -203,7 +203,7 @@ Namespace ParsleyDemo
                         Throw New InvalidOperationException("The cursor is after the end of the enumeration")
                     End If
                     If (TableTokenizerEnumerator._Disposed = Me._state) Then
-                        TableTokenizerEnumerator._ThrowDisposed()
+                        TableTokenizerEnumerator._ThrowDisposed
                     End If
                 End If
                 Return Me._current
@@ -216,11 +216,11 @@ Namespace ParsleyDemo
         End Property
         Sub System_Collections_IEnumerator_Reset() Implements System.Collections.IEnumerator.Reset
             If (TableTokenizerEnumerator._Disposed = Me._state) Then
-                TableTokenizerEnumerator._ThrowDisposed()
+                TableTokenizerEnumerator._ThrowDisposed
             End If
-            If (False _
+            If (false  _
                         = (TableTokenizerEnumerator._BeforeBegin = Me._state)) Then
-                Me._input.Reset()
+                Me._input.Reset
             End If
             Me._state = TableTokenizerEnumerator._BeforeBegin
             Me._line = 1
@@ -231,46 +231,46 @@ Namespace ParsleyDemo
             'if we're not enumerating
             If (TableTokenizerEnumerator._Enumerating > Me._state) Then
                 If (TableTokenizerEnumerator._Disposed = Me._state) Then
-                    TableTokenizerEnumerator._ThrowDisposed()
+                    TableTokenizerEnumerator._ThrowDisposed
                 End If
                 If (TableTokenizerEnumerator._AfterEnd = Me._state) Then
-                    Return False
+                    Return false
                 End If
             End If
             Me._current = CType(Nothing, Token)
             Me._current.Line = Me._line
             Me._current.Column = Me._column
             Me._current.Position = Me._position
-            Me._buffer.Clear()
+            Me._buffer.Clear
             'lex the next input
             Me._current.SymbolId = Me._Lex
             'now look for hiddens and block ends
-            Dim done As Boolean = False
+            Dim done As Boolean = false
 
-            Do While (False = done)
-                done = True
+            Do While (false = done)
+                done = true
                 'if we're on a valid symbol
                 If (TableTokenizerEnumerator.ErrorSymbol < Me._current.SymbolId) Then
                     'get the block end for our symbol
                     Dim be As String = Me._blockEnds(Me._current.SymbolId)
-                    If ((Not (be) Is Nothing) _
-                                AndAlso (False _
+                    If ((Not (be) Is Nothing)  _
+                                AndAlso (false  _
                                 = (0 = be.Length))) Then
                         'read until we find it or end of input
-                        If (False = Me._TryReadUntilBlockEnd(be)) Then
+                        If (false = Me._TryReadUntilBlockEnd(be)) Then
                             Me._current.SymbolId = TableTokenizerEnumerator.ErrorSymbol
                         End If
                     End If
-                    If ((TableTokenizerEnumerator.ErrorSymbol < Me._current.SymbolId) _
-                                AndAlso (False _
-                                = (0 _
+                    If ((TableTokenizerEnumerator.ErrorSymbol < Me._current.SymbolId)  _
+                                AndAlso (false  _
+                                = (0  _
                                 = (Me._nodeFlags(Me._current.SymbolId) And 1)))) Then
                         'update the cursor position and lex the next input, skipping this one
-                        done = False
+                        done = false
                         Me._current.Line = Me._line
                         Me._current.Column = Me._column
                         Me._current.Position = Me._position
-                        Me._buffer.Clear()
+                        Me._buffer.Clear
                         Me._current.SymbolId = Me._Lex
                     End If
                 End If
@@ -281,17 +281,17 @@ Namespace ParsleyDemo
             If (TableTokenizerEnumerator._EosSymbol = Me._current.SymbolId) Then
                 Me._state = TableTokenizerEnumerator._AfterEnd
             End If
-            Return (False _
+            Return (false  _
                         = (TableTokenizerEnumerator._AfterEnd = Me._state))
         End Function
         Sub IDisposable_Dispose() Implements IDisposable.Dispose
-            Me._input.Dispose()
+            Me._input.Dispose
             Me._state = TableTokenizerEnumerator._Disposed
         End Sub
         'moves to the next position, updates the state accordingly, and tracks the cursor position
         Function _MoveNextInput() As Boolean
             If Me._input.MoveNext Then
-                If (False _
+                If (false  _
                             = (TableTokenizerEnumerator._BeforeBegin = Me._state)) Then
                     Me._position = (Me._position + 1)
                     If (Global.Microsoft.VisualBasic.ChrW(10) = Me._input.Current) Then
@@ -311,54 +311,54 @@ Namespace ParsleyDemo
                         Me._line = (Me._line + 1)
                     Else
                         If (Global.Microsoft.VisualBasic.ChrW(9) = Me._input.Current) Then
-                            Me._column = (Me._column _
+                            Me._column = (Me._column  _
                                         + (TableTokenizerEnumerator._TabWidth - 1))
                         End If
                     End If
                 End If
-                Return True
+                Return true
             End If
             Me._state = TableTokenizerEnumerator._InnerFinished
-            Return False
+            Return false
         End Function
         'reads until the specified character, consuming it, returning false if it wasn't found
         Function _TryReadUntil(ByVal character As Char) As Boolean
             Dim ch As Char = Me._input.Current
             Me._buffer.Append(ch)
             If (ch = character) Then
-                Return True
+                Return true
             End If
 
-            Do While (Me._MoveNextInput _
-                        AndAlso (False _
+            Do While (Me._MoveNextInput  _
+                        AndAlso (false  _
                         = (Me._input.Current = character)))
                 Me._buffer.Append(Me._input.Current)
 
             Loop
-            If (False _
+            If (false  _
                         = (Me._state = TableTokenizerEnumerator._InnerFinished)) Then
                 Me._buffer.Append(Me._input.Current)
                 Return (Me._input.Current = character)
             End If
-            Return False
+            Return false
         End Function
         'reads until the string is encountered, capturing it.
         Function _TryReadUntilBlockEnd(ByVal blockEnd As String) As Boolean
 
-            Do While ((False _
-                        = (TableTokenizerEnumerator._InnerFinished = Me._state)) _
+            Do While ((false  _
+                        = (TableTokenizerEnumerator._InnerFinished = Me._state))  _
                         AndAlso Me._TryReadUntil(blockEnd(0)))
-                Dim found As Boolean = True
+                Dim found As Boolean = true
                 Dim i As Integer = 1
-                Do While (found _
+                Do While (found  _
                             AndAlso (i < blockEnd.Length))
-                    If (False _
-                                = (Me._MoveNextInput _
-                                OrElse (False _
+                    If (false  _
+                                = (Me._MoveNextInput  _
+                                OrElse (false  _
                                 = (Me._input.Current = blockEnd(i))))) Then
-                        found = False
+                        found = false
                     Else
-                        If (False _
+                        If (false  _
                                     = (TableTokenizerEnumerator._InnerFinished = Me._state)) Then
                             Me._buffer.Append(Me._input.Current)
                         End If
@@ -366,12 +366,12 @@ Namespace ParsleyDemo
                     i = (i + 1)
                 Loop
                 If found Then
-                    Me._MoveNextInput()
-                    Return True
+                    Me._MoveNextInput
+                    Return true
                 End If
 
             Loop
-            Return False
+            Return false
         End Function
         'lex the next token
         Function _Lex() As Integer
@@ -379,11 +379,11 @@ Namespace ParsleyDemo
             Dim acceptSymbolId As Integer
             Dim dfaState As Integer = 0
             If (TableTokenizerEnumerator._BeforeBegin = Me._state) Then
-                If (False = Me._MoveNextInput) Then
+                If (false = Me._MoveNextInput) Then
                     'if we're on an accepting state, return that
                     'otherwise, error
                     acceptSymbolId = Me._dfaTable(dfaState).AcceptSymbolId
-                    If (False _
+                    If (false  _
                                 = (-1 = acceptSymbolId)) Then
                         Return acceptSymbolId
                     Else
@@ -392,20 +392,20 @@ Namespace ParsleyDemo
                 End If
                 Me._state = TableTokenizerEnumerator._Enumerating
             Else
-                If ((TableTokenizerEnumerator._InnerFinished = Me._state) _
+                If ((TableTokenizerEnumerator._InnerFinished = Me._state)  _
                             OrElse (TableTokenizerEnumerator._AfterEnd = Me._state)) Then
                     'if we're at the end just return the end symbol
                     Return TableTokenizerEnumerator._EosSymbol
                 End If
             End If
-            Dim done As Boolean = False
+            Dim done As Boolean = false
 
-            Do While (False = done)
+            Do While (false = done)
                 Dim nextDfaState As Integer = -1
                 Dim i As Integer = 0
                 Do While (i < Me._dfaTable(dfaState).Transitions.Length)
                     Dim entry As DfaTransitionEntry = Me._dfaTable(dfaState).Transitions(i)
-                    Dim found As Boolean = False
+                    Dim found As Boolean = false
                     Dim j As Integer = 0
                     Do While (j < entry.PackedRanges.Length)
                         Dim ch As Char = Me._input.Current
@@ -414,7 +414,7 @@ Namespace ParsleyDemo
                         Dim last As Char = entry.PackedRanges(j)
                         If (ch <= last) Then
                             If (first <= ch) Then
-                                found = True
+                                found = true
                             End If
                             j = (Integer.MaxValue - 1)
                             'break
@@ -429,18 +429,18 @@ Namespace ParsleyDemo
                     End If
                     i = (i + 1)
                 Loop
-                If (False _
+                If (false  _
                             = (-1 = nextDfaState)) Then
                     'capture our character
                     Me._buffer.Append(Me._input.Current)
                     'and iterate to our next state
                     dfaState = nextDfaState
-                    If (False = Me._MoveNextInput) Then
+                    If (false = Me._MoveNextInput) Then
                         'end of stream, if we're on an accepting state,
                         'return that, just like we do on empty string
                         'if we're not, then we error, just like before
                         acceptSymbolId = Me._dfaTable(dfaState).AcceptSymbolId
-                        If (False _
+                        If (false  _
                                     = (-1 = acceptSymbolId)) Then
                             Return acceptSymbolId
                         Else
@@ -448,13 +448,13 @@ Namespace ParsleyDemo
                         End If
                     End If
                 Else
-                    done = True
+                    done = true
                 End If
                 'no valid transition, we can exit the loop
 
             Loop
             acceptSymbolId = Me._dfaTable(dfaState).AcceptSymbolId
-            If (False _
+            If (false  _
                         = (-1 = acceptSymbolId)) Then
                 Return acceptSymbolId
             Else

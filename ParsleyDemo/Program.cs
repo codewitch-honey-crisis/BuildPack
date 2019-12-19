@@ -9,10 +9,12 @@ namespace ParsleyDemo
 	{
 		static void Main(string[] args)
 		{
-			var text = "3*5+7*2"; 
+			var text = "3*5+a*2";
+			var vars = new Dictionary<string, int>();
+			vars["a"] = 1;
 			var exprTokenizer = new ExpressionTokenizer(text);
 			var pt = ExpressionParser.ParseExpression(exprTokenizer);
-			Console.WriteLine("{0} = {1}",text,ExpressionParser.EvaluateExpression(pt));
+			Console.WriteLine("{0} = {1}",text,ExpressionParser.EvaluateExpression(pt,vars));
 			Console.WriteLine();
 			_WriteTree(pt, Console.Out);
 			Console.WriteLine("Press any key...");

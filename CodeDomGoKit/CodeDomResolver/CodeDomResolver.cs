@@ -650,8 +650,9 @@ namespace CD
 						var cttr = new CodeTypeReference(GetBaseNameOfType(t, scope));
 						foreach (CodeTypeParameter ctp in t.TypeParameters)
 							cttr.TypeArguments.Add(new CodeTypeReference(ctp));
-
-						result.Add(ctm.Name, cttr);
+						// TODO: we need to change this entire thing in order to support method overloads
+						if (!result.ContainsKey(ctm.Name))
+							result.Add(ctm.Name, cttr);
 						
 					}
 				}
