@@ -30,6 +30,10 @@ I decided to finally do something about that, and with it comes a really quick a
 
 This readme can't do it justice, so just visit the link
 
+## Parsley
+
+A little recursive descent LL(1) parser generator in C#. Supports actions in the grammar. See my [Code Project article](https://www.codeproject.com/Articles/5254538/Parsley-A-Recursive-Descent-Parser-Generator-in-Csharp) for information on using it.
+
 ## Rolex
 
 A neat little tokenizer generator in C#. I use it all the time for parsers, and slang uses it for its tokenization, as does the RolexDemo parser. I've included this as lexers/tokenizers are often indespensible for build tools, plus it showcases the other included tools pretty extensively in its own implementation.
