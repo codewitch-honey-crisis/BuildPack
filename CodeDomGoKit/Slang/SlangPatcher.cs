@@ -52,6 +52,7 @@ namespace CD
 							_Patch(ctx.Target as CodeVariableReferenceExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeDelegateInvokeExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeObjectCreateExpression, ctx, resolver);
+							_Patch(ctx.Target as CodeBinaryOperatorExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeIndexerExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeMemberMethod, ctx, resolver);
 							_Patch(ctx.Target as CodeMemberProperty, ctx, resolver);
@@ -79,6 +80,7 @@ namespace CD
 							_Patch(ctx.Target as CodeVariableReferenceExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeDelegateInvokeExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeObjectCreateExpression, ctx, resolver);
+							_Patch(ctx.Target as CodeBinaryOperatorExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeIndexerExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeMemberMethod, ctx, resolver);
 							_Patch(ctx.Target as CodeMemberProperty, ctx, resolver);
@@ -158,15 +160,111 @@ namespace CD
 		{
 			if (null != prop)
 			{
-				// TODO: add public implementation types
+				// TODO: make sure the member is actually public
+				if (null == prop.PrivateImplementationType)
+				{
+					if (prop.Name == "Current")
+						System.Diagnostics.Debugger.Break();
+					var scope = resolver.GetScope(prop);
+					var td = scope.DeclaringType;
+					var binder = new CodeDomBinder(scope);
+					for (int ic = td.BaseTypes.Count, i = 0; i < ic; ++i)
+					{
+						var ctr = td.BaseTypes[i];
+						var t = resolver.TryResolveType(ctr, scope);
+						if (null != t)
+						{
+							var ma = binder.GetPropertyGroup(t, prop.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+							if (0 < ma.Length)
+							{
+								var p = binder.SelectProperty(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly, ma, null,_GetParameterTypes(prop.Parameters), null);
+								if (null != p)
+									prop.ImplementationTypes.Add(ctr);
+							}
+
+
+						}
+
+					}
+				}
+
 				prop.UserData.Remove("slang:unresolved");
+			}
+		}
+		static void _Patch(CodeBinaryOperatorExpression op, CodeDomVisitContext ctx, CodeDomResolver resolver)
+		{
+			if (null != op)
+			{
+				var scope = resolver.GetScope(op);
+				if (CodeBinaryOperatorType.IdentityEquality==op.Operator)
+				{
+					if (_HasUnresolved(op.Left))
+						return;
+					var tr1 =resolver.GetTypeOfExpression(op.Left);
+					if (resolver.IsValueType(tr1))
+					{
+						if (_HasUnresolved(op.Right))
+							return;
+						var tr2 = resolver.GetTypeOfExpression(op.Right);
+						if(resolver.IsValueType(tr2))
+						{
+							op.Operator = CodeBinaryOperatorType.ValueEquality;
+						}
+					}
+					op.UserData.Remove("slang:unresolved");
+
+				}
+				else if(CodeBinaryOperatorType.IdentityInequality==op.Operator)
+				{
+					if (_HasUnresolved(op.Left))
+						return;
+					var tr1 = resolver.GetTypeOfExpression(op.Left);
+					if (resolver.IsValueType(tr1))
+					{
+						if (_HasUnresolved(op.Right))
+							return;
+						var tr2 = resolver.GetTypeOfExpression(op.Right);
+						if (resolver.IsValueType(tr2))
+						{
+							// we have to hack the codedom because there is no value inequality
+							op.Operator = CodeBinaryOperatorType.ValueEquality;
+							var newOp = new CodeBinaryOperatorExpression(new CodePrimitiveExpression(false), CodeBinaryOperatorType.ValueEquality, op);
+							CodeDomVisitor.ReplaceTarget(ctx, newOp);
+						}
+					}
+					op.UserData.Remove("slang:unresolved");
+				} 
 			}
 		}
 		static void _Patch(CodeMemberMethod meth,CodeDomVisitContext ctx,CodeDomResolver resolver)
 		{
 			if (null != meth)
 			{
-				// TODO: Populate public implementation types
+				// TODO: make sure the member is actually public
+				if(null==meth.PrivateImplementationType) {
+					var scope = resolver.GetScope(meth);
+					var td = scope.DeclaringType;
+					var binder = new CodeDomBinder(scope);
+					for (int ic =td.BaseTypes.Count,i=0;i<ic;++i)
+					{
+						var ctr = td.BaseTypes[i];
+						var t=resolver.TryResolveType(ctr, scope);
+						if(null!=t)
+						{
+							var ma =binder.GetMethodGroup(t, meth.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+							if(0<ma.Length)
+							{
+								var m = binder.SelectMethod(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly, ma, _GetParameterTypes(meth.Parameters), null);
+								if (null != m)
+									meth.ImplementationTypes.Add(ctr);
+							}
+
+							
+						}
+						
+					}
+				}
+					
 				meth.UserData.Remove("slang:unresolved");
 				if ("Main" == meth.Name && (meth.Attributes & MemberAttributes.ScopeMask) == MemberAttributes.Static)
 				{
@@ -191,6 +289,13 @@ namespace CD
 				//return;
 			}
 
+		}
+		static CodeTypeReference[] _GetParameterTypes(CodeParameterDeclarationExpressionCollection parms)
+		{
+			var result = new CodeTypeReference[parms.Count];
+			for(var i = 0;i<result.Length;i++)
+				result[i]=parms[i].Type;
+			return result;
 		}
 		static void _Patch(CodeVariableReferenceExpression vr,CodeDomVisitContext ctx,  CodeDomResolver resolver)
 		{

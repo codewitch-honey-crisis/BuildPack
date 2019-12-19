@@ -199,6 +199,7 @@ namespace CD
 				_AddStartDirs(c, dirs);
 				dirs.AddRange(_ParseDirectives(pc,true));
 				_AddEndDirs(c, dirs);
+				return c;
 			}
 			_SkipComments(pc);
 			dirs.AddRange(_ParseDirectives(pc));

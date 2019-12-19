@@ -299,9 +299,13 @@ namespace CD
 				pc.Advance();
 				var rhs = _ParseRelational(pc);
 				
-				lhs = new CodeBinaryOperatorExpression(lhs, CodeBinaryOperatorType.ValueEquality, rhs);
-				if (!op) // have to hack below because CodeDOM is inexplicably missing value inequality
-					lhs = new CodeBinaryOperatorExpression(new CodePrimitiveExpression(false), CodeBinaryOperatorType.ValueEquality, lhs);
+				if (op)
+					lhs = new CodeBinaryOperatorExpression(lhs, CodeBinaryOperatorType.IdentityEquality, rhs);
+				else
+					lhs = new CodeBinaryOperatorExpression(lhs, CodeBinaryOperatorType.IdentityInequality, rhs);
+				// we don't know if this is value or reference equality
+				// and VB requires us to know
+				lhs.UserData.Add("slang:unresolved",true);
 			}
 		}
 		static CodeExpression _ParseRelational(_PC pc)

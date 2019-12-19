@@ -530,7 +530,34 @@ namespace CD
 			return null == type || (0 == type.ArrayRank && 0 == string.Compare("System.Void", type.BaseType,StringComparison.InvariantCulture));
 				
 		}
-
+		/// <summary>
+		/// Indicates whether the specified type is a value type
+		/// </summary>
+		/// <param name="type">The type</param>
+		/// <param name="scope">The scope or null</param>
+		/// <returns>True if the type is a value type, otherwise false</returns>
+		public bool IsValueType(CodeTypeReference type,CodeDomResolverScope scope=null)
+		{
+			if (IsNullOrVoidType(type))
+				return false;
+			if (0 < type.ArrayRank)
+				return false;
+			if(null==scope)
+			{
+				scope = GetScope(type);
+			}
+			var t = TryResolveType(type, scope);
+			if (null == t)
+				throw new TypeLoadException("Unable to resolve type");
+			var rt = t as Type;
+			if(null!=rt)
+			{
+				return rt.IsValueType;
+			}
+			var td = t as CodeTypeDeclaration;
+			return td.IsEnum || td.IsStruct;
+			
+		}
 		internal HashSet<string> GetFieldNames(CodeDomResolverScope scope)
 		{
 			var result = new HashSet<string>();
@@ -1142,6 +1169,8 @@ namespace CD
 		}
 		object _ResolveTypeImpl(CodeTypeReference type,int resolutionType = _ResolveAssemblies | _ResolveCompileUnits)
 		{
+			if (type.BaseType == "Token")
+				System.Diagnostics.Debugger.Break();
 			object result = null;
 			if(null!=type.ArrayElementType && 1<=type.ArrayRank)
 			{

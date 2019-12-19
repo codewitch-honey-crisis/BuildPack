@@ -317,6 +317,10 @@ namespace CD
 			if(null!=ie)
 			{
 				var t = GetTypeOfExpression(ie.TargetObject, scope);
+				// we have to special case for string because there
+				// is no "real" indexer property on it.
+				if (0 == t.ArrayRank && 0 == string.Compare("System.String", t.BaseType))
+					return new CodeTypeReference(typeof(char));
 				var types = new CodeTypeReference[ie.Indices.Count];
 				for (var i = 0; i < types.Length; ++i)
 				{

@@ -82,6 +82,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(SolutionDir)Rolex\bin\Release\rolex.exe" "$(ProjectDir)Slang\SlangTokenizer.rl" /output "$(ProjectDir)Slang\SlangTokenizer.cs" /namespace CD /ifstale</PreBuildEvent>
+    <PreBuildEvent>"$(SolutionDir)\Rolex\bin\Release\rolex.exe" "$(ProjectDir)Slang\SlangTokenizer.rl" /output "$(ProjectDir)Slang\SlangTokenizer.cs" /namespace CD /ifstale</PreBuildEvent>
   </PropertyGroup>
 </Project>

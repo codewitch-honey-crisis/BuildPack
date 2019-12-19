@@ -176,6 +176,12 @@ namespace CD
 				{
 					result.BaseTypes.Add(_ParseTypeRef(pc));
 					_SkipComments(pc);
+					if(ST.comma==pc.SymbolId)
+					{
+						pc.Advance();
+						if (pc.IsEnded)
+							_Error("Expecting type", pc.Current);
+					}
 				}
 				_SkipComments(pc);
 				if (pc.IsEnded)

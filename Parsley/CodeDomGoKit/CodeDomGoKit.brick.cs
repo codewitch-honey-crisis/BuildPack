@@ -812,22 +812,30 @@ BindingFlags.Instance|BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPu
 /// <param name="type">The type to evaluate</param>
 /// <returns>True if the type is null or void, otherwise false</returns>
 public static bool IsNullOrVoidType(CodeTypeReference type){return null==type||(0==type.ArrayRank&&0==string.Compare("System.Void",type.BaseType,StringComparison.InvariantCulture));
-}internal HashSet<string>GetFieldNames(CodeDomResolverScope scope){var result=new HashSet<string>();var t=scope.DeclaringType;if(null!=t){var binder=new
- CodeDomBinder(scope);var members=binder.GetMembers(t,MemberTypes.Field,BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.Static);
-foreach(var m in members){var cpi=m as CodeMemberField;if(null!=cpi)result.Add(cpi.Name);var pi=m as FieldInfo;if(null!=pi){if(!pi.IsSpecialName)result.Add(pi.Name);
-}}}return result;}internal HashSet<string>GetEventNames(CodeDomResolverScope scope){var result=new HashSet<string>();var t=scope.DeclaringType;if(null
-!=t){var binder=new CodeDomBinder(scope);var members=binder.GetMembers(t,MemberTypes.Event,BindingFlags.Instance|BindingFlags.Static|BindingFlags.Public
-|BindingFlags.NonPublic);foreach(var m in members){var cpi=m as CodeMemberEvent;if(null!=cpi)result.Add(cpi.Name);var pi=m as EventInfo;if(null!=pi){if
-(!pi.IsSpecialName)result.Add(pi.Name);}}}return result;}internal HashSet<string>GetMethodNames(CodeDomResolverScope scope){var result=new HashSet<string>();
-var t=scope.DeclaringType;if(null!=t){var binder=new CodeDomBinder(scope);var members=binder.GetMembers(t,MemberTypes.Method,BindingFlags.Instance|BindingFlags.Static
-|BindingFlags.Public|BindingFlags.NonPublic);foreach(var m in members){var cpi=m as CodeMemberMethod;if(null!=(cpi as CodeConstructor))cpi=null;if(null
-!=cpi)result.Add(cpi.Name);var pi=m as MethodInfo;if(null!=pi&&pi.IsConstructor)pi=null;if(null!=pi){if(!pi.IsSpecialName)result.Add(pi.Name);}}}return
- result;}internal IDictionary<string,CodeTypeReference>GetTypeTargets(CodeDomResolverScope scope){var result=new Dictionary<string,CodeTypeReference>();
-var t=scope.DeclaringType;if(null!=t){var binder=new CodeDomBinder(scope);var members=binder.GetMembers(t,MemberTypes.All,BindingFlags.Public|BindingFlags.NonPublic
-|BindingFlags.Static);foreach(var m in members){var ctm=m as CodeTypeMember;if(null!=ctm){ var cttr=new CodeTypeReference(GetBaseNameOfType(t,scope));
-foreach(CodeTypeParameter ctp in t.TypeParameters)cttr.TypeArguments.Add(new CodeTypeReference(ctp));result.Add(ctm.Name,cttr);}}}return result;}internal
- HashSet<string>GetBaseTargets(CodeDomResolverScope scope){ throw new NotImplementedException("Base references need to be implemented");}internal HashSet<string>
-GetThisTargets(CodeDomResolverScope scope){var result=new HashSet<string>();var t=scope.DeclaringType;if(null!=t){var binder=new CodeDomBinder(scope);
+}/// <summary>
+/// Indicates whether the specified type is a value type
+/// </summary>
+/// <param name="type">The type</param>
+/// <param name="scope">The scope or null</param>
+/// <returns>True if the type is a value type, otherwise false</returns>
+public bool IsValueType(CodeTypeReference type,CodeDomResolverScope scope=null){if(IsNullOrVoidType(type))return false;if(0<type.ArrayRank)return false;
+if(null==scope){scope=GetScope(type);}var t=TryResolveType(type,scope);if(null==t)throw new TypeLoadException("Unable to resolve type");var rt=t as Type;
+if(null!=rt){return rt.IsValueType;}var td=t as CodeTypeDeclaration;return td.IsEnum||td.IsStruct;}internal HashSet<string>GetFieldNames(CodeDomResolverScope
+ scope){var result=new HashSet<string>();var t=scope.DeclaringType;if(null!=t){var binder=new CodeDomBinder(scope);var members=binder.GetMembers(t,MemberTypes.Field,
+BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.Static);foreach(var m in members){var cpi=m as CodeMemberField;if(null!=
+cpi)result.Add(cpi.Name);var pi=m as FieldInfo;if(null!=pi){if(!pi.IsSpecialName)result.Add(pi.Name);}}}return result;}internal HashSet<string>GetEventNames(CodeDomResolverScope
+ scope){var result=new HashSet<string>();var t=scope.DeclaringType;if(null!=t){var binder=new CodeDomBinder(scope);var members=binder.GetMembers(t,MemberTypes.Event,
+BindingFlags.Instance|BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic);foreach(var m in members){var cpi=m as CodeMemberEvent;if(null!=
+cpi)result.Add(cpi.Name);var pi=m as EventInfo;if(null!=pi){if(!pi.IsSpecialName)result.Add(pi.Name);}}}return result;}internal HashSet<string>GetMethodNames(CodeDomResolverScope
+ scope){var result=new HashSet<string>();var t=scope.DeclaringType;if(null!=t){var binder=new CodeDomBinder(scope);var members=binder.GetMembers(t,MemberTypes.Method,
+BindingFlags.Instance|BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPublic);foreach(var m in members){var cpi=m as CodeMemberMethod;if(null!=
+(cpi as CodeConstructor))cpi=null;if(null!=cpi)result.Add(cpi.Name);var pi=m as MethodInfo;if(null!=pi&&pi.IsConstructor)pi=null;if(null!=pi){if(!pi.IsSpecialName)
+result.Add(pi.Name);}}}return result;}internal IDictionary<string,CodeTypeReference>GetTypeTargets(CodeDomResolverScope scope){var result=new Dictionary<string,
+CodeTypeReference>();var t=scope.DeclaringType;if(null!=t){var binder=new CodeDomBinder(scope);var members=binder.GetMembers(t,MemberTypes.All,BindingFlags.Public
+|BindingFlags.NonPublic|BindingFlags.Static);foreach(var m in members){var ctm=m as CodeTypeMember;if(null!=ctm){ var cttr=new CodeTypeReference(GetBaseNameOfType(t,
+scope));foreach(CodeTypeParameter ctp in t.TypeParameters)cttr.TypeArguments.Add(new CodeTypeReference(ctp));result.Add(ctm.Name,cttr);}}}return result;
+}internal HashSet<string>GetBaseTargets(CodeDomResolverScope scope){ throw new NotImplementedException("Base references need to be implemented");}internal
+ HashSet<string>GetThisTargets(CodeDomResolverScope scope){var result=new HashSet<string>();var t=scope.DeclaringType;if(null!=t){var binder=new CodeDomBinder(scope);
 var members=binder.GetMembers(t,MemberTypes.All,BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance);foreach(var m in members){var ctm=m as
  CodeTypeMember;if(null!=ctm){ result.Add(ctm.Name);}}}return result;}internal HashSet<string>GetMemberNames(CodeDomResolverScope scope){var result=new
  HashSet<string>();var t=scope.DeclaringType;if(null!=t){var binder=new CodeDomBinder(scope);var members=binder.GetMembers(t,MemberTypes.All,BindingFlags.Instance
@@ -960,19 +968,19 @@ if(0<s.Length)s=string.Concat(pfx,".",type.BaseType);else s=type.BaseType;var ct
 ctrs.Add(ctr);}var t=_DualResolve(ctrs);if(null==t)return false;if(0<type.TypeArguments.Count){var types=new Type[type.TypeArguments.Count];for(var i=
 0;i<types.Length;i++){if(!IsValidType(type.TypeArguments[i],scope))return false;}}return true;}object _DualResolve(IList<CodeTypeReference>ctrs){foreach
 (var ctr in ctrs){var t=_ResolveTypeImpl(ctr,_ResolveCompileUnits);if(null!=t)return t;}foreach(var ctr in ctrs){var t=_ResolveTypeImpl(ctr,_ResolveAssemblies);
-if(null!=t)return t;}return null;}object _ResolveTypeImpl(CodeTypeReference type,int resolutionType=_ResolveAssemblies|_ResolveCompileUnits){object result
-=null;if(null!=type.ArrayElementType&&1<=type.ArrayRank){ return typeof(Array);}if(_ResolveCompileUnits==(resolutionType&_ResolveCompileUnits)){foreach
-(var ccu in CompileUnits){CodeDomVisitor.Visit(ccu,(ctx)=>{var td=ctx.Target as CodeTypeDeclaration;if(null!=td){var name=_GetGenericName(td);CodeObject
- p=td;while((p=_GetRef(p,_parentKey)as CodeObject)!=null){var ptd=p as CodeTypeDeclaration;if(null!=ptd){name=string.Concat(_GetGenericName(ptd),"+",name);
-td=ptd;}var ns=p as CodeNamespace;if(null!=ns&&!string.IsNullOrEmpty(ns.Name)){name=string.Concat(ns.Name,".",name);}}if(name==type.BaseType){td=ctx.Target
- as CodeTypeDeclaration;result=td;ctx.Cancel=true;}}},CodeDomVisitTargets.Types|CodeDomVisitTargets.TypeRefs|CodeDomVisitTargets.Members);if(null!=result)
-return result;}}if(_ResolveAssemblies==(resolutionType&_ResolveAssemblies)){Type t;if(_typeCache.TryGetValue(type,out t))return t;foreach(var ccu in CompileUnits)
-{var corlib=typeof(string).Assembly;var rt=corlib.GetType(type.BaseType,false,false);result=rt;if(null!=result){_typeCache.Add(type,rt);return result;
-}foreach(var astr in ccu.ReferencedAssemblies){var asm=_LoadAsm(astr);rt=asm.GetType(type.BaseType,false,false);result=rt;if(null!=result){_typeCache.Add(type,
-rt);return result;}}}if(0==CompileUnits.Count){var corlib=typeof(string).Assembly;var rt=corlib.GetType(type.BaseType,false,false);result=rt;if(null!=
-result){_typeCache.Add(type,rt);return result;}}_typeCache.Add(type,null);}return result;}Assembly _LoadAsm(string asm){if(File.Exists(asm)){return Assembly.LoadFile(Path.GetFullPath(asm));
-}else if(asm.StartsWith(@"\\")){return Assembly.LoadFile(asm);}AssemblyName an=null;try{an=new AssemblyName(asm);}catch{an=null;}if(null!=an){return Assembly.Load(an);
-}return Assembly.Load(asm);}/// <summary>
+if(null!=t)return t;}return null;}object _ResolveTypeImpl(CodeTypeReference type,int resolutionType=_ResolveAssemblies|_ResolveCompileUnits){if(type.BaseType
+=="Token")System.Diagnostics.Debugger.Break();object result=null;if(null!=type.ArrayElementType&&1<=type.ArrayRank){ return typeof(Array);}if(_ResolveCompileUnits
+==(resolutionType&_ResolveCompileUnits)){foreach(var ccu in CompileUnits){CodeDomVisitor.Visit(ccu,(ctx)=>{var td=ctx.Target as CodeTypeDeclaration;if
+(null!=td){var name=_GetGenericName(td);CodeObject p=td;while((p=_GetRef(p,_parentKey)as CodeObject)!=null){var ptd=p as CodeTypeDeclaration;if(null!=
+ptd){name=string.Concat(_GetGenericName(ptd),"+",name);td=ptd;}var ns=p as CodeNamespace;if(null!=ns&&!string.IsNullOrEmpty(ns.Name)){name=string.Concat(ns.Name,
+".",name);}}if(name==type.BaseType){td=ctx.Target as CodeTypeDeclaration;result=td;ctx.Cancel=true;}}},CodeDomVisitTargets.Types|CodeDomVisitTargets.TypeRefs
+|CodeDomVisitTargets.Members);if(null!=result)return result;}}if(_ResolveAssemblies==(resolutionType&_ResolveAssemblies)){Type t;if(_typeCache.TryGetValue(type,
+out t))return t;foreach(var ccu in CompileUnits){var corlib=typeof(string).Assembly;var rt=corlib.GetType(type.BaseType,false,false);result=rt;if(null
+!=result){_typeCache.Add(type,rt);return result;}foreach(var astr in ccu.ReferencedAssemblies){var asm=_LoadAsm(astr);rt=asm.GetType(type.BaseType,false,
+false);result=rt;if(null!=result){_typeCache.Add(type,rt);return result;}}}if(0==CompileUnits.Count){var corlib=typeof(string).Assembly;var rt=corlib.GetType(type.BaseType,
+false,false);result=rt;if(null!=result){_typeCache.Add(type,rt);return result;}}_typeCache.Add(type,null);}return result;}Assembly _LoadAsm(string asm)
+{if(File.Exists(asm)){return Assembly.LoadFile(Path.GetFullPath(asm));}else if(asm.StartsWith(@"\\")){return Assembly.LoadFile(asm);}AssemblyName an=null;
+try{an=new AssemblyName(asm);}catch{an=null;}if(null!=an){return Assembly.Load(an);}return Assembly.Load(asm);}/// <summary>
 /// Clears the type cache
 /// </summary>
 public void ClearCache(){_typeCache.Clear();}/// <summary>
@@ -1268,16 +1276,16 @@ if(null!=mi)return GetTypeForMember(mi);else return GetTypeForMember(res as Code
 }var di=expr as CodeDelegateInvokeExpression;if(null!=di){var ctr=GetTypeOfExpression(di.TargetObject,scope);var tt=_ResolveType(ctr,scope)as Type;if(null
 ==tt)throw new InvalidOperationException("The delegate invoke expression's target expression type could not resolved.");var ma=tt.GetMember("Invoke");
 if(0<ma.Length){var mi=ma[0]as MethodInfo;if(null!=mi)return new CodeTypeReference(mi.ReturnType);}throw new InvalidOperationException("The target is not a delegate");
-}var ie=expr as CodeIndexerExpression;if(null!=ie){var t=GetTypeOfExpression(ie.TargetObject,scope);var types=new CodeTypeReference[ie.Indices.Count];
-for(var i=0;i<types.Length;++i){var p=ie.Indices[i];var de=p as CodeDirectionExpression;if(null!=de)p=de.Expression;types[i]=GetTypeOfExpression(p,scope);
-if(IsNullOrVoidType(types[i]))throw new InvalidOperationException("One or more of the indexer argument types was void");}var tt=TryResolveType(t,scope);
-if(null==tt)throw new InvalidOperationException("The indexer expression's target expression type could not be resolved");var binder=new CodeDomBinder(scope);
-var td=tt as CodeTypeDeclaration;object tm=null;if(null!=td){var grp=binder.GetPropertyGroup(td,"Item",BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static
-|BindingFlags.Instance);tm=binder.SelectProperty(BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static|BindingFlags.Instance,grp,null,types,null);
-}else{var rt=tt as Type;if(null!=rt){var grp=binder.GetPropertyGroup(rt,"Item",BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static|BindingFlags.Instance);
-tm=binder.SelectProperty(BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static|BindingFlags.Instance,grp,null,types,null);}}if(null==tm)throw
- new InvalidOperationException("The indexer expression's target object type does not have a matching indexer property");var pi=tm as PropertyInfo;if(null
-!=pi)return new CodeTypeReference(pi.PropertyType);var cm=tm as CodeMemberProperty;if(null==cm.Type)throw new InvalidOperationException("The property declaration's property type was null");
+}var ie=expr as CodeIndexerExpression;if(null!=ie){var t=GetTypeOfExpression(ie.TargetObject,scope); if(0==t.ArrayRank&&0==string.Compare("System.String",
+t.BaseType))return new CodeTypeReference(typeof(char));var types=new CodeTypeReference[ie.Indices.Count];for(var i=0;i<types.Length;++i){var p=ie.Indices[i];
+var de=p as CodeDirectionExpression;if(null!=de)p=de.Expression;types[i]=GetTypeOfExpression(p,scope);if(IsNullOrVoidType(types[i]))throw new InvalidOperationException("One or more of the indexer argument types was void");
+}var tt=TryResolveType(t,scope);if(null==tt)throw new InvalidOperationException("The indexer expression's target expression type could not be resolved");
+var binder=new CodeDomBinder(scope);var td=tt as CodeTypeDeclaration;object tm=null;if(null!=td){var grp=binder.GetPropertyGroup(td,"Item",BindingFlags.Public
+|BindingFlags.NonPublic|BindingFlags.Static|BindingFlags.Instance);tm=binder.SelectProperty(BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static
+|BindingFlags.Instance,grp,null,types,null);}else{var rt=tt as Type;if(null!=rt){var grp=binder.GetPropertyGroup(rt,"Item",BindingFlags.Public|BindingFlags.NonPublic
+|BindingFlags.Static|BindingFlags.Instance);tm=binder.SelectProperty(BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static|BindingFlags.Instance,
+grp,null,types,null);}}if(null==tm)throw new InvalidOperationException("The indexer expression's target object type does not have a matching indexer property");
+var pi=tm as PropertyInfo;if(null!=pi)return new CodeTypeReference(pi.PropertyType);var cm=tm as CodeMemberProperty;if(null==cm.Type)throw new InvalidOperationException("The property declaration's property type was null");
 return cm.Type;}throw new InvalidOperationException(string.Format("Unsupported expression type {0}",expr.GetType().Name));}/// <summary>
 /// Attempts to return the type of the specified expression using the specified scope
 /// </summary>
@@ -3127,10 +3135,10 @@ switch(pc.SymbolId){case ST.bitwiseOr:op=CodeBinaryOperatorType.BitwiseOr;break;
 op,rhs);}}static CodeExpression _ParseBitwiseAnd(_PC pc){var lhs=_ParseEquality(pc);while(true){var op=default(CodeBinaryOperatorType);_SkipComments(pc);
 switch(pc.SymbolId){case ST.bitwiseAnd:op=CodeBinaryOperatorType.BitwiseAnd;break;default:return lhs;}pc.Advance();var rhs=_ParseEquality(pc);lhs=new CodeBinaryOperatorExpression(lhs,
 op,rhs);}}static CodeExpression _ParseEquality(_PC pc){var lhs=_ParseRelational(pc);while(true){var op=true;_SkipComments(pc);switch(pc.SymbolId){case
- ST.eqEq:op=true;break;case ST.notEq:op=false;break;default:return lhs;}pc.Advance();var rhs=_ParseRelational(pc);lhs=new CodeBinaryOperatorExpression(lhs,
-CodeBinaryOperatorType.ValueEquality,rhs);if(!op) lhs=new CodeBinaryOperatorExpression(new CodePrimitiveExpression(false),CodeBinaryOperatorType.ValueEquality,
-lhs);}}static CodeExpression _ParseRelational(_PC pc){var lhs=_ParseTerm(pc);while(true){var op=default(CodeBinaryOperatorType);_SkipComments(pc);switch
-(pc.SymbolId){case ST.lt:op=CodeBinaryOperatorType.LessThan;break;case ST.gt:op=CodeBinaryOperatorType.GreaterThan;break;case ST.lte:op=CodeBinaryOperatorType.LessThanOrEqual;
+ ST.eqEq:op=true;break;case ST.notEq:op=false;break;default:return lhs;}pc.Advance();var rhs=_ParseRelational(pc);if(op)lhs=new CodeBinaryOperatorExpression(lhs,
+CodeBinaryOperatorType.IdentityEquality,rhs);else lhs=new CodeBinaryOperatorExpression(lhs,CodeBinaryOperatorType.IdentityInequality,rhs); lhs.UserData.Add("slang:unresolved",true);
+}}static CodeExpression _ParseRelational(_PC pc){var lhs=_ParseTerm(pc);while(true){var op=default(CodeBinaryOperatorType);_SkipComments(pc);switch(pc.SymbolId)
+{case ST.lt:op=CodeBinaryOperatorType.LessThan;break;case ST.gt:op=CodeBinaryOperatorType.GreaterThan;break;case ST.lte:op=CodeBinaryOperatorType.LessThanOrEqual;
 break;case ST.gte:op=CodeBinaryOperatorType.GreaterThanOrEqual;break;default:return lhs;}pc.Advance();var rhs=_ParseTerm(pc);lhs=new CodeBinaryOperatorExpression(lhs,
 op,rhs);}}static CodeCastExpression _ParseCast(_PC pc){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated cast or subexpression.",pc.Current);
 var ctr=_ParseTypeRef(pc);_SkipComments(pc);if(ST.rparen!=pc.SymbolId)_Error("Unterminated cast or subexpression.",pc.Current);pc.Advance();var expr=_ParseExpression(pc);
@@ -3469,52 +3477,52 @@ dirs){for(int ic=dirs.Count,i=0;i<ic;++i){var dir=dirs[i];var l=dir as CodeLineP
 }var d=dir as CodeDirective;if(null!=d){stmt.StartDirectives.Add(d);dirs.RemoveAt(i);--i;--ic;}}}static void _AddEndDirs(CodeStatement stmt,IList<object>
 dirs){for(int ic=dirs.Count,i=0;i<ic;++i){var dir=dirs[i];var d=dir as CodeDirective;if(null!=d){stmt.EndDirectives.Add(d);dirs.RemoveAt(i);--i;--ic;}
 }}static CodeStatement _ParseStatement(_PC pc,bool includeComments=false){var dirs=_ParseDirectives(pc);if(includeComments&&(ST.lineComment==pc.SymbolId
-||ST.blockComment==pc.SymbolId)){var c=_ParseCommentStatement(pc);_AddStartDirs(c,dirs);dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(c,dirs);}
-_SkipComments(pc);dirs.AddRange(_ParseDirectives(pc));var pc2=pc.GetLookAhead();pc2.EnsureStarted();CodeVariableDeclarationStatement vs=null;try{vs=_ParseVariableDeclaration(pc2);
-}catch{vs=null;}if(null!=vs){ _ParseVariableDeclaration(pc);_AddStartDirs(vs,dirs);_SkipComments(pc);dirs.AddRange(_ParseDirectives(pc,true));return vs;
-}pc2=pc.GetLookAhead();pc2.EnsureStarted();CodeExpression e;try{_ParseDirectives(pc2,false);_SkipComments(pc);e=_ParseExpression(pc2);}catch{e=null;}if
-(null!=e){_SkipComments(pc2);if(ST.semi==pc2.SymbolId){pc2.Advance();_ParseExpression(pc);_SkipComments(pc);pc.Advance(); CodeStatement r=null;var bo=
-e as CodeBinaryOperatorExpression;if(null!=bo&&CodeBinaryOperatorType.Assign==bo.Operator)r=new CodeAssignStatement(bo.Left,bo.Right);else r=new CodeExpressionStatement(e);
-_AddStartDirs(r,dirs);dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(r,dirs);return r;}else if(ST.addAssign==pc2.SymbolId||ST.subAssign==pc2.SymbolId)
-{bool isAttach=ST.addAssign==pc2.SymbolId;_ParseExpression(pc);_SkipComments(pc);pc.Advance();pc2.Advance();_SkipComments(pc);var le=_ParseExpression(pc);
-_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated statement. Expecting ;",pc.Current);pc.Advance();var v=e as CodeVariableReferenceExpression;CodeEventReferenceExpression
- er=null;if(null!=v){er=new CodeEventReferenceExpression(null,v.VariableName);}else{var f=e as CodeFieldReferenceExpression;if(null!=f)er=new CodeEventReferenceExpression(f.TargetObject,
-f.FieldName);}if(null==er)_Error("The attach/remove target does not refer to a valid event",pc.Current);er.UserData.Add("slang:unresolved",true);var r
-=isAttach?new CodeAttachEventStatement(er,le)as CodeStatement:new CodeRemoveEventStatement(er,le);_AddStartDirs(r,dirs);_ParseDirectives(pc,true);_AddEndDirs(r,
-dirs);return r;}}switch(pc.SymbolId){case ST.keyword:CodeStatement r=null;switch(pc.Value){case"if":r=_ParseIfStatement(pc);break;case"goto":r=_ParseGotoStatement(pc);
-break;case"for":r=_ParseForStatement(pc);break;case"while":r=_ParseWhileStatement(pc);break;case"return":r=_ParseReturnStatement(pc);break;case"throw":
-r=_ParseThrowStatement(pc);break;case"try":r=_ParseTryCatchFinallyStatement(pc);break;case"var":case"bool":case"char":case"string":case"sbyte":case"byte":
-case"short":case"ushort":case"int":case"uint":case"long":case"ulong":case"float":case"double":case"decimal":r=_ParseVariableDeclaration(pc);break;default:
-throw new NotSupportedException(string.Format("The keyword {0} is not supported",pc.Value));}_AddStartDirs(r,dirs);dirs.AddRange(_ParseDirectives(pc,true));
-_AddEndDirs(r,dirs);return r;case ST.identifier: var s=pc.Value;pc2=pc.GetLookAhead();pc2.EnsureStarted();pc2.Advance();if(ST.colon==pc2.SymbolId){ var
- ls=new CodeLabeledStatement(pc.Value);pc.Advance();_SkipComments(pc);if(pc.IsEnded||ST.colon!=pc.SymbolId)_Error("Unterminated label. Expecting :",pc.Current);
-pc.Advance();_AddStartDirs(ls,dirs);dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(ls,dirs);return ls;}throw new NotImplementedException("Not finished");
-default:_Error(string.Format("Unexpected token {0} found statement.",pc.Value),pc.Current);break;}return null;}static CodeCommentStatement _ParseCommentStatement(_PC
- pc){ var s=pc.Value;if(ST.lineComment==pc.SymbolId){pc.Advance();if(s.StartsWith("///"))return new CodeCommentStatement(s.Substring(3).Trim(),true);return
- new CodeCommentStatement(s.Substring(2).Trim());}pc.Advance();return new CodeCommentStatement(s.Substring(2,s.Length-4).Trim());}static CodeTryCatchFinallyStatement
- _ParseTryCatchFinallyStatement(_PC pc){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated try statement",pc.Current);var result=new CodeTryCatchFinallyStatement();
-if(ST.lbrace!=pc.SymbolId)_Error("Unterminated try statement",pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId){result.TryStatements.Add(_ParseStatement(pc,true));
-}if(pc.IsEnded)_Error("Unterminated try statement",pc.Current);pc.Advance();_SkipComments(pc);if(ST.keyword!=pc.SymbolId)_Error("Expecting catch or finally statement",
-pc.Current);while("catch"==pc.Value){pc.Advance();_SkipComments(pc);var cc=new CodeCatchClause();if(ST.lparen==pc.SymbolId){if(!pc.Advance())_Error("Unterminated catch clause",
-pc.Current);cc.CatchExceptionType=_ParseTypeRef(pc);_SkipComments(pc);if(ST.identifier==pc.SymbolId){cc.LocalName=pc.Value;if(!pc.Advance())_Error("Unterminated catch clause",
-pc.Current);_SkipComments(pc);if(ST.rparen!=pc.SymbolId)_Error(string.Format("Unexpected token {0} in catch clause",pc.Value),pc.Current);pc.Advance();
-_SkipComments(pc);}else if(ST.rparen==pc.SymbolId){pc.Advance();_SkipComments(pc);}else _Error(string.Format("Unexpected token {0} in catch clause",pc.Value),
-pc.Current);}else throw new NotSupportedException("You must specify an exception type to catch in each catch clause.");if(ST.lbrace!=pc.SymbolId)_Error("Expecting { in catch clause",
-pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId){cc.Statements.Add(_ParseStatement(pc,true));}if(pc.IsEnded)_Error("Unterminated catch clause",
-pc.Current);pc.Advance();_SkipComments(pc);result.CatchClauses.Add(cc);}if(ST.keyword==pc.SymbolId&&"finally"==pc.Value){pc.Advance();_SkipComments(pc);
-if(ST.lbrace!=pc.SymbolId)_Error("Expecting { in finally clause",pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId)result.FinallyStatements.Add(_ParseStatement(pc,true));
-if(pc.IsEnded)_Error("Unterminated finally clause",pc.Current);pc.Advance();if(0==result.FinallyStatements.Count){ result.FinallyStatements.Add(new CodeSnippetStatement());
-}}return result;}static CodeVariableDeclarationStatement _ParseVariableDeclaration(_PC pc){CodeTypeReference ctr=null;if(!(ST.keyword==pc.SymbolId&&"var"
-==pc.Value))ctr=_ParseTypeRef(pc);else pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated variable declaration statement",pc.Current);if
-(ST.inc==pc.SymbolId)throw new NotSupportedException("Postfix increment is not supported. Consider using prefix increment instead.");if(ST.dec==pc.SymbolId)
-throw new NotSupportedException("Postfix decrement is not supported. Consider using prefix decrement instead.");if(ST.identifier!=pc.SymbolId)_Error("Expecting identifier in variable declaration",pc.Current);
-var result=new CodeVariableDeclarationStatement(ctr,pc.Value);if(null==ctr)result.UserData.Add("slang:unresolved",true);pc.Advance();_SkipComments(pc);
-if(pc.IsEnded)_Error("Unterminated variable declaration statement",pc.Current);if(ST.eq==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated variable declaration initializer",
-pc.Current);result.InitExpression=_ParseExpression(pc);_SkipComments(pc);if(ST.semi!=pc.SymbolId)_Error("Invalid expression in variable declaration initializer",
-pc.Current);pc.Advance();return result;}else if(null==ctr)_Error("Var variable declarations must have an initializer",pc.Current);_SkipComments(pc);if
-(ST.semi!=pc.SymbolId)_Error("Invalid expression in variable declaration initializer",pc.Current);pc.Advance();return result;}static CodeMethodReturnStatement
- _ParseReturnStatement(_PC pc){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated return statement",pc.Current);if(ST.semi==pc.SymbolId)
-{pc.Advance();return new CodeMethodReturnStatement();}var e=_ParseExpression(pc);_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated return statement",
+||ST.blockComment==pc.SymbolId)){var c=_ParseCommentStatement(pc);_AddStartDirs(c,dirs);dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(c,dirs);return
+ c;}_SkipComments(pc);dirs.AddRange(_ParseDirectives(pc));var pc2=pc.GetLookAhead();pc2.EnsureStarted();CodeVariableDeclarationStatement vs=null;try{vs
+=_ParseVariableDeclaration(pc2);}catch{vs=null;}if(null!=vs){ _ParseVariableDeclaration(pc);_AddStartDirs(vs,dirs);_SkipComments(pc);dirs.AddRange(_ParseDirectives(pc,true));
+return vs;}pc2=pc.GetLookAhead();pc2.EnsureStarted();CodeExpression e;try{_ParseDirectives(pc2,false);_SkipComments(pc);e=_ParseExpression(pc2);}catch
+{e=null;}if(null!=e){_SkipComments(pc2);if(ST.semi==pc2.SymbolId){pc2.Advance();_ParseExpression(pc);_SkipComments(pc);pc.Advance(); CodeStatement r=null;
+var bo=e as CodeBinaryOperatorExpression;if(null!=bo&&CodeBinaryOperatorType.Assign==bo.Operator)r=new CodeAssignStatement(bo.Left,bo.Right);else r=new
+ CodeExpressionStatement(e);_AddStartDirs(r,dirs);dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(r,dirs);return r;}else if(ST.addAssign==pc2.SymbolId
+||ST.subAssign==pc2.SymbolId){bool isAttach=ST.addAssign==pc2.SymbolId;_ParseExpression(pc);_SkipComments(pc);pc.Advance();pc2.Advance();_SkipComments(pc);
+var le=_ParseExpression(pc);_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated statement. Expecting ;",pc.Current);pc.Advance();var v=e as CodeVariableReferenceExpression;
+CodeEventReferenceExpression er=null;if(null!=v){er=new CodeEventReferenceExpression(null,v.VariableName);}else{var f=e as CodeFieldReferenceExpression;
+if(null!=f)er=new CodeEventReferenceExpression(f.TargetObject,f.FieldName);}if(null==er)_Error("The attach/remove target does not refer to a valid event",pc.Current);
+er.UserData.Add("slang:unresolved",true);var r=isAttach?new CodeAttachEventStatement(er,le)as CodeStatement:new CodeRemoveEventStatement(er,le);_AddStartDirs(r,
+dirs);_ParseDirectives(pc,true);_AddEndDirs(r,dirs);return r;}}switch(pc.SymbolId){case ST.keyword:CodeStatement r=null;switch(pc.Value){case"if":r=_ParseIfStatement(pc);
+break;case"goto":r=_ParseGotoStatement(pc);break;case"for":r=_ParseForStatement(pc);break;case"while":r=_ParseWhileStatement(pc);break;case"return":r=
+_ParseReturnStatement(pc);break;case"throw":r=_ParseThrowStatement(pc);break;case"try":r=_ParseTryCatchFinallyStatement(pc);break;case"var":case"bool":
+case"char":case"string":case"sbyte":case"byte":case"short":case"ushort":case"int":case"uint":case"long":case"ulong":case"float":case"double":case"decimal":
+r=_ParseVariableDeclaration(pc);break;default:throw new NotSupportedException(string.Format("The keyword {0} is not supported",pc.Value));}_AddStartDirs(r,
+dirs);dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(r,dirs);return r;case ST.identifier: var s=pc.Value;pc2=pc.GetLookAhead();pc2.EnsureStarted();
+pc2.Advance();if(ST.colon==pc2.SymbolId){ var ls=new CodeLabeledStatement(pc.Value);pc.Advance();_SkipComments(pc);if(pc.IsEnded||ST.colon!=pc.SymbolId)
+_Error("Unterminated label. Expecting :",pc.Current);pc.Advance();_AddStartDirs(ls,dirs);dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(ls,dirs);
+return ls;}throw new NotImplementedException("Not finished");default:_Error(string.Format("Unexpected token {0} found statement.",pc.Value),pc.Current);
+break;}return null;}static CodeCommentStatement _ParseCommentStatement(_PC pc){ var s=pc.Value;if(ST.lineComment==pc.SymbolId){pc.Advance();if(s.StartsWith("///"))
+return new CodeCommentStatement(s.Substring(3).Trim(),true);return new CodeCommentStatement(s.Substring(2).Trim());}pc.Advance();return new CodeCommentStatement(s.Substring(2,
+s.Length-4).Trim());}static CodeTryCatchFinallyStatement _ParseTryCatchFinallyStatement(_PC pc){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated try statement",
+pc.Current);var result=new CodeTryCatchFinallyStatement();if(ST.lbrace!=pc.SymbolId)_Error("Unterminated try statement",pc.Current);pc.Advance();while(!pc.IsEnded
+&&ST.rbrace!=pc.SymbolId){result.TryStatements.Add(_ParseStatement(pc,true));}if(pc.IsEnded)_Error("Unterminated try statement",pc.Current);pc.Advance();
+_SkipComments(pc);if(ST.keyword!=pc.SymbolId)_Error("Expecting catch or finally statement",pc.Current);while("catch"==pc.Value){pc.Advance();_SkipComments(pc);
+var cc=new CodeCatchClause();if(ST.lparen==pc.SymbolId){if(!pc.Advance())_Error("Unterminated catch clause",pc.Current);cc.CatchExceptionType=_ParseTypeRef(pc);
+_SkipComments(pc);if(ST.identifier==pc.SymbolId){cc.LocalName=pc.Value;if(!pc.Advance())_Error("Unterminated catch clause",pc.Current);_SkipComments(pc);
+if(ST.rparen!=pc.SymbolId)_Error(string.Format("Unexpected token {0} in catch clause",pc.Value),pc.Current);pc.Advance();_SkipComments(pc);}else if(ST.rparen
+==pc.SymbolId){pc.Advance();_SkipComments(pc);}else _Error(string.Format("Unexpected token {0} in catch clause",pc.Value),pc.Current);}else throw new NotSupportedException("You must specify an exception type to catch in each catch clause.");
+if(ST.lbrace!=pc.SymbolId)_Error("Expecting { in catch clause",pc.Current);pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId){cc.Statements.Add(_ParseStatement(pc,true));
+}if(pc.IsEnded)_Error("Unterminated catch clause",pc.Current);pc.Advance();_SkipComments(pc);result.CatchClauses.Add(cc);}if(ST.keyword==pc.SymbolId&&
+"finally"==pc.Value){pc.Advance();_SkipComments(pc);if(ST.lbrace!=pc.SymbolId)_Error("Expecting { in finally clause",pc.Current);pc.Advance();while(!pc.IsEnded
+&&ST.rbrace!=pc.SymbolId)result.FinallyStatements.Add(_ParseStatement(pc,true));if(pc.IsEnded)_Error("Unterminated finally clause",pc.Current);pc.Advance();
+if(0==result.FinallyStatements.Count){ result.FinallyStatements.Add(new CodeSnippetStatement());}}return result;}static CodeVariableDeclarationStatement
+ _ParseVariableDeclaration(_PC pc){CodeTypeReference ctr=null;if(!(ST.keyword==pc.SymbolId&&"var"==pc.Value))ctr=_ParseTypeRef(pc);else pc.Advance();_SkipComments(pc);
+if(pc.IsEnded)_Error("Unterminated variable declaration statement",pc.Current);if(ST.inc==pc.SymbolId)throw new NotSupportedException("Postfix increment is not supported. Consider using prefix increment instead.");
+if(ST.dec==pc.SymbolId)throw new NotSupportedException("Postfix decrement is not supported. Consider using prefix decrement instead.");if(ST.identifier
+!=pc.SymbolId)_Error("Expecting identifier in variable declaration",pc.Current);var result=new CodeVariableDeclarationStatement(ctr,pc.Value);if(null==
+ctr)result.UserData.Add("slang:unresolved",true);pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated variable declaration statement",pc.Current);
+if(ST.eq==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated variable declaration initializer",pc.Current);result.InitExpression
+=_ParseExpression(pc);_SkipComments(pc);if(ST.semi!=pc.SymbolId)_Error("Invalid expression in variable declaration initializer",pc.Current);pc.Advance();
+return result;}else if(null==ctr)_Error("Var variable declarations must have an initializer",pc.Current);_SkipComments(pc);if(ST.semi!=pc.SymbolId)_Error("Invalid expression in variable declaration initializer",
+pc.Current);pc.Advance();return result;}static CodeMethodReturnStatement _ParseReturnStatement(_PC pc){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated return statement",
+pc.Current);if(ST.semi==pc.SymbolId){pc.Advance();return new CodeMethodReturnStatement();}var e=_ParseExpression(pc);_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated return statement",
 pc.Current);if(ST.semi!=pc.SymbolId)_Error("Invalid expression in return statement",pc.Current);pc.Advance();return new CodeMethodReturnStatement(e);}
 static CodeThrowExceptionStatement _ParseThrowStatement(_PC pc){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated throw statement",pc.Current);
 if(ST.semi==pc.SymbolId){pc.Advance();return new CodeThrowExceptionStatement();}var e=_ParseExpression(pc);_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated throw statement",
@@ -3599,42 +3607,43 @@ if(ST.comma!=pc.SymbolId)break;pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Err
 pc.Current);pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated generic type parameter specification",pc.Current);}if(ST.colon==pc.SymbolId)
 {pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated type declaration",pc.Current);if(ST.lbrace==pc.SymbolId||(ST.identifier==pc.SymbolId
 &&"where"==pc.Value))_Error("Empty base type specifiers",pc.Current);while(!pc.IsEnded&&!(ST.lbrace==pc.SymbolId||(ST.identifier==pc.SymbolId&&"where"
-==pc.Value))){result.BaseTypes.Add(_ParseTypeRef(pc));_SkipComments(pc);}_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated type declaration",pc.Current);
-}if(ST.identifier==pc.SymbolId&&"where"==pc.Value){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated type constraint",pc.Current);var moved
-=false;while(!pc.IsEnded&&ST.lbrace!=pc.SymbolId){moved=true;if(ST.identifier!=pc.SymbolId)_Error("Expecting identifier in type constraint",pc.Current);
-var cp=_LookupTypeParameter(result.TypeParameters,pc.Value,pc);pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated type constraint",pc.Current);
-if(ST.colon!=pc.SymbolId)_Error("Expecting : in type constraint",pc.Current);pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated type constraint",
-pc.Current);cp.Constraints.Add(_ParseTypeRef(pc));_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated type declaration",pc.Current);if(ST.comma==pc.SymbolId)
-{pc.Advance();_SkipComments(pc);if(ST.lbrace==pc.SymbolId)_Error("Unterminated type constraint",pc.Current);}}if(!moved)_Error("Unterminated type constraint",
-pc.Current);}if(ST.lbrace!=pc.SymbolId)_Error("Expecting { in type definition",pc.Current);pc.Advance();if(pc.IsEnded)_Error("Unterminated type declaration",
-pc.Current);while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId){result.Members.Add(_ParseMember(pc,result.Name));}if(pc.IsEnded)_Error("Unterminated type declaration",
-pc.Current);if(ST.rbrace!=pc.SymbolId)_Error("Illegal member declaration in type",pc.Current);pc.Advance();_SkipComments(pc);dirs.AddRange(_ParseDirectives(pc,
-true));_AddEndDirs(result,dirs);return result;}static CodeTypeParameter _LookupTypeParameter(CodeTypeParameterCollection parms,string name,_PC pc){foreach
-(CodeTypeParameter tp in parms)if(tp.Name==name)return tp;_Error("Undeclared type parameter",pc.Current);return null;}static CodeTypeDeclaration _ParseEnum(_PC
- pc,CodeTypeDeclaration result){var bt=new CodeTypeReference(typeof(int));if(ST.colon==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated enum declaration",
-pc.Current);bt=_ParseTypeRef(pc);result.BaseTypes.Add(bt);_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated enum declaration",pc.Current);}if(ST.lbrace
-!=pc.SymbolId)_Error("Expecting enum body",pc.Current);pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated enum declaration",pc.Current);
-while(ST.rbrace!=pc.SymbolId){_SkipComments(pc);result.Members.Add(_ParseEnumField(pc,bt));}if(ST.rbrace!=pc.SymbolId)_Error("Unterminated enum declaration",
-pc.Current);pc.Advance();return result;}static CodeMemberField _ParseEnumField(_PC pc,CodeTypeReference enumType){_SkipComments(pc);if(pc.IsEnded)_Error("Expecting enum field declaration",
-pc.Current);IList<KeyValuePair<string,CodeAttributeDeclaration>>custAttrs=null;if(ST.lbracket==pc.SymbolId)custAttrs=_ParseCustomAttributes(pc);_SkipComments(pc);
-if(pc.IsEnded||ST.identifier!=pc.SymbolId)_Error("Expecting enum field declaration",pc.Current);var result=new CodeMemberField();result.Name=pc.Value;
-_AddCustomAttributes(custAttrs,null,result.CustomAttributes);_AddCustomAttributes(custAttrs,"field",result.CustomAttributes);if(null!=custAttrs&&custAttrs.Count
->result.CustomAttributes.Count)_Error("Invalid custom attribute targets",pc.Current);pc.Advance();_SkipComments(pc);if(pc.IsEnded||(ST.eq!=pc.SymbolId
-&&ST.comma!=pc.SymbolId&&ST.rbrace!=pc.SymbolId))_Error("Expecting enum field value, }, or ,",pc.Current);if(ST.eq==pc.SymbolId){pc.Advance();_SkipComments(pc);
-if(pc.IsEnded)_Error("Expecting enum field value",pc.Current);result.InitExpression=_ParseExpression(pc);_SkipComments(pc);if(pc.IsEnded)_Error("Expecting , or } in enum declaration",
-pc.Current);}if(ST.comma==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Expecting enum field value",pc.Current);}return result;}static
- TypeAttributes _BuildTopLevelTypeAttributes(ICollection<string>attrs,_PC pc){var result=(TypeAttributes)0;foreach(var attr in attrs){switch(attr){case
-"public":result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.Public;break;case"internal":result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NotPublic;
-break;case"abstract":result|=TypeAttributes.Abstract;break;case"private":_Error("Top level types cannot be private",pc.Current);break;case"protected":
-_Error("Top level types cannot be protected",pc.Current);break;}}return result;}static TypeAttributes _BuildNestedTypeAttributes(ICollection<string>attrs)
-{ var result=TypeAttributes.NestedFamORAssem;foreach(var attr in attrs){switch(attr){case"protected":if(attrs.Contains("internal"))result=(result&~TypeAttributes.VisibilityMask)
-|TypeAttributes.NestedFamORAssem|TypeAttributes.NotPublic;else result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedFamily|TypeAttributes.NotPublic;
-break;case"internal":if(attrs.Contains("protected"))result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedFamORAssem|TypeAttributes.NotPublic;
-else result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedFamANDAssem|TypeAttributes.NotPublic;break;case"public":result=(result&~TypeAttributes.VisibilityMask)
-|TypeAttributes.NestedPublic;break;case"private":result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedPrivate|TypeAttributes.NotPublic;
-break;}}return result;}static HashSet<string>_ParseTypeAttributes(_PC pc){var result=new HashSet<string>();_SkipComments(pc);var more=true;while(more&&
-!pc.IsEnded&&ST.keyword==pc.SymbolId){switch(pc.Value){case"static":case"abstract":case"protected":case"internal":case"public":case"private":result.Add(pc.Value);
-pc.Advance();_SkipComments(pc);break;default:more=false;break;}}return result;}}}namespace CD{using ST=SlangTokenizer;partial class SlangParser{/// <summary>
+==pc.Value))){result.BaseTypes.Add(_ParseTypeRef(pc));_SkipComments(pc);if(ST.comma==pc.SymbolId){pc.Advance();if(pc.IsEnded)_Error("Expecting type",pc.Current);
+}}_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated type declaration",pc.Current);}if(ST.identifier==pc.SymbolId&&"where"==pc.Value){pc.Advance();_SkipComments(pc);
+if(pc.IsEnded)_Error("Unterminated type constraint",pc.Current);var moved=false;while(!pc.IsEnded&&ST.lbrace!=pc.SymbolId){moved=true;if(ST.identifier
+!=pc.SymbolId)_Error("Expecting identifier in type constraint",pc.Current);var cp=_LookupTypeParameter(result.TypeParameters,pc.Value,pc);pc.Advance();
+_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated type constraint",pc.Current);if(ST.colon!=pc.SymbolId)_Error("Expecting : in type constraint",pc.Current);
+pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated type constraint",pc.Current);cp.Constraints.Add(_ParseTypeRef(pc));_SkipComments(pc);
+if(pc.IsEnded)_Error("Unterminated type declaration",pc.Current);if(ST.comma==pc.SymbolId){pc.Advance();_SkipComments(pc);if(ST.lbrace==pc.SymbolId)_Error("Unterminated type constraint",
+pc.Current);}}if(!moved)_Error("Unterminated type constraint",pc.Current);}if(ST.lbrace!=pc.SymbolId)_Error("Expecting { in type definition",pc.Current);
+pc.Advance();if(pc.IsEnded)_Error("Unterminated type declaration",pc.Current);while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId){result.Members.Add(_ParseMember(pc,
+result.Name));}if(pc.IsEnded)_Error("Unterminated type declaration",pc.Current);if(ST.rbrace!=pc.SymbolId)_Error("Illegal member declaration in type",
+pc.Current);pc.Advance();_SkipComments(pc);dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(result,dirs);return result;}static CodeTypeParameter _LookupTypeParameter(CodeTypeParameterCollection
+ parms,string name,_PC pc){foreach(CodeTypeParameter tp in parms)if(tp.Name==name)return tp;_Error("Undeclared type parameter",pc.Current);return null;
+}static CodeTypeDeclaration _ParseEnum(_PC pc,CodeTypeDeclaration result){var bt=new CodeTypeReference(typeof(int));if(ST.colon==pc.SymbolId){pc.Advance();
+_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated enum declaration",pc.Current);bt=_ParseTypeRef(pc);result.BaseTypes.Add(bt);_SkipComments(pc);if(pc.IsEnded)
+_Error("Unterminated enum declaration",pc.Current);}if(ST.lbrace!=pc.SymbolId)_Error("Expecting enum body",pc.Current);pc.Advance();_SkipComments(pc);
+if(pc.IsEnded)_Error("Unterminated enum declaration",pc.Current);while(ST.rbrace!=pc.SymbolId){_SkipComments(pc);result.Members.Add(_ParseEnumField(pc,
+bt));}if(ST.rbrace!=pc.SymbolId)_Error("Unterminated enum declaration",pc.Current);pc.Advance();return result;}static CodeMemberField _ParseEnumField(_PC
+ pc,CodeTypeReference enumType){_SkipComments(pc);if(pc.IsEnded)_Error("Expecting enum field declaration",pc.Current);IList<KeyValuePair<string,CodeAttributeDeclaration>>
+custAttrs=null;if(ST.lbracket==pc.SymbolId)custAttrs=_ParseCustomAttributes(pc);_SkipComments(pc);if(pc.IsEnded||ST.identifier!=pc.SymbolId)_Error("Expecting enum field declaration",
+pc.Current);var result=new CodeMemberField();result.Name=pc.Value;_AddCustomAttributes(custAttrs,null,result.CustomAttributes);_AddCustomAttributes(custAttrs,
+"field",result.CustomAttributes);if(null!=custAttrs&&custAttrs.Count>result.CustomAttributes.Count)_Error("Invalid custom attribute targets",pc.Current);
+pc.Advance();_SkipComments(pc);if(pc.IsEnded||(ST.eq!=pc.SymbolId&&ST.comma!=pc.SymbolId&&ST.rbrace!=pc.SymbolId))_Error("Expecting enum field value, }, or ,",
+pc.Current);if(ST.eq==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Expecting enum field value",pc.Current);result.InitExpression=
+_ParseExpression(pc);_SkipComments(pc);if(pc.IsEnded)_Error("Expecting , or } in enum declaration",pc.Current);}if(ST.comma==pc.SymbolId){pc.Advance();
+_SkipComments(pc);if(pc.IsEnded)_Error("Expecting enum field value",pc.Current);}return result;}static TypeAttributes _BuildTopLevelTypeAttributes(ICollection<string>
+attrs,_PC pc){var result=(TypeAttributes)0;foreach(var attr in attrs){switch(attr){case"public":result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.Public;
+break;case"internal":result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NotPublic;break;case"abstract":result|=TypeAttributes.Abstract;break;
+case"private":_Error("Top level types cannot be private",pc.Current);break;case"protected":_Error("Top level types cannot be protected",pc.Current);break;
+}}return result;}static TypeAttributes _BuildNestedTypeAttributes(ICollection<string>attrs){ var result=TypeAttributes.NestedFamORAssem;foreach(var attr
+ in attrs){switch(attr){case"protected":if(attrs.Contains("internal"))result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedFamORAssem|TypeAttributes.NotPublic;
+else result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedFamily|TypeAttributes.NotPublic;break;case"internal":if(attrs.Contains("protected"))
+result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedFamORAssem|TypeAttributes.NotPublic;else result=(result&~TypeAttributes.VisibilityMask)
+|TypeAttributes.NestedFamANDAssem|TypeAttributes.NotPublic;break;case"public":result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedPublic;
+break;case"private":result=(result&~TypeAttributes.VisibilityMask)|TypeAttributes.NestedPrivate|TypeAttributes.NotPublic;break;}}return result;}static
+ HashSet<string>_ParseTypeAttributes(_PC pc){var result=new HashSet<string>();_SkipComments(pc);var more=true;while(more&&!pc.IsEnded&&ST.keyword==pc.SymbolId)
+{switch(pc.Value){case"static":case"abstract":case"protected":case"internal":case"public":case"private":result.Add(pc.Value);pc.Advance();_SkipComments(pc);
+break;default:more=false;break;}}return result;}}}namespace CD{using ST=SlangTokenizer;partial class SlangParser{/// <summary>
 /// Reads a <see cref="CodeTypeReference"/> from the specified <see cref="TextReader"/>
 /// </summary>
 /// <param name="reader">The reader to read from</param>
@@ -3699,11 +3708,12 @@ resolver.Refresh();restart:var working=-1;var oworking=0;while(0!=working&&owork
 {CodeDomVisitor.Visit(resolver.CompileUnits[i],(ctx)=>{var co=ctx.Target as CodeObject;if(null!=co&&co.UserData.Contains("slang:unresolved")){++working;
 _Patch(ctx.Target as CodeFieldReferenceExpression,ctx,resolver);_Patch(ctx.Target as CodeVariableDeclarationStatement,ctx,resolver);_Patch(ctx.Target as
  CodeVariableReferenceExpression,ctx,resolver);_Patch(ctx.Target as CodeDelegateInvokeExpression,ctx,resolver);_Patch(ctx.Target as CodeObjectCreateExpression,
-ctx,resolver);_Patch(ctx.Target as CodeIndexerExpression,ctx,resolver);_Patch(ctx.Target as CodeMemberMethod,ctx,resolver);_Patch(ctx.Target as CodeMemberProperty,
-ctx,resolver);_Patch(ctx.Target as CodeTypeReference,ctx,resolver);}});}resolver.Refresh();}oworking=working;working=0;if(0<oworking){ for(int ic=resolver.CompileUnits.Count,
-i=0;i<ic;++i){CodeDomVisitor.Visit(resolver.CompileUnits[i],(ctx)=>{var co=ctx.Target as CodeObject;if(null!=co&&co.UserData.Contains("slang:unresolved"))
-{++working;_Patch(ctx.Target as CodeFieldReferenceExpression,ctx,resolver);_Patch(ctx.Target as CodeVariableDeclarationStatement,ctx,resolver);_Patch(ctx.Target
- as CodeVariableReferenceExpression,ctx,resolver);_Patch(ctx.Target as CodeDelegateInvokeExpression,ctx,resolver);_Patch(ctx.Target as CodeObjectCreateExpression,
+ctx,resolver);_Patch(ctx.Target as CodeBinaryOperatorExpression,ctx,resolver);_Patch(ctx.Target as CodeIndexerExpression,ctx,resolver);_Patch(ctx.Target
+ as CodeMemberMethod,ctx,resolver);_Patch(ctx.Target as CodeMemberProperty,ctx,resolver);_Patch(ctx.Target as CodeTypeReference,ctx,resolver);}});}resolver.Refresh();
+}oworking=working;working=0;if(0<oworking){ for(int ic=resolver.CompileUnits.Count,i=0;i<ic;++i){CodeDomVisitor.Visit(resolver.CompileUnits[i],(ctx)=>
+{var co=ctx.Target as CodeObject;if(null!=co&&co.UserData.Contains("slang:unresolved")){++working;_Patch(ctx.Target as CodeFieldReferenceExpression,ctx,
+resolver);_Patch(ctx.Target as CodeVariableDeclarationStatement,ctx,resolver);_Patch(ctx.Target as CodeVariableReferenceExpression,ctx,resolver);_Patch(ctx.Target
+ as CodeDelegateInvokeExpression,ctx,resolver);_Patch(ctx.Target as CodeObjectCreateExpression,ctx,resolver);_Patch(ctx.Target as CodeBinaryOperatorExpression,
 ctx,resolver);_Patch(ctx.Target as CodeIndexerExpression,ctx,resolver);_Patch(ctx.Target as CodeMemberMethod,ctx,resolver);_Patch(ctx.Target as CodeMemberProperty,
 ctx,resolver);_Patch(ctx.Target as CodeTypeReference,ctx,resolver);}});}if(oworking!=working)goto restart;}}/// <summary>
 /// Gets the next element that has not been resolved
@@ -3722,13 +3732,28 @@ public static CodeObject GetNextUnresolvedElement(IEnumerable<CodeCompileUnit>co
 {tr.UserData.Remove("slang:unresolved");return;} throw new NotImplementedException();}}static void _Patch(CodeObjectCreateExpression oc,CodeDomVisitContext
  ctx,CodeDomResolver res){if(null!=oc){oc.UserData.Remove("slang:unresolved");if(1==oc.Parameters.Count){if(_IsDelegate(oc.Parameters[0],res)){var del
 =_GetDelegateFromFields(oc,oc.Parameters[0],res);CodeDomVisitor.ReplaceTarget(ctx,del);}}}}static void _Patch(CodeMemberProperty prop,CodeDomVisitContext
- ctx,CodeDomResolver resolver){if(null!=prop){ prop.UserData.Remove("slang:unresolved");}}static void _Patch(CodeMemberMethod meth,CodeDomVisitContext
- ctx,CodeDomResolver resolver){if(null!=meth){ meth.UserData.Remove("slang:unresolved");if("Main"==meth.Name&&(meth.Attributes&MemberAttributes.ScopeMask)
+ ctx,CodeDomResolver resolver){if(null!=prop){ if(null==prop.PrivateImplementationType){if(prop.Name=="Current")System.Diagnostics.Debugger.Break();var
+ scope=resolver.GetScope(prop);var td=scope.DeclaringType;var binder=new CodeDomBinder(scope);for(int ic=td.BaseTypes.Count,i=0;i<ic;++i){var ctr=td.BaseTypes[i];
+var t=resolver.TryResolveType(ctr,scope);if(null!=t){var ma=binder.GetPropertyGroup(t,prop.Name,BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly);
+if(0<ma.Length){var p=binder.SelectProperty(BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly,ma,null,_GetParameterTypes(prop.Parameters),
+null);if(null!=p)prop.ImplementationTypes.Add(ctr);}}}}prop.UserData.Remove("slang:unresolved");}}static void _Patch(CodeBinaryOperatorExpression op,CodeDomVisitContext
+ ctx,CodeDomResolver resolver){if(null!=op){var scope=resolver.GetScope(op);if(CodeBinaryOperatorType.IdentityEquality==op.Operator){if(_HasUnresolved(op.Left))
+return;var tr1=resolver.GetTypeOfExpression(op.Left);if(resolver.IsValueType(tr1)){if(_HasUnresolved(op.Right))return;var tr2=resolver.GetTypeOfExpression(op.Right);
+if(resolver.IsValueType(tr2)){op.Operator=CodeBinaryOperatorType.ValueEquality;}}op.UserData.Remove("slang:unresolved");}else if(CodeBinaryOperatorType.IdentityInequality==op.Operator)
+{if(_HasUnresolved(op.Left))return;var tr1=resolver.GetTypeOfExpression(op.Left);if(resolver.IsValueType(tr1)){if(_HasUnresolved(op.Right))return;var tr2
+=resolver.GetTypeOfExpression(op.Right);if(resolver.IsValueType(tr2)){ op.Operator=CodeBinaryOperatorType.ValueEquality;var newOp=new CodeBinaryOperatorExpression(new
+ CodePrimitiveExpression(false),CodeBinaryOperatorType.ValueEquality,op);CodeDomVisitor.ReplaceTarget(ctx,newOp);}}op.UserData.Remove("slang:unresolved");
+}}}static void _Patch(CodeMemberMethod meth,CodeDomVisitContext ctx,CodeDomResolver resolver){if(null!=meth){ if(null==meth.PrivateImplementationType)
+{var scope=resolver.GetScope(meth);var td=scope.DeclaringType;var binder=new CodeDomBinder(scope);for(int ic=td.BaseTypes.Count,i=0;i<ic;++i){var ctr=
+td.BaseTypes[i];var t=resolver.TryResolveType(ctr,scope);if(null!=t){var ma=binder.GetMethodGroup(t,meth.Name,BindingFlags.Instance|BindingFlags.Public
+|BindingFlags.DeclaredOnly);if(0<ma.Length){var m=binder.SelectMethod(BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly,ma,_GetParameterTypes(meth.Parameters),
+null);if(null!=m)meth.ImplementationTypes.Add(ctr);}}}}meth.UserData.Remove("slang:unresolved");if("Main"==meth.Name&&(meth.Attributes&MemberAttributes.ScopeMask)
 ==MemberAttributes.Static){if(0==meth.Parameters.Count&&null==meth.ReturnType||"System.Void"==meth.ReturnType.BaseType){var epm=new CodeEntryPointMethod();
 epm.Attributes=meth.Attributes;epm.LinePragma=meth.LinePragma;epm.StartDirectives.AddRange(meth.StartDirectives);epm.EndDirectives.AddRange(meth.EndDirectives);
 epm.Comments.AddRange(meth.Comments);epm.CustomAttributes.AddRange(meth.CustomAttributes);epm.ReturnTypeCustomAttributes.AddRange(meth.ReturnTypeCustomAttributes);
 epm.TypeParameters.AddRange(meth.TypeParameters);epm.PrivateImplementationType=meth.PrivateImplementationType;epm.ImplementationTypes.AddRange(meth.ImplementationTypes);
-epm.Name=meth.Name;epm.Statements.AddRange(meth.Statements);CodeDomVisitor.ReplaceTarget(ctx,epm);}}}}static void _Patch(CodeVariableReferenceExpression
+epm.Name=meth.Name;epm.Statements.AddRange(meth.Statements);CodeDomVisitor.ReplaceTarget(ctx,epm);}}}}static CodeTypeReference[]_GetParameterTypes(CodeParameterDeclarationExpressionCollection
+ parms){var result=new CodeTypeReference[parms.Count];for(var i=0;i<result.Length;i++)result[i]=parms[i].Type;return result;}static void _Patch(CodeVariableReferenceExpression
  vr,CodeDomVisitContext ctx,CodeDomResolver resolver){if(null!=vr){if(vr.VariableName=="done")System.Diagnostics.Debug.WriteLine("done var ref hit");var
  scope=resolver.GetScope(vr);CodeTypeReference ctr;if(scope.VariableTypes.TryGetValue(vr.VariableName,out ctr)){if(!CodeDomResolver.IsNullOrVoidType(ctr))
 {if(vr.VariableName=="done")System.Diagnostics.Debug.WriteLine("done var resolved to var");vr.UserData.Remove("slang:unresolved");return;}} if(scope.ArgumentTypes.ContainsKey(vr.VariableName))
