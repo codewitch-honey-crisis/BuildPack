@@ -214,6 +214,37 @@ Namespace ParsleyDemo
             context.EnsureStarted
             Return ExpressionParser._ParseExpression(context)
         End Function
+        Public Shared Function ParseTerm(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
+            Dim context As ParserContext = New ParserContext(tokenizer)
+            context.EnsureStarted
+            Return ExpressionParser._ParseTerm(context)
+        End Function
+        Public Shared Function ParseFactor(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
+            Dim context As ParserContext = New ParserContext(tokenizer)
+            context.EnsureStarted
+            Return ExpressionParser._ParseFactor(context)
+        End Function
+        Public Shared Function ParseUnary(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
+            Dim context As ParserContext = New ParserContext(tokenizer)
+            context.EnsureStarted
+            Return ExpressionParser._ParseUnary(context)
+        End Function
+        Public Shared Function ParseLeaf(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
+            Dim context As ParserContext = New ParserContext(tokenizer)
+            context.EnsureStarted
+            Return ExpressionParser._ParseLeaf(context)
+        End Function
+        Public Shared Function Parse(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
+            Dim context As ParserContext = New ParserContext(tokenizer)
+            context.EnsureStarted
+            Return ExpressionParser._ParseExpression(context)
+        End Function
+        Public Overloads Shared Function Evaluate(ByVal node As ParseNode) As Integer
+            Return ExpressionParser.EvaluateExpression(node)
+        End Function
+        Public Overloads Shared Function Evaluate(ByVal node As ParseNode, ByVal state As Object) As Integer
+            Return ExpressionParser.EvaluateExpression(node, state)
+        End Function
         Public Overloads Shared Function EvaluateExpression(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Expression = node.SymbolId) Then
                 Return CType(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateTerm(node.Children(0), state), GetType(Integer)),Integer)
@@ -223,7 +254,7 @@ Namespace ParsleyDemo
         Public Overloads Shared Function EvaluateExpression(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateExpression(node, Nothing)
         End Function
-        Friend Overloads Shared Function EvaluateTerm(ByVal node As ParseNode, ByVal state As Object) As Object
+        Public Overloads Shared Function EvaluateTerm(ByVal node As ParseNode, ByVal state As Object) As Object
             If (ExpressionParser.Term = node.SymbolId) Then
                 If (1 = node.Children.Length) Then
                     Return CType(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0), state), GetType(Object)),Object)
@@ -237,10 +268,10 @@ Namespace ParsleyDemo
             End If
             Throw New SyntaxException("Expecting Term", node.Line, node.Column, node.Position)
         End Function
-        Friend Overloads Shared Function EvaluateTerm(ByVal node As ParseNode) As Object
+        Public Overloads Shared Function EvaluateTerm(ByVal node As ParseNode) As Object
             Return ExpressionParser.EvaluateTerm(node, Nothing)
         End Function
-        Friend Overloads Shared Function EvaluateFactor(ByVal node As ParseNode, ByVal state As Object) As Integer
+        Public Overloads Shared Function EvaluateFactor(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Factor = node.SymbolId) Then
                 If (1 = node.Children.Length) Then
                     Return CType(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(0), state), GetType(Integer)),Integer)
@@ -254,10 +285,10 @@ Namespace ParsleyDemo
             End If
             Throw New SyntaxException("Expecting Factor", node.Line, node.Column, node.Position)
         End Function
-        Friend Overloads Shared Function EvaluateFactor(ByVal node As ParseNode) As Integer
+        Public Overloads Shared Function EvaluateFactor(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateFactor(node, Nothing)
         End Function
-        Friend Overloads Shared Function EvaluateUnary(ByVal node As ParseNode, ByVal state As Object) As Integer
+        Public Overloads Shared Function EvaluateUnary(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Unary = node.SymbolId) Then
                 If (1 = node.Children.Length) Then
                     Return CType(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateLeaf(node.Children(0), state), GetType(Integer)),Integer)
@@ -271,10 +302,10 @@ Namespace ParsleyDemo
             End If
             Throw New SyntaxException("Expecting Unary", node.Line, node.Column, node.Position)
         End Function
-        Friend Overloads Shared Function EvaluateUnary(ByVal node As ParseNode) As Integer
+        Public Overloads Shared Function EvaluateUnary(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateUnary(node, Nothing)
         End Function
-        Friend Overloads Shared Function EvaluateLeaf(ByVal node As ParseNode, ByVal state As Object) As Integer
+        Public Overloads Shared Function EvaluateLeaf(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Leaf = node.SymbolId) Then
                 Dim n As ParseNode = node.Children(0)
                 If (ParsleyDemo.ExpressionParser.identifier = n.SymbolId) Then
@@ -292,7 +323,7 @@ Namespace ParsleyDemo
             End If
             Throw New SyntaxException("Expecting Leaf", node.Line, node.Column, node.Position)
         End Function
-        Friend Overloads Shared Function EvaluateLeaf(ByVal node As ParseNode) As Integer
+        Public Overloads Shared Function EvaluateLeaf(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateLeaf(node, Nothing)
         End Function
         Private Shared Function _ChangeType(ByVal obj As Object, ByVal type As System.Type) As Object

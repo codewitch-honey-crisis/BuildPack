@@ -14,7 +14,7 @@ namespace ParsleyDemo
 			vars["a"] = 1;
 			var exprTokenizer = new ExpressionTokenizer(text);
 			var pt = ExpressionParser.ParseExpression(exprTokenizer);
-			Console.WriteLine("{0} = {1}",text,ExpressionParser.EvaluateExpression(pt,vars));
+			Console.WriteLine("{0} = {1}",text,ExpressionParser.Evaluate(pt,vars));
 			Console.WriteLine();
 			_WriteTree(pt, Console.Out);
 			Console.WriteLine("Press any key...");
@@ -22,7 +22,7 @@ namespace ParsleyDemo
 			using (var sw = File.OpenText(@"..\..\data.json"))
 				text = sw.ReadToEnd();
 			var jsonTokenizer = new JsonTokenizer(text);
-			pt = JsonParser.ParseJson(jsonTokenizer);
+			pt = JsonParser.Parse(jsonTokenizer);
 			_WriteTree(pt, Console.Out);
 			Console.WriteLine("Press any key...");
 			Console.ReadKey();

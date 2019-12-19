@@ -293,6 +293,46 @@ namespace ParsleyDemo {
             context.EnsureStarted();
             return JsonParser._ParseJson(context);
         }
+        public static ParseNode ParseObject(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return JsonParser._ParseObject(context);
+        }
+        public static ParseNode ParseFields(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return JsonParser._ParseFields(context);
+        }
+        public static ParseNode ParseField(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return JsonParser._ParseField(context);
+        }
+        public static ParseNode ParseArray(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return JsonParser._ParseArray(context);
+        }
+        public static ParseNode ParseValues(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return JsonParser._ParseValues(context);
+        }
+        public static ParseNode ParseValue(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return JsonParser._ParseValue(context);
+        }
+        public static ParseNode ParseBoolean(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return JsonParser._ParseBoolean(context);
+        }
+        public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return JsonParser._ParseJson(context);
+        }
     }
     /// <summary>
     /// 
@@ -480,9 +520,6 @@ namespace ParsleyDemo {
         public void Dispose() {
             this._e.Dispose();
             this._state = -3;
-        }
-        void IDisposable.Dispose() {
-            this.Dispose();
         }
     }
 }

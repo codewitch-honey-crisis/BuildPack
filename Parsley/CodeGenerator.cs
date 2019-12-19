@@ -280,26 +280,39 @@ namespace Parsley
 				{
 					if (-1 < pi)
 					{
-						/*
 						var prod = doc.Productions[pi];
 						if (0 != prod.Line)
 						{
-							m.LinePragma = new CodeLinePragma(filename, prod.Line);
+							m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
 						}
-						*/
 					}
 				}
 				parser.Members.Add(m);
 			}
-
-			var ss = cfg.StartSymbol;
+			for(int ic = doc.Productions.Count,i=0;i<ic;++i)
+			{
+				var prod = doc.Productions[i];
+				if (!prod.IsTerminal && !prod.IsCollapsed)
+				{
+					var s = prod.Name;
+					var t = new CodeTypeReference(typeof(IEnumerable<>));
+					t.TypeArguments.Add(C.Type("Token"));
+					var m = C.Method(C.Type("ParseNode"), string.Concat("Parse", s), MemberAttributes.Static | MemberAttributes.Public, C.Param(t, "tokenizer"));
+					m.Statements.Add(C.Var(C.Type("ParserContext"), "context", C.New(C.Type("ParserContext"), C.ArgRef("tokenizer"))));
+					m.Statements.Add(C.Call(C.VarRef("context"), "EnsureStarted"));
+					m.Statements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), string.Concat("_Parse", s), C.VarRef("context"))));
+					parser.Members.Add(m);
+				}
+			}
+			var ss = doc.StartProduction.Name;
 			var et = new CodeTypeReference(typeof(IEnumerable<>));
 			et.TypeArguments.Add(C.Type("Token"));
-			var sm = C.Method(C.Type("ParseNode"), string.Concat("Parse", ss), MemberAttributes.Static | MemberAttributes.Public, C.Param(et, "tokenizer"));
+			var sm = C.Method(C.Type("ParseNode"), "Parse", MemberAttributes.Static | MemberAttributes.Public, C.Param(et, "tokenizer"));
 			sm.Statements.Add(C.Var(C.Type("ParserContext"), "context", C.New(C.Type("ParserContext"), C.ArgRef("tokenizer"))));
 			sm.Statements.Add(C.Call(C.VarRef("context"), "EnsureStarted"));
 			sm.Statements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), string.Concat("_Parse", ss), C.VarRef("context"))));
 			parser.Members.Add(sm);
+
 		}
 		static void _BuildParserEvalFunctions(
 			CodeTypeDeclaration parser,
@@ -339,10 +352,16 @@ namespace Parsley
 					}
 
 					MemberAttributes attrs; 
+					attrs = MemberAttributes.Public| MemberAttributes.Static;
 					if (isStart)
-						attrs = MemberAttributes.Public | MemberAttributes.Static;
-					else
-						attrs = MemberAttributes.FamilyAndAssembly | MemberAttributes.Static;
+					{
+						var ms = C.Method(type, "Evaluate", attrs, C.Param(C.Type("ParseNode"), "node"));
+						ms.Statements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), string.Concat("Evaluate", prod.Name), C.ArgRef("node"))));
+						parser.Members.Add(ms);
+						ms = C.Method(type, "Evaluate", attrs, C.Param(C.Type("ParseNode"), "node"),C.Param(C.Type(typeof(object)),"state"));
+						ms.Statements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), string.Concat("Evaluate", prod.Name), C.ArgRef("node"),C.ArgRef("state"))));
+						parser.Members.Add(ms);
+					}
 					var m = C.Method(type, string.Concat("Evaluate", prod.Name), attrs, C.Param("ParseNode", "node"), C.Param(typeof(object), "state"));
 					var cnst = consts[syms.IndexOf(prod.Name)];
 					var fr = C.FieldRef(C.TypeRef("Parser"), cnst);
@@ -403,6 +422,7 @@ namespace Parsley
 				m.Statements.Add(C.Return(C.Invoke(C.VarRef("typeConverter"), "ConvertTo", C.ArgRef("obj"), C.ArgRef("type"))));
 				parser.Members.Add(m);
 			}
+			
 		}
 
 		private static Dictionary<CfgRule, ICollection<string>> _BuildRuleMap(IDictionary<string, ICollection<string>> follows, HashSet<string> es, string nt, ICollection<(CfgRule Rule, string Symbol)> pred)

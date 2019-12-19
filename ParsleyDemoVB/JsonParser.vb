@@ -296,6 +296,46 @@ Namespace ParsleyDemo
             context.EnsureStarted
             Return JsonParser._ParseJson(context)
         End Function
+        Public Shared Function ParseObject(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
+            Dim context As ParserContext = New ParserContext(tokenizer)
+            context.EnsureStarted
+            Return JsonParser._ParseObject(context)
+        End Function
+        Public Shared Function ParseFields(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
+            Dim context As ParserContext = New ParserContext(tokenizer)
+            context.EnsureStarted
+            Return JsonParser._ParseFields(context)
+        End Function
+        Public Shared Function ParseField(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
+            Dim context As ParserContext = New ParserContext(tokenizer)
+            context.EnsureStarted
+            Return JsonParser._ParseField(context)
+        End Function
+        Public Shared Function ParseArray(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
+            Dim context As ParserContext = New ParserContext(tokenizer)
+            context.EnsureStarted
+            Return JsonParser._ParseArray(context)
+        End Function
+        Public Shared Function ParseValues(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
+            Dim context As ParserContext = New ParserContext(tokenizer)
+            context.EnsureStarted
+            Return JsonParser._ParseValues(context)
+        End Function
+        Public Shared Function ParseValue(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
+            Dim context As ParserContext = New ParserContext(tokenizer)
+            context.EnsureStarted
+            Return JsonParser._ParseValue(context)
+        End Function
+        Public Shared Function ParseBoolean(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
+            Dim context As ParserContext = New ParserContext(tokenizer)
+            context.EnsureStarted
+            Return JsonParser._ParseBoolean(context)
+        End Function
+        Public Shared Function Parse(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
+            Dim context As ParserContext = New ParserContext(tokenizer)
+            context.EnsureStarted
+            Return JsonParser._ParseJson(context)
+        End Function
     End Class
     '''<summary>
     '''
