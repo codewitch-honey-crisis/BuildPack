@@ -275,11 +275,15 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Public Shared Function Parse(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return ExpressionParser._ParseExpression(context)
         End Function
+        
+        #End ExternalSource
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Public Overloads Shared Function Evaluate(ByVal node As ParseNode) As Integer

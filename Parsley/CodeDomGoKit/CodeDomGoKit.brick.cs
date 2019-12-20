@@ -2971,118 +2971,43 @@ case _Ended:return false;case _NotStarted:return _MoveToNextEnum();} if(!_e.Move
  found=false;while(_collections.MoveNext()){var e=_collections.Current.GetEnumerator();if(e.MoveNext()){found=true;if(null!=_e)_e.Dispose();_e=e;break;
 }}if(!found){_state=_Ended;return false;}_state=_Enumerating;return true;}public void Reset(){switch(_state){case _Disposed:throw new ObjectDisposedException(GetType().Name);
 case _NotStarted:return;}_collections.Reset();if(null!=_e)_e.Dispose();}public void Dispose(){_state=_Disposed;if(null!=_e)_e.Dispose();_collections.Dispose();
-}}}namespace CD{partial class IndexedQueue<T>:ICollection<T>{/// <summary>
-/// Indicates the count of items in the queue
-/// </summary>
-public int Count=>_count;bool ICollection<T>.IsReadOnly=>false;void ICollection<T>.Add(T item)=>Enqueue(item);/// <summary>
-/// Clears the items from the queue
-/// </summary>
-public void Clear(){if(0<_count&&null==default(T)){Array.Clear(_array,_head,_array.Length-_head);if(_head+_count>=_array.Length)Array.Clear(_array,0,_head
-+_count%_array.Length);}_head=0;_count=0;unchecked{++_version;}}/// <summary>
-/// Indicates whether the queue contains an item
-/// </summary>
-/// <param name="item">The item to search for</param>
-/// <returns>True if the item was found, otherwise false</returns>
-public bool Contains(T item){for(var i=0;i<_count;++i)if(Equals(_array[(_head+i)%_array.Length],item))return true;return false;}/// <summary>
-/// Copys the queue's items to a destination array
-/// </summary>
-/// <param name="array">The destination array</param>
-/// <param name="arrayIndex">The index in the destination to start copying at</param>
-public void CopyTo(T[]array,int arrayIndex){if(null==array)throw new ArgumentNullException(nameof(array));if(0>arrayIndex||array.Length<arrayIndex+_count)
-throw new ArgumentOutOfRangeException(nameof(arrayIndex)); for(var i=0;i<_count;++i)array[arrayIndex+i]=_array[(_head+i)%_array.Length];}bool ICollection<T>.Remove(T
- item){if(Equals(_array[_head],item)){Dequeue();return true;}else{for(var i=0;i<_count;++i){var idx=(_head+i)%_array.Length;if(Equals(_array[idx],item))
-{if(_head+_count<_array.Length){Array.Copy(_array,idx+1,_array,idx,_count-idx-1);_array[_head+_count-1]=default(T);}else if(idx==_array.Length-1){_array[idx]
-=_array[0];if(_count+_head!=_array.Length){var idx2=(_count+_head)%_array.Length;Array.Copy(_array,1,_array,0,idx2-1);_array[idx2]=default(T);}}else if
-(idx<_head){var idx2=(_count+_head)%_array.Length;Array.Copy(_array,idx+1,_array,idx,idx2-1);_array[idx2]=default(T);}--_count;unchecked{++_version;}return
- true;}}}return false;}}}namespace CD{/// <summary>
-/// Represents a queue with indexed access to the items
-/// </summary>
-/// <typeparam name="T">The type of items in the queue</typeparam>
-partial class IndexedQueue<T>{const int _DefaultCapacity=16;const float _GrowthFactor=2f;const float _TrimThreshold=.9f;T[]_array;int _head;int _count;
-/// <summary>
-/// Creates a queue with the specified capacity
-/// </summary>
-/// <param name="capacity">The initial capacity of the queue</param>
-public IndexedQueue(int capacity){if(0>=capacity)throw new ArgumentOutOfRangeException("The capacity must be greater than zero.",nameof(capacity));_array
-=new T[capacity];_head=0;_count=0;_version=0;}/// <summary>
-/// Gets or sets the value at the index
-/// </summary>
-/// <param name="index">The index</param>
-/// <returns>The value at the specified index</returns>
-public T this[int index]{get{if(0>index||index>=_count)throw new IndexOutOfRangeException();return _array[(index+_head)%_array.Length];}set{if(0>index
-||index>=_count)throw new IndexOutOfRangeException();_array[(index+_head)%_array.Length]=value;++_version;}}/// <summary>
-/// Creates a queue with the default capacity
-/// </summary>
-public IndexedQueue():this(_DefaultCapacity){}/// <summary>
-/// Creates a queue filled with the specified items
-/// </summary>
-/// <param name="collection">The collection of items to fill the queue with</param>
-public IndexedQueue(IEnumerable<T>collection){if(null==collection)throw new ArgumentNullException(nameof(collection));foreach(var item in collection)Enqueue(item);
-}/// <summary>
-/// Provides access to the item at the front of the queue without dequeueing it
-/// </summary>
-/// <returns>The frontmost item</returns>
-public T Peek(){if(0==_count)throw new InvalidOperationException("The queue is empty.");return _array[_head];}/// <summary>
-/// Returns an array of the items in the queue
-/// </summary>
-/// <returns>An array containing the queue's items</returns>
-public T[]ToArray(){var result=new T[_count];CopyTo(result,0);return result;}/// <summary>
-/// Inserts an item at the rear of the queue
-/// </summary>
-/// <param name="item">The item to insert</param>
-public void Enqueue(T item){if(_count==_array.Length){var arr=new T[(int)(_array.Length*_GrowthFactor)];if(_head+_count<=_array.Length){Array.Copy(_array,
-arr,_count);_head=0;arr[_count]=item;++_count;unchecked{++_version;}_array=arr;}else{Array.Copy(_array,_head,arr,0,_array.Length-_head);Array.Copy(_array,
-0,arr,_array.Length-_head,_head);_head=0;arr[_count]=item;++_count;unchecked{++_version;}_array=arr;}}else{_array[(_head+_count)%_array.Length]=item;++_count;
-unchecked{++_version;}}}/// <summary>
-/// Removes an item from the front of the queue, returning it
-/// </summary>
-/// <returns>The item that was removed</returns>
-public T Dequeue(){if(0==_count)throw new InvalidOperationException("The queue is empty");var result=_array[_head]; _array[_head]=default(T);++_head;_head
-=_head%_array.Length;--_count;unchecked{++_version;}return result;}/// <summary>
-/// Trims the extra array space that isn't being used.
-/// </summary>
-public void TrimExcess(){if(0==_count){_array=new T[_DefaultCapacity];}if(_array.Length*_TrimThreshold>=_count){var arr=new T[_count];CopyTo(arr,0);_head
-=0;_array=arr;unchecked{++_version;}}}/// <summary>
-/// Attempts to return an item from the front of the queue without removing it
-/// </summary>
-/// <param name="item">The item</param>
-/// <returns>True if the queue returned an item or false if the queue is empty</returns>
-public bool TryPeek(out T item){if(0!=_count){item=_array[_head];return true;}item=default(T);return false;}/// <summary>
-/// Attempts to return an item from the front of the queue, removing it
-/// </summary>
-/// <param name="item">The item</param>
-/// <returns>True if the queue returned an item or false if the queue is empty</returns>
-public bool TryDequeue(out T item){if(0<_count){item=_array[_head]; _array[_head]=default(T);++_head;_head=_head%_array.Length;--_count;unchecked{++_version;
-}return true;}item=default(T);return false;}}}namespace CD{partial class IndexedQueue<T>:IEnumerable<T>{int _version;public IEnumerator<T>GetEnumerator()
-=>new Enumerator(this); IEnumerator IEnumerable.GetEnumerator()=>GetEnumerator();struct Enumerator:IEnumerator<T>{const int _AfterEnd=-1;const int _BeforeStart
-=-2;const int _Disposed=-3;IndexedQueue<T>_outer;int _index;int _version;public Enumerator(IndexedQueue<T>outer){_outer=outer;_version=outer._version;
-_index=_BeforeStart;}public T Current{get{switch(_index){case _Disposed:throw new ObjectDisposedException(GetType().Name);case _BeforeStart:throw new InvalidOperationException("The cursor is before the start of the enumeration.");
-case _AfterEnd:throw new InvalidOperationException("The cursor is after the end of the enumeration.");}_CheckVersion();return _outer._array[_index%_outer._array.Length];
-}} object IEnumerator.Current=>Current;public bool MoveNext(){switch(_index){case _Disposed:throw new ObjectDisposedException(GetType().Name);case _AfterEnd:
-return false;case _BeforeStart:_CheckVersion();if(0==_outer._count){_index=_AfterEnd;return false;}_index=_outer._head;return true;}_CheckVersion();if
-(++_index>=_outer._count+_outer._head){_index=_AfterEnd;return false;}return true;}public void Reset(){if(-3==_index)throw new ObjectDisposedException(GetType().Name);
-_CheckVersion();_index=_BeforeStart;}public void Dispose(){_index=_Disposed;}void _CheckVersion(){if(_version!=_outer._version)throw new InvalidOperationException("The enumeration has changed and may not execute.");
-}}}}namespace CD{/// <summary>
+}}}namespace CD{/// <summary>
 /// An enumerator that provides lookahead without advancing the cursor
 /// </summary>
 /// <typeparam name="T">The type to enumerate</typeparam>
-class LookAheadEnumerator<T>:IEnumerator<T>{const int _Enumerating=0;const int _FirstRead=1;const int _NotStarted=-2;const int _Ended=-1;const int _Disposed
-=-3;IEnumerator<T>_inner;IndexedQueue<T>_queue;int _state;public LookAheadEnumerator(IEnumerator<T>inner){_inner=inner;_state=_NotStarted;_queue=new IndexedQueue<T>();
+class LookAheadEnumerator<T>:IEnumerator<T>{const int _Enumerating=0;const int _NotStarted=-2;const int _Ended=-1;const int _Disposed=-3;IEnumerator<T>
+_inner;int _state; const int _DefaultCapacity=16;const float _GrowthFactor=.9f;T[]_queue;int _queueHead;int _queueCount;public LookAheadEnumerator(IEnumerator<T>
+inner){_inner=inner;_state=_NotStarted;_queue=new T[_DefaultCapacity];_queueHead=0;_queueCount=0;}public void DiscardLookAhead(){while(1<_queueCount)_Dequeue();
 }public T Current{get{switch(_state){case _NotStarted:throw new InvalidOperationException("The cursor is before the start of the enumeration.");case _Ended:
 throw new InvalidOperationException("The cursor is after the end of the enumeration.");case _Disposed:throw new ObjectDisposedException(GetType().Name);
-}return _queue.Peek();}} object IEnumerator.Current=>Current;public bool TryPeek(int lookahead,out T value){if(_Disposed==_state)throw new ObjectDisposedException(GetType().Name);
-if(0>lookahead)throw new ArgumentOutOfRangeException(nameof(lookahead));if(_Ended==_state){value=default(T);return false;}if(0==lookahead){if(_NotStarted==_state)
-{if(!MoveNext()){value=default(T);return false;}_state=_FirstRead;}value=_queue.Peek();return true;}bool read=false;value=default(T);while(_queue.Count<=lookahead)
-{if(!_inner.MoveNext()){if(0==_queue.Count)_state=_Ended;value=default(T);return false;}value=_inner.Current;_queue.Enqueue(value);read=true;} if(read)
-return true;value=_queue[lookahead];return true;}public T Peek(int lookahead){T value;if(!TryPeek(lookahead,out value))throw new InvalidOperationException("There were not enough values in the enumeration to satisfy the request");
-return value;}public IEnumerable<T>LookAhead{get{T value;var i=1;while(TryPeek(i,out value)){yield return value;++i;}}}public bool MoveNext(){switch(_state)
-{case _Disposed:throw new ObjectDisposedException(GetType().Name);case _Ended:return false;case _NotStarted:if(!_inner.MoveNext()){_state=_Ended;return
- false;}else{ _queue.Enqueue(_inner.Current);_state=_Enumerating;return true;}default: _queue.Dequeue();if(0==_queue.Count){if(!_inner.MoveNext()){_state
-=_Ended;return false;}_queue.Enqueue(_inner.Current);}return true;}}public void Reset(){_inner.Reset();_queue.Clear();_state=_NotStarted;}
+}return _queue[_queueHead];}} object IEnumerator.Current{get{return Current;}}internal int QueueCount{get{return _queueCount;}}public bool TryPeek(int
+ lookahead,out T value){if(_Disposed==_state)throw new ObjectDisposedException(GetType().Name);if(0>lookahead)throw new ArgumentOutOfRangeException(nameof(lookahead));
+if(_Ended==_state){value=default(T);return false;}if(_NotStarted==_state){if(0==lookahead){value=default(T);return false;}}if(lookahead<_queueCount){value
+=_queue[(lookahead+_queueHead)%_queue.Length];return true;}lookahead-=_queueCount;value=default(T);while(0<lookahead&&_inner.MoveNext()){value=_inner.Current;
+_Enqueue(value);--lookahead;}return 0==lookahead;}public T Peek(int lookahead){T value;if(!TryPeek(lookahead,out value))throw new InvalidOperationException("There were not enough values in the enumeration to satisfy the request");
+return value;}public IEnumerable<T>LookAhead{get{return new LookAheadEnumeratorEnumerable<T>(this);}}public bool MoveNext(){switch(_state){case _Disposed:
+throw new ObjectDisposedException(GetType().Name);case _Ended:return false;case _NotStarted:if(0<_queueCount){_state=_Enumerating;return true;}if(!_inner.MoveNext())
+{_state=_Ended;return false;}else{ _Enqueue(_inner.Current);_state=_Enumerating;return true;}default: _Dequeue();if(0==_queueCount){if(!_inner.MoveNext())
+{_state=_Ended;return false;}_Enqueue(_inner.Current);}return true;}}public void Reset(){_inner.Reset();if(0<_queueCount&&null==default(T)){Array.Clear(_queue,
+_queueHead,_queue.Length-_queueHead);if(_queueHead+_queueCount>=_queue.Length)Array.Clear(_queue,0,_queueHead+_queueCount%_queue.Length);}_queueHead=0;
+_queueCount=0;_state=_NotStarted;}
 #region IDisposable Support
-public void Dispose(){if(_Disposed!=_state){_inner.Dispose();_state=_Disposed;GC.SuppressFinalize(this);}}~LookAheadEnumerator(){Dispose();}
+public void Dispose(){if(_Disposed!=_state){_inner.Dispose();_state=_Disposed;GC.SuppressFinalize(this);}}void _Enqueue(T item){if(_queueCount==_queue.Length)
+{var arr=new T[(int)(_queue.Length*_GrowthFactor)];if(_queueHead+_queueCount<=_queue.Length){Array.Copy(_queue,arr,_queueCount);_queueHead=0;arr[_queueCount]
+=item;++_queueCount;_queue=arr;}else{Array.Copy(_queue,_queueHead,arr,0,_queue.Length-_queueHead);Array.Copy(_queue,0,arr,_queue.Length-_queueHead,_queueHead);
+_queueHead=0;arr[_queueCount]=item;++_queueCount;_queue=arr;}}else{_queue[(_queueHead+_queueCount)%_queue.Length]=item;++_queueCount;}}T _Dequeue(){if
+(0==_queueCount)throw new InvalidOperationException("The queue is empty");var result=_queue[_queueHead]; _queue[_queueHead]=default(T);++_queueHead;_queueHead
+=_queueHead%_queue.Length;--_queueCount;return result;}~LookAheadEnumerator(){Dispose();}
 #endregion
-}}namespace CD{using ST=SlangTokenizer;partial class SlangParser{/// <summary>
+}class LookAheadEnumeratorEnumerable<T>:IEnumerable<T>{LookAheadEnumerator<T>_outer;public LookAheadEnumeratorEnumerable(LookAheadEnumerator<T>outer){
+_outer=outer;}public IEnumerator<T>GetEnumerator(){return new LookAheadEnumeratorEnumerator<T>(_outer);}IEnumerator IEnumerable.GetEnumerator(){return
+ GetEnumerator();}}class LookAheadEnumeratorEnumerator<T>:IEnumerator<T>{const int _NotStarted=-2;const int _Ended=-1;const int _Disposed=-3;LookAheadEnumerator<T>
+_outer;int _index;T _current;public LookAheadEnumeratorEnumerator(LookAheadEnumerator<T>outer){_outer=outer;_index=_NotStarted;}public T Current{get{if
+(0>_index){if(_index==_NotStarted)throw new InvalidOperationException("The cursor is before the start of the enumeration.");if(_index==_Ended)throw new
+ InvalidOperationException("The cursor is after the end of the enumeration.");throw new ObjectDisposedException(GetType().Name);}return _current;}}object
+ IEnumerator.Current{get{return Current;}}public void Dispose(){_index=_Disposed;}public bool MoveNext(){if(0>_index){if(_index==_Disposed)throw new ObjectDisposedException(GetType().Name);
+if(_index==_Ended)return false;_index=0;}T value;++_index;if(!_outer.TryPeek(_index,out value)){_index=_Ended;return false;}_current=value;return true;
+}public void Reset(){_index=_NotStarted;}}}namespace CD{using ST=SlangTokenizer;partial class SlangParser{/// <summary>
 /// Reads a <see cref="CodeCompileUnit"/> from the specified <see cref="TextReader"/>
 /// </summary>
 /// <param name="reader">The reader to read from</param>

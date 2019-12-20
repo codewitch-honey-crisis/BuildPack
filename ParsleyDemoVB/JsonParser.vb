@@ -410,11 +410,15 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",2)
         Public Shared Function Parse(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return JsonParser._ParseJson(context)
         End Function
+        
+        #End ExternalSource
     End Class
     '''<summary>
     '''

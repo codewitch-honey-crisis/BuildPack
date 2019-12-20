@@ -282,11 +282,16 @@ namespace ParsleyDemo {
         
         #line default
         #line hidden
+        
+        #line 1 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return ExpressionParser._ParseExpression(context);
         }
+        
+        #line default
+        #line hidden
         
         #line 1 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int Evaluate(ParseNode node) {

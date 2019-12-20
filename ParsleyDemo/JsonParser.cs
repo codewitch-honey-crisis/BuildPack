@@ -419,11 +419,16 @@ namespace ParsleyDemo {
         
         #line default
         #line hidden
+        
+        #line 2 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return JsonParser._ParseJson(context);
         }
+        
+        #line default
+        #line hidden
     }
     /// <summary>
     /// 
