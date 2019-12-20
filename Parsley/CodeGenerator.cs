@@ -441,7 +441,7 @@ namespace Parsley
 						var r = ctx.Target as CodeMethodReturnStatement;
 						if (null != r)
 						{
-							if (null != type) {
+							if (!CD.CodeDomResolver.IsNullOrVoidType(type) &&  (0!=type.ArrayRank || 0!=string.Compare("System.Object",type.BaseType,StringComparison.InvariantCulture))) {
 								var hasVoid = false;
 								if (null != r.Expression)
 								{

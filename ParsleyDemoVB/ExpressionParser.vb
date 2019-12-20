@@ -467,12 +467,12 @@ Namespace ParsleyDemo
         Public Overloads Shared Function EvaluateTerm(ByVal node As ParseNode, ByVal state As Object) As Object
             If (ExpressionParser.Term = node.SymbolId) Then
                 If (1 = node.Children.Length) Then
-                    Return CType(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0), state), GetType(Object)),Object)
+                    Return ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0), state)
                 Else
                     If (node.Children(1).SymbolId = ParsleyDemo.ExpressionParser.add) Then
-                        Return CType(ExpressionParser._ChangeType((CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0), state),Integer) + CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(2), state),Integer)), GetType(Object)),Object)
+                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0), state),Integer) + CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(2), state),Integer))
                     Else
-                        Return CType(ExpressionParser._ChangeType((CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0), state),Integer) - CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(2), state),Integer)), GetType(Object)),Object)
+                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0), state),Integer) - CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(2), state),Integer))
                     End If
                 End If
             End If

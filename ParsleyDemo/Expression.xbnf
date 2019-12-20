@@ -1,39 +1,37 @@
-﻿Expression<start,type="int">=Term => { return EvaluateTerm(node.Children[0],state);}
+﻿Expression<start,type="int">=Term => { return EvaluateTerm(node.Children[0]);}
 Term= Factor ("+"|"-") Factor | Factor => {
 	if(1==node.Children.Length)
-		return EvaluateFactor(node.Children[0],state);
+		return EvaluateFactor(node.Children[0]);
 	else if(node.Children[1].SymbolId==add)
-		return ((int)EvaluateFactor(node.Children[0],state)) + ((int)EvaluateFactor(node.Children[2],state));
+		return ((int)EvaluateFactor(node.Children[0])) + ((int)EvaluateFactor(node.Children[2]));
 	else
-		return ((int)EvaluateFactor(node.Children[0],state)) - ((int)EvaluateFactor(node.Children[2],state));
+		return ((int)EvaluateFactor(node.Children[0])) - ((int)EvaluateFactor(node.Children[2]));
 }
 Factor<type="int">= Unary ("*"|"/") Unary | Unary => {
 	if(1==node.Children.Length)
-		return EvaluateUnary(node.Children[0],state);
+		return EvaluateUnary(node.Children[0]);
 	else if(node.Children[1].SymbolId==mul)
-		return ((int)EvaluateUnary(node.Children[0],state)) * ((int)EvaluateUnary(node.Children[2],state));
+		return ((int)EvaluateUnary(node.Children[0])) * ((int)EvaluateUnary(node.Children[2]));
 	else
-		return ((int)EvaluateUnary(node.Children[0],state)) / ((int)EvaluateUnary(node.Children[2],state));
+		return ((int)EvaluateUnary(node.Children[0])) / ((int)EvaluateUnary(node.Children[2]));
 }
 Unary<type="int">= ("+"|"-") Unary | Leaf => {
 	if (1 == node.Children.Length)
-		return EvaluateLeaf(node.Children[0],state);
+		return EvaluateLeaf(node.Children[0]);
 	else if (node.Children[0].SymbolId == add)
-		return EvaluateUnary(node.Children[1],state);
+		return EvaluateUnary(node.Children[1]);
 	else
-		return -(int)EvaluateUnary(node.Children[1],state);
+		return -(int)EvaluateUnary(node.Children[1]);
 }
 Leaf<type="int">= identifier | integer | "(" Expression ")" => {
 	var n = node.Children[0];
 	if (identifier == n.SymbolId) {
-		if(null==state)
-			throw new InvalidOperationException("Variables were not defined.");
-		return ((IDictionary<string,int>)state)[n.Value];
+		throw new NotImplementedException("Variables are not implemented");
 	}
 	else if (integer == n.SymbolId)
 		return n.Value;
 	else 
-		return (int)EvaluateExpression(n.Children[1],state);
+		return (int)EvaluateExpression(n.Children[1]);
 }
 add= "+";
 sub= "-";
