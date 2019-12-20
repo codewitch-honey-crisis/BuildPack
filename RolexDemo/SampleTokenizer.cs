@@ -91,21 +91,21 @@ namespace RolexDemo {
         // indicates we're currently enumerating. We spend most of our time and effort in this state
         protected const int Enumerating = 0;
         // indicates the tab width, used for updating the Column property when we encounter a tab
-        const int _TabWidth = 4;
+        private const int _TabWidth = 4;
         // the input cursor
-        IEnumerator<char> _input;
+        private IEnumerator<char> _input;
         // our state
         protected int State;
         // the current token
-        Token _current;
+        private Token _current;
         // a buffer used primarily by Lex() to capture matched input
         protected StringBuilder ValueBuffer;
         // the one based line
-        int _line;
+        private int _line;
         // the one based column
-        int _column;
+        private int _column;
         // the zero based position
-        long _position;
+        private long _position;
         protected CompiledTokenizerEnumerator(IEnumerator<char> input) {
             // just set up our initial values
             this._input = input;
@@ -136,11 +136,6 @@ namespace RolexDemo {
                     }
                 }
                 return this._current;
-            }
-        }
-        Token IEnumerator<Token>.Current {
-            get {
-                return this.Current;
             }
         }
         object System.Collections.IEnumerator.Current {
@@ -190,9 +185,7 @@ namespace RolexDemo {
                 if ((CompiledTokenizerEnumerator.ErrorSymbol < this._current.SymbolId)) {
                     // get the block end for our symbol
                     string be = this.GetBlockEnd(this._current.SymbolId);
-                    // if it's valid
-                    if (((false 
-                                == (null == be)) 
+                    if (((null != be) 
                                 && (false 
                                 == (0 == be.Length)))) {
                         // read until we find it or end of input

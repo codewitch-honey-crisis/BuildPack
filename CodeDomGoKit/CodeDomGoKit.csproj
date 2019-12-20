@@ -58,6 +58,9 @@
     <Compile Include="CodeTypeReferenceEqualityComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Slang\ConcatEnumerator.cs" />
+    <Compile Include="Slang\IndexedQueue.Collection.cs" />
+    <Compile Include="Slang\IndexedQueue.cs" />
+    <Compile Include="Slang\IndexedQueue.Enumerable.cs" />
     <Compile Include="Slang\LookAheadEnumerator.cs" />
     <Compile Include="Slang\SlangParser.CompileUnit.cs" />
     <Compile Include="Slang\SlangParser.cs" />

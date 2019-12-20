@@ -192,6 +192,9 @@ namespace CD
 		}
 		static CodeStatement _ParseStatement(_PC pc,bool includeComments=false)
 		{
+			if (21 == pc.Current.Line)
+				System.Diagnostics.Debugger.Break();
+
 			var dirs = _ParseDirectives(pc);
 			if (includeComments && (ST.lineComment == pc.SymbolId || ST.blockComment == pc.SymbolId))
 			{
@@ -346,8 +349,8 @@ namespace CD
 				case ST.identifier: // we already know it isn't an expression
 					var s = pc.Value;
 					pc2 = pc.GetLookAhead();
-					pc2.EnsureStarted();
-					pc2.Advance();
+					pc2.EnsureStarted(); // on result
+					pc2.Advance(); // past result
 					if(ST.colon==pc2.SymbolId)
 					{
 						// CodeDOM for some reason wants us to attach a statement to a label.

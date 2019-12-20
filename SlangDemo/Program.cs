@@ -43,7 +43,6 @@ namespace SlangDemo
 					{
 						Console.WriteLine("Warning: Error resolving code - " + ex.Message);
 					}
-					
 					var tc = new CodeDomTypeConverter();
 					var item = (ccu.Namespaces[0].Types[0].Members[0] as CodeMemberMethod).Statements[0];
 
@@ -55,7 +54,7 @@ namespace SlangDemo
 							co = es.Expression;
 					}
 					else co = item;
-
+					
 					s = CodeDomUtility.ToString(co);
 					s = s.Trim();
 					Console.Write("C#: ");

@@ -98,6 +98,7 @@ namespace CSBrick
 				}
 				else
 				{
+					Console.Error.WriteLine("{0} is merging to {1}.", _Name, outputfile);
 					if (null != outputfile)
 					{
 						var sw = new StreamWriter(outputfile);
