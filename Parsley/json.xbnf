@@ -1,0 +1,24 @@
+﻿// based on spec @ json.org
+Json<start>= Object | Array;
+Object= "{" [ Field { "," Field } ] "}";
+Field= string ":" Value;
+Array= "[" [ Value { "," Value } ] "]";
+Value<collapsed>= string |
+	number	|
+    Object	|
+	Array	|
+    Boolean |
+    null	;
+Boolean= true|false;
+number= '\-?(0|[1-9][0-9]*)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?';
+string= '"([^\n"\\]|\\([btrnf"\\/]|(u[A-Fa-f]{4})))*"';
+true= "true";
+false= "false";
+null= "null";
+lbracket<collapsed>= "[";
+rbracket<collapsed>= "]";
+lbrace<collapsed>= "{";
+rbrace<collapsed>= "}";
+colon<collapsed>= ":";
+comma<collapsed>= ",";
+whitespace<hidden>= '[\n\r\t ]+';

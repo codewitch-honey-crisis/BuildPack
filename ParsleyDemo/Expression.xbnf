@@ -31,9 +31,9 @@ Leaf<type="int">= identifier | integer | "(" Expression ")" => {
 		return ((IDictionary<string,int>)state)[n.Value];
 	}
 	else if (integer == n.SymbolId)
-		return int.Parse(n.Value);
+		return n.Value;
 	else 
-		return EvaluateExpression(n.Children[1],state);
+		return (int)EvaluateExpression(n.Children[1],state);
 }
 add= "+";
 sub= "-";

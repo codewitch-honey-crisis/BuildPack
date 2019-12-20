@@ -12,6 +12,39 @@ namespace ParsleyDemo {
     using System;
     using System.Collections.Generic;
     
+    /// <summary>Parses the following grammar:
+    /// Expression= Term;
+    /// Term= Factor ( "+" | "-" ) Factor | Factor;
+    /// Factor= Unary ( "*" | "/" ) Unary | Unary;
+    /// Unary= ( "+" | "-" ) Unary | Leaf;
+    /// Leaf= identifier | integer | "(" Expression ")";
+    /// add= "+";
+    /// sub= "-";
+    /// mul= "*";
+    /// div= "/";
+    /// lparen= "(";
+    /// rparen= ")";
+    /// integer= '[0-9]+';
+    /// identifier= '[A-Z_a-z][0-9A-Z_a-z]*';
+    /// (whitespace)= '\s+';
+    /// </summary>
+    /// <remarks>The rules for the factored grammar are as follows:
+    /// Expression -> Term
+    /// Unary -> add Unary
+    /// Unary -> sub Unary
+    /// Unary -> Leaf
+    /// Leaf -> identifier
+    /// Leaf -> integer
+    /// Leaf -> lparen Expression rparen
+    /// Term -> Factor TermPart
+    /// TermPart -> add Factor
+    /// TermPart -> sub Factor
+    /// TermPart ->
+    /// Factor -> Unary FactorPart
+    /// FactorPart -> mul Unary
+    /// FactorPart -> div Unary
+    /// FactorPart ->
+    /// </remarks>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
     internal partial class ExpressionParser {
         internal const int ErrorSymbol = -1;
@@ -117,8 +150,11 @@ namespace ParsleyDemo {
                 context.Advance();
                 children[1] = ExpressionParser._ParseExpression(context);
                 children[2] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, line, column, position);
-                context.Advance();
-                return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);
+                if ((ExpressionParser.rparen == context.SymbolId)) {
+                    context.Advance();
+                    return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);
+                }
+                context.Error("Expecting rparen");
             }
             context.Error("Expecting identifier, integer, or lparen");
             return null;
@@ -232,6 +268,15 @@ namespace ParsleyDemo {
             context.Error("Expecting mul, div, add, sub, #EOS, or rparen");
             return null;
         }
+        /// <summary>
+        /// Parses a production of the form:
+        /// Expression= Term
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Expression -> Term
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #line 1 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static ParseNode ParseExpression(System.Collections.Generic.IEnumerable<Token> tokenizer) {
@@ -242,6 +287,15 @@ namespace ParsleyDemo {
         
         #line default
         #line hidden
+        /// <summary>
+        /// Parses a production of the form:
+        /// Term= Factor ( "+" | "-" ) Factor | Factor
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Term -> Factor TermPart
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #line 2 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static ParseNode ParseTerm(System.Collections.Generic.IEnumerable<Token> tokenizer) {
@@ -252,6 +306,15 @@ namespace ParsleyDemo {
         
         #line default
         #line hidden
+        /// <summary>
+        /// Parses a production of the form:
+        /// Factor= Unary ( "*" | "/" ) Unary | Unary
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Factor -> Unary FactorPart
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #line 10 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static ParseNode ParseFactor(System.Collections.Generic.IEnumerable<Token> tokenizer) {
@@ -262,6 +325,17 @@ namespace ParsleyDemo {
         
         #line default
         #line hidden
+        /// <summary>
+        /// Parses a production of the form:
+        /// Unary= ( "+" | "-" ) Unary | Leaf
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Unary -> add Unary
+        /// Unary -> sub Unary
+        /// Unary -> Leaf
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #line 18 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static ParseNode ParseUnary(System.Collections.Generic.IEnumerable<Token> tokenizer) {
@@ -272,6 +346,17 @@ namespace ParsleyDemo {
         
         #line default
         #line hidden
+        /// <summary>
+        /// Parses a production of the form:
+        /// Leaf= identifier | integer | "(" Expression ")"
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Leaf -> identifier
+        /// Leaf -> integer
+        /// Leaf -> lparen Expression rparen
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #line 26 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static ParseNode ParseLeaf(System.Collections.Generic.IEnumerable<Token> tokenizer) {
@@ -282,6 +367,15 @@ namespace ParsleyDemo {
         
         #line default
         #line hidden
+        /// <summary>
+        /// Parses a derivation of the form:
+        /// Expression= Term
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Expression -> Term
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #line 1 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
@@ -292,6 +386,16 @@ namespace ParsleyDemo {
         
         #line default
         #line hidden
+        /// <summary>
+        /// Evaluates a derivation of the form:
+        /// Expression= Term
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Expression -> Term
+        /// </remarks>
+        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        /// <returns>The result of the evaluation</returns>
         
         #line 1 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int Evaluate(ParseNode node) {
@@ -300,6 +404,17 @@ namespace ParsleyDemo {
         
         #line default
         #line hidden
+        /// <summary>
+        /// Evaluates a derivation of the form:
+        /// Expression= Term
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Expression -> Term
+        /// </remarks>
+        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
+        /// <returns>The result of the evaluation</returns>
         
         #line 1 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int Evaluate(ParseNode node, object state) {
@@ -308,6 +423,17 @@ namespace ParsleyDemo {
         
         #line default
         #line hidden
+        /// <summary>
+        /// Evaluates a derivation of the form:
+        /// Expression= Term
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Expression -> Term
+        /// </remarks>
+        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
+        /// <returns>The result of the evaluation</returns>
         
         #line 1 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int EvaluateExpression(ParseNode node, object state) {
@@ -319,9 +445,35 @@ namespace ParsleyDemo {
         
         #line default
         #line hidden
+        /// <summary>
+        /// Evaluates a derivation of the form:
+        /// Expression= Term
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Expression -> Term
+        /// </remarks>
+        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        /// <returns>The result of the evaluation</returns>
+        
+        #line 1 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int EvaluateExpression(ParseNode node) {
             return ExpressionParser.EvaluateExpression(node, null);
         }
+        
+        #line default
+        #line hidden
+        /// <summary>
+        /// Evaluates a derivation of the form:
+        /// Term= Factor ( "+" | "-" ) Factor | Factor
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Term -> Factor TermPart
+        /// </remarks>
+        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
+        /// <returns>The result of the evaluation</returns>
         
         #line 2 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static object EvaluateTerm(ParseNode node, object state) {
@@ -343,9 +495,35 @@ namespace ParsleyDemo {
         
         #line default
         #line hidden
+        /// <summary>
+        /// Evaluates a derivation of the form:
+        /// Term= Factor ( "+" | "-" ) Factor | Factor
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Term -> Factor TermPart
+        /// </remarks>
+        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        /// <returns>The result of the evaluation</returns>
+        
+        #line 2 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static object EvaluateTerm(ParseNode node) {
             return ExpressionParser.EvaluateTerm(node, null);
         }
+        
+        #line default
+        #line hidden
+        /// <summary>
+        /// Evaluates a derivation of the form:
+        /// Factor= Unary ( "*" | "/" ) Unary | Unary
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Factor -> Unary FactorPart
+        /// </remarks>
+        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
+        /// <returns>The result of the evaluation</returns>
         
         #line 10 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int EvaluateFactor(ParseNode node, object state) {
@@ -367,9 +545,37 @@ namespace ParsleyDemo {
         
         #line default
         #line hidden
+        /// <summary>
+        /// Evaluates a derivation of the form:
+        /// Factor= Unary ( "*" | "/" ) Unary | Unary
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Factor -> Unary FactorPart
+        /// </remarks>
+        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        /// <returns>The result of the evaluation</returns>
+        
+        #line 10 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int EvaluateFactor(ParseNode node) {
             return ExpressionParser.EvaluateFactor(node, null);
         }
+        
+        #line default
+        #line hidden
+        /// <summary>
+        /// Evaluates a derivation of the form:
+        /// Unary= ( "+" | "-" ) Unary | Leaf
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Unary -> add Unary
+        /// Unary -> sub Unary
+        /// Unary -> Leaf
+        /// </remarks>
+        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
+        /// <returns>The result of the evaluation</returns>
         
         #line 18 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int EvaluateUnary(ParseNode node, object state) {
@@ -391,9 +597,39 @@ namespace ParsleyDemo {
         
         #line default
         #line hidden
+        /// <summary>
+        /// Evaluates a derivation of the form:
+        /// Unary= ( "+" | "-" ) Unary | Leaf
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Unary -> add Unary
+        /// Unary -> sub Unary
+        /// Unary -> Leaf
+        /// </remarks>
+        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        /// <returns>The result of the evaluation</returns>
+        
+        #line 18 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int EvaluateUnary(ParseNode node) {
             return ExpressionParser.EvaluateUnary(node, null);
         }
+        
+        #line default
+        #line hidden
+        /// <summary>
+        /// Evaluates a derivation of the form:
+        /// Leaf= identifier | integer | "(" Expression ")"
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Leaf -> identifier
+        /// Leaf -> integer
+        /// Leaf -> lparen Expression rparen
+        /// </remarks>
+        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
+        /// <returns>The result of the evaluation</returns>
         
         #line 26 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int EvaluateLeaf(ParseNode node, object state) {
@@ -407,10 +643,10 @@ namespace ParsleyDemo {
                 }
                 else {
                     if ((ParsleyDemo.ExpressionParser.integer == n.SymbolId)) {
-                        return ((int)(ExpressionParser._ChangeType(int.Parse(n.Value), typeof(int))));
+                        return ((int)(ExpressionParser._ChangeType(n.Value, typeof(int))));
                     }
                     else {
-                        return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateExpression(n.Children[1], state), typeof(int))));
+                        return ((int)(ParsleyDemo.ExpressionParser.EvaluateExpression(n.Children[1], state)));
                     }
                 }
             }
@@ -419,9 +655,26 @@ namespace ParsleyDemo {
         
         #line default
         #line hidden
+        /// <summary>
+        /// Evaluates a derivation of the form:
+        /// Leaf= identifier | integer | "(" Expression ")"
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Leaf -> identifier
+        /// Leaf -> integer
+        /// Leaf -> lparen Expression rparen
+        /// </remarks>
+        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        /// <returns>The result of the evaluation</returns>
+        
+        #line 26 "C:\dev\BuildPack\ParsleyDemo\Expression.xbnf"
         public static int EvaluateLeaf(ParseNode node) {
             return ExpressionParser.EvaluateLeaf(node, null);
         }
+        
+        #line default
+        #line hidden
         private static object _ChangeType(object obj, System.Type type) {
             System.ComponentModel.TypeConverter typeConverter = System.ComponentModel.TypeDescriptor.GetConverter(obj);
             if (((null == typeConverter) 

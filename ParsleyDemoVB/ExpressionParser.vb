@@ -15,6 +15,39 @@ Imports System
 Imports System.Collections.Generic
 
 Namespace ParsleyDemo
+    '''<summary>Parses the following grammar:
+    '''Expression= Term;
+    '''Term= Factor ( "+" | "-" ) Factor | Factor;
+    '''Factor= Unary ( "*" | "/" ) Unary | Unary;
+    '''Unary= ( "+" | "-" ) Unary | Leaf;
+    '''Leaf= identifier | integer | "(" Expression ")";
+    '''add= "+";
+    '''sub= "-";
+    '''mul= "*";
+    '''div= "/";
+    '''lparen= "(";
+    '''rparen= ")";
+    '''integer= '[0-9]+';
+    '''identifier= '[A-Z_a-z][0-9A-Z_a-z]*';
+    '''(whitespace)= '\s+';
+    '''</summary>
+    '''<remarks>The rules for the factored grammar are as follows:
+    '''Expression -> Term
+    '''Unary -> add Unary
+    '''Unary -> sub Unary
+    '''Unary -> Leaf
+    '''Leaf -> identifier
+    '''Leaf -> integer
+    '''Leaf -> lparen Expression rparen
+    '''Term -> Factor TermPart
+    '''TermPart -> add Factor
+    '''TermPart -> sub Factor
+    '''TermPart ->
+    '''Factor -> Unary FactorPart
+    '''FactorPart -> mul Unary
+    '''FactorPart -> div Unary
+    '''FactorPart ->
+    '''</remarks>
     <System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")>  _
     Partial Friend Class ExpressionParser
         Friend Const ErrorSymbol As Integer = -1
@@ -118,8 +151,11 @@ Namespace ParsleyDemo
                 context.Advance
                 children(1) = ExpressionParser._ParseExpression(context)
                 children(2) = New ParseNode(ExpressionParser.rparen, "rparen", context.Value, line, column, position)
-                context.Advance
-                Return New ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position)
+                If (ExpressionParser.rparen = context.SymbolId) Then
+                    context.Advance
+                    Return New ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position)
+                End If
+                context.Error("Expecting rparen")
             End If
             context.Error("Expecting identifier, integer, or lparen")
             Return Nothing
@@ -230,6 +266,15 @@ Namespace ParsleyDemo
             context.Error("Expecting mul, div, add, sub, #EOS, or rparen")
             Return Nothing
         End Function
+        '''<summary>
+        '''Parses a production of the form:
+        '''Expression= Term
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Expression -> Term
+        '''</remarks>
+        '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Public Shared Function ParseExpression(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
@@ -239,6 +284,15 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Parses a production of the form:
+        '''Term= Factor ( "+" | "-" ) Factor | Factor
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Term -> Factor TermPart
+        '''</remarks>
+        '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",2)
         Public Shared Function ParseTerm(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
@@ -248,6 +302,15 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Parses a production of the form:
+        '''Factor= Unary ( "*" | "/" ) Unary | Unary
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Factor -> Unary FactorPart
+        '''</remarks>
+        '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",10)
         Public Shared Function ParseFactor(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
@@ -257,6 +320,17 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Parses a production of the form:
+        '''Unary= ( "+" | "-" ) Unary | Leaf
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Unary -> add Unary
+        '''Unary -> sub Unary
+        '''Unary -> Leaf
+        '''</remarks>
+        '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",18)
         Public Shared Function ParseUnary(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
@@ -266,6 +340,17 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Parses a production of the form:
+        '''Leaf= identifier | integer | "(" Expression ")"
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Leaf -> identifier
+        '''Leaf -> integer
+        '''Leaf -> lparen Expression rparen
+        '''</remarks>
+        '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",26)
         Public Shared Function ParseLeaf(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
@@ -275,6 +360,15 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Parses a derivation of the form:
+        '''Expression= Term
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Expression -> Term
+        '''</remarks>
+        '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Public Shared Function Parse(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
@@ -284,6 +378,16 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Evaluates a derivation of the form:
+        '''Expression= Term
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Expression -> Term
+        '''</remarks>
+        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        '''<returns>The result of the evaluation</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Public Overloads Shared Function Evaluate(ByVal node As ParseNode) As Integer
@@ -291,6 +395,17 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Evaluates a derivation of the form:
+        '''Expression= Term
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Expression -> Term
+        '''</remarks>
+        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
+        '''<returns>The result of the evaluation</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Public Overloads Shared Function Evaluate(ByVal node As ParseNode, ByVal state As Object) As Integer
@@ -298,6 +413,17 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Evaluates a derivation of the form:
+        '''Expression= Term
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Expression -> Term
+        '''</remarks>
+        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
+        '''<returns>The result of the evaluation</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Public Overloads Shared Function EvaluateExpression(ByVal node As ParseNode, ByVal state As Object) As Integer
@@ -308,9 +434,34 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Evaluates a derivation of the form:
+        '''Expression= Term
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Expression -> Term
+        '''</remarks>
+        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        '''<returns>The result of the evaluation</returns>
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Public Overloads Shared Function EvaluateExpression(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateExpression(node, Nothing)
         End Function
+        
+        #End ExternalSource
+        '''<summary>
+        '''Evaluates a derivation of the form:
+        '''Term= Factor ( "+" | "-" ) Factor | Factor
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Term -> Factor TermPart
+        '''</remarks>
+        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
+        '''<returns>The result of the evaluation</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",2)
         Public Overloads Shared Function EvaluateTerm(ByVal node As ParseNode, ByVal state As Object) As Object
@@ -329,9 +480,34 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Evaluates a derivation of the form:
+        '''Term= Factor ( "+" | "-" ) Factor | Factor
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Term -> Factor TermPart
+        '''</remarks>
+        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        '''<returns>The result of the evaluation</returns>
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",2)
         Public Overloads Shared Function EvaluateTerm(ByVal node As ParseNode) As Object
             Return ExpressionParser.EvaluateTerm(node, Nothing)
         End Function
+        
+        #End ExternalSource
+        '''<summary>
+        '''Evaluates a derivation of the form:
+        '''Factor= Unary ( "*" | "/" ) Unary | Unary
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Factor -> Unary FactorPart
+        '''</remarks>
+        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
+        '''<returns>The result of the evaluation</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",10)
         Public Overloads Shared Function EvaluateFactor(ByVal node As ParseNode, ByVal state As Object) As Integer
@@ -350,9 +526,36 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Evaluates a derivation of the form:
+        '''Factor= Unary ( "*" | "/" ) Unary | Unary
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Factor -> Unary FactorPart
+        '''</remarks>
+        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        '''<returns>The result of the evaluation</returns>
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",10)
         Public Overloads Shared Function EvaluateFactor(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateFactor(node, Nothing)
         End Function
+        
+        #End ExternalSource
+        '''<summary>
+        '''Evaluates a derivation of the form:
+        '''Unary= ( "+" | "-" ) Unary | Leaf
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Unary -> add Unary
+        '''Unary -> sub Unary
+        '''Unary -> Leaf
+        '''</remarks>
+        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
+        '''<returns>The result of the evaluation</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",18)
         Public Overloads Shared Function EvaluateUnary(ByVal node As ParseNode, ByVal state As Object) As Integer
@@ -371,9 +574,38 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Evaluates a derivation of the form:
+        '''Unary= ( "+" | "-" ) Unary | Leaf
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Unary -> add Unary
+        '''Unary -> sub Unary
+        '''Unary -> Leaf
+        '''</remarks>
+        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        '''<returns>The result of the evaluation</returns>
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",18)
         Public Overloads Shared Function EvaluateUnary(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateUnary(node, Nothing)
         End Function
+        
+        #End ExternalSource
+        '''<summary>
+        '''Evaluates a derivation of the form:
+        '''Leaf= identifier | integer | "(" Expression ")"
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Leaf -> identifier
+        '''Leaf -> integer
+        '''Leaf -> lparen Expression rparen
+        '''</remarks>
+        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
+        '''<returns>The result of the evaluation</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",26)
         Public Overloads Shared Function EvaluateLeaf(ByVal node As ParseNode, ByVal state As Object) As Integer
@@ -386,7 +618,7 @@ Namespace ParsleyDemo
                     Return CType(ExpressionParser._ChangeType(CType(state,IDictionary(Of String, Integer))(n.Value), GetType(Integer)),Integer)
                 Else
                     If (ParsleyDemo.ExpressionParser.[integer] = n.SymbolId) Then
-                        Return CType(ExpressionParser._ChangeType(Integer.Parse(n.Value), GetType(Integer)),Integer)
+                        Return CType(ExpressionParser._ChangeType(n.Value, GetType(Integer)),Integer)
                     Else
                         Return CType(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateExpression(n.Children(1), state), GetType(Integer)),Integer)
                     End If
@@ -396,9 +628,25 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Evaluates a derivation of the form:
+        '''Leaf= identifier | integer | "(" Expression ")"
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Leaf -> identifier
+        '''Leaf -> integer
+        '''Leaf -> lparen Expression rparen
+        '''</remarks>
+        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        '''<returns>The result of the evaluation</returns>
+        
+        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",26)
         Public Overloads Shared Function EvaluateLeaf(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateLeaf(node, Nothing)
         End Function
+        
+        #End ExternalSource
         Private Shared Function _ChangeType(ByVal obj As Object, ByVal type As System.Type) As Object
             Dim typeConverter As System.ComponentModel.TypeConverter = System.ComponentModel.TypeDescriptor.GetConverter(obj)
             If ((Nothing Is typeConverter)  _

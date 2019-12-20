@@ -95,6 +95,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Expression.xbnf" />
+    <None Include="json.xbnf" />
     <None Include="Key.snk" />
   </ItemGroup>
   <ItemGroup />

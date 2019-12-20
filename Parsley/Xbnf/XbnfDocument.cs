@@ -101,14 +101,25 @@ namespace Parsley
 		}
 		object ICloneable.Clone()
 			=> Clone();
-		public override string ToString()
+		public string ToString(string fmt)
 		{
 			var sb = new StringBuilder();
-			for(int ic = Productions.Count,i=0;i<ic;++i)
-				sb.AppendLine(Productions[i].ToString());
+			if ("gnc" == fmt)
+				for (int ic = Productions.Count, i = 0; i < ic; ++i)
+					sb.AppendLine(Productions[i].ToString("pnc"));
+			else if ("xc" == fmt)
+				for (int ic = Productions.Count, i = 0; i < ic; ++i)
+					sb.AppendLine(Productions[i].ToString("xc"));
+			else
+				for (int ic = Productions.Count, i = 0; i < ic; ++i)
+					sb.AppendLine(Productions[i].ToString());
 			return sb.ToString();
 		}
-		
+		public override string ToString()
+		{
+			return ToString(null);
+		}
+
 		internal static XbnfDocument Parse(ParseContext pc)
 		{
 			var result = new XbnfDocument();

@@ -15,6 +15,55 @@ Imports System
 Imports System.Collections.Generic
 
 Namespace ParsleyDemo
+    '''<summary>Parses the following grammar:
+    '''Json= Object | Array;
+    '''Object= "{" [ Field { "," Field } ] "}";
+    '''Field= string ":" Value;
+    '''Array= "[" [ Value { "," Value } ] "]";
+    '''{Value}= string | number | Object | Array | Boolean | null;
+    '''Boolean= true | false;
+    '''number= '\-?(0|[1-9][0-9]*)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?';
+    '''string= '"([^\n"\\]|\\([btrnf"\\/]|(u[A-Fa-f]{4})))*"';
+    '''true= "true";
+    '''false= "false";
+    '''null= "null";
+    '''{lbracket}= "[";
+    '''{rbracket}= "]";
+    '''{lbrace}= "{";
+    '''{rbrace}= "}";
+    '''{colon}= ":";
+    '''{comma}= ",";
+    '''(whitespace)= '[\n\r\t ]+';
+    '''</summary>
+    '''<remarks>The rules for the factored grammar are as follows:
+    '''Json -> Object
+    '''Json -> Array
+    '''Field -> string colon Value
+    '''Value -> string
+    '''Value -> number
+    '''Value -> Object
+    '''Value -> Array
+    '''Value -> Boolean
+    '''Value -> null
+    '''Boolean -> true
+    '''Boolean -> false
+    '''ImplicitList -> comma Field ImplicitListRightAssoc
+    '''ImplicitList2 -> comma Value ImplicitList2RightAssoc
+    '''ImplicitListRightAssoc -> comma Field ImplicitListRightAssoc
+    '''ImplicitListRightAssoc ->
+    '''ImplicitList2RightAssoc -> comma Value ImplicitList2RightAssoc
+    '''ImplicitList2RightAssoc ->
+    '''ObjectPart -> ImplicitList rbrace
+    '''ObjectPart -> rbrace
+    '''ArrayPart -> ImplicitList2 rbracket
+    '''ArrayPart -> rbracket
+    '''Object -> lbrace ObjectPart2
+    '''ObjectPart2 -> rbrace
+    '''ObjectPart2 -> Field ObjectPart
+    '''Array -> lbracket ArrayPart2
+    '''ArrayPart2 -> rbracket
+    '''ArrayPart2 -> Value ArrayPart
+    '''</remarks>
     <System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")>  _
     Partial Friend Class JsonParser
         Friend Const ErrorSymbol As Integer = -1
@@ -79,9 +128,12 @@ Namespace ParsleyDemo
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
                 children.Add(New ParseNode(JsonParser.[string], "string", context.Value, line, column, position))
                 context.Advance
-                context.Advance
-                children.AddRange(JsonParser._ParseValue(context).Children)
-                Return New ParseNode(JsonParser.Field, "Field", children.ToArray, line, column, position)
+                If (JsonParser.colon = context.SymbolId) Then
+                    context.Advance
+                    children.AddRange(JsonParser._ParseValue(context).Children)
+                    Return New ParseNode(JsonParser.Field, "Field", children.ToArray, line, column, position)
+                End If
+                context.Error("Expecting colon")
             End If
             context.Error("Expecting string")
             Return Nothing
@@ -242,8 +294,11 @@ Namespace ParsleyDemo
                 'ObjectPart -> ImplicitList rbrace
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
                 children.AddRange(JsonParser._ParseImplicitList(context).Children)
-                context.Advance
-                Return New ParseNode(JsonParser.ObjectPart, "ObjectPart", children.ToArray, line, column, position)
+                If (JsonParser.rbrace = context.SymbolId) Then
+                    context.Advance
+                    Return New ParseNode(JsonParser.ObjectPart, "ObjectPart", children.ToArray, line, column, position)
+                End If
+                context.Error("Expecting rbrace")
             End If
             If (JsonParser.rbrace = context.SymbolId) Then
                 'ObjectPart -> rbrace
@@ -262,8 +317,11 @@ Namespace ParsleyDemo
                 'ArrayPart -> ImplicitList2 rbracket
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
                 children.AddRange(JsonParser._ParseImplicitList2(context).Children)
-                context.Advance
-                Return New ParseNode(JsonParser.ArrayPart, "ArrayPart", children.ToArray, line, column, position)
+                If (JsonParser.rbracket = context.SymbolId) Then
+                    context.Advance
+                    Return New ParseNode(JsonParser.ArrayPart, "ArrayPart", children.ToArray, line, column, position)
+                End If
+                context.Error("Expecting rbracket")
             End If
             If (JsonParser.rbracket = context.SymbolId) Then
                 'ArrayPart -> rbracket
@@ -356,6 +414,16 @@ Namespace ParsleyDemo
             context.Error("Expecting rbracket, string, number, lbrace, lbracket, true, false, or null")
             Return Nothing
         End Function
+        '''<summary>
+        '''Parses a production of the form:
+        '''Json= Object | Array
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Json -> Object
+        '''Json -> Array
+        '''</remarks>
+        '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",2)
         Public Shared Function ParseJson(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
@@ -365,6 +433,15 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Parses a production of the form:
+        '''Object= "{" [ Field { "," Field } ] "}"
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Object -> lbrace ObjectPart2
+        '''</remarks>
+        '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",3)
         Public Shared Function ParseObject(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
@@ -374,6 +451,15 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Parses a production of the form:
+        '''Field= string ":" Value
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Field -> string colon Value
+        '''</remarks>
+        '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",4)
         Public Shared Function ParseField(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
@@ -383,6 +469,15 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Parses a production of the form:
+        '''Array= "[" [ Value { "," Value } ] "]"
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Array -> lbracket ArrayPart2
+        '''</remarks>
+        '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",5)
         Public Shared Function ParseArray(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
@@ -392,15 +487,16 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",6)
-        Public Shared Function ParseValue(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
-            Dim context As ParserContext = New ParserContext(tokenizer)
-            context.EnsureStarted
-            Return JsonParser._ParseValue(context)
-        End Function
-        
-        #End ExternalSource
+        '''<summary>
+        '''Parses a production of the form:
+        '''Boolean= true | false
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Boolean -> true
+        '''Boolean -> false
+        '''</remarks>
+        '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",12)
         Public Shared Function ParseBoolean(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
@@ -410,6 +506,16 @@ Namespace ParsleyDemo
         End Function
         
         #End ExternalSource
+        '''<summary>
+        '''Parses a derivation of the form:
+        '''Json= Object | Array
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Json -> Object
+        '''Json -> Array
+        '''</remarks>
+        '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\json.xbnf",2)
         Public Shared Function Parse(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode

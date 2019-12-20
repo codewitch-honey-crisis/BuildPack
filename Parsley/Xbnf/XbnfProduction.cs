@@ -33,7 +33,7 @@ namespace Parsley
 		}
 		public bool IsCollapsed {
 			get {
-				var i = Attributes.IndexOf("collapse");
+				var i = Attributes.IndexOf("collapsed");
 				if (-1 < i && Attributes[i].Value is bool && (bool)Attributes[i].Value)
 					return true;
 				return false;
@@ -59,10 +59,24 @@ namespace Parsley
 			=> Clone();
 		public override string ToString()
 		{
+			return ToString(null);
+		}
+		public string ToString(string fmt)
+		{
 			var sb = new StringBuilder();
-			sb.Append(Name);
+			if ("xc" == fmt)
+			{
+				if (IsHidden)
+					sb.Append(string.Concat("(", Name, ")"));
+				else if (IsCollapsed)
+					sb.Append(string.Concat("{", Name, "}"));
+				else
+					sb.Append(Name);
+			}
+			else
+				sb.Append(Name);
 			var ic = Attributes.Count;
-			if(0<ic)
+			if(0<ic && "p"!=fmt && "xc"!=fmt)
 			{
 				sb.Append("<");
 				var delim = "";
@@ -78,13 +92,13 @@ namespace Parsley
 				sb.Append("= ");
 				sb.Append(Expression);
 			}
-			if (null != Code)
+			if (null != Code && ("pc"==fmt || string.IsNullOrEmpty(fmt)))
 			{
 				sb.Append(" => {");
 				sb.Append(Code);
 				sb.Append("}");
 			}
-			else
+			else if("p"!=fmt)
 				sb.Append(";");
 			return sb.ToString();
 		}
