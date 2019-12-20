@@ -27,7 +27,7 @@ namespace SlangDemo
 					else
 						co = SlangParser.ParseExpression(s);
 				}
-				catch(ArgumentException ex)
+				catch(SlangSyntaxException ex)
 				{
 					Console.WriteLine("Error: " + ex.Message);
 				}
