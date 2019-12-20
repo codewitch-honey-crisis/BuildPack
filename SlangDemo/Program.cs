@@ -33,15 +33,7 @@ namespace SlangDemo
 				}
 				if (null!=co)
 				{
-					s = CodeDomUtility.ToString(co);
-					s = s.Trim();
-					Console.Write("C#: ");
-					Console.WriteLine(s);
-					s = CodeDomUtility.ToString(co,"vb");
-					s = s.Trim();
-					Console.Write("VB: ");
-					Console.WriteLine(s);
-
+					
 					var ccu = _RootCode(co);
 					try
 					{
@@ -66,8 +58,17 @@ namespace SlangDemo
 							co = es.Expression;
 					}
 					else co = item;
-					
-					
+
+					s = CodeDomUtility.ToString(co);
+					s = s.Trim();
+					Console.Write("C#: ");
+					Console.WriteLine(s);
+					s = CodeDomUtility.ToString(co, "vb");
+					s = s.Trim();
+					Console.Write("VB: ");
+					Console.WriteLine(s);
+
+
 					s = CodeDomUtility.ToString(CodeDomUtility.Literal(co, tc));
 					s = s.Trim();
 					
