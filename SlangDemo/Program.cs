@@ -43,10 +43,7 @@ namespace SlangDemo
 					{
 						Console.WriteLine("Warning: Error resolving code - " + ex.Message);
 					}
-					if(null!=SlangPatcher.GetNextUnresolvedElement(ccu))
-					{
-						Console.WriteLine("Warning: Not all of the code could be resolved.");
-					}
+					
 					var tc = new CodeDomTypeConverter();
 					var item = (ccu.Namespaces[0].Types[0].Members[0] as CodeMemberMethod).Statements[0];
 
@@ -68,12 +65,15 @@ namespace SlangDemo
 					Console.Write("VB: ");
 					Console.WriteLine(s);
 
-
 					s = CodeDomUtility.ToString(CodeDomUtility.Literal(co, tc));
 					s = s.Trim();
 					
 					Console.Write("CodeDom: ");
 					Console.WriteLine(s);
+					if (null != SlangPatcher.GetNextUnresolvedElement(ccu))
+					{
+						Console.WriteLine("Warning: Not all of the code could be resolved.");
+					}
 				}
 			}
 		}
