@@ -30,6 +30,7 @@ namespace Parsley
 			string codenamespace = null;
 			string codelanguage = null;
 			string name = null;
+			bool verbose = false;
 			bool noshared = false;
 			bool ifstale = false;
 
@@ -80,6 +81,9 @@ namespace Parsley
 							break;
 						case "/noshared":
 							noshared = true;
+							break;
+						case "/verbose":
+							verbose= true;
 							break;
 						case "/rolex":
 							if (args.Length - 1 == i) // check if we're at the end
@@ -139,7 +143,13 @@ namespace Parsley
 					}
 					var doc = XbnfDocument.ReadFrom(inputfile);
 					var cfg = XbnfConvert.ToCfg(doc);
-					cfg.PrepareLL1();
+					var msgs = cfg.TryPrepareLL1();
+					foreach (var msg in msgs)
+					{
+						if(verbose || ErrorLevel.Message!=msg.ErrorLevel)
+							Console.Error.WriteLine(msg);
+					}
+					CfgException.ThrowIfErrors(msgs);
 					var ccu = CodeGenerator.GenerateCompileUnit(doc,cfg,name,codenamespace);
 					var ccuNS = ccu.Namespaces[ccu.Namespaces.Count - 1];
 					var ccuShared = CodeGenerator.GenerateSharedCompileUnit(codenamespace);
@@ -256,7 +266,8 @@ namespace Parsley
 			t.Write(File);
 			t.WriteLine(" <inputfile> [/output <outputfile>] [/rolex <rolexfile>]");
 			t.WriteLine("   [/namespace <codenamespace>] [/name <classname>]");
-			t.WriteLine("	[/langage <codelanguage>] [/noshared] [/ifstale]");
+			t.WriteLine("	[/langage <codelanguage>] [/noshared] [/verbose]");
+			t.WriteLine("	[/ifstale]");
 			t.WriteLine();
 			t.WriteLine("   <inputfile>     The input project file to use.");
 			t.WriteLine("   <outputfile>    The output file to use - default stdout.");
@@ -265,6 +276,7 @@ namespace Parsley
 			t.WriteLine("   <classname>		Generate code with the specified class name - default derived from <outputfile> or the grammar.");
 			t.WriteLine("   <codelanguage>	Generate code in the specified language - default derived from <outputfile> or C#.");
 			t.WriteLine("	<noshared>		Do not include shared library prerequisites");
+			t.WriteLine("	<verbose>		Output all messages from the generation process");
 			t.WriteLine("	<ifstale>       Do not generate unless <outputfile> or <rolexfile> is older than <inputfile>.");
 			t.WriteLine();
 			t.WriteLine("Any other switch displays this screen and exits.");
