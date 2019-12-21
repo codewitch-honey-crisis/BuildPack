@@ -56,7 +56,7 @@ Leaf<type="int">= integer | identifier | "(" Term ")" => {
 				if(d.TryGetValue(identifier1,out val))
 					return val;
 			}	
-			throw new SyntaxException(string.Format("Reference to undefined variable {0}",node.Children[0].Value),node.Line,node.Column,node.Position);
+			throw new SyntaxException(string.Format("Reference to undefined variable {0}",identifier1),node.Line,node.Column,node.Position);
 		}
 	} else // Term
 		return Term2;

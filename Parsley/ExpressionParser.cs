@@ -449,7 +449,7 @@ namespace ParsleyDemo {
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <returns>The result of the evaluation</returns>
-        public static int Evaluate(ParseNode node) {
+        public static object Evaluate(ParseNode node) {
             return ExpressionParser.EvaluateTerm(node);
         }
         /// <summary>
@@ -463,7 +463,7 @@ namespace ParsleyDemo {
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         /// <returns>The result of the evaluation</returns>
-        public static int Evaluate(ParseNode node, object state) {
+        public static object Evaluate(ParseNode node, object state) {
             return ExpressionParser.EvaluateTerm(node, state);
         }
         /// <summary>
@@ -477,22 +477,22 @@ namespace ParsleyDemo {
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         /// <returns>The result of the evaluation</returns>
-        public static int EvaluateTerm(ParseNode node, object state) {
+        public static object EvaluateTerm(ParseNode node, object state) {
             if ((ExpressionParser.Term == node.SymbolId)) {
-                int result = ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[0]);
+                int result = ((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[0])));
                 int i = 2;
                 for (
                 ; (i < node.Children.Length); 
                 ) {
                     if ((node.Children[(i - 1)].SymbolId == ParsleyDemo.ExpressionParser.add)) {
-                        result = (result + ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]));
+                        result = (result + ((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]))));
                     }
                     else {
-                        result = (result - ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]));
+                        result = (result - ((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]))));
                     }
                     i = (i + 2);
                 }
-                return ((int)(ExpressionParser._ChangeType(result, typeof(int))));
+                return result;
             }
             throw new SyntaxException("Expecting Term", node.Line, node.Column, node.Position);
         }
@@ -506,7 +506,7 @@ namespace ParsleyDemo {
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <returns>The result of the evaluation</returns>
-        public static int EvaluateTerm(ParseNode node) {
+        public static object EvaluateTerm(ParseNode node) {
             return ExpressionParser.EvaluateTerm(node, null);
         }
         /// <summary>
@@ -520,32 +520,32 @@ namespace ParsleyDemo {
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         /// <returns>The result of the evaluation</returns>
-        public static int EvaluateFactor(ParseNode node, object state) {
+        public static object EvaluateFactor(ParseNode node, object state) {
             if ((ExpressionParser.Factor == node.SymbolId)) {
-                int result = ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[0]);
+                int result = ((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[0])));
                 int i = 2;
                 for (
                 ; (i < node.Children.Length); 
                 ) {
                     if ((node.Children[i].SymbolId == ParsleyDemo.ExpressionParser.Unary)) {
                         if ((node.Children[(i - 1)].SymbolId == ParsleyDemo.ExpressionParser.mul)) {
-                            result = (result * ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[i]));
+                            result = (result * ((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[i]))));
                         }
                         else {
-                            result = (result / ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[i]));
+                            result = (result / ((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[i]))));
                         }
                     }
                     else {
                         if ((node.Children[(i - 1)].SymbolId == ParsleyDemo.ExpressionParser.mul)) {
-                            result = (result * ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]));
+                            result = (result * ((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]))));
                         }
                         else {
-                            result = (result / ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]));
+                            result = (result / ((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]))));
                         }
                     }
                     i = (i + 2);
                 }
-                return ((int)(ExpressionParser._ChangeType(result, typeof(int))));
+                return result;
             }
             throw new SyntaxException("Expecting Factor", node.Line, node.Column, node.Position);
         }
@@ -559,7 +559,7 @@ namespace ParsleyDemo {
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <returns>The result of the evaluation</returns>
-        public static int EvaluateFactor(ParseNode node) {
+        public static object EvaluateFactor(ParseNode node) {
             return ExpressionParser.EvaluateFactor(node, null);
         }
         /// <summary>
@@ -575,16 +575,16 @@ namespace ParsleyDemo {
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         /// <returns>The result of the evaluation</returns>
-        public static int EvaluateUnary(ParseNode node, object state) {
+        public static object EvaluateUnary(ParseNode node, object state) {
             if ((ExpressionParser.Unary == node.SymbolId)) {
                 if ((node.Children.Length == 1)) {
-                    return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateLeaf(node.Children[0]), typeof(int))));
+                    return ParsleyDemo.ExpressionParser.EvaluateLeaf(node.Children[0]);
                 }
                 if ((node.Children[0].SymbolId == ParsleyDemo.ExpressionParser.add)) {
-                    return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[1]), typeof(int))));
+                    return ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[1]);
                 }
                 else {
-                    return ((int)(ExpressionParser._ChangeType((0 - ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[1])), typeof(int))));
+                    return (0 - ((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[1]))));
                 }
             }
             throw new SyntaxException("Expecting Unary", node.Line, node.Column, node.Position);
@@ -601,7 +601,7 @@ namespace ParsleyDemo {
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <returns>The result of the evaluation</returns>
-        public static int EvaluateUnary(ParseNode node) {
+        public static object EvaluateUnary(ParseNode node) {
             return ExpressionParser.EvaluateUnary(node, null);
         }
         /// <summary>
@@ -617,22 +617,22 @@ namespace ParsleyDemo {
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         /// <returns>The result of the evaluation</returns>
-        public static int EvaluateLeaf(ParseNode node, object state) {
-            if ((ExpressionParser.Leaf == node.SymbolId)) {
-                if ((node.Children.Length == 1)) {
-                    if ((node.Children[1].SymbolId == ParsleyDemo.ExpressionParser.integer)) {
-                        return ((int)(ExpressionParser._ChangeType(node.Children[0].Value, typeof(int))));
-                    }
-                    else {
-                        throw new NotImplementedException("Variables are not implemented.");
-                    }
-                }
-                else {
-                    return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateTerm(node.Children[1]), typeof(int))));
-                }
-            }
-            throw new SyntaxException("Expecting Leaf", node.Line, node.Column, node.Position);
-        }
+		public static object EvaluateLeaf(ParseNode node, object state) {
+			if ((ExpressionParser.Leaf == node.SymbolId)) {
+				if ((node.Children.Length == 1)) {
+					if ((node.Children[1].SymbolId == ParsleyDemo.ExpressionParser.integer)) {
+						return int.Parse(node.Children[0].Value);
+					}
+					else {
+						throw new NotImplementedException("Variables are not implemented.");
+					}
+				}
+				else {
+					return ParsleyDemo.ExpressionParser.EvaluateTerm(node.Children[1]);
+				}
+			}
+			throw new SyntaxException("Expecting Leaf", node.Line, node.Column, node.Position);
+		}
         /// <summary>
         /// Evaluates a derivation of the form:
         /// Leaf= integer | identifier | "(" Term ")"
@@ -645,16 +645,8 @@ namespace ParsleyDemo {
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <returns>The result of the evaluation</returns>
-        public static int EvaluateLeaf(ParseNode node) {
+        public static object EvaluateLeaf(ParseNode node) {
             return ExpressionParser.EvaluateLeaf(node, null);
-        }
-        private static object _ChangeType(object obj, System.Type type) {
-            System.ComponentModel.TypeConverter typeConverter = System.ComponentModel.TypeDescriptor.GetConverter(obj);
-            if (((null == typeConverter) 
-                        || (false == typeConverter.CanConvertTo(type)))) {
-                return System.Convert.ChangeType(obj, type);
-            }
-            return typeConverter.ConvertTo(obj, type);
         }
     }
     /// <summary>
@@ -785,8 +777,7 @@ namespace ParsleyDemo {
             this._t.SymbolId = -1;
         }
         public void EnsureStarted() {
-            if ((0 
-                        - (1 == this._state))) {
+            if ((-1 == this._state)) {
                 this.Advance();
             }
         }
@@ -817,8 +808,7 @@ namespace ParsleyDemo {
         }
         public bool IsEnded {
             get {
-                return (0 
-                            - (2 == this._state));
+                return (-2 == this._state);
             }
         }
         public bool Advance() {
