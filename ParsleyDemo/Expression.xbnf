@@ -1,58 +1,65 @@
 ﻿Term<start,type="int">= Factor { ("+"|"-") Factor } => {
-	int result = EvaluateFactor(node.Children[0]);
+	int result = Factor1;
 	int i = 2;
 	while (i<Length) 
 	{
-		if(node.Children[i-1].SymbolId==add)
-			result += EvaluateFactor(node.Children[i]);
+		if(SymbolId[i-1]==add)
+			result += Factor[i];
 		else // sub
-			result -= EvaluateFactor(node.Children[i]);
+			result -= Factor[i];
 		i+=2;
 	}
 	return result;
 }
 
 Factor<type="int">= Unary { ("*"|"/") Unary } => { 
-	int result = EvaluateUnary(node.Children[0]);
+	int result = Unary1;
 	int i = 2;
-	// Because of the way the grammar is factored, this can 
-	// end up being Factors when collapsed. We have to check
+	// Because of the way the grammar is 
+	// factored, this can end up being 
+	// Factors when collapsed. We use
+	// Child[n] which is a "smart"
+	// macro that evaluates the symbol
+	// at runtime and calls the right
+	// EvaluateXXXX method
 	while (i<Length) 
 	{
-		if(node.Children[i].SymbolId==Unary) // Unary
-		{
-			if(node.Children[i-1].SymbolId==mul) 
-				result *= EvaluateUnary(node.Children[i]);
-			else // div
-				result /= EvaluateUnary(node.Children[i]);
-		} else // Factor
-		{
-			if(node.Children[i-1].SymbolId==mul) 
-				result *= EvaluateFactor(node.Children[i]);
-			else // div
-				result /= EvaluateFactor(node.Children[i]);
-		}
+		// Child always returns an object type so 
+		// be sure to cast as necessary
+		if(SymbolId[i-1]==mul) 
+			result *= (int)Child[i];
+		else // div
+			result /= (int)Child[i];
 		i+=2;
 	}
 	return result;
 }
 Unary<type="int">= ("+"|"-") Unary | Leaf => {
-	if(node.Children.Length==1)
-		return EvaluateLeaf(node.Children[0]);
-	if(node.Children[0].SymbolId==add)
-		return EvaluateUnary(node.Children[1]);
+	if(Length==1)
+		return Leaf1;
+	if(SymbolId[0]==add)
+		return Unary2;
 	else
-		return -EvaluateUnary(node.Children[1]);
+		return -Unary2;
 }
 Leaf<type="int">= integer | identifier | "(" Term ")" => {
-	if(node.Children.Length==1) // integer | identifer
+	if(Length==1) // integer | identifer
 	{
-		if(node.Children[1].SymbolId==integer)
-			return node.Children[0].Value;
+		if(SymbolId[0]==integer)
+			return integer1;
 		else // identifier
-			throw new NotImplementedException("Variables are not implemented.");
+		{
+			if(state!=null) 
+			{
+				int val;
+				var d = (IDictionary<string,int>)state;
+				if(d.TryGetValue(identifier1,out val))
+					return val;
+			}	
+			throw new SyntaxException(string.Format("Reference to undefined variable {0}",node.Children[0].Value),node.Line,node.Column,node.Position);
+		}
 	} else // Term
-		return EvaluateTerm(node.Children[1]); 
+		return Term2;
 }
 // we only need to declare terminals explicitly if we want 
 // constant names for them or to apply attributes to them

@@ -9,9 +9,9 @@ namespace ParsleyDemo
 	{
 		static void Main(string[] args)
 		{
-			var text = "3 * 5 * -(7 + 7 + 6) + 5 * 2 + -10";
 			var vars = new Dictionary<string, int>();
-			vars["a"] = 1;
+			vars["a"] = 6;
+			var text = "3 * 5 * -(7 + 7 + a) + 5 * 2 + -10";
 			var exprTokenizer = new ExpressionTokenizer(text);
 			var pt = ExpressionParser.Parse(exprTokenizer);
 			_WriteTree(pt, Console.Out);

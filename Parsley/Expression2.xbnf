@@ -1,7 +1,7 @@
 ﻿Term<start>= Factor { ("+"|"-") Factor } => {
 	int result = (int)EvaluateFactor(node.Children[0]);
 	int i = 2;
-	while (i<Length) 
+	while (i<node.Children.Length) 
 	{
 		if(node.Children[i-1].SymbolId==add)
 			result += (int)EvaluateFactor(node.Children[i]);
@@ -17,7 +17,7 @@ Factor= Unary { ("*"|"/") Unary } => {
 	int i = 2;
 	// Because of the way the grammar is factored, this can 
 	// end up being Factors when collapsed. We have to check
-	while (i<Length) 
+	while (i<node.Children.Length) 
 	{
 		if(node.Children[i].SymbolId==Unary) // Unary
 		{

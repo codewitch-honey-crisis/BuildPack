@@ -1,10 +1,11 @@
 ﻿Term<start,type="int">= Factor { ("+"|"-") Factor } => {
 	int result = Factor1;
 	int i = 2;
-	while (i<Length) {
-		if(node.Children[i-1].SymbolId==add)
+	while (i<Length) 
+	{
+		if(SymbolId[i-1]==add)
 			result += Factor[i];
-		else
+		else // sub
 			result -= Factor[i];
 		i+=2;
 	}
@@ -14,15 +15,20 @@
 Factor<type="int">= Unary { ("*"|"/") Unary } => { 
 	int result = Unary1;
 	int i = 2;
-	// Because of the way the grammar is factored, this can 
-	// end up being Factors when collapsed. We use the "smart"
-	// evaluation to resolve this at runtime. Note that with
-	// Child, the type returned will always be object so we 
-	// must cast
-	while (i<Length) {
-		if(node.Children[i-1].SymbolId==mul)
+	// Because of the way the grammar is 
+	// factored, this can end up being 
+	// Factors when collapsed. We use
+	// Child[n] which is a "smart"
+	// macro that evaluates the symbol
+	// at runtime and calls the right
+	// EvaluateXXXX method
+	while (i<Length) 
+	{
+		// Child always returns an object type so 
+		// be sure to cast as necessary
+		if(SymbolId[i-1]==mul) 
 			result *= (int)Child[i];
-		else
+		else // div
 			result /= (int)Child[i];
 		i+=2;
 	}
@@ -31,15 +37,29 @@ Factor<type="int">= Unary { ("*"|"/") Unary } => {
 Unary<type="int">= ("+"|"-") Unary | Leaf => {
 	if(Length==1)
 		return Leaf1;
-	if(SymbolId1==add)
+	if(SymbolId[0]==add)
 		return Unary2;
 	else
 		return -Unary2;
 }
-Leaf<type="int">= integer | "(" Term ")" => {
-	if(Length==1)
-		return integer1;
-	else return Term2; 
+Leaf<type="int">= integer | identifier | "(" Term ")" => {
+	if(Length==1) // integer | identifer
+	{
+		if(SymbolId[0]==integer)
+			return integer1;
+		else // identifier
+		{
+			if(state!=null) 
+			{
+				int val;
+				var d = (IDictionary<string,int>)state;
+				if(d.TryGetValue(identifier1,out val))
+					return val;
+			}	
+			throw new SyntaxException(string.Format("Reference to undefined variable {0}",node.Children[0].Value),node.Line,node.Column,node.Position);
+		}
+	} else // Term
+		return Term2;
 }
 // we only need to declare terminals explicitly if we want 
 // constant names for them or to apply attributes to them
@@ -48,4 +68,5 @@ Leaf<type="int">= integer | "(" Term ")" => {
 add="+";
 mul="*";
 integer='[0-9]+';
+identifier='[A-Z_a-z][0-9A-Z_a-z]*';
 whitespace<hidden>='\s+';

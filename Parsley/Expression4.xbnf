@@ -1,19 +1,19 @@
 ﻿Term<start,type="int">= Factor { ("+"|"-") Factor } => {
-	int result = EvaluateFactor(node.Children[0]);
+	int result = EvaluateFactor(node.Children[0],state);
 	int i = 2;
 	while (i<node.Children.Length) 
 	{
 		if(node.Children[i-1].SymbolId==add)
-			result += EvaluateFactor(node.Children[i]);
+			result += EvaluateFactor(node.Children[i],state);
 		else // sub
-			result -= EvaluateFactor(node.Children[i]);
+			result -= EvaluateFactor(node.Children[i],state);
 		i+=2;
 	}
 	return result;
 }
 
 Factor<type="int">= Unary { ("*"|"/") Unary } => { 
-	int result = EvaluateUnary(node.Children[0]);
+	int result = EvaluateUnary(node.Children[0],state);
 	int i = 2;
 	// Because of the way the grammar is factored, this can 
 	// end up being Factors when collapsed. We have to check
@@ -22,15 +22,15 @@ Factor<type="int">= Unary { ("*"|"/") Unary } => {
 		if(node.Children[i].SymbolId==Unary) // Unary
 		{
 			if(node.Children[i-1].SymbolId==mul) 
-				result *= EvaluateUnary(node.Children[i]);
+				result *= EvaluateUnary(node.Children[i],state);
 			else // div
-				result /= EvaluateUnary(node.Children[i]);
+				result /= EvaluateUnary(node.Children[i],state);
 		} else // Factor
 		{
 			if(node.Children[i-1].SymbolId==mul) 
-				result *= EvaluateFactor(node.Children[i]);
+				result *= EvaluateFactor(node.Children[i],state);
 			else // div
-				result /= EvaluateFactor(node.Children[i]);
+				result /= EvaluateFactor(node.Children[i],state);
 		}
 		i+=2;
 	}
@@ -38,21 +38,30 @@ Factor<type="int">= Unary { ("*"|"/") Unary } => {
 }
 Unary<type="int">= ("+"|"-") Unary | Leaf => {
 	if(node.Children.Length==1)
-		return EvaluateLeaf(node.Children[0]);
+		return EvaluateLeaf(node.Children[0],state);
 	if(node.Children[0].SymbolId==add)
-		return EvaluateUnary(node.Children[1]);
+		return EvaluateUnary(node.Children[1],state);
 	else
-		return -EvaluateUnary(node.Children[1]);
+		return -EvaluateUnary(node.Children[1],state);
 }
 Leaf<type="int">= integer | identifier | "(" Term ")" => {
 	if(node.Children.Length==1) // integer | identifer
 	{
-		if(node.Children[1].SymbolId==integer)
+		if(node.Children[0].SymbolId==integer)
 			return node.Children[0].Value;
 		else // identifier
-			throw new NotImplementedException("Variables are not implemented.");
+		{
+			if(state!=null) 
+			{
+				int val;
+				var d = (IDictionary<string,int>)state;
+				if(d.TryGetValue(node.Children[0].Value,out val))
+					return val;
+			}	
+			throw new SyntaxException(string.Format("Reference to undefined variable {0}",node.Children[0].Value),node.Line,node.Column,node.Position);
+		}
 	} else // Term
-		return EvaluateTerm(node.Children[1]); 
+		return EvaluateTerm(node.Children[1],state); 
 }
 // we only need to declare terminals explicitly if we want 
 // constant names for them or to apply attributes to them

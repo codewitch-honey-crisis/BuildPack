@@ -479,16 +479,16 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         public static int EvaluateTerm(ParseNode node, object state) {
             if ((ExpressionParser.Term == node.SymbolId)) {
-                int result = ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[0]);
+                int result = ExpressionParser.EvaluateFactor(node.Children[0], state);
                 int i = 2;
                 for (
                 ; (i < node.Children.Length); 
                 ) {
                     if ((node.Children[(i - 1)].SymbolId == ParsleyDemo.ExpressionParser.add)) {
-                        result = (result + ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]));
+                        result = (result + ExpressionParser.EvaluateFactor(node.Children[i], state));
                     }
                     else {
-                        result = (result - ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]));
+                        result = (result - ExpressionParser.EvaluateFactor(node.Children[i], state));
                     }
                     i = (i + 2);
                 }
@@ -522,26 +522,18 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         public static int EvaluateFactor(ParseNode node, object state) {
             if ((ExpressionParser.Factor == node.SymbolId)) {
-                int result = ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[0]);
+                int result = ExpressionParser.EvaluateUnary(node.Children[0], state);
                 int i = 2;
                 for (
                 ; (i < node.Children.Length); 
                 ) {
-                    if ((node.Children[i].SymbolId == ParsleyDemo.ExpressionParser.Unary)) {
-                        if ((node.Children[(i - 1)].SymbolId == ParsleyDemo.ExpressionParser.mul)) {
-                            result = (result * ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[i]));
-                        }
-                        else {
-                            result = (result / ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[i]));
-                        }
+                    // Child always returns an object type so
+                    // be sure to cast as necessary
+                    if ((node.Children[(i - 1)].SymbolId == ParsleyDemo.ExpressionParser.mul)) {
+                        result = (result * ((int)(ExpressionParser._EvaluateAny(node.Children[i], state))));
                     }
                     else {
-                        if ((node.Children[(i - 1)].SymbolId == ParsleyDemo.ExpressionParser.mul)) {
-                            result = (result * ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]));
-                        }
-                        else {
-                            result = (result / ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]));
-                        }
+                        result = (result / ((int)(ExpressionParser._EvaluateAny(node.Children[i], state))));
                     }
                     i = (i + 2);
                 }
@@ -578,13 +570,13 @@ namespace ParsleyDemo {
         public static int EvaluateUnary(ParseNode node, object state) {
             if ((ExpressionParser.Unary == node.SymbolId)) {
                 if ((node.Children.Length == 1)) {
-                    return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateLeaf(node.Children[0]), typeof(int))));
+                    return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateLeaf(node.Children[0], state), typeof(int))));
                 }
                 if ((node.Children[0].SymbolId == ParsleyDemo.ExpressionParser.add)) {
-                    return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[1]), typeof(int))));
+                    return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateUnary(node.Children[1], state), typeof(int))));
                 }
                 else {
-                    return ((int)(ExpressionParser._ChangeType((0 - ParsleyDemo.ExpressionParser.EvaluateUnary)(node.Children[1]), typeof(int))));
+                    return ((int)(ExpressionParser._ChangeType((0 - ExpressionParser.EvaluateUnary(node.Children[1], state)), typeof(int))));
                 }
             }
             throw new SyntaxException("Expecting Unary", node.Line, node.Column, node.Position);
@@ -620,15 +612,22 @@ namespace ParsleyDemo {
         public static int EvaluateLeaf(ParseNode node, object state) {
             if ((ExpressionParser.Leaf == node.SymbolId)) {
                 if ((node.Children.Length == 1)) {
-                    if ((node.Children[1].SymbolId == ParsleyDemo.ExpressionParser.integer)) {
+                    if ((node.Children[0].SymbolId == ParsleyDemo.ExpressionParser.integer)) {
                         return ((int)(ExpressionParser._ChangeType(node.Children[0].Value, typeof(int))));
                     }
                     else {
-                        throw new NotImplementedException("Variables are not implemented.");
+                        if ((state != null)) {
+                            int val;
+                            IDictionary<string, int> d = ((IDictionary<string, int>)(state));
+                            if (d.TryGetValue(node.Children[0].Value, out val)) {
+                                return ((int)(ExpressionParser._ChangeType(val, typeof(int))));
+                            }
+                        }
+                        throw new SyntaxException(string.Format("Reference to undefined variable {0}", node.Children[0].Value), node.Line, node.Column, node.Position);
                     }
                 }
                 else {
-                    return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateTerm(node.Children[1]), typeof(int))));
+                    return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateTerm(node.Children[1], state), typeof(int))));
                 }
             }
             throw new SyntaxException("Expecting Leaf", node.Line, node.Column, node.Position);
@@ -655,6 +654,33 @@ namespace ParsleyDemo {
                 return System.Convert.ChangeType(obj, type);
             }
             return typeConverter.ConvertTo(obj, type);
+        }
+        private static object _EvaluateAny(ParseNode node, object state) {
+            if ((node.SymbolId == ExpressionParser.Term)) {
+                return ExpressionParser.EvaluateTerm(node, state);
+            }
+            if ((node.SymbolId == ExpressionParser.Factor)) {
+                return ExpressionParser.EvaluateFactor(node, state);
+            }
+            if ((node.SymbolId == ExpressionParser.Unary)) {
+                return ExpressionParser.EvaluateUnary(node, state);
+            }
+            if ((node.SymbolId == ExpressionParser.Leaf)) {
+                return ExpressionParser.EvaluateLeaf(node, state);
+            }
+            if ((node.SymbolId == ExpressionParser.add)) {
+                return node.Value;
+            }
+            if ((node.SymbolId == ExpressionParser.mul)) {
+                return node.Value;
+            }
+            if ((node.SymbolId == ExpressionParser.integer)) {
+                return node.Value;
+            }
+            if ((node.SymbolId == ExpressionParser.identifier)) {
+                return node.Value;
+            }
+            return null;
         }
     }
 }

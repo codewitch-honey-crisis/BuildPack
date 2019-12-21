@@ -370,10 +370,10 @@ namespace CD
 
 				case ST.add:
 					pc.Advance();
-					return _ParseExpression(pc);
+					return _ParseUnary(pc);
 				case ST.sub:
 					pc.Advance();
-					rhs = _ParseExpression(pc);
+					rhs = _ParseUnary(pc);
 					// simulate the negation unary operator in the codedom
 					var pe = rhs as CodePrimitiveExpression;
 					if(null!=pe)

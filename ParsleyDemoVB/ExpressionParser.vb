@@ -19,10 +19,11 @@ Namespace ParsleyDemo
     '''Term= Factor { ( "+" | "-" ) Factor };
     '''Factor= Unary { ( "*" | "/" ) Unary };
     '''Unary= ( "+" | "-" ) Unary | Leaf;
-    '''Leaf= integer | "(" Term ")";
+    '''Leaf= integer | identifier | "(" Term ")";
     '''add= "+";
     '''mul= "*";
     '''integer= '[0-9]+';
+    '''identifier= '[A-Z_a-z][0-9A-Z_a-z]*';
     '''(whitespace)= '\s+';
     '''</summary>
     '''<remarks>The rules for the factored grammar are as follows:
@@ -30,6 +31,7 @@ Namespace ParsleyDemo
     '''Unary -> Implicit Unary
     '''Unary -> Leaf
     '''Leaf -> integer
+    '''Leaf -> identifier
     '''Leaf -> Implicit3 Term Implicit4
     '''TermList -> add Factor TermListRightAssoc TermListRightAssoc2
     '''TermList -> Implicit Factor TermListRightAssoc TermListRightAssoc2
@@ -69,11 +71,12 @@ Namespace ParsleyDemo
         Public Const add As Integer = 12
         Public Const Implicit As Integer = 13
         Public Const [integer] As Integer = 14
-        Public Const Implicit3 As Integer = 15
-        Public Const Implicit4 As Integer = 16
-        Public Const mul As Integer = 17
-        Public Const Implicit2 As Integer = 18
-        Public Const whitespace As Integer = 19
+        Public Const identifier As Integer = 15
+        Public Const Implicit3 As Integer = 16
+        Public Const Implicit4 As Integer = 17
+        Public Const mul As Integer = 18
+        Public Const Implicit2 As Integer = 19
+        Public Const whitespace As Integer = 20
         Private Shared Function _ParseUnary(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -94,14 +97,15 @@ Namespace ParsleyDemo
                 children(1) = ExpressionParser._ParseUnary(context)
                 Return New ParseNode(ExpressionParser.Unary, "Unary", children, line, column, position)
             End If
-            If ((ExpressionParser.[integer] = context.SymbolId)  _
+            If (((ExpressionParser.[integer] = context.SymbolId)  _
+                        OrElse (ExpressionParser.identifier = context.SymbolId))  _
                         OrElse (ExpressionParser.Implicit3 = context.SymbolId)) Then
                 'Unary -> Leaf
                 Dim children(0) As ParseNode
                 children(0) = ExpressionParser._ParseLeaf(context)
                 Return New ParseNode(ExpressionParser.Unary, "Unary", children, line, column, position)
             End If
-            context.Error("Expecting add, Implicit, integer, or Implicit3")
+            context.Error("Expecting add, Implicit, integer, identifier, or Implicit3")
             Return Nothing
         End Function
         Private Shared Function _ParseLeaf(ByVal context As ParserContext) As ParseNode
@@ -112,6 +116,13 @@ Namespace ParsleyDemo
                 'Leaf -> integer
                 Dim children(0) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.[integer], "integer", context.Value, line, column, position)
+                context.Advance
+                Return New ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position)
+            End If
+            If (ExpressionParser.identifier = context.SymbolId) Then
+                'Leaf -> identifier
+                Dim children(0) As ParseNode
+                children(0) = New ParseNode(ExpressionParser.identifier, "identifier", context.Value, line, column, position)
                 context.Advance
                 Return New ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position)
             End If
@@ -128,7 +139,7 @@ Namespace ParsleyDemo
                 End If
                 context.Error("Expecting Implicit4")
             End If
-            context.Error("Expecting integer or Implicit3")
+            context.Error("Expecting integer, identifier, or Implicit3")
             Return Nothing
         End Function
         Private Shared Function _ParseTermList(ByVal context As ParserContext) As ParseNode
@@ -237,9 +248,10 @@ Namespace ParsleyDemo
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
             Dim position As Long = context.Position
-            If ((((ExpressionParser.add = context.SymbolId)  _
+            If (((((ExpressionParser.add = context.SymbolId)  _
                         OrElse (ExpressionParser.Implicit = context.SymbolId))  _
                         OrElse (ExpressionParser.[integer] = context.SymbolId))  _
+                        OrElse (ExpressionParser.identifier = context.SymbolId))  _
                         OrElse (ExpressionParser.Implicit3 = context.SymbolId)) Then
                 'Term -> Factor TermPart
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -247,7 +259,7 @@ Namespace ParsleyDemo
                 children.AddRange(ExpressionParser._ParseTermPart(context).Children)
                 Return New ParseNode(ExpressionParser.Term, "Term", children.ToArray, line, column, position)
             End If
-            context.Error("Expecting add, Implicit, integer, or Implicit3")
+            context.Error("Expecting add, Implicit, integer, identifier, or Implicit3")
             Return Nothing
         End Function
         Private Shared Function _ParseTermPart(ByVal context As ParserContext) As ParseNode
@@ -274,9 +286,10 @@ Namespace ParsleyDemo
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
             Dim position As Long = context.Position
-            If ((((ExpressionParser.add = context.SymbolId)  _
+            If (((((ExpressionParser.add = context.SymbolId)  _
                         OrElse (ExpressionParser.Implicit = context.SymbolId))  _
                         OrElse (ExpressionParser.[integer] = context.SymbolId))  _
+                        OrElse (ExpressionParser.identifier = context.SymbolId))  _
                         OrElse (ExpressionParser.Implicit3 = context.SymbolId)) Then
                 'Factor -> Unary FactorPart
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -284,7 +297,7 @@ Namespace ParsleyDemo
                 children.AddRange(ExpressionParser._ParseFactorPart(context).Children)
                 Return New ParseNode(ExpressionParser.Factor, "Factor", children.ToArray, line, column, position)
             End If
-            context.Error("Expecting add, Implicit, integer, or Implicit3")
+            context.Error("Expecting add, Implicit, integer, identifier, or Implicit3")
             Return Nothing
         End Function
         Private Shared Function _ParseFactorPart(ByVal context As ParserContext) As ParseNode
@@ -401,11 +414,12 @@ Namespace ParsleyDemo
         End Function
         '''<summary>
         '''Parses a production of the form:
-        '''Leaf= integer | "(" Term ")"
+        '''Leaf= integer | identifier | "(" Term ")"
         '''</summary>
         '''<remarks>
         '''The production rules are:
         '''Leaf -> integer
+        '''Leaf -> identifier
         '''Leaf -> Implicit3 Term Implicit4
         '''</remarks>
         '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
@@ -514,6 +528,8 @@ Namespace ParsleyDemo
                 Dim i As Integer = 2
 
                 Do While (i < node.Children.Length)
+                    'Child always returns an object type so
+                    'be sure to cast as necessary
                     If (node.Children((i - 1)).SymbolId = ParsleyDemo.ExpressionParser.mul) Then
                         result = (result * CType(ExpressionParser._EvaluateAny(node.Children(i), state),Integer))
                     Else
@@ -582,11 +598,12 @@ Namespace ParsleyDemo
         End Function
         '''<summary>
         '''Evaluates a derivation of the form:
-        '''Leaf= integer | "(" Term ")"
+        '''Leaf= integer | identifier | "(" Term ")"
         '''</summary>
         '''<remarks>
         '''The production rules are:
         '''Leaf -> integer
+        '''Leaf -> identifier
         '''Leaf -> Implicit3 Term Implicit4
         '''</remarks>
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
@@ -595,7 +612,18 @@ Namespace ParsleyDemo
         Public Overloads Shared Function EvaluateLeaf(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Leaf = node.SymbolId) Then
                 If (node.Children.Length = 1) Then
-                    Return CType(ExpressionParser._ChangeType(node.Children(0).Value, GetType(Integer)),Integer)
+                    If (node.Children(0).SymbolId = ParsleyDemo.ExpressionParser.[integer]) Then
+                        Return CType(ExpressionParser._ChangeType(node.Children(0).Value, GetType(Integer)),Integer)
+                    Else
+                        If (Not (state) Is Nothing) Then
+                            Dim val As Integer
+                            Dim d As IDictionary(Of String, Integer) = CType(state,IDictionary(Of String, Integer))
+                            If d.TryGetValue(node.Children(0).Value, val) Then
+                                Return CType(ExpressionParser._ChangeType(val, GetType(Integer)),Integer)
+                            End If
+                        End If
+                        Throw New SyntaxException(String.Format("Reference to undefined variable {0}", node.Children(0).Value), node.Line, node.Column, node.Position)
+                    End If
                 Else
                     Return CType(ExpressionParser._ChangeType(ExpressionParser.EvaluateTerm(node.Children(1), state), GetType(Integer)),Integer)
                 End If
@@ -604,11 +632,12 @@ Namespace ParsleyDemo
         End Function
         '''<summary>
         '''Evaluates a derivation of the form:
-        '''Leaf= integer | "(" Term ")"
+        '''Leaf= integer | identifier | "(" Term ")"
         '''</summary>
         '''<remarks>
         '''The production rules are:
         '''Leaf -> integer
+        '''Leaf -> identifier
         '''Leaf -> Implicit3 Term Implicit4
         '''</remarks>
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
@@ -644,6 +673,9 @@ Namespace ParsleyDemo
                 Return node.Value
             End If
             If (node.SymbolId = ExpressionParser.[integer]) Then
+                Return node.Value
+            End If
+            If (node.SymbolId = ExpressionParser.identifier) Then
                 Return node.Value
             End If
             Return Nothing

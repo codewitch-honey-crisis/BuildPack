@@ -94,6 +94,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Expression5.xbnf" />
+    <None Include="Expression4.xbnf" />
     <None Include="ExpressionFinal.xbnf" />
     <None Include="Expression.xbnf" />
     <None Include="Expression3.xbnf" />

@@ -438,7 +438,7 @@ namespace Parsley
 							if(null!=to)
 							{
 								int pi;
-								if(0==string.Compare("Child",to.VariableName))
+								if(0==string.Compare("Child",to.VariableName,StringComparison.InvariantCulture))
 								{
 									// is a thing like Child[0]
 									hasEvalAny = true;
@@ -461,6 +461,10 @@ namespace Parsley
 											V.ReplaceTarget(ctx, pr);
 										}
 									}
+								} else if(0==string.Compare("SymbolId",to.VariableName))
+								{
+									var pr = C.PropRef(C.ArrIndexer(C.PropRef(node, "Children"), idx.Indices[0]), "SymbolId");
+									V.ReplaceTarget(ctx, pr);
 								}
 							}
 						}
