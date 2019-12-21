@@ -438,10 +438,68 @@ namespace Parsley
 					parser.Members.Add(m);
 					var hasReturn = false;
 					V.Visit(cnd, (ctx) => {
+						var v =ctx.Target as CodeVariableReferenceExpression;
+						if (null != v)
+						{
+							foreach (var p in doc.Productions)
+							{
+								if (p.IsHidden || p.IsCollapsed)
+									continue;
+								if (v.VariableName.StartsWith(p.Name, StringComparison.InvariantCulture))
+								{
+									if (p.Name.Length < v.VariableName.Length)
+									{
+										var s = v.VariableName.Substring(p.Name.Length);
+										int num;
+										if (int.TryParse(s, out num))
+										{
+											if (0 < num)
+											{
+												if (!p.IsTerminal)
+												{
+													var mi = C.Invoke(C.TypeRef("Parser"), string.Concat("Evaluate", p.Name), C.ArrIndexer(C.PropRef(node, "Children"), C.Literal(num - 1)), C.ArgRef("state"));
+													V.ReplaceTarget(ctx, mi);
+												}
+												else
+												{
+													var pr = C.PropRef(C.ArrIndexer(C.PropRef(node, "Children"), C.Literal(num - 1)), "Value");
+													V.ReplaceTarget(ctx, pr);
+												}
+											}
+										}
+									}
+								}
+								else
+								{
+									if (v.VariableName.StartsWith("SymbolId"))
+									{
+										if (8 < v.VariableName.Length)
+										{
+											var s = v.VariableName.Substring(8);
+											int num;
+											if (int.TryParse(s, out num))
+											{
+												if (0 < num)
+												{
+
+													var pr = C.PropRef(C.ArrIndexer(C.PropRef(node, "Children"), C.Literal(num - 1)), "SymbolId");
+													V.ReplaceTarget(ctx, pr);
+
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					});
+					V.Visit(cnd, (ctx) =>
+					{
 						var r = ctx.Target as CodeMethodReturnStatement;
 						if (null != r)
 						{
-							if (!CD.CodeDomResolver.IsNullOrVoidType(type) &&  (0!=type.ArrayRank || 0!=string.Compare("System.Object",type.BaseType,StringComparison.InvariantCulture))) {
+							if (!CD.CodeDomResolver.IsNullOrVoidType(type) && (0 != type.ArrayRank || 0 != string.Compare("System.Object", type.BaseType, StringComparison.InvariantCulture)))
+							{
 								var hasVoid = false;
 								if (null != r.Expression)
 								{
@@ -452,14 +510,15 @@ namespace Parsley
 											hasVoid = true;
 									}
 								}
-								if (null== r.Expression || hasVoid)
+								if (null == r.Expression || hasVoid)
 								{
 									r.Expression = C.Default(type);
-								} else
+								}
+								else
 								{
 									var isType = false;
 									var cc = r.Expression as CodeCastExpression;
-									if(null!=cc)
+									if (null != cc)
 									{
 										if (CD.CodeTypeReferenceEqualityComparer.Equals(cc.TargetType, type))
 											isType = true;

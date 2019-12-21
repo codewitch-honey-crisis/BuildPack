@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,7 +10,7 @@ namespace RE
 #if REGEXLIB
 	public 
 #endif
-	struct CharRange : IEquatable<CharRange>, IList<char>
+	struct CharRange : IComparable<CharRange>, IEquatable<CharRange>, IList<char>
 	{
 		/// <summary>
 		/// Initializes the character range with the specified first and last characters
@@ -178,15 +177,14 @@ namespace RE
 
 		}
 		/// <summary>
-		/// Takes a list of ranges and ensures each range's First character is less than or equal to its Last character
+		/// Takes a list of ranges and ensures each range is in sorted order and contiguous ranges are combined
 		/// </summary>
 		/// <param name="ranges">The ranges to normalize</param>
-		public static void NormalizeRangeList(List<CharRange> ranges)
+		/// <remarks>The list is modified</remarks>
+		public static void NormalizeRangeList(IList<CharRange> ranges)
 		{
-			ranges.Sort(delegate (CharRange left, CharRange right)
-			{
-				return left.First.CompareTo(right.First);
-			});
+			
+			_Sort(ranges,0,ranges.Count-1);
 			var or = default(CharRange);
 			for (int i = 1; i < ranges.Count; ++i)
 			{
@@ -282,8 +280,9 @@ namespace RE
 			else
 				yield return First;
 		}
+		
 		// legacy collection support (required)
-		IEnumerator IEnumerable.GetEnumerator()
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			=> ((IEnumerable<char>)this).GetEnumerator();
 		// list support (required)
 		int IList<char>.IndexOf(char item)
@@ -370,6 +369,111 @@ namespace RE
 		/// <param name="rhs">The right hand range to compare</param>
 		/// <returns>True if the ranges are different, otherwise false</returns>
 		public static bool operator !=(CharRange lhs, CharRange rhs) => !lhs.Equals(rhs);
+		/// <summary>
+		/// Indicates whether one character range is less than the other
+		/// </summary>
+		/// <param name="lhs">The left hand range</param>
+		/// <param name="rhs">The right hand range</param>
+		/// <returns>True if <paramref name="lhs"/> is less than <paramref name="rhs"/>, otherwise false</returns>
+		public static bool operator<(CharRange lhs,CharRange rhs)
+		{
+			if (lhs.First == rhs.First)
+				return lhs.Last < rhs.Last;
+			return lhs.First < rhs.First;
+		}
+		/// <summary>
+		/// Indicates whether one character range is greater than the other
+		/// </summary>
+		/// <param name="lhs">The left hand range</param>
+		/// <param name="rhs">The right hand range</param>
+		/// <returns>True if <paramref name="lhs"/> is greater than <paramref name="rhs"/>, otherwise false</returns>
+		public static bool operator >(CharRange lhs, CharRange rhs)
+		{
+			if (lhs.First == rhs.First)
+				return lhs.Last > rhs.Last;
+			return lhs.First > rhs.First;
+		}
+		/// <summary>
+		/// Indicates whether one character range is less than or equal to the other
+		/// </summary>
+		/// <param name="lhs">The left hand range</param>
+		/// <param name="rhs">The right hand range</param>
+		/// <returns>True if <paramref name="lhs"/> is less than or equal to <paramref name="rhs"/>, otherwise false</returns>
+		public static bool operator <=(CharRange lhs, CharRange rhs)
+		{
+			if (lhs.First == rhs.First)
+				return lhs.Last <= rhs.Last;
+			return lhs.First <= rhs.First;
+		}
+		/// <summary>
+		/// Indicates whether one character range is greater than or equal to the other
+		/// </summary>
+		/// <param name="lhs">The left hand range</param>
+		/// <param name="rhs">The right hand range</param>
+		/// <returns>True if <paramref name="lhs"/> is greater than or equal to <paramref name="rhs"/>, otherwise false</returns>
+		public static bool operator >=(CharRange lhs,CharRange rhs)
+		{
+			if (lhs.First == rhs.First)
+				return lhs.Last >= rhs.Last;
+			return lhs.First >= rhs.First;
+		}
+		static void _Sort(IList<CharRange> arr, int left, int right)
+		{
+			if (left < right)
+			{
+				int pivot = _Partition(arr, left, right);
 
+				if (1< pivot)
+				{
+					_Sort(arr, left, pivot - 1);
+				}
+				if (pivot + 1 < right)
+				{
+					_Sort(arr, pivot + 1, right);
+				}
+			}
+
+		}
+
+		static int _Partition(IList<CharRange> arr, int left, int right)
+		{
+			CharRange pivot = arr[left];
+			while (true)
+			{
+
+				while (arr[left] < pivot)
+				{
+					left++;
+				}
+
+				while (arr[right] > pivot)
+				{
+					right--;
+				}
+
+				if (left < right)
+				{
+					if (arr[left] == arr[right]) return right;
+
+					CharRange swap = arr[left];
+					arr[left] = arr[right];
+					arr[right] = swap;
+
+
+				}
+				else
+				{
+					return right;
+				}
+			}
+		}
+
+		public int CompareTo(CharRange other)
+		{
+			var c = First.CompareTo(other.First);
+			if (0 == c)
+				c = Last.CompareTo(other.Last);
+			return c;
+		}
 	}
 }

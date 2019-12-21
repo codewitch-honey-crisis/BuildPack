@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Globalization;
 using System.IO;
-using System.Collections;
 using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
 using System.CodeDom;
+using System.Collections;
 using System.Reflection;
 using System.Diagnostics;
 using System.Net;
@@ -1024,7 +1024,7 @@ public RegexExpression Expression{get;set;}}}namespace RE{/// <summary>
 #if REGEXLIB
 public
 #endif
-struct CharRange:IEquatable<CharRange>,IList<char>{/// <summary>
+struct CharRange:IComparable<CharRange>,IEquatable<CharRange>,IList<char>{/// <summary>
 /// Initializes the character range with the specified first and last characters
 /// </summary>
 /// <param name="first">The first character</param>
@@ -1089,12 +1089,12 @@ public static IEnumerable<CharRange>NotRanges(IEnumerable<CharRange>ranges){ var
 -1)));last=e.Current.Last;if(char.MaxValue==last)yield break;}while(e.MoveNext()){if(char.MaxValue==last)yield break;if(unchecked((char)(last+1))<e.Current.First)
 yield return new CharRange(unchecked((char)(last+1)),unchecked((char)(e.Current.First-1)));last=e.Current.Last;}if(char.MaxValue>last)yield return new
  CharRange(unchecked((char)(last+1)),char.MaxValue);}}/// <summary>
-/// Takes a list of ranges and ensures each range's First character is less than or equal to its Last character
+/// Takes a list of ranges and ensures each range is in sorted order and contiguous ranges are combined
 /// </summary>
 /// <param name="ranges">The ranges to normalize</param>
-public static void NormalizeRangeList(List<CharRange>ranges){ranges.Sort(delegate(CharRange left,CharRange right){return left.First.CompareTo(right.First);
-});var or=default(CharRange);for(int i=1;i<ranges.Count;++i){if(ranges[i-1].Last>=ranges[i].First){var nr=new CharRange(ranges[i-1].First,ranges[i].Last);
-ranges[i-1]=or=nr;ranges.RemoveAt(i);--i;}}}/// <summary>
+/// <remarks>The list is modified</remarks>
+public static void NormalizeRangeList(IList<CharRange>ranges){_Sort(ranges,0,ranges.Count-1);var or=default(CharRange);for(int i=1;i<ranges.Count;++i)
+{if(ranges[i-1].Last>=ranges[i].First){var nr=new CharRange(ranges[i-1].First,ranges[i].Last);ranges[i-1]=or=nr;ranges.RemoveAt(i);--i;}}}/// <summary>
 /// Returns the count of characters in the range
 /// </summary>
 int ICollection<char>.Count=>Length;/// <summary>
@@ -1123,9 +1123,9 @@ public override string ToString(){if(First==Last)return _Escape(First);if(2==Len
  new NotSupportedException("The collection is read-only.");} void ICollection<char>.Add(char item){_ThrowReadOnly();} void ICollection<char>.Clear(){_ThrowReadOnly();
 } bool ICollection<char>.Contains(char item)=>item>=First&&item<=Last; void ICollection<char>.CopyTo(char[]array,int arrayIndex){char ch=First;for(int
  ic=Length,i=arrayIndex;i<ic;++i){array[i]=ch;++ch;}} IEnumerator<char>IEnumerable<char>.GetEnumerator(){if(First!=Last){for(char ch=First;ch<Last;++ch)
-yield return ch;yield return Last;}else yield return First;} IEnumerator IEnumerable.GetEnumerator()=>((IEnumerable<char>)this).GetEnumerator(); int IList<char>.IndexOf(char
- item){if(First<=item&&Last>=item)return item-First;return-1;} void IList<char>.Insert(int index,char item){_ThrowReadOnly();} bool ICollection<char>.Remove(char
- item){_ThrowReadOnly();return false;} void IList<char>.RemoveAt(int index){_ThrowReadOnly();}
+yield return ch;yield return Last;}else yield return First;} System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()=>((IEnumerable<char>)this).GetEnumerator();
+ int IList<char>.IndexOf(char item){if(First<=item&&Last>=item)return item-First;return-1;} void IList<char>.Insert(int index,char item){_ThrowReadOnly();
+} bool ICollection<char>.Remove(char item){_ThrowReadOnly();return false;} void IList<char>.RemoveAt(int index){_ThrowReadOnly();}
 #region _Escape
  string _Escape(char ch){switch(ch){case'\n':return@"\n";case'\r':return@"\r";case'\t':return@"\t";case'\f':return@"\f";case'\b':return@"\b";case'-':return
 @"\-";case'[':return@"\[";case']':return@"\]";case'(':return@"\(";case')':return@"\)";case'?':return@"\?";case'+':return@"\+";case'*':return@"\*";case
@@ -1144,7 +1144,35 @@ public static bool operator==(CharRange lhs,CharRange rhs)=>lhs.Equals(rhs);/// 
 /// <param name="lhs">The left hand range to compare</param>
 /// <param name="rhs">The right hand range to compare</param>
 /// <returns>True if the ranges are different, otherwise false</returns>
-public static bool operator!=(CharRange lhs,CharRange rhs)=>!lhs.Equals(rhs);}}namespace RE{/// <summary>
+public static bool operator!=(CharRange lhs,CharRange rhs)=>!lhs.Equals(rhs);/// <summary>
+/// Indicates whether one character range is less than the other
+/// </summary>
+/// <param name="lhs">The left hand range</param>
+/// <param name="rhs">The right hand range</param>
+/// <returns>True if <paramref name="lhs"/> is less than <paramref name="rhs"/>, otherwise false</returns>
+public static bool operator<(CharRange lhs,CharRange rhs){if(lhs.First==rhs.First)return lhs.Last<rhs.Last;return lhs.First<rhs.First;}/// <summary>
+/// Indicates whether one character range is greater than the other
+/// </summary>
+/// <param name="lhs">The left hand range</param>
+/// <param name="rhs">The right hand range</param>
+/// <returns>True if <paramref name="lhs"/> is greater than <paramref name="rhs"/>, otherwise false</returns>
+public static bool operator>(CharRange lhs,CharRange rhs){if(lhs.First==rhs.First)return lhs.Last>rhs.Last;return lhs.First>rhs.First;}/// <summary>
+/// Indicates whether one character range is less than or equal to the other
+/// </summary>
+/// <param name="lhs">The left hand range</param>
+/// <param name="rhs">The right hand range</param>
+/// <returns>True if <paramref name="lhs"/> is less than or equal to <paramref name="rhs"/>, otherwise false</returns>
+public static bool operator<=(CharRange lhs,CharRange rhs){if(lhs.First==rhs.First)return lhs.Last<=rhs.Last;return lhs.First<=rhs.First;}/// <summary>
+/// Indicates whether one character range is greater than or equal to the other
+/// </summary>
+/// <param name="lhs">The left hand range</param>
+/// <param name="rhs">The right hand range</param>
+/// <returns>True if <paramref name="lhs"/> is greater than or equal to <paramref name="rhs"/>, otherwise false</returns>
+public static bool operator>=(CharRange lhs,CharRange rhs){if(lhs.First==rhs.First)return lhs.Last>=rhs.Last;return lhs.First>=rhs.First;}static void _Sort(IList<CharRange>
+arr,int left,int right){if(left<right){int pivot=_Partition(arr,left,right);if(1<pivot){_Sort(arr,left,pivot-1);}if(pivot+1<right){_Sort(arr,pivot+1,right);
+}}}static int _Partition(IList<CharRange>arr,int left,int right){CharRange pivot=arr[left];while(true){while(arr[left]<pivot){left++;}while(arr[right]
+>pivot){right--;}if(left<right){if(arr[left]==arr[right])return right;CharRange swap=arr[left];arr[left]=arr[right];arr[right]=swap;}else{return right;
+}}}public int CompareTo(CharRange other){var c=First.CompareTo(other.First);if(0==c)c=Last.CompareTo(other.Last);return c;}}}namespace RE{/// <summary>
 /// This is an internal class that helps the code serializer know how to serialize DFA entries
 /// </summary>
 class CharDfaEntryConverter:TypeConverter{ public override bool CanConvertTo(ITypeDescriptorContext context,Type destinationType){if(typeof(InstanceDescriptor)

@@ -1,37 +1,38 @@
-﻿Expression<start>= Term => { return EvaluateTerm(node.Children[0],state);}
-Term= Factor ("+"|"-") Factor | Factor => {
+﻿Expression<start,type="int">= Term => { return Term1; }
+Term<type="int">= Factor ("+"|"-") Factor | Factor => {
 	if(1==node.Children.Length)
-		return EvaluateFactor(node.Children[0],state);
-	else if(node.Children[1].SymbolId==add)
-		return ((int)EvaluateFactor(node.Children[0],state)) + ((int)EvaluateFactor(node.Children[2],state));
+		return Factor1;
+	else if(SymbolId2==add)
+		return Factor1 + Factor3;
 	else
-		return ((int)EvaluateFactor(node.Children[0],state)) - ((int)EvaluateFactor(node.Children[2],state));
+		return Factor1 - Factor3;
 }
-Factor= Unary ("*"|"/") Unary | Unary => {
+Factor<type="int">= Unary ("*"|"/") Unary | Unary => {
 	if(1==node.Children.Length)
-		return EvaluateUnary(node.Children[0],state);
-	else if(node.Children[1].SymbolId==mul)
-		return ((int)EvaluateUnary(node.Children[0],state)) * ((int)EvaluateUnary(node.Children[2],state));
+		return Unary1;
+	else if(SymbolId2==mul)
+		return Unary1 * Unary3;
 	else
-		return ((int)EvaluateUnary(node.Children[0],state)) / ((int)EvaluateUnary(node.Children[2],state));
+		return Unary1 / Unary3;
 }
-Unary= ("+"|"-") Unary | Leaf => {
+Unary<type="int">= ("+"|"-") Unary | Leaf => {
 	if (1 == node.Children.Length)
-		return EvaluateLeaf(node.Children[0],state);
-	else if (node.Children[0].SymbolId == add)
-		return EvaluateUnary(node.Children[1],state);
+		return Leaf1;
+	else if (SymbolId1 == add)
+		return Unary2;
 	else
-		return -(int)EvaluateUnary(node.Children[1],state);
+		return -(int)Unary2;
 }
-Leaf= identifier | integer | "(" Expression ")" => {
-	var n = node.Children[0];
-	if (identifier == n.SymbolId) {
-		throw new NotImplementedException("Variables are not implemented.");
+Leaf<type="int">= identifier | integer | "(" Expression ")" => {
+	if (SymbolId1==identifier) {
+		if(null==state)
+			throw new InvalidOperationException("Variables were not defined.");
+		return ((IDictionary<string,int>)state)[identifier1];
 	}
-	else if (integer == n.SymbolId)
-		return int.Parse(n.Value);
+	else if (SymbolId1==integer)
+		return integer1;
 	else 
-		return EvaluateExpression(n.Children[1],state);
+		return Expression2;
 }
 add= "+";
 sub= "-";

@@ -125,40 +125,40 @@ namespace ParsleyDemo {
         #line hidden
         
         #line 26 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-		private static ParseNode _ParseLeaf(ParserContext context) {
-			int line = context.Line;
-			int column = context.Column;
-			long position = context.Position;
-			if ((ExpressionParser.identifier == context.SymbolId)) {
-				// Leaf -> identifier
-				ParseNode[] children = new ParseNode[1];
-				children[0] = new ParseNode(ExpressionParser.identifier, "identifier", context.Value, line, column, position);
-				context.Advance();
-				return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);
-			}
-			if ((ExpressionParser.integer == context.SymbolId)) {
-				// Leaf -> integer
-				ParseNode[] children = new ParseNode[1];
-				children[0] = new ParseNode(ExpressionParser.integer, "integer", context.Value, line, column, position);
-				context.Advance();
-				return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);
-			}
-			if ((ExpressionParser.lparen == context.SymbolId)) {
-				// Leaf -> lparen Expression rparen
-				ParseNode[] children = new ParseNode[3];
-				children[0] = new ParseNode(ExpressionParser.lparen, "lparen", context.Value, line, column, position);
-				context.Advance();
-				children[1] = ExpressionParser._ParseExpression(context);
-				children[2] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, line, column, position);
-				if ((ExpressionParser.rparen == context.SymbolId)) {
-					context.Advance();
-					return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);
-				}
-				context.Error("Expecting rparen");
-			}
-			context.Error("Expecting identifier, integer, or lparen");
-			return null;
-		}
+        private static ParseNode _ParseLeaf(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            if ((ExpressionParser.identifier == context.SymbolId)) {
+                // Leaf -> identifier
+                ParseNode[] children = new ParseNode[1];
+                children[0] = new ParseNode(ExpressionParser.identifier, "identifier", context.Value, line, column, position);
+                context.Advance();
+                return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);
+            }
+            if ((ExpressionParser.integer == context.SymbolId)) {
+                // Leaf -> integer
+                ParseNode[] children = new ParseNode[1];
+                children[0] = new ParseNode(ExpressionParser.integer, "integer", context.Value, line, column, position);
+                context.Advance();
+                return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);
+            }
+            if ((ExpressionParser.lparen == context.SymbolId)) {
+                // Leaf -> lparen Expression rparen
+                ParseNode[] children = new ParseNode[3];
+                children[0] = new ParseNode(ExpressionParser.lparen, "lparen", context.Value, line, column, position);
+                context.Advance();
+                children[1] = ExpressionParser._ParseExpression(context);
+                children[2] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, line, column, position);
+                if ((ExpressionParser.rparen == context.SymbolId)) {
+                    context.Advance();
+                    return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);
+                }
+                context.Error("Expecting rparen");
+            }
+            context.Error("Expecting identifier, integer, or lparen");
+            return null;
+        }
         
         #line default
         #line hidden
@@ -398,7 +398,7 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         
         #line 1 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        public static object Evaluate(ParseNode node) {
+        public static int Evaluate(ParseNode node) {
             return ExpressionParser.EvaluateExpression(node);
         }
         
@@ -417,7 +417,7 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         
         #line 1 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        public static object Evaluate(ParseNode node, object state) {
+        public static int Evaluate(ParseNode node, object state) {
             return ExpressionParser.EvaluateExpression(node, state);
         }
         
@@ -436,9 +436,9 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         
         #line 1 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        public static object EvaluateExpression(ParseNode node, object state) {
+        public static int EvaluateExpression(ParseNode node, object state) {
             if ((ExpressionParser.Expression == node.SymbolId)) {
-                return ParsleyDemo.ExpressionParser.EvaluateTerm(node.Children[0], state);
+                return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateTerm(node.Children[0], state), typeof(int))));
             }
             throw new SyntaxException("Expecting Expression", node.Line, node.Column, node.Position);
         }
@@ -457,7 +457,7 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         
         #line 1 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        public static object EvaluateExpression(ParseNode node) {
+        public static int EvaluateExpression(ParseNode node) {
             return ExpressionParser.EvaluateExpression(node, null);
         }
         
@@ -476,17 +476,17 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         
         #line 2 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        public static object EvaluateTerm(ParseNode node, object state) {
+        public static int EvaluateTerm(ParseNode node, object state) {
             if ((ExpressionParser.Term == node.SymbolId)) {
                 if ((1 == node.Children.Length)) {
-                    return ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[0], state);
+                    return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateFactor(node.Children[0], state), typeof(int))));
                 }
                 else {
                     if ((node.Children[1].SymbolId == ParsleyDemo.ExpressionParser.add)) {
-                        return (((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[0], state))) + ((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[2], state))));
+                        return ((int)(ExpressionParser._ChangeType((ExpressionParser.EvaluateFactor(node.Children[0], state) + ExpressionParser.EvaluateFactor(node.Children[2], state)), typeof(int))));
                     }
                     else {
-                        return (((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[0], state))) - ((int)(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[2], state))));
+                        return ((int)(ExpressionParser._ChangeType((ExpressionParser.EvaluateFactor(node.Children[0], state) - ExpressionParser.EvaluateFactor(node.Children[2], state)), typeof(int))));
                     }
                 }
             }
@@ -507,7 +507,7 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         
         #line 2 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        public static object EvaluateTerm(ParseNode node) {
+        public static int EvaluateTerm(ParseNode node) {
             return ExpressionParser.EvaluateTerm(node, null);
         }
         
@@ -526,17 +526,17 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         
         #line 10 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        public static object EvaluateFactor(ParseNode node, object state) {
+        public static int EvaluateFactor(ParseNode node, object state) {
             if ((ExpressionParser.Factor == node.SymbolId)) {
                 if ((1 == node.Children.Length)) {
-                    return ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[0], state);
+                    return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateUnary(node.Children[0], state), typeof(int))));
                 }
                 else {
                     if ((node.Children[1].SymbolId == ParsleyDemo.ExpressionParser.mul)) {
-                        return (((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[0], state))) * ((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[2], state))));
+                        return ((int)(ExpressionParser._ChangeType((ExpressionParser.EvaluateUnary(node.Children[0], state) * ExpressionParser.EvaluateUnary(node.Children[2], state)), typeof(int))));
                     }
                     else {
-                        return (((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[0], state))) / ((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[2], state))));
+                        return ((int)(ExpressionParser._ChangeType((ExpressionParser.EvaluateUnary(node.Children[0], state) / ExpressionParser.EvaluateUnary(node.Children[2], state)), typeof(int))));
                     }
                 }
             }
@@ -557,7 +557,7 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         
         #line 10 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        public static object EvaluateFactor(ParseNode node) {
+        public static int EvaluateFactor(ParseNode node) {
             return ExpressionParser.EvaluateFactor(node, null);
         }
         
@@ -578,17 +578,17 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         
         #line 18 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        public static object EvaluateUnary(ParseNode node, object state) {
+        public static int EvaluateUnary(ParseNode node, object state) {
             if ((ExpressionParser.Unary == node.SymbolId)) {
                 if ((1 == node.Children.Length)) {
-                    return ParsleyDemo.ExpressionParser.EvaluateLeaf(node.Children[0], state);
+                    return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateLeaf(node.Children[0], state), typeof(int))));
                 }
                 else {
                     if ((node.Children[0].SymbolId == ParsleyDemo.ExpressionParser.add)) {
-                        return ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[1], state);
+                        return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateUnary(node.Children[1], state), typeof(int))));
                     }
                     else {
-                        return (0 - ((int)(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[1], state))));
+                        return ((int)(ExpressionParser._ChangeType((0 - ((int)(ExpressionParser.EvaluateUnary(node.Children[1], state)))), typeof(int))));
                     }
                 }
             }
@@ -611,7 +611,7 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         
         #line 18 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        public static object EvaluateUnary(ParseNode node) {
+        public static int EvaluateUnary(ParseNode node) {
             return ExpressionParser.EvaluateUnary(node, null);
         }
         
@@ -632,23 +632,25 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         
         #line 26 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-		public static object EvaluateLeaf(ParseNode node, object state) {
-			if ((ExpressionParser.Leaf == node.SymbolId)) {
-				ParseNode n = node.Children[0];
-				if ((ParsleyDemo.ExpressionParser.identifier == n.SymbolId)) {
-					throw new NotImplementedException("Variables are not implemented.");
-				}
-				else {
-					if ((ParsleyDemo.ExpressionParser.integer == n.SymbolId)) {
-						return int.Parse(n.Value);
-					}
-					else {
-						return ParsleyDemo.ExpressionParser.EvaluateExpression(n.Children[1], state);
-					}
-				}
-			}
-			throw new SyntaxException("Expecting Leaf", node.Line, node.Column, node.Position);
-		}
+        public static int EvaluateLeaf(ParseNode node, object state) {
+            if ((ExpressionParser.Leaf == node.SymbolId)) {
+                if ((node.Children[0].SymbolId == ParsleyDemo.ExpressionParser.identifier)) {
+                    if ((null == state)) {
+                        throw new InvalidOperationException("Variables were not defined.");
+                    }
+                    return ((int)(ExpressionParser._ChangeType(((IDictionary<string, int>)(state))[node.Children[0].Value], typeof(int))));
+                }
+                else {
+                    if ((node.Children[0].SymbolId == ParsleyDemo.ExpressionParser.integer)) {
+                        return ((int)(ExpressionParser._ChangeType(node.Children[0].Value, typeof(int))));
+                    }
+                    else {
+                        return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateExpression(node.Children[1], state), typeof(int))));
+                    }
+                }
+            }
+            throw new SyntaxException("Expecting Leaf", node.Line, node.Column, node.Position);
+        }
         
         #line default
         #line hidden
@@ -666,12 +668,20 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         
         #line 26 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        public static object EvaluateLeaf(ParseNode node) {
+        public static int EvaluateLeaf(ParseNode node) {
             return ExpressionParser.EvaluateLeaf(node, null);
         }
         
         #line default
         #line hidden
+        private static object _ChangeType(object obj, System.Type type) {
+            System.ComponentModel.TypeConverter typeConverter = System.ComponentModel.TypeDescriptor.GetConverter(obj);
+            if (((null == typeConverter) 
+                        || (false == typeConverter.CanConvertTo(type)))) {
+                return System.Convert.ChangeType(obj, type);
+            }
+            return typeConverter.ConvertTo(obj, type);
+        }
     }
     /// <summary>
     /// 

@@ -428,7 +428,7 @@ Namespace ParsleyDemo
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Public Overloads Shared Function EvaluateExpression(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Expression = node.SymbolId) Then
-                Return CType(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateTerm(node.Children(0), state), GetType(Integer)),Integer)
+                Return CType(ExpressionParser._ChangeType(ExpressionParser.EvaluateTerm(node.Children(0), state), GetType(Integer)),Integer)
             End If
             Throw New SyntaxException("Expecting Expression", node.Line, node.Column, node.Position)
         End Function
@@ -464,15 +464,15 @@ Namespace ParsleyDemo
         '''<returns>The result of the evaluation</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",2)
-        Public Overloads Shared Function EvaluateTerm(ByVal node As ParseNode, ByVal state As Object) As Object
+        Public Overloads Shared Function EvaluateTerm(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Term = node.SymbolId) Then
                 If (1 = node.Children.Length) Then
-                    Return CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0), state),Integer)
+                    Return CType(ExpressionParser._ChangeType(ExpressionParser.EvaluateFactor(node.Children(0), state), GetType(Integer)),Integer)
                 Else
                     If (node.Children(1).SymbolId = ParsleyDemo.ExpressionParser.add) Then
-                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0), state),Integer) + CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(2), state),Integer))
+                        Return CType(ExpressionParser._ChangeType((ExpressionParser.EvaluateFactor(node.Children(0), state) + ExpressionParser.EvaluateFactor(node.Children(2), state)), GetType(Integer)),Integer)
                     Else
-                        Return (CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(0), state),Integer) - CType(ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(2), state),Integer))
+                        Return CType(ExpressionParser._ChangeType((ExpressionParser.EvaluateFactor(node.Children(0), state) - ExpressionParser.EvaluateFactor(node.Children(2), state)), GetType(Integer)),Integer)
                     End If
                 End If
             End If
@@ -492,7 +492,7 @@ Namespace ParsleyDemo
         '''<returns>The result of the evaluation</returns>
         
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",2)
-        Public Overloads Shared Function EvaluateTerm(ByVal node As ParseNode) As Object
+        Public Overloads Shared Function EvaluateTerm(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateTerm(node, Nothing)
         End Function
         
@@ -513,12 +513,12 @@ Namespace ParsleyDemo
         Public Overloads Shared Function EvaluateFactor(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Factor = node.SymbolId) Then
                 If (1 = node.Children.Length) Then
-                    Return CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(0), state),Integer)
+                    Return CType(ExpressionParser._ChangeType(ExpressionParser.EvaluateUnary(node.Children(0), state), GetType(Integer)),Integer)
                 Else
                     If (node.Children(1).SymbolId = ParsleyDemo.ExpressionParser.mul) Then
-                        Return CType(ExpressionParser._ChangeType((CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(0), state),Integer) * CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(2), state),Integer)), GetType(Integer)),Integer)
+                        Return CType(ExpressionParser._ChangeType((ExpressionParser.EvaluateUnary(node.Children(0), state) * ExpressionParser.EvaluateUnary(node.Children(2), state)), GetType(Integer)),Integer)
                     Else
-                        Return CType(ExpressionParser._ChangeType((CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(0), state),Integer) / CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(2), state),Integer)), GetType(Integer)),Integer)
+                        Return CType(ExpressionParser._ChangeType((ExpressionParser.EvaluateUnary(node.Children(0), state) / ExpressionParser.EvaluateUnary(node.Children(2), state)), GetType(Integer)),Integer)
                     End If
                 End If
             End If
@@ -561,12 +561,12 @@ Namespace ParsleyDemo
         Public Overloads Shared Function EvaluateUnary(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Unary = node.SymbolId) Then
                 If (1 = node.Children.Length) Then
-                    Return CType(ParsleyDemo.ExpressionParser.EvaluateLeaf(node.Children(0), state),Integer)
+                    Return CType(ExpressionParser._ChangeType(ExpressionParser.EvaluateLeaf(node.Children(0), state), GetType(Integer)),Integer)
                 Else
                     If (node.Children(0).SymbolId = ParsleyDemo.ExpressionParser.add) Then
-                        Return CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(1), state),Integer)
+                        Return CType(ExpressionParser._ChangeType(ExpressionParser.EvaluateUnary(node.Children(1), state), GetType(Integer)),Integer)
                     Else
-                        Return CType(ExpressionParser._ChangeType((0 - CType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(1), state),Integer)), GetType(Integer)),Integer)
+                        Return CType(ExpressionParser._ChangeType((0 - CType(ExpressionParser.EvaluateUnary(node.Children(1), state),Integer)), GetType(Integer)),Integer)
                     End If
                 End If
             End If
@@ -610,17 +610,16 @@ Namespace ParsleyDemo
         #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",26)
         Public Overloads Shared Function EvaluateLeaf(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Leaf = node.SymbolId) Then
-                Dim n As ParseNode = node.Children(0)
-                If (ParsleyDemo.ExpressionParser.identifier = n.SymbolId) Then
+                If (node.Children(0).SymbolId = ParsleyDemo.ExpressionParser.identifier) Then
                     If (Nothing Is state) Then
                         Throw New InvalidOperationException("Variables were not defined.")
                     End If
-                    Return CType(ExpressionParser._ChangeType(CType(state,IDictionary(Of String, Integer))(n.Value), GetType(Integer)),Integer)
+                    Return CType(ExpressionParser._ChangeType(CType(state,IDictionary(Of String, Integer))(node.Children(0).Value), GetType(Integer)),Integer)
                 Else
-                    If (ParsleyDemo.ExpressionParser.[integer] = n.SymbolId) Then
-                        Return CType(ExpressionParser._ChangeType(n.Value, GetType(Integer)),Integer)
+                    If (node.Children(0).SymbolId = ParsleyDemo.ExpressionParser.[integer]) Then
+                        Return CType(ExpressionParser._ChangeType(node.Children(0).Value, GetType(Integer)),Integer)
                     Else
-                        Return CType(ParsleyDemo.ExpressionParser.EvaluateExpression(n.Children(1), state),Integer)
+                        Return CType(ExpressionParser._ChangeType(ExpressionParser.EvaluateExpression(node.Children(1), state), GetType(Integer)),Integer)
                     End If
                 End If
             End If
