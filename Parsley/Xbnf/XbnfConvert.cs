@@ -50,17 +50,27 @@ namespace Parsley
 				var id = cfg.GetIdOfSymbol(te.Value);
 				if (-1 < id) // some terminals might never be used.
 				{
-					var prod = document.Productions[te.Value];
-					sb.Append(te.Value);
-					sb.Append("<id=");
-					sb.Append(id);
-					foreach (var attr in prod.Attributes)
+					// implicit terminals do not have productions and therefore attributes
+					var pi = document.Productions.IndexOf(te.Value);
+					if (-1 < pi)
 					{
-						sb.Append(", ");
-						sb.Append(attr.ToString());
+						// explicit
+						var prod = document.Productions[pi];
+						sb.Append(te.Value);
+						sb.Append("<id=");
+						sb.Append(id);
+						foreach (var attr in prod.Attributes)
+						{
+							sb.Append(", ");
+							sb.Append(attr.ToString());
+						}
+						sb.Append(">");
+					} else 
+					{
+						// implicit
+						sb.Append(te.Value);
+						sb.Append(string.Concat("<id=", id, ">"));
 					}
-					sb.Append(">");
-
 					sb.AppendLine(string.Concat("= \'", _ToRegex(document, te.Key, true), "\'"));
 				}
 			}

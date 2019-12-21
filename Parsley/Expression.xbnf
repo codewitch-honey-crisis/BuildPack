@@ -14,8 +14,10 @@
 Factor<type="int">= Unary { ("*"|"/") Unary } => { 
 	int result = Unary1;
 	int i = 2;
+	// Because of the way the grammar is factored, this can 
+	// end up being Factors when collapsed
 	while (i<Length) {
-		if(node.Children[i].SymbolId==Leaf) {
+		if(node.Children[i].SymbolId==Unary) {
 			if(node.Children[i-1].SymbolId==mul)
 				result *= EvaluateUnary(node.Children[i],state);
 			else
@@ -43,11 +45,11 @@ Leaf<type="int">= integer | "(" Term ")" => {
 		return integer1;
 	else return Term2; 
 }
+// we only need to declare terminals explicitly if we want 
+// constant names for them or to apply attributes to them
+// in this case we don't need divide, subtract or 
+// parentheses to be declared
 add="+";
-sub="-";
 mul="*";
-div="/";
-lparen="(";
-rparen=")";
 integer='[0-9]+';
 whitespace<hidden>='\s+';

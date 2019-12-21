@@ -266,7 +266,7 @@ namespace Parsley
 					var ppi = doc.Productions.IndexOf(nt);
 					if(-1<ppi)
 					{
-						var prod = doc.Productions[i];
+						var prod = doc.Productions[ppi];
 						//if (0 < prod.Line && !string.IsNullOrEmpty(doc.Filename))
 						//	m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
 					}

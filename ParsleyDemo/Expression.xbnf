@@ -45,11 +45,11 @@ Leaf<type="int">= integer | "(" Term ")" => {
 		return integer1;
 	else return Term2; 
 }
+// we only need to declare terminals explicitly if we want 
+// constant names for them or to apply attributes to them
+// in this case we don't need divide, subtract or 
+// parentheses to be declared
 add="+";
-sub="-";
 mul="*";
-div="/";
-lparen="(";
-rparen=")";
 integer='[0-9]+';
 whitespace<hidden>='\s+';
