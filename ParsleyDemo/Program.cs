@@ -9,7 +9,7 @@ namespace ParsleyDemo
 	{
 		static void Main(string[] args)
 		{
-			var text = "3*5+a*2";
+			var text = "3 + a * 5 + 7 / 2";
 			var vars = new Dictionary<string, int>();
 			vars["a"] = 1;
 			var exprTokenizer = new ExpressionTokenizer(text);

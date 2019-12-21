@@ -47,19 +47,22 @@ namespace Parsley
 			for (int ic = tmap.Count, i = 0; i < ic; ++i)
 			{
 				var te = tmap[i];
-				var prod = document.Productions[te.Value];
-				sb.Append(te.Value);
-				sb.Append("<id=");
-				sb.Append(cfg.GetIdOfSymbol(te.Value));
-				foreach (var attr in prod.Attributes)
+				var id = cfg.GetIdOfSymbol(te.Value);
+				if (-1 < id) // some terminals might never be used.
 				{
-					sb.Append(", ");
-					sb.Append(attr.ToString());
-				}
-				sb.Append(">");
-				
-				sb.AppendLine(string.Concat("= \'", _ToRegex(document, te.Key, true), "\'"));
+					var prod = document.Productions[te.Value];
+					sb.Append(te.Value);
+					sb.Append("<id=");
+					sb.Append(id);
+					foreach (var attr in prod.Attributes)
+					{
+						sb.Append(", ");
+						sb.Append(attr.ToString());
+					}
+					sb.Append(">");
 
+					sb.AppendLine(string.Concat("= \'", _ToRegex(document, te.Key, true), "\'"));
+				}
 			}
 			return sb.ToString();
 		}

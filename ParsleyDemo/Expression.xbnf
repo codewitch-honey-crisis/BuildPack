@@ -1,5 +1,5 @@
 ﻿Expression<start,type="int">= Term => { return Term1; }
-Term<type="int">= Factor ("+"|"-") Factor | Factor => {
+Term<type="int">= Factor ("+"|"-") Term | Factor => {
 	if(1==Length)
 		return Factor1;
 	else if(SymbolId2==add)
@@ -7,7 +7,7 @@ Term<type="int">= Factor ("+"|"-") Factor | Factor => {
 	else
 		return Factor1 - Factor3;
 }
-Factor<type="int">= Unary ("*"|"/") Unary | Unary => {
+Factor<type="int">= Factor ("*"|"/") Unary | Unary => {
 	if(1==Length)
 		return Unary1;
 	else if(SymbolId2==mul)

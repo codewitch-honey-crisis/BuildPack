@@ -1,45 +1,37 @@
-﻿Expression<start,type="int">= Term => { return Term1; }
-Term<type="int">= Factor ("+"|"-") Factor | Factor => {
-	if(1==Length)
+﻿Expression<type="int",start>= Term "+" Expression | Term => {
+	if(Length==1)
+		return Term1;
+	if(SymbolId2==add)
+		return Term1 + Expression3;
+	else
+		return Term1 - Expression3;
+}
+Term<type="int"> = Term "*" Factor | Factor => {
+	if(Length==1)
 		return Factor1;
-	else if(SymbolId2==add)
-		return Factor1 + Factor3;
+	if(SymbolId2==mul)
+		return Term1 * Factor3;
 	else
-		return Factor1 - Factor3;
+		return Term1 / Factor3;
 }
-Factor<type="int">= Unary ("*"|"/") Unary | Unary => {
-	if(1==Length)
-		return Unary1;
-	else if(SymbolId2==mul)
-		return Unary1 * Unary3;
-	else
-		return Unary1 / Unary3;
-}
-Unary<type="int">= ("+"|"-") Unary | Leaf => {
-	if (1 == Length)
-		return Leaf1;
-	else if (SymbolId1 == add)
-		return Unary2;
-	else
-		return -(int)Unary2;
-}
-Leaf<type="int">= identifier | integer | "(" Expression ")" => {
-	if (SymbolId1==identifier) {
-		if(null==state)
-			throw new InvalidOperationException("Variables were not defined.");
-		return ((IDictionary<string,int>)state)[identifier1];
+Factor<type="int"> = "(" Expression ")" | integer | identifier => {
+	if(Length==1) {
+		if(SymbolId1==integer)
+			return integer1;
+		else {
+			if(null==state)
+				throw new InvalidOperationException("Variables were not defined.");
+			return ((IDictionary<string,int>)state)[identifier1];
+		}
 	}
-	else if (SymbolId1==integer)
-		return integer1;
-	else 
-		return Expression2;
+	return Expression2;
 }
-add= "+";
-sub= "-";
-mul= "*";
-div= "/";
-lparen= "(";
-rparen= ")";
-integer= '[0-9]+';
-identifier= '[A-Z_a-z][0-9A-Z_a-z]*';
-whitespace<hidden>= '\s+';
+integer='[0-9]+';
+identifier='[A-Z_a-z][0-9A-Z_a-z]*';
+whitespace<hidden>='\s+';
+add="+";
+sub="-";
+mul="*";
+div="/";
+lparen="(";
+rparen=")";
