@@ -14,7 +14,7 @@ namespace Parsley
 					if (name == item.Name)
 						return item;
 				}
-				throw new KeyNotFoundException();
+				throw new KeyNotFoundException(string.Format("The specified production {0} was not found in the grammar",name));
 			}
 		}
 		public int IndexOf(string name)

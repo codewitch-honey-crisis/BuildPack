@@ -491,54 +491,30 @@ namespace ParsleyDemo {
                                         '0',
                                         '9'}, 7),
                             new DfaTransitionEntry(new char[] {
-                                        'A',
-                                        'Z',
-                                        '_',
-                                        '_',
-                                        'a',
-                                        'z'}, 8),
-                            new DfaTransitionEntry(new char[] {
                                         '\t',
                                         '\r',
                                         ' ',
-                                        ' '}, 10)}, -1),
-                new DfaEntry(new DfaTransitionEntry[0], 8),
-                new DfaEntry(new DfaTransitionEntry[0], 9),
-                new DfaEntry(new DfaTransitionEntry[0], 14),
-                new DfaEntry(new DfaTransitionEntry[0], 15),
+                                        ' '}, 8)}, -1),
                 new DfaEntry(new DfaTransitionEntry[0], 12),
                 new DfaEntry(new DfaTransitionEntry[0], 13),
+                new DfaEntry(new DfaTransitionEntry[0], 17),
+                new DfaEntry(new DfaTransitionEntry[0], 18),
+                new DfaEntry(new DfaTransitionEntry[0], 15),
+                new DfaEntry(new DfaTransitionEntry[0], 16),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         '0',
-                                        '9'}, 7)}, 11),
-                new DfaEntry(new DfaTransitionEntry[] {
-                            new DfaTransitionEntry(new char[] {
-                                        '0',
-                                        '9',
-                                        'A',
-                                        'Z',
-                                        '_',
-                                        '_',
-                                        'a',
-                                        'z'}, 9)}, 10),
-                new DfaEntry(new DfaTransitionEntry[] {
-                            new DfaTransitionEntry(new char[] {
-                                        '0',
-                                        '9',
-                                        'A',
-                                        'Z',
-                                        '_',
-                                        '_',
-                                        'a',
-                                        'z'}, 9)}, 10),
+                                        '9'}, 7)}, 14),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         '\t',
                                         '\r',
                                         ' ',
-                                        ' '}, 10)}, 16)};
+                                        ' '}, 8)}, 19)};
         internal static int[] NodeFlags = new int[] {
+                0,
+                0,
+                0,
                 0,
                 0,
                 0,
@@ -573,18 +549,20 @@ namespace ParsleyDemo {
                 null,
                 null,
                 null,
+                null,
+                null,
+                null,
                 null};
         public ExpressionTokenizer(IEnumerable<char> input) : 
                 base(ExpressionTokenizer.DfaTable, ExpressionTokenizer.BlockEnds, ExpressionTokenizer.NodeFlags, input) {
         }
-        public const int add = 8;
-        public const int sub = 9;
-        public const int identifier = 10;
-        public const int integer = 11;
-        public const int lparen = 12;
-        public const int rparen = 13;
-        public const int mul = 14;
-        public const int div = 15;
-        public const int whitespace = 16;
+        public const int add = 12;
+        public const int sub = 13;
+        public const int integer = 14;
+        public const int lparen = 15;
+        public const int rparen = 16;
+        public const int mul = 17;
+        public const int div = 18;
+        public const int whitespace = 19;
     }
 }

@@ -16,423 +16,522 @@ Imports System.Collections.Generic
 
 Namespace ParsleyDemo
     '''<summary>Parses the following grammar:
-    '''Expression= Term "+" Expression | Term;
-    '''Term= Term "*" Factor | Factor;
-    '''Factor= "(" Expression ")" | integer | identifier;
-    '''integer= '[0-9]+';
-    '''identifier= '[A-Z_a-z][0-9A-Z_a-z]*';
-    '''(whitespace)= '\s+';
+    '''Term= Factor { ( "+" | "-" ) Factor };
+    '''Factor= Leaf { ( "*" | "/" ) Leaf };
+    '''Leaf= integer | "(" Term ")";
     '''add= "+";
     '''sub= "-";
     '''mul= "*";
     '''div= "/";
     '''lparen= "(";
     '''rparen= ")";
+    '''integer= '[0-9]+';
+    '''(whitespace)= '\s+';
     '''</summary>
     '''<remarks>The rules for the factored grammar are as follows:
-    '''Term -> Factor TermRightAssoc
-    '''Factor -> lparen Expression rparen
-    '''Factor -> integer
-    '''Factor -> identifier
-    '''TermRightAssoc -> mul Factor TermRightAssoc
-    '''TermRightAssoc ->
-    '''Expression -> Term ExpressionPart
-    '''ExpressionPart -> add Expression
-    '''ExpressionPart ->
+    '''Leaf -> integer
+    '''Leaf -> lparen Term rparen
+    '''ImplicitList -> add Factor ImplicitListRightAssoc ImplicitListRightAssoc2
+    '''ImplicitList -> sub Factor ImplicitListRightAssoc ImplicitListRightAssoc2
+    '''ImplicitList2 -> mul Leaf ImplicitList2RightAssoc ImplicitList2RightAssoc2
+    '''ImplicitList2 -> div Leaf ImplicitList2RightAssoc ImplicitList2RightAssoc2
+    '''ImplicitListRightAssoc -> add Factor ImplicitListRightAssoc
+    '''ImplicitListRightAssoc ->
+    '''ImplicitList2RightAssoc -> mul Leaf ImplicitList2RightAssoc
+    '''ImplicitList2RightAssoc ->
+    '''Term -> Factor TermPart
+    '''TermPart -> ImplicitList
+    '''TermPart ->
+    '''Factor -> Leaf FactorPart
+    '''FactorPart -> ImplicitList2
+    '''FactorPart ->
+    '''ImplicitListRightAssoc2 -> sub Factor ImplicitListRightAssoc2
+    '''ImplicitListRightAssoc2 ->
+    '''ImplicitList2RightAssoc2 -> div Leaf ImplicitList2RightAssoc2
+    '''ImplicitList2RightAssoc2 ->
     '''</remarks>
     <System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")>  _
     Partial Friend Class ExpressionParser
         Friend Const ErrorSymbol As Integer = -1
         Friend Const EosSymbol As Integer = -2
-        Public Const Term As Integer = 0
-        Public Const Factor As Integer = 1
-        Public Const TermRightAssoc As Integer = 2
-        Public Const Expression As Integer = 3
-        Public Const ExpressionPart As Integer = 4
-        Public Const lparen As Integer = 5
-        Public Const rparen As Integer = 6
-        Public Const [integer] As Integer = 7
-        Public Const identifier As Integer = 8
-        Public Const mul As Integer = 9
-        Public Const add As Integer = 10
-        Public Const whitespace As Integer = 11
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",9)
-        Private Shared Function _ParseTerm(ByVal context As ParserContext) As ParseNode
+        Public Const Leaf As Integer = 0
+        Public Const ImplicitList As Integer = 1
+        Public Const ImplicitList2 As Integer = 2
+        Public Const ImplicitListRightAssoc As Integer = 3
+        Public Const ImplicitList2RightAssoc As Integer = 4
+        Public Const Term As Integer = 5
+        Public Const TermPart As Integer = 6
+        Public Const Factor As Integer = 7
+        Public Const FactorPart As Integer = 8
+        Public Const ImplicitListRightAssoc2 As Integer = 9
+        Public Const ImplicitList2RightAssoc2 As Integer = 10
+        Public Const [integer] As Integer = 11
+        Public Const lparen As Integer = 12
+        Public Const rparen As Integer = 13
+        Public Const add As Integer = 14
+        Public Const [sub] As Integer = 15
+        Public Const mul As Integer = 16
+        Public Const div As Integer = 17
+        Public Const whitespace As Integer = 18
+        Private Shared Function _ParseLeaf(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
             Dim position As Long = context.Position
-            If (((ExpressionParser.lparen = context.SymbolId)  _
-                        OrElse (ExpressionParser.[integer] = context.SymbolId))  _
-                        OrElse (ExpressionParser.identifier = context.SymbolId)) Then
-                'Term -> Factor TermRightAssoc
-                Dim children(1) As ParseNode
-                children(0) = ExpressionParser._ParseFactor(context)
-                children(1) = ExpressionParser._ParseTermRightAssoc(context)
-                Return New ParseNode(ExpressionParser.Term, "Term", children, line, column, position)
-            End If
-            context.Error("Expecting lparen, integer, or identifier")
-            Return Nothing
-        End Function
-        
-        #End ExternalSource
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",17)
-        Private Shared Function _ParseFactor(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
-            If (ExpressionParser.lparen = context.SymbolId) Then
-                'Factor -> lparen Expression rparen
-                Dim children(2) As ParseNode
-                children(0) = New ParseNode(ExpressionParser.lparen, "lparen", context.Value, line, column, position)
-                context.Advance
-                children(1) = ExpressionParser._ParseExpression(context)
-                children(2) = New ParseNode(ExpressionParser.rparen, "rparen", context.Value, line, column, position)
-                If (ExpressionParser.rparen = context.SymbolId) Then
-                    context.Advance
-                    Return New ParseNode(ExpressionParser.Factor, "Factor", children, line, column, position)
-                End If
-                context.Error("Expecting rparen")
-            End If
             If (ExpressionParser.[integer] = context.SymbolId) Then
-                'Factor -> integer
+                'Leaf -> integer
                 Dim children(0) As ParseNode
                 children(0) = New ParseNode(ExpressionParser.[integer], "integer", context.Value, line, column, position)
                 context.Advance
-                Return New ParseNode(ExpressionParser.Factor, "Factor", children, line, column, position)
+                Return New ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position)
             End If
-            If (ExpressionParser.identifier = context.SymbolId) Then
-                'Factor -> identifier
-                Dim children(0) As ParseNode
-                children(0) = New ParseNode(ExpressionParser.identifier, "identifier", context.Value, line, column, position)
-                context.Advance
-                Return New ParseNode(ExpressionParser.Factor, "Factor", children, line, column, position)
-            End If
-            context.Error("Expecting lparen, integer, or identifier")
-            Return Nothing
-        End Function
-        
-        #End ExternalSource
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",9)
-        Private Shared Function _ParseTermRightAssoc(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
-            If (ExpressionParser.mul = context.SymbolId) Then
-                'TermRightAssoc -> mul Factor TermRightAssoc
+            If (ExpressionParser.lparen = context.SymbolId) Then
+                'Leaf -> lparen Term rparen
                 Dim children(2) As ParseNode
-                children(0) = New ParseNode(ExpressionParser.mul, "mul", context.Value, line, column, position)
+                children(0) = New ParseNode(ExpressionParser.lparen, "lparen", context.Value, line, column, position)
                 context.Advance
-                children(1) = ExpressionParser._ParseFactor(context)
-                children(2) = ExpressionParser._ParseTermRightAssoc(context)
-                Return New ParseNode(ExpressionParser.Term, "Term", children, line, column, position)
+                children(1) = ExpressionParser._ParseTerm(context)
+                children(2) = New ParseNode(ExpressionParser.rparen, "rparen", context.Value, line, column, position)
+                If (ExpressionParser.rparen = context.SymbolId) Then
+                    context.Advance
+                    Return New ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position)
+                End If
+                context.Error("Expecting rparen")
             End If
-            If (((ExpressionParser.add = context.SymbolId)  _
-                        OrElse (ExpressionParser.EosSymbol = context.SymbolId))  _
-                        OrElse (ExpressionParser.rparen = context.SymbolId)) Then
-                'TermRightAssoc ->
-                Dim children(-1) As ParseNode
-                Return New ParseNode(ExpressionParser.Term, "Term", children, line, column, position)
-            End If
-            context.Error("Expecting mul, add, #EOS, or rparen")
+            context.Error("Expecting integer or lparen")
             Return Nothing
         End Function
-        
-        #End ExternalSource
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",1)
-        Private Shared Function _ParseExpression(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
-            If (((ExpressionParser.lparen = context.SymbolId)  _
-                        OrElse (ExpressionParser.[integer] = context.SymbolId))  _
-                        OrElse (ExpressionParser.identifier = context.SymbolId)) Then
-                'Expression -> Term ExpressionPart
-                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
-                children.Add(ExpressionParser._ParseTerm(context))
-                children.AddRange(ExpressionParser._ParseExpressionPart(context).Children)
-                Return New ParseNode(ExpressionParser.Expression, "Expression", children.ToArray, line, column, position)
-            End If
-            context.Error("Expecting lparen, integer, or identifier")
-            Return Nothing
-        End Function
-        
-        #End ExternalSource
-        Private Shared Function _ParseExpressionPart(ByVal context As ParserContext) As ParseNode
+        Private Shared Function _ParseImplicitList(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
             Dim position As Long = context.Position
             If (ExpressionParser.add = context.SymbolId) Then
-                'ExpressionPart -> add Expression
-                Dim children(1) As ParseNode
-                children(0) = New ParseNode(ExpressionParser.add, "add", context.Value, line, column, position)
+                'ImplicitList -> add Factor ImplicitListRightAssoc ImplicitListRightAssoc2
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                children.Add(New ParseNode(ExpressionParser.add, "add", context.Value, line, column, position))
                 context.Advance
-                children(1) = ExpressionParser._ParseExpression(context)
-                Return New ParseNode(ExpressionParser.ExpressionPart, "ExpressionPart", children, line, column, position)
+                children.Add(ExpressionParser._ParseFactor(context))
+                children.AddRange(ExpressionParser._ParseImplicitListRightAssoc(context).Children)
+                children.AddRange(ExpressionParser._ParseImplicitListRightAssoc2(context).Children)
+                Return New ParseNode(ExpressionParser.ImplicitList, "ImplicitList", children.ToArray, line, column, position)
+            End If
+            If (ExpressionParser.[sub] = context.SymbolId) Then
+                'ImplicitList -> sub Factor ImplicitListRightAssoc ImplicitListRightAssoc2
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                children.Add(New ParseNode(ExpressionParser.[sub], "sub", context.Value, line, column, position))
+                context.Advance
+                children.Add(ExpressionParser._ParseFactor(context))
+                children.AddRange(ExpressionParser._ParseImplicitListRightAssoc(context).Children)
+                children.AddRange(ExpressionParser._ParseImplicitListRightAssoc2(context).Children)
+                Return New ParseNode(ExpressionParser.ImplicitList, "ImplicitList", children.ToArray, line, column, position)
+            End If
+            context.Error("Expecting add or sub")
+            Return Nothing
+        End Function
+        Private Shared Function _ParseImplicitList2(ByVal context As ParserContext) As ParseNode
+            Dim line As Integer = context.Line
+            Dim column As Integer = context.Column
+            Dim position As Long = context.Position
+            If (ExpressionParser.mul = context.SymbolId) Then
+                'ImplicitList2 -> mul Leaf ImplicitList2RightAssoc ImplicitList2RightAssoc2
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                children.Add(New ParseNode(ExpressionParser.mul, "mul", context.Value, line, column, position))
+                context.Advance
+                children.Add(ExpressionParser._ParseLeaf(context))
+                children.AddRange(ExpressionParser._ParseImplicitList2RightAssoc(context).Children)
+                children.AddRange(ExpressionParser._ParseImplicitList2RightAssoc2(context).Children)
+                Return New ParseNode(ExpressionParser.ImplicitList2, "ImplicitList2", children.ToArray, line, column, position)
+            End If
+            If (ExpressionParser.div = context.SymbolId) Then
+                'ImplicitList2 -> div Leaf ImplicitList2RightAssoc ImplicitList2RightAssoc2
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                children.Add(New ParseNode(ExpressionParser.div, "div", context.Value, line, column, position))
+                context.Advance
+                children.Add(ExpressionParser._ParseLeaf(context))
+                children.AddRange(ExpressionParser._ParseImplicitList2RightAssoc(context).Children)
+                children.AddRange(ExpressionParser._ParseImplicitList2RightAssoc2(context).Children)
+                Return New ParseNode(ExpressionParser.ImplicitList2, "ImplicitList2", children.ToArray, line, column, position)
+            End If
+            context.Error("Expecting mul or div")
+            Return Nothing
+        End Function
+        Private Shared Function _ParseImplicitListRightAssoc(ByVal context As ParserContext) As ParseNode
+            Dim line As Integer = context.Line
+            Dim column As Integer = context.Column
+            Dim position As Long = context.Position
+            If (ExpressionParser.add = context.SymbolId) Then
+                'ImplicitListRightAssoc -> add Factor ImplicitListRightAssoc
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                children.Add(New ParseNode(ExpressionParser.add, "add", context.Value, line, column, position))
+                context.Advance
+                children.Add(ExpressionParser._ParseFactor(context))
+                children.AddRange(ExpressionParser._ParseImplicitListRightAssoc(context).Children)
+                Return New ParseNode(ExpressionParser.ImplicitListRightAssoc, "ImplicitListRightAssoc", children.ToArray, line, column, position)
+            End If
+            If (((ExpressionParser.[sub] = context.SymbolId)  _
+                        OrElse (ExpressionParser.EosSymbol = context.SymbolId))  _
+                        OrElse (ExpressionParser.rparen = context.SymbolId)) Then
+                'ImplicitListRightAssoc ->
+                Dim children(-1) As ParseNode
+                Return New ParseNode(ExpressionParser.ImplicitListRightAssoc, "ImplicitListRightAssoc", children, line, column, position)
+            End If
+            context.Error("Expecting add, sub, #EOS, or rparen")
+            Return Nothing
+        End Function
+        Private Shared Function _ParseImplicitList2RightAssoc(ByVal context As ParserContext) As ParseNode
+            Dim line As Integer = context.Line
+            Dim column As Integer = context.Column
+            Dim position As Long = context.Position
+            If (ExpressionParser.mul = context.SymbolId) Then
+                'ImplicitList2RightAssoc -> mul Leaf ImplicitList2RightAssoc
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                children.Add(New ParseNode(ExpressionParser.mul, "mul", context.Value, line, column, position))
+                context.Advance
+                children.Add(ExpressionParser._ParseLeaf(context))
+                children.AddRange(ExpressionParser._ParseImplicitList2RightAssoc(context).Children)
+                Return New ParseNode(ExpressionParser.ImplicitList2RightAssoc, "ImplicitList2RightAssoc", children.ToArray, line, column, position)
+            End If
+            If (((((ExpressionParser.div = context.SymbolId)  _
+                        OrElse (ExpressionParser.add = context.SymbolId))  _
+                        OrElse (ExpressionParser.[sub] = context.SymbolId))  _
+                        OrElse (ExpressionParser.EosSymbol = context.SymbolId))  _
+                        OrElse (ExpressionParser.rparen = context.SymbolId)) Then
+                'ImplicitList2RightAssoc ->
+                Dim children(-1) As ParseNode
+                Return New ParseNode(ExpressionParser.ImplicitList2RightAssoc, "ImplicitList2RightAssoc", children, line, column, position)
+            End If
+            context.Error("Expecting mul, div, add, sub, #EOS, or rparen")
+            Return Nothing
+        End Function
+        Private Shared Function _ParseTerm(ByVal context As ParserContext) As ParseNode
+            Dim line As Integer = context.Line
+            Dim column As Integer = context.Column
+            Dim position As Long = context.Position
+            If ((ExpressionParser.[integer] = context.SymbolId)  _
+                        OrElse (ExpressionParser.lparen = context.SymbolId)) Then
+                'Term -> Factor TermPart
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                children.Add(ExpressionParser._ParseFactor(context))
+                children.AddRange(ExpressionParser._ParseTermPart(context).Children)
+                Return New ParseNode(ExpressionParser.Term, "Term", children.ToArray, line, column, position)
+            End If
+            context.Error("Expecting integer or lparen")
+            Return Nothing
+        End Function
+        Private Shared Function _ParseTermPart(ByVal context As ParserContext) As ParseNode
+            Dim line As Integer = context.Line
+            Dim column As Integer = context.Column
+            Dim position As Long = context.Position
+            If ((ExpressionParser.add = context.SymbolId)  _
+                        OrElse (ExpressionParser.[sub] = context.SymbolId)) Then
+                'TermPart -> ImplicitList
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                children.AddRange(ExpressionParser._ParseImplicitList(context).Children)
+                Return New ParseNode(ExpressionParser.TermPart, "TermPart", children.ToArray, line, column, position)
             End If
             If ((ExpressionParser.EosSymbol = context.SymbolId)  _
                         OrElse (ExpressionParser.rparen = context.SymbolId)) Then
-                'ExpressionPart ->
+                'TermPart ->
                 Dim children(-1) As ParseNode
-                Return New ParseNode(ExpressionParser.ExpressionPart, "ExpressionPart", children, line, column, position)
+                Return New ParseNode(ExpressionParser.TermPart, "TermPart", children, line, column, position)
             End If
-            context.Error("Expecting add, #EOS, or rparen")
+            context.Error("Expecting add, sub, #EOS, or rparen")
+            Return Nothing
+        End Function
+        Private Shared Function _ParseFactor(ByVal context As ParserContext) As ParseNode
+            Dim line As Integer = context.Line
+            Dim column As Integer = context.Column
+            Dim position As Long = context.Position
+            If ((ExpressionParser.[integer] = context.SymbolId)  _
+                        OrElse (ExpressionParser.lparen = context.SymbolId)) Then
+                'Factor -> Leaf FactorPart
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                children.Add(ExpressionParser._ParseLeaf(context))
+                children.AddRange(ExpressionParser._ParseFactorPart(context).Children)
+                Return New ParseNode(ExpressionParser.Factor, "Factor", children.ToArray, line, column, position)
+            End If
+            context.Error("Expecting integer or lparen")
+            Return Nothing
+        End Function
+        Private Shared Function _ParseFactorPart(ByVal context As ParserContext) As ParseNode
+            Dim line As Integer = context.Line
+            Dim column As Integer = context.Column
+            Dim position As Long = context.Position
+            If ((ExpressionParser.mul = context.SymbolId)  _
+                        OrElse (ExpressionParser.div = context.SymbolId)) Then
+                'FactorPart -> ImplicitList2
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                children.AddRange(ExpressionParser._ParseImplicitList2(context).Children)
+                Return New ParseNode(ExpressionParser.FactorPart, "FactorPart", children.ToArray, line, column, position)
+            End If
+            If ((((ExpressionParser.add = context.SymbolId)  _
+                        OrElse (ExpressionParser.[sub] = context.SymbolId))  _
+                        OrElse (ExpressionParser.EosSymbol = context.SymbolId))  _
+                        OrElse (ExpressionParser.rparen = context.SymbolId)) Then
+                'FactorPart ->
+                Dim children(-1) As ParseNode
+                Return New ParseNode(ExpressionParser.FactorPart, "FactorPart", children, line, column, position)
+            End If
+            context.Error("Expecting mul, div, add, sub, #EOS, or rparen")
+            Return Nothing
+        End Function
+        Private Shared Function _ParseImplicitListRightAssoc2(ByVal context As ParserContext) As ParseNode
+            Dim line As Integer = context.Line
+            Dim column As Integer = context.Column
+            Dim position As Long = context.Position
+            If (ExpressionParser.[sub] = context.SymbolId) Then
+                'ImplicitListRightAssoc2 -> sub Factor ImplicitListRightAssoc2
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                children.Add(New ParseNode(ExpressionParser.[sub], "sub", context.Value, line, column, position))
+                context.Advance
+                children.Add(ExpressionParser._ParseFactor(context))
+                children.AddRange(ExpressionParser._ParseImplicitListRightAssoc2(context).Children)
+                Return New ParseNode(ExpressionParser.ImplicitListRightAssoc2, "ImplicitListRightAssoc2", children.ToArray, line, column, position)
+            End If
+            If ((ExpressionParser.EosSymbol = context.SymbolId)  _
+                        OrElse (ExpressionParser.rparen = context.SymbolId)) Then
+                'ImplicitListRightAssoc2 ->
+                Dim children(-1) As ParseNode
+                Return New ParseNode(ExpressionParser.ImplicitListRightAssoc2, "ImplicitListRightAssoc2", children, line, column, position)
+            End If
+            context.Error("Expecting sub, #EOS, or rparen")
+            Return Nothing
+        End Function
+        Private Shared Function _ParseImplicitList2RightAssoc2(ByVal context As ParserContext) As ParseNode
+            Dim line As Integer = context.Line
+            Dim column As Integer = context.Column
+            Dim position As Long = context.Position
+            If (ExpressionParser.div = context.SymbolId) Then
+                'ImplicitList2RightAssoc2 -> div Leaf ImplicitList2RightAssoc2
+                Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
+                children.Add(New ParseNode(ExpressionParser.div, "div", context.Value, line, column, position))
+                context.Advance
+                children.Add(ExpressionParser._ParseLeaf(context))
+                children.AddRange(ExpressionParser._ParseImplicitList2RightAssoc2(context).Children)
+                Return New ParseNode(ExpressionParser.ImplicitList2RightAssoc2, "ImplicitList2RightAssoc2", children.ToArray, line, column, position)
+            End If
+            If ((((ExpressionParser.add = context.SymbolId)  _
+                        OrElse (ExpressionParser.[sub] = context.SymbolId))  _
+                        OrElse (ExpressionParser.EosSymbol = context.SymbolId))  _
+                        OrElse (ExpressionParser.rparen = context.SymbolId)) Then
+                'ImplicitList2RightAssoc2 ->
+                Dim children(-1) As ParseNode
+                Return New ParseNode(ExpressionParser.ImplicitList2RightAssoc2, "ImplicitList2RightAssoc2", children, line, column, position)
+            End If
+            context.Error("Expecting div, add, sub, #EOS, or rparen")
             Return Nothing
         End Function
         '''<summary>
         '''Parses a production of the form:
-        '''Expression= Term "+" Expression | Term
+        '''Term= Factor { ( "+" | "-" ) Factor }
         '''</summary>
         '''<remarks>
         '''The production rules are:
-        '''Expression -> Term ExpressionPart
+        '''Term -> Factor TermPart
         '''</remarks>
         '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",1)
-        Public Shared Function ParseExpression(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
-            Dim context As ParserContext = New ParserContext(tokenizer)
-            context.EnsureStarted
-            Return ExpressionParser._ParseExpression(context)
-        End Function
-        
-        #End ExternalSource
-        '''<summary>
-        '''Parses a production of the form:
-        '''Term= Term "*" Factor | Factor
-        '''</summary>
-        '''<remarks>
-        '''The production rules are:
-        '''Term -> Factor TermRightAssoc
-        '''</remarks>
-        '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",9)
         Public Shared Function ParseTerm(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return ExpressionParser._ParseTerm(context)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Parses a production of the form:
-        '''Factor= "(" Expression ")" | integer | identifier
+        '''Factor= Leaf { ( "*" | "/" ) Leaf }
         '''</summary>
         '''<remarks>
         '''The production rules are:
-        '''Factor -> lparen Expression rparen
-        '''Factor -> integer
-        '''Factor -> identifier
+        '''Factor -> Leaf FactorPart
         '''</remarks>
         '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",17)
         Public Shared Function ParseFactor(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return ExpressionParser._ParseFactor(context)
         End Function
-        
-        #End ExternalSource
         '''<summary>
-        '''Parses a derivation of the form:
-        '''Expression= Term "+" Expression | Term
+        '''Parses a production of the form:
+        '''Leaf= integer | "(" Term ")"
         '''</summary>
         '''<remarks>
         '''The production rules are:
-        '''Expression -> Term ExpressionPart
+        '''Leaf -> integer
+        '''Leaf -> lparen Term rparen
         '''</remarks>
         '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",1)
+        Public Shared Function ParseLeaf(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
+            Dim context As ParserContext = New ParserContext(tokenizer)
+            context.EnsureStarted
+            Return ExpressionParser._ParseLeaf(context)
+        End Function
+        '''<summary>
+        '''Parses a derivation of the form:
+        '''Term= Factor { ( "+" | "-" ) Factor }
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Term -> Factor TermPart
+        '''</remarks>
+        '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         Public Shared Function Parse(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
-            Return ExpressionParser._ParseExpression(context)
+            Return ExpressionParser._ParseTerm(context)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
-        '''Expression= Term "+" Expression | Term
+        '''Term= Factor { ( "+" | "-" ) Factor }
         '''</summary>
         '''<remarks>
         '''The production rules are:
-        '''Expression -> Term ExpressionPart
+        '''Term -> Factor TermPart
         '''</remarks>
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",1)
         Public Overloads Shared Function Evaluate(ByVal node As ParseNode) As Integer
-            Return ExpressionParser.EvaluateExpression(node)
+            Return ExpressionParser.EvaluateTerm(node)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
-        '''Expression= Term "+" Expression | Term
+        '''Term= Factor { ( "+" | "-" ) Factor }
         '''</summary>
         '''<remarks>
         '''The production rules are:
-        '''Expression -> Term ExpressionPart
+        '''Term -> Factor TermPart
         '''</remarks>
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",1)
         Public Overloads Shared Function Evaluate(ByVal node As ParseNode, ByVal state As Object) As Integer
-            Return ExpressionParser.EvaluateExpression(node, state)
+            Return ExpressionParser.EvaluateTerm(node, state)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
-        '''Expression= Term "+" Expression | Term
+        '''Term= Factor { ( "+" | "-" ) Factor }
         '''</summary>
         '''<remarks>
         '''The production rules are:
-        '''Expression -> Term ExpressionPart
+        '''Term -> Factor TermPart
         '''</remarks>
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",1)
-        Public Overloads Shared Function EvaluateExpression(ByVal node As ParseNode, ByVal state As Object) As Integer
-            If (ExpressionParser.Expression = node.SymbolId) Then
-                If (node.Children.Length = 1) Then
-                    Return CType(ExpressionParser._ChangeType(ExpressionParser.EvaluateTerm(node.Children(0), state), GetType(Integer)),Integer)
-                End If
-                If (node.Children(1).SymbolId = ParsleyDemo.ExpressionParser.add) Then
-                    Return CType(ExpressionParser._ChangeType((ExpressionParser.EvaluateTerm(node.Children(0), state) + ExpressionParser.EvaluateExpression(node.Children(2), state)), GetType(Integer)),Integer)
-                Else
-                    Return CType(ExpressionParser._ChangeType((ExpressionParser.EvaluateTerm(node.Children(0), state) - ExpressionParser.EvaluateExpression(node.Children(2), state)), GetType(Integer)),Integer)
-                End If
-            End If
-            Throw New SyntaxException("Expecting Expression", node.Line, node.Column, node.Position)
-        End Function
-        
-        #End ExternalSource
-        '''<summary>
-        '''Evaluates a derivation of the form:
-        '''Expression= Term "+" Expression | Term
-        '''</summary>
-        '''<remarks>
-        '''The production rules are:
-        '''Expression -> Term ExpressionPart
-        '''</remarks>
-        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
-        '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",1)
-        Public Overloads Shared Function EvaluateExpression(ByVal node As ParseNode) As Integer
-            Return ExpressionParser.EvaluateExpression(node, Nothing)
-        End Function
-        
-        #End ExternalSource
-        '''<summary>
-        '''Evaluates a derivation of the form:
-        '''Term= Term "*" Factor | Factor
-        '''</summary>
-        '''<remarks>
-        '''The production rules are:
-        '''Term -> Factor TermRightAssoc
-        '''</remarks>
-        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
-        '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
-        '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",9)
         Public Overloads Shared Function EvaluateTerm(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Term = node.SymbolId) Then
-                If (node.Children.Length = 1) Then
-                    Return CType(ExpressionParser._ChangeType(ExpressionParser.EvaluateFactor(node.Children(0), state), GetType(Integer)),Integer)
-                End If
-                If (node.Children(1).SymbolId = ParsleyDemo.ExpressionParser.mul) Then
-                    Return CType(ExpressionParser._ChangeType((ExpressionParser.EvaluateTerm(node.Children(0), state) * ExpressionParser.EvaluateFactor(node.Children(2), state)), GetType(Integer)),Integer)
-                Else
-                    Return CType(ExpressionParser._ChangeType((ExpressionParser.EvaluateTerm(node.Children(0), state) / ExpressionParser.EvaluateFactor(node.Children(2), state)), GetType(Integer)),Integer)
-                End If
+                Dim result As Integer = ExpressionParser.EvaluateFactor(node.Children(0), state)
+                Dim i As Integer = 2
+
+                Do While (i < node.Children.Length)
+                    If (node.Children((i - 1)).SymbolId = ParsleyDemo.ExpressionParser.add) Then
+                        result = (result + ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(i), state))
+                    Else
+                        result = (result - ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(i), state))
+                    End If
+                    i = (i + 2)
+
+                Loop
+                Return CType(ExpressionParser._ChangeType(result, GetType(Integer)),Integer)
             End If
             Throw New SyntaxException("Expecting Term", node.Line, node.Column, node.Position)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
-        '''Term= Term "*" Factor | Factor
+        '''Term= Factor { ( "+" | "-" ) Factor }
         '''</summary>
         '''<remarks>
         '''The production rules are:
-        '''Term -> Factor TermRightAssoc
+        '''Term -> Factor TermPart
         '''</remarks>
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",9)
         Public Overloads Shared Function EvaluateTerm(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateTerm(node, Nothing)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
-        '''Factor= "(" Expression ")" | integer | identifier
+        '''Factor= Leaf { ( "*" | "/" ) Leaf }
         '''</summary>
         '''<remarks>
         '''The production rules are:
-        '''Factor -> lparen Expression rparen
-        '''Factor -> integer
-        '''Factor -> identifier
+        '''Factor -> Leaf FactorPart
         '''</remarks>
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",17)
         Public Overloads Shared Function EvaluateFactor(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Factor = node.SymbolId) Then
-                If (node.Children.Length = 1) Then
-                    If (node.Children(0).SymbolId = ParsleyDemo.ExpressionParser.[integer]) Then
-                        Return CType(ExpressionParser._ChangeType(node.Children(0).Value, GetType(Integer)),Integer)
-                    Else
-                        If (Nothing Is state) Then
-                            Throw New InvalidOperationException("Variables were not defined.")
+                Dim result As Integer = ExpressionParser.EvaluateLeaf(node.Children(0), state)
+                Dim i As Integer = 2
+
+                Do While (i < node.Children.Length)
+                    If (node.Children(i).SymbolId = ParsleyDemo.ExpressionParser.Leaf) Then
+                        If (node.Children((i - 1)).SymbolId = ParsleyDemo.ExpressionParser.mul) Then
+                            result = (result * ParsleyDemo.ExpressionParser.EvaluateLeaf(node.Children(i), state))
+                        Else
+                            result = (result / ParsleyDemo.ExpressionParser.EvaluateLeaf(node.Children(i), state))
                         End If
-                        Return CType(ExpressionParser._ChangeType(CType(state,IDictionary(Of String, Integer))(node.Children(0).Value), GetType(Integer)),Integer)
+                    Else
+                        If (node.Children((i - 1)).SymbolId = ParsleyDemo.ExpressionParser.mul) Then
+                            result = (result * ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(i), state))
+                        Else
+                            result = (result / ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children((i - 1)), state))
+                        End If
                     End If
-                End If
-                Return CType(ExpressionParser._ChangeType(ExpressionParser.EvaluateExpression(node.Children(1), state), GetType(Integer)),Integer)
+                    i = (i + 2)
+
+                Loop
+                Return CType(ExpressionParser._ChangeType(result, GetType(Integer)),Integer)
             End If
             Throw New SyntaxException("Expecting Factor", node.Line, node.Column, node.Position)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
-        '''Factor= "(" Expression ")" | integer | identifier
+        '''Factor= Leaf { ( "*" | "/" ) Leaf }
         '''</summary>
         '''<remarks>
         '''The production rules are:
-        '''Factor -> lparen Expression rparen
-        '''Factor -> integer
-        '''Factor -> identifier
+        '''Factor -> Leaf FactorPart
         '''</remarks>
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\Parsley\Expression.xbnf",17)
         Public Overloads Shared Function EvaluateFactor(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateFactor(node, Nothing)
         End Function
-        
-        #End ExternalSource
+        '''<summary>
+        '''Evaluates a derivation of the form:
+        '''Leaf= integer | "(" Term ")"
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Leaf -> integer
+        '''Leaf -> lparen Term rparen
+        '''</remarks>
+        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
+        '''<returns>The result of the evaluation</returns>
+        Public Overloads Shared Function EvaluateLeaf(ByVal node As ParseNode, ByVal state As Object) As Integer
+            If (ExpressionParser.Leaf = node.SymbolId) Then
+                If (node.Children.Length = 1) Then
+                    Return CType(ExpressionParser._ChangeType(node.Children(0).Value, GetType(Integer)),Integer)
+                Else
+                    Return CType(ExpressionParser._ChangeType(ExpressionParser.EvaluateTerm(node.Children(1), state), GetType(Integer)),Integer)
+                End If
+            End If
+            Throw New SyntaxException("Expecting Leaf", node.Line, node.Column, node.Position)
+        End Function
+        '''<summary>
+        '''Evaluates a derivation of the form:
+        '''Leaf= integer | "(" Term ")"
+        '''</summary>
+        '''<remarks>
+        '''The production rules are:
+        '''Leaf -> integer
+        '''Leaf -> lparen Term rparen
+        '''</remarks>
+        '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        '''<returns>The result of the evaluation</returns>
+        Public Overloads Shared Function EvaluateLeaf(ByVal node As ParseNode) As Integer
+            Return ExpressionParser.EvaluateLeaf(node, Nothing)
+        End Function
         Private Shared Function _ChangeType(ByVal obj As Object, ByVal type As System.Type) As Object
             Dim typeConverter As System.ComponentModel.TypeConverter = System.ComponentModel.TypeDescriptor.GetConverter(obj)
             If ((Nothing Is typeConverter)  _

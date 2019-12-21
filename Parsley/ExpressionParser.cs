@@ -13,442 +13,526 @@ namespace ParsleyDemo {
     using System.Collections.Generic;
     
     /// <summary>Parses the following grammar:
-    /// Expression= Term "+" Expression | Term;
-    /// Term= Term "*" Factor | Factor;
-    /// Factor= "(" Expression ")" | integer | identifier;
-    /// integer= '[0-9]+';
-    /// identifier= '[A-Z_a-z][0-9A-Z_a-z]*';
-    /// (whitespace)= '\s+';
+    /// Term= Factor { ( "+" | "-" ) Factor };
+    /// Factor= Leaf { ( "*" | "/" ) Leaf };
+    /// Leaf= integer | "(" Term ")";
     /// add= "+";
     /// sub= "-";
     /// mul= "*";
-    /// div= "/";
     /// lparen= "(";
     /// rparen= ")";
+    /// integer= '[0-9]+';
+    /// (whitespace)= '\s+';
     /// </summary>
     /// <remarks>The rules for the factored grammar are as follows:
-    /// Term -> Factor TermRightAssoc
-    /// Factor -> lparen Expression rparen
-    /// Factor -> integer
-    /// Factor -> identifier
-    /// TermRightAssoc -> mul Factor TermRightAssoc
-    /// TermRightAssoc ->
-    /// Expression -> Term ExpressionPart
-    /// ExpressionPart -> add Expression
-    /// ExpressionPart ->
+    /// Leaf -> integer
+    /// Leaf -> lparen Term rparen
+    /// ImplicitList -> add Factor ImplicitListRightAssoc ImplicitListRightAssoc2
+    /// ImplicitList -> sub Factor ImplicitListRightAssoc ImplicitListRightAssoc2
+    /// ImplicitList2 -> mul Leaf ImplicitList2RightAssoc ImplicitList2RightAssoc2
+    /// ImplicitList2 -> Implicit Leaf ImplicitList2RightAssoc ImplicitList2RightAssoc2
+    /// ImplicitListRightAssoc -> add Factor ImplicitListRightAssoc
+    /// ImplicitListRightAssoc ->
+    /// ImplicitList2RightAssoc -> mul Leaf ImplicitList2RightAssoc
+    /// ImplicitList2RightAssoc ->
+    /// Term -> Factor TermPart
+    /// TermPart -> ImplicitList
+    /// TermPart ->
+    /// Factor -> Leaf FactorPart
+    /// FactorPart -> ImplicitList2
+    /// FactorPart ->
+    /// ImplicitListRightAssoc2 -> sub Factor ImplicitListRightAssoc2
+    /// ImplicitListRightAssoc2 ->
+    /// ImplicitList2RightAssoc2 -> Implicit Leaf ImplicitList2RightAssoc2
+    /// ImplicitList2RightAssoc2 ->
     /// </remarks>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
     internal partial class ExpressionParser {
         internal const int ErrorSymbol = -1;
         internal const int EosSymbol = -2;
-        public const int Term = 0;
-        public const int Factor = 1;
-        public const int TermRightAssoc = 2;
-        public const int Expression = 3;
-        public const int ExpressionPart = 4;
-        public const int lparen = 5;
-        public const int rparen = 6;
-        public const int integer = 7;
-        public const int identifier = 8;
-        public const int mul = 9;
-        public const int add = 10;
-        public const int whitespace = 11;
-        
-        #line 9 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        private static ParseNode _ParseTerm(ParserContext context) {
+        public const int Leaf = 0;
+        public const int ImplicitList = 1;
+        public const int ImplicitList2 = 2;
+        public const int ImplicitListRightAssoc = 3;
+        public const int ImplicitList2RightAssoc = 4;
+        public const int Term = 5;
+        public const int TermPart = 6;
+        public const int Factor = 7;
+        public const int FactorPart = 8;
+        public const int ImplicitListRightAssoc2 = 9;
+        public const int ImplicitList2RightAssoc2 = 10;
+        public const int integer = 11;
+        public const int lparen = 12;
+        public const int rparen = 13;
+        public const int add = 14;
+        public const int sub = 15;
+        public const int mul = 16;
+        public const int Implicit = 17;
+        public const int whitespace = 18;
+        private static ParseNode _ParseLeaf(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
-            if ((((ExpressionParser.lparen == context.SymbolId) 
-                        || (ExpressionParser.integer == context.SymbolId)) 
-                        || (ExpressionParser.identifier == context.SymbolId))) {
-                // Term -> Factor TermRightAssoc
-                ParseNode[] children = new ParseNode[2];
-                children[0] = ExpressionParser._ParseFactor(context);
-                children[1] = ExpressionParser._ParseTermRightAssoc(context);
-                return new ParseNode(ExpressionParser.Term, "Term", children, line, column, position);
-            }
-            context.Error("Expecting lparen, integer, or identifier");
-            return null;
-        }
-        
-        #line default
-        #line hidden
-        
-        #line 17 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        private static ParseNode _ParseFactor(ParserContext context) {
-            int line = context.Line;
-            int column = context.Column;
-            long position = context.Position;
-            if ((ExpressionParser.lparen == context.SymbolId)) {
-                // Factor -> lparen Expression rparen
-                ParseNode[] children = new ParseNode[3];
-                children[0] = new ParseNode(ExpressionParser.lparen, "lparen", context.Value, line, column, position);
-                context.Advance();
-                children[1] = ExpressionParser._ParseExpression(context);
-                children[2] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, line, column, position);
-                if ((ExpressionParser.rparen == context.SymbolId)) {
-                    context.Advance();
-                    return new ParseNode(ExpressionParser.Factor, "Factor", children, line, column, position);
-                }
-                context.Error("Expecting rparen");
-            }
             if ((ExpressionParser.integer == context.SymbolId)) {
-                // Factor -> integer
+                // Leaf -> integer
                 ParseNode[] children = new ParseNode[1];
                 children[0] = new ParseNode(ExpressionParser.integer, "integer", context.Value, line, column, position);
                 context.Advance();
-                return new ParseNode(ExpressionParser.Factor, "Factor", children, line, column, position);
+                return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);
             }
-            if ((ExpressionParser.identifier == context.SymbolId)) {
-                // Factor -> identifier
-                ParseNode[] children = new ParseNode[1];
-                children[0] = new ParseNode(ExpressionParser.identifier, "identifier", context.Value, line, column, position);
-                context.Advance();
-                return new ParseNode(ExpressionParser.Factor, "Factor", children, line, column, position);
-            }
-            context.Error("Expecting lparen, integer, or identifier");
-            return null;
-        }
-        
-        #line default
-        #line hidden
-        
-        #line 9 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        private static ParseNode _ParseTermRightAssoc(ParserContext context) {
-            int line = context.Line;
-            int column = context.Column;
-            long position = context.Position;
-            if ((ExpressionParser.mul == context.SymbolId)) {
-                // TermRightAssoc -> mul Factor TermRightAssoc
+            if ((ExpressionParser.lparen == context.SymbolId)) {
+                // Leaf -> lparen Term rparen
                 ParseNode[] children = new ParseNode[3];
-                children[0] = new ParseNode(ExpressionParser.mul, "mul", context.Value, line, column, position);
+                children[0] = new ParseNode(ExpressionParser.lparen, "lparen", context.Value, line, column, position);
                 context.Advance();
-                children[1] = ExpressionParser._ParseFactor(context);
-                children[2] = ExpressionParser._ParseTermRightAssoc(context);
-                return new ParseNode(ExpressionParser.Term, "Term", children, line, column, position);
+                children[1] = ExpressionParser._ParseTerm(context);
+                children[2] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, line, column, position);
+                if ((ExpressionParser.rparen == context.SymbolId)) {
+                    context.Advance();
+                    return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);
+                }
+                context.Error("Expecting rparen");
             }
-            if ((((ExpressionParser.add == context.SymbolId) 
-                        || (ExpressionParser.EosSymbol == context.SymbolId)) 
-                        || (ExpressionParser.rparen == context.SymbolId))) {
-                // TermRightAssoc ->
-                ParseNode[] children = new ParseNode[0];
-                return new ParseNode(ExpressionParser.Term, "Term", children, line, column, position);
-            }
-            context.Error("Expecting mul, add, #EOS, or rparen");
+            context.Error("Expecting integer or lparen");
             return null;
         }
-        
-        #line default
-        #line hidden
-        
-        #line 1 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        private static ParseNode _ParseExpression(ParserContext context) {
-            int line = context.Line;
-            int column = context.Column;
-            long position = context.Position;
-            if ((((ExpressionParser.lparen == context.SymbolId) 
-                        || (ExpressionParser.integer == context.SymbolId)) 
-                        || (ExpressionParser.identifier == context.SymbolId))) {
-                // Expression -> Term ExpressionPart
-                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(ExpressionParser._ParseTerm(context));
-                children.AddRange(ExpressionParser._ParseExpressionPart(context).Children);
-                return new ParseNode(ExpressionParser.Expression, "Expression", children.ToArray(), line, column, position);
-            }
-            context.Error("Expecting lparen, integer, or identifier");
-            return null;
-        }
-        
-        #line default
-        #line hidden
-        private static ParseNode _ParseExpressionPart(ParserContext context) {
+        private static ParseNode _ParseImplicitList(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             if ((ExpressionParser.add == context.SymbolId)) {
-                // ExpressionPart -> add Expression
-                ParseNode[] children = new ParseNode[2];
-                children[0] = new ParseNode(ExpressionParser.add, "add", context.Value, line, column, position);
+                // ImplicitList -> add Factor ImplicitListRightAssoc ImplicitListRightAssoc2
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(new ParseNode(ExpressionParser.add, "add", context.Value, line, column, position));
                 context.Advance();
-                children[1] = ExpressionParser._ParseExpression(context);
-                return new ParseNode(ExpressionParser.ExpressionPart, "ExpressionPart", children, line, column, position);
+                children.Add(ExpressionParser._ParseFactor(context));
+                children.AddRange(ExpressionParser._ParseImplicitListRightAssoc(context).Children);
+                children.AddRange(ExpressionParser._ParseImplicitListRightAssoc2(context).Children);
+                return new ParseNode(ExpressionParser.ImplicitList, "ImplicitList", children.ToArray(), line, column, position);
+            }
+            if ((ExpressionParser.sub == context.SymbolId)) {
+                // ImplicitList -> sub Factor ImplicitListRightAssoc ImplicitListRightAssoc2
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(new ParseNode(ExpressionParser.sub, "sub", context.Value, line, column, position));
+                context.Advance();
+                children.Add(ExpressionParser._ParseFactor(context));
+                children.AddRange(ExpressionParser._ParseImplicitListRightAssoc(context).Children);
+                children.AddRange(ExpressionParser._ParseImplicitListRightAssoc2(context).Children);
+                return new ParseNode(ExpressionParser.ImplicitList, "ImplicitList", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting add or sub");
+            return null;
+        }
+        private static ParseNode _ParseImplicitList2(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            if ((ExpressionParser.mul == context.SymbolId)) {
+                // ImplicitList2 -> mul Leaf ImplicitList2RightAssoc ImplicitList2RightAssoc2
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(new ParseNode(ExpressionParser.mul, "mul", context.Value, line, column, position));
+                context.Advance();
+                children.Add(ExpressionParser._ParseLeaf(context));
+                children.AddRange(ExpressionParser._ParseImplicitList2RightAssoc(context).Children);
+                children.AddRange(ExpressionParser._ParseImplicitList2RightAssoc2(context).Children);
+                return new ParseNode(ExpressionParser.ImplicitList2, "ImplicitList2", children.ToArray(), line, column, position);
+            }
+            if ((ExpressionParser.Implicit == context.SymbolId)) {
+                // ImplicitList2 -> Implicit Leaf ImplicitList2RightAssoc ImplicitList2RightAssoc2
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(new ParseNode(ExpressionParser.Implicit, "Implicit", context.Value, line, column, position));
+                context.Advance();
+                children.Add(ExpressionParser._ParseLeaf(context));
+                children.AddRange(ExpressionParser._ParseImplicitList2RightAssoc(context).Children);
+                children.AddRange(ExpressionParser._ParseImplicitList2RightAssoc2(context).Children);
+                return new ParseNode(ExpressionParser.ImplicitList2, "ImplicitList2", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting mul or Implicit");
+            return null;
+        }
+        private static ParseNode _ParseImplicitListRightAssoc(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            if ((ExpressionParser.add == context.SymbolId)) {
+                // ImplicitListRightAssoc -> add Factor ImplicitListRightAssoc
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(new ParseNode(ExpressionParser.add, "add", context.Value, line, column, position));
+                context.Advance();
+                children.Add(ExpressionParser._ParseFactor(context));
+                children.AddRange(ExpressionParser._ParseImplicitListRightAssoc(context).Children);
+                return new ParseNode(ExpressionParser.ImplicitListRightAssoc, "ImplicitListRightAssoc", children.ToArray(), line, column, position);
+            }
+            if ((((ExpressionParser.sub == context.SymbolId) 
+                        || (ExpressionParser.EosSymbol == context.SymbolId)) 
+                        || (ExpressionParser.rparen == context.SymbolId))) {
+                // ImplicitListRightAssoc ->
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(ExpressionParser.ImplicitListRightAssoc, "ImplicitListRightAssoc", children, line, column, position);
+            }
+            context.Error("Expecting add, sub, #EOS, or rparen");
+            return null;
+        }
+        private static ParseNode _ParseImplicitList2RightAssoc(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            if ((ExpressionParser.mul == context.SymbolId)) {
+                // ImplicitList2RightAssoc -> mul Leaf ImplicitList2RightAssoc
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(new ParseNode(ExpressionParser.mul, "mul", context.Value, line, column, position));
+                context.Advance();
+                children.Add(ExpressionParser._ParseLeaf(context));
+                children.AddRange(ExpressionParser._ParseImplicitList2RightAssoc(context).Children);
+                return new ParseNode(ExpressionParser.ImplicitList2RightAssoc, "ImplicitList2RightAssoc", children.ToArray(), line, column, position);
+            }
+            if ((((((ExpressionParser.Implicit == context.SymbolId) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.EosSymbol == context.SymbolId)) 
+                        || (ExpressionParser.rparen == context.SymbolId))) {
+                // ImplicitList2RightAssoc ->
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(ExpressionParser.ImplicitList2RightAssoc, "ImplicitList2RightAssoc", children, line, column, position);
+            }
+            context.Error("Expecting mul, Implicit, add, sub, #EOS, or rparen");
+            return null;
+        }
+        private static ParseNode _ParseTerm(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            if (((ExpressionParser.integer == context.SymbolId) 
+                        || (ExpressionParser.lparen == context.SymbolId))) {
+                // Term -> Factor TermPart
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(ExpressionParser._ParseFactor(context));
+                children.AddRange(ExpressionParser._ParseTermPart(context).Children);
+                return new ParseNode(ExpressionParser.Term, "Term", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting integer or lparen");
+            return null;
+        }
+        private static ParseNode _ParseTermPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            if (((ExpressionParser.add == context.SymbolId) 
+                        || (ExpressionParser.sub == context.SymbolId))) {
+                // TermPart -> ImplicitList
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(ExpressionParser._ParseImplicitList(context).Children);
+                return new ParseNode(ExpressionParser.TermPart, "TermPart", children.ToArray(), line, column, position);
             }
             if (((ExpressionParser.EosSymbol == context.SymbolId) 
                         || (ExpressionParser.rparen == context.SymbolId))) {
-                // ExpressionPart ->
+                // TermPart ->
                 ParseNode[] children = new ParseNode[0];
-                return new ParseNode(ExpressionParser.ExpressionPart, "ExpressionPart", children, line, column, position);
+                return new ParseNode(ExpressionParser.TermPart, "TermPart", children, line, column, position);
             }
-            context.Error("Expecting add, #EOS, or rparen");
+            context.Error("Expecting add, sub, #EOS, or rparen");
+            return null;
+        }
+        private static ParseNode _ParseFactor(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            if (((ExpressionParser.integer == context.SymbolId) 
+                        || (ExpressionParser.lparen == context.SymbolId))) {
+                // Factor -> Leaf FactorPart
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(ExpressionParser._ParseLeaf(context));
+                children.AddRange(ExpressionParser._ParseFactorPart(context).Children);
+                return new ParseNode(ExpressionParser.Factor, "Factor", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting integer or lparen");
+            return null;
+        }
+        private static ParseNode _ParseFactorPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            if (((ExpressionParser.mul == context.SymbolId) 
+                        || (ExpressionParser.Implicit == context.SymbolId))) {
+                // FactorPart -> ImplicitList2
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(ExpressionParser._ParseImplicitList2(context).Children);
+                return new ParseNode(ExpressionParser.FactorPart, "FactorPart", children.ToArray(), line, column, position);
+            }
+            if (((((ExpressionParser.add == context.SymbolId) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.EosSymbol == context.SymbolId)) 
+                        || (ExpressionParser.rparen == context.SymbolId))) {
+                // FactorPart ->
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(ExpressionParser.FactorPart, "FactorPart", children, line, column, position);
+            }
+            context.Error("Expecting mul, Implicit, add, sub, #EOS, or rparen");
+            return null;
+        }
+        private static ParseNode _ParseImplicitListRightAssoc2(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            if ((ExpressionParser.sub == context.SymbolId)) {
+                // ImplicitListRightAssoc2 -> sub Factor ImplicitListRightAssoc2
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(new ParseNode(ExpressionParser.sub, "sub", context.Value, line, column, position));
+                context.Advance();
+                children.Add(ExpressionParser._ParseFactor(context));
+                children.AddRange(ExpressionParser._ParseImplicitListRightAssoc2(context).Children);
+                return new ParseNode(ExpressionParser.ImplicitListRightAssoc2, "ImplicitListRightAssoc2", children.ToArray(), line, column, position);
+            }
+            if (((ExpressionParser.EosSymbol == context.SymbolId) 
+                        || (ExpressionParser.rparen == context.SymbolId))) {
+                // ImplicitListRightAssoc2 ->
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(ExpressionParser.ImplicitListRightAssoc2, "ImplicitListRightAssoc2", children, line, column, position);
+            }
+            context.Error("Expecting sub, #EOS, or rparen");
+            return null;
+        }
+        private static ParseNode _ParseImplicitList2RightAssoc2(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            if ((ExpressionParser.Implicit == context.SymbolId)) {
+                // ImplicitList2RightAssoc2 -> Implicit Leaf ImplicitList2RightAssoc2
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(new ParseNode(ExpressionParser.Implicit, "Implicit", context.Value, line, column, position));
+                context.Advance();
+                children.Add(ExpressionParser._ParseLeaf(context));
+                children.AddRange(ExpressionParser._ParseImplicitList2RightAssoc2(context).Children);
+                return new ParseNode(ExpressionParser.ImplicitList2RightAssoc2, "ImplicitList2RightAssoc2", children.ToArray(), line, column, position);
+            }
+            if (((((ExpressionParser.add == context.SymbolId) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.EosSymbol == context.SymbolId)) 
+                        || (ExpressionParser.rparen == context.SymbolId))) {
+                // ImplicitList2RightAssoc2 ->
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(ExpressionParser.ImplicitList2RightAssoc2, "ImplicitList2RightAssoc2", children, line, column, position);
+            }
+            context.Error("Expecting Implicit, add, sub, #EOS, or rparen");
             return null;
         }
         /// <summary>
         /// Parses a production of the form:
-        /// Expression= Term "+" Expression | Term
+        /// Term= Factor { ( "+" | "-" ) Factor }
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Expression -> Term ExpressionPart
+        /// Term -> Factor TermPart
         /// </remarks>
         /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #line 1 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        public static ParseNode ParseExpression(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return ExpressionParser._ParseExpression(context);
-        }
-        
-        #line default
-        #line hidden
-        /// <summary>
-        /// Parses a production of the form:
-        /// Term= Term "*" Factor | Factor
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Term -> Factor TermRightAssoc
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #line 9 "C:\dev\BuildPack\Parsley\Expression.xbnf"
         public static ParseNode ParseTerm(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return ExpressionParser._ParseTerm(context);
         }
-        
-        #line default
-        #line hidden
         /// <summary>
         /// Parses a production of the form:
-        /// Factor= "(" Expression ")" | integer | identifier
+        /// Factor= Leaf { ( "*" | "/" ) Leaf }
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Factor -> lparen Expression rparen
-        /// Factor -> integer
-        /// Factor -> identifier
+        /// Factor -> Leaf FactorPart
         /// </remarks>
         /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #line 17 "C:\dev\BuildPack\Parsley\Expression.xbnf"
         public static ParseNode ParseFactor(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return ExpressionParser._ParseFactor(context);
         }
-        
-        #line default
-        #line hidden
         /// <summary>
-        /// Parses a derivation of the form:
-        /// Expression= Term "+" Expression | Term
+        /// Parses a production of the form:
+        /// Leaf= integer | "(" Term ")"
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Expression -> Term ExpressionPart
+        /// Leaf -> integer
+        /// Leaf -> lparen Term rparen
         /// </remarks>
         /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #line 1 "C:\dev\BuildPack\Parsley\Expression.xbnf"
+        public static ParseNode ParseLeaf(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return ExpressionParser._ParseLeaf(context);
+        }
+        /// <summary>
+        /// Parses a derivation of the form:
+        /// Term= Factor { ( "+" | "-" ) Factor }
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Term -> Factor TermPart
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
-            return ExpressionParser._ParseExpression(context);
+            return ExpressionParser._ParseTerm(context);
         }
-        
-        #line default
-        #line hidden
         /// <summary>
         /// Evaluates a derivation of the form:
-        /// Expression= Term "+" Expression | Term
+        /// Term= Factor { ( "+" | "-" ) Factor }
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Expression -> Term ExpressionPart
+        /// Term -> Factor TermPart
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <returns>The result of the evaluation</returns>
-        
-        #line 1 "C:\dev\BuildPack\Parsley\Expression.xbnf"
         public static int Evaluate(ParseNode node) {
-            return ExpressionParser.EvaluateExpression(node);
+            return ExpressionParser.EvaluateTerm(node);
         }
-        
-        #line default
-        #line hidden
         /// <summary>
         /// Evaluates a derivation of the form:
-        /// Expression= Term "+" Expression | Term
+        /// Term= Factor { ( "+" | "-" ) Factor }
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Expression -> Term ExpressionPart
+        /// Term -> Factor TermPart
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         /// <returns>The result of the evaluation</returns>
-        
-        #line 1 "C:\dev\BuildPack\Parsley\Expression.xbnf"
         public static int Evaluate(ParseNode node, object state) {
-            return ExpressionParser.EvaluateExpression(node, state);
+            return ExpressionParser.EvaluateTerm(node, state);
         }
-        
-        #line default
-        #line hidden
         /// <summary>
         /// Evaluates a derivation of the form:
-        /// Expression= Term "+" Expression | Term
+        /// Term= Factor { ( "+" | "-" ) Factor }
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Expression -> Term ExpressionPart
+        /// Term -> Factor TermPart
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         /// <returns>The result of the evaluation</returns>
-        
-        #line 1 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        public static int EvaluateExpression(ParseNode node, object state) {
-            if ((ExpressionParser.Expression == node.SymbolId)) {
-                if ((node.Children.Length == 1)) {
-                    return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateTerm(node.Children[0], state), typeof(int))));
-                }
-                if ((node.Children[1].SymbolId == ParsleyDemo.ExpressionParser.add)) {
-                    return ((int)(ExpressionParser._ChangeType((ExpressionParser.EvaluateTerm(node.Children[0], state) + ExpressionParser.EvaluateExpression(node.Children[2], state)), typeof(int))));
-                }
-                else {
-                    return ((int)(ExpressionParser._ChangeType((ExpressionParser.EvaluateTerm(node.Children[0], state) - ExpressionParser.EvaluateExpression(node.Children[2], state)), typeof(int))));
-                }
-            }
-            throw new SyntaxException("Expecting Expression", node.Line, node.Column, node.Position);
-        }
-        
-        #line default
-        #line hidden
-        /// <summary>
-        /// Evaluates a derivation of the form:
-        /// Expression= Term "+" Expression | Term
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Expression -> Term ExpressionPart
-        /// </remarks>
-        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
-        /// <returns>The result of the evaluation</returns>
-        
-        #line 1 "C:\dev\BuildPack\Parsley\Expression.xbnf"
-        public static int EvaluateExpression(ParseNode node) {
-            return ExpressionParser.EvaluateExpression(node, null);
-        }
-        
-        #line default
-        #line hidden
-        /// <summary>
-        /// Evaluates a derivation of the form:
-        /// Term= Term "*" Factor | Factor
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Term -> Factor TermRightAssoc
-        /// </remarks>
-        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
-        /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
-        /// <returns>The result of the evaluation</returns>
-        
-        #line 9 "C:\dev\BuildPack\Parsley\Expression.xbnf"
         public static int EvaluateTerm(ParseNode node, object state) {
             if ((ExpressionParser.Term == node.SymbolId)) {
-                if ((node.Children.Length == 1)) {
-                    return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateFactor(node.Children[0], state), typeof(int))));
+                int result = ExpressionParser.EvaluateFactor(node.Children[0], state);
+                int i = 2;
+                for (
+                ; (i < node.Children.Length); 
+                ) {
+                    if ((node.Children[(i - 1)].SymbolId == ParsleyDemo.ExpressionParser.add)) {
+                        result = (result + ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i], state));
+                    }
+                    else {
+                        result = (result - ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i], state));
+                    }
+                    i = (i + 2);
                 }
-                if ((node.Children[1].SymbolId == ParsleyDemo.ExpressionParser.mul)) {
-                    return ((int)(ExpressionParser._ChangeType((ExpressionParser.EvaluateTerm(node.Children[0], state) * ExpressionParser.EvaluateFactor(node.Children[2], state)), typeof(int))));
-                }
-                else {
-                    return ((int)(ExpressionParser._ChangeType((ExpressionParser.EvaluateTerm(node.Children[0], state) / ExpressionParser.EvaluateFactor(node.Children[2], state)), typeof(int))));
-                }
+                return ((int)(ExpressionParser._ChangeType(result, typeof(int))));
             }
             throw new SyntaxException("Expecting Term", node.Line, node.Column, node.Position);
         }
-        
-        #line default
-        #line hidden
         /// <summary>
         /// Evaluates a derivation of the form:
-        /// Term= Term "*" Factor | Factor
+        /// Term= Factor { ( "+" | "-" ) Factor }
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Term -> Factor TermRightAssoc
+        /// Term -> Factor TermPart
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <returns>The result of the evaluation</returns>
-        
-        #line 9 "C:\dev\BuildPack\Parsley\Expression.xbnf"
         public static int EvaluateTerm(ParseNode node) {
             return ExpressionParser.EvaluateTerm(node, null);
         }
-        
-        #line default
-        #line hidden
         /// <summary>
         /// Evaluates a derivation of the form:
-        /// Factor= "(" Expression ")" | integer | identifier
+        /// Factor= Leaf { ( "*" | "/" ) Leaf }
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Factor -> lparen Expression rparen
-        /// Factor -> integer
-        /// Factor -> identifier
+        /// Factor -> Leaf FactorPart
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         /// <returns>The result of the evaluation</returns>
-        
-        #line 17 "C:\dev\BuildPack\Parsley\Expression.xbnf"
         public static int EvaluateFactor(ParseNode node, object state) {
             if ((ExpressionParser.Factor == node.SymbolId)) {
-                if ((node.Children.Length == 1)) {
-                    if ((node.Children[0].SymbolId == ParsleyDemo.ExpressionParser.integer)) {
-                        return ((int)(ExpressionParser._ChangeType(node.Children[0].Value, typeof(int))));
+                int result = ExpressionParser.EvaluateLeaf(node.Children[0], state);
+                int i = 2;
+                for (
+                ; (i < node.Children.Length); 
+                ) {
+                    if ((node.Children[i].SymbolId == ParsleyDemo.ExpressionParser.Leaf)) {
+                        if ((node.Children[(i - 1)].SymbolId == ParsleyDemo.ExpressionParser.mul)) {
+                            result = (result * ParsleyDemo.ExpressionParser.EvaluateLeaf(node.Children[i], state));
+                        }
+                        else {
+                            result = (result / ParsleyDemo.ExpressionParser.EvaluateLeaf(node.Children[i], state));
+                        }
                     }
                     else {
-                        if ((null == state)) {
-                            throw new InvalidOperationException("Variables were not defined.");
+                        if ((node.Children[(i - 1)].SymbolId == ParsleyDemo.ExpressionParser.mul)) {
+                            result = (result * ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i], state));
                         }
-                        return ((int)(ExpressionParser._ChangeType(((IDictionary<string, int>)(state))[node.Children[0].Value], typeof(int))));
+                        else {
+                            result = (result / ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[(i - 1)], state));
+                        }
                     }
+                    i = (i + 2);
                 }
-                return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateExpression(node.Children[1], state), typeof(int))));
+                return ((int)(ExpressionParser._ChangeType(result, typeof(int))));
             }
             throw new SyntaxException("Expecting Factor", node.Line, node.Column, node.Position);
         }
-        
-        #line default
-        #line hidden
         /// <summary>
         /// Evaluates a derivation of the form:
-        /// Factor= "(" Expression ")" | integer | identifier
+        /// Factor= Leaf { ( "*" | "/" ) Leaf }
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Factor -> lparen Expression rparen
-        /// Factor -> integer
-        /// Factor -> identifier
+        /// Factor -> Leaf FactorPart
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <returns>The result of the evaluation</returns>
-        
-        #line 17 "C:\dev\BuildPack\Parsley\Expression.xbnf"
         public static int EvaluateFactor(ParseNode node) {
             return ExpressionParser.EvaluateFactor(node, null);
         }
-        
-        #line default
-        #line hidden
+        /// <summary>
+        /// Evaluates a derivation of the form:
+        /// Leaf= integer | "(" Term ")"
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Leaf -> integer
+        /// Leaf -> lparen Term rparen
+        /// </remarks>
+        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
+        /// <returns>The result of the evaluation</returns>
+        public static int EvaluateLeaf(ParseNode node, object state) {
+            if ((ExpressionParser.Leaf == node.SymbolId)) {
+                if ((node.Children.Length == 1)) {
+                    return ((int)(ExpressionParser._ChangeType(node.Children[0].Value, typeof(int))));
+                }
+                else {
+                    return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateTerm(node.Children[1], state), typeof(int))));
+                }
+            }
+            throw new SyntaxException("Expecting Leaf", node.Line, node.Column, node.Position);
+        }
+        /// <summary>
+        /// Evaluates a derivation of the form:
+        /// Leaf= integer | "(" Term ")"
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Leaf -> integer
+        /// Leaf -> lparen Term rparen
+        /// </remarks>
+        /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
+        /// <returns>The result of the evaluation</returns>
+        public static int EvaluateLeaf(ParseNode node) {
+            return ExpressionParser.EvaluateLeaf(node, null);
+        }
         private static object _ChangeType(object obj, System.Type type) {
             System.ComponentModel.TypeConverter typeConverter = System.ComponentModel.TypeDescriptor.GetConverter(obj);
             if (((null == typeConverter) 

@@ -267,8 +267,8 @@ namespace Parsley
 					if(-1<ppi)
 					{
 						var prod = doc.Productions[i];
-						if (0 < prod.Line && !string.IsNullOrEmpty(doc.Filename))
-							m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
+						//if (0 < prod.Line && !string.IsNullOrEmpty(doc.Filename))
+						//	m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
 					}
 
 				}
@@ -313,7 +313,7 @@ namespace Parsley
 						var prod = doc.Productions[pi];
 						if (0 != prod.Line)
 						{
-							m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
+							//m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
 						}
 					}
 				}
@@ -333,8 +333,8 @@ namespace Parsley
 					m.Statements.Add(C.Var(C.Type("ParserContext"), "context", C.New(C.Type("ParserContext"), C.ArgRef("tokenizer"))));
 					m.Statements.Add(C.Call(C.VarRef("context"), "EnsureStarted"));
 					m.Statements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), string.Concat("_Parse", s), C.VarRef("context"))));
-					if (!string.IsNullOrEmpty(doc.Filename) && 0 != prod.Line)
-						m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
+					//if (!string.IsNullOrEmpty(doc.Filename) && 0 != prod.Line)
+					//	m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
 					rs.Clear();
 					foreach (var r in cfg.FillNonTerminalRules(prod.Name))
 						rs.AppendLine(r.ToString());
@@ -355,8 +355,8 @@ namespace Parsley
 				rs.AppendLine(r.ToString());
 			sm.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nParses a derivation of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"tokenizer\">The tokenizer to parse with</param><returns>A <see cref=\"ParseNode\" /> representing the parsed tokens</returns>", pprod.ToString("p").TrimEnd(), rs.ToString().TrimEnd()), true));
 
-			if (!string.IsNullOrEmpty(doc.Filename) && 0 != pprod.Line)
-				sm.LinePragma = new CodeLinePragma(doc.Filename, pprod.Line);
+			//if (!string.IsNullOrEmpty(doc.Filename) && 0 != pprod.Line)
+			//	sm.LinePragma = new CodeLinePragma(doc.Filename, pprod.Line);
 
 			parser.Members.Add(sm);
 
@@ -407,21 +407,21 @@ namespace Parsley
 					if (isStart)
 					{
 						var ms = C.Method(type, "Evaluate", attrs, C.Param(C.Type("ParseNode"), "node"));
-						if (0 != prod.Line && !string.IsNullOrEmpty(doc.Filename))
-							ms.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
+						//if (0 != prod.Line && !string.IsNullOrEmpty(doc.Filename))
+						//	ms.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
 						ms.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nEvaluates a derivation of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"node\">The <see cref=\"ParseNode\"/> to evaluate</param>\r\n<returns>The result of the evaluation</returns>", prod.ToString("p").TrimEnd(), rs.ToString().TrimEnd()), true));
 						ms.Statements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), string.Concat("Evaluate", prod.Name), C.ArgRef("node"))));
 						parser.Members.Add(ms);
 						ms = C.Method(type, "Evaluate", attrs, C.Param(C.Type("ParseNode"), "node"),C.Param(C.Type(typeof(object)),"state"));
-						if (0 != prod.Line && !string.IsNullOrEmpty(doc.Filename))
-							ms.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
+						//if (0 != prod.Line && !string.IsNullOrEmpty(doc.Filename))
+						//	ms.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
 						ms.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nEvaluates a derivation of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"node\">The <see cref=\"ParseNode\"/> to evaluate</param>\r\n<param name=\"state\">A user supplied state object. What it should be depends on the production's associated code block</param>\r\n<returns>The result of the evaluation</returns>", prod.ToString("p").TrimEnd(), rs.ToString().TrimEnd()), true));
 						ms.Statements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), string.Concat("Evaluate", prod.Name), C.ArgRef("node"),C.ArgRef("state"))));
 						parser.Members.Add(ms);
 					}
 					var m = C.Method(type, string.Concat("Evaluate", prod.Name), attrs, C.Param("ParseNode", "node"), C.Param(typeof(object), "state"));
-					if (0 != prod.Line)
-						m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
+					//if (0 != prod.Line)
+					//	m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
 					m.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nEvaluates a derivation of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"node\">The <see cref=\"ParseNode\"/> to evaluate</param>\r\n<param name=\"state\">A user supplied state object. What it should be depends on the production's associated code block</param>\r\n<returns>The result of the evaluation</returns>",prod.ToString("p").TrimEnd(),rs.ToString().TrimEnd()), true));
 					var cnst = consts[syms.IndexOf(prod.Name)];
 					var fr = C.FieldRef(C.TypeRef("Parser"), cnst);
@@ -431,8 +431,8 @@ namespace Parsley
 					m.Statements.Add(C.Throw(C.New(C.Type("SyntaxException"), C.Literal(string.Concat("Expecting ", prod.Name)), C.PropRef(node, "Line"), C.PropRef(node, "Column"), C.PropRef(node, "Position"))));
 					parser.Members.Add(m);
 					m = C.Method(m.ReturnType, m.Name, attrs, C.Param("ParseNode", "node"));
-					if (0 != prod.Line && !string.IsNullOrEmpty(doc.Filename))
-						m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
+					//if (0 != prod.Line && !string.IsNullOrEmpty(doc.Filename))
+					//	m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
 					m.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nEvaluates a derivation of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"node\">The <see cref=\"ParseNode\"/> to evaluate</param>\r\n<returns>The result of the evaluation</returns>", prod.ToString("p").TrimEnd(), rs.ToString().TrimEnd()), true));
 					m.Statements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), m.Name, C.ArgRef("node"), C.Null)));
 					parser.Members.Add(m);
@@ -468,7 +468,8 @@ namespace Parsley
 											}
 										}
 									}
-								} else if(0==string.Compare("Length",v.VariableName,StringComparison.InvariantCulture))
+								} 
+								else if(0==string.Compare("Length",v.VariableName,StringComparison.InvariantCulture))
 								{
 									var ffr = C.PropRef(C.PropRef(node, "Children"), "Length");
 									V.ReplaceTarget(ctx, ffr);

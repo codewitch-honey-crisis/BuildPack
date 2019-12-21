@@ -44,15 +44,15 @@ namespace ParsleyDemo {
     /// Value -> null
     /// Boolean -> true
     /// Boolean -> false
-    /// ImplicitList -> comma Field ImplicitListRightAssoc
-    /// ImplicitList2 -> comma Value ImplicitList2RightAssoc
-    /// ImplicitListRightAssoc -> comma Field ImplicitListRightAssoc
-    /// ImplicitListRightAssoc ->
-    /// ImplicitList2RightAssoc -> comma Value ImplicitList2RightAssoc
-    /// ImplicitList2RightAssoc ->
-    /// ObjectPart -> ImplicitList rbrace
+    /// ObjectList -> comma Field ObjectListRightAssoc
+    /// ArrayList -> comma Value ArrayListRightAssoc
+    /// ObjectListRightAssoc -> comma Field ObjectListRightAssoc
+    /// ObjectListRightAssoc ->
+    /// ArrayListRightAssoc -> comma Value ArrayListRightAssoc
+    /// ArrayListRightAssoc ->
+    /// ObjectPart -> ObjectList rbrace
     /// ObjectPart -> rbrace
-    /// ArrayPart -> ImplicitList2 rbracket
+    /// ArrayPart -> ArrayList rbracket
     /// ArrayPart -> rbracket
     /// Object -> lbrace ObjectPart2
     /// ObjectPart2 -> rbrace
@@ -69,10 +69,10 @@ namespace ParsleyDemo {
         public const int Field = 1;
         public const int Value = 2;
         public const int Boolean = 3;
-        public const int ImplicitList = 4;
-        public const int ImplicitList2 = 5;
-        public const int ImplicitListRightAssoc = 6;
-        public const int ImplicitList2RightAssoc = 7;
+        public const int ObjectList = 4;
+        public const int ArrayList = 5;
+        public const int ObjectListRightAssoc = 6;
+        public const int ArrayListRightAssoc = 7;
         public const int ObjectPart = 8;
         public const int ArrayPart = 9;
         public const int Object = 10;
@@ -91,8 +91,6 @@ namespace ParsleyDemo {
         public const int lbrace = 23;
         public const int lbracket = 24;
         public const int whitespace = 25;
-        
-        #line 2 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         private static ParseNode _ParseJson(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -112,11 +110,6 @@ namespace ParsleyDemo {
             context.Error("Expecting lbrace or lbracket");
             return null;
         }
-        
-        #line default
-        #line hidden
-        
-        #line 4 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         private static ParseNode _ParseField(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -136,11 +129,6 @@ namespace ParsleyDemo {
             context.Error("Expecting string");
             return null;
         }
-        
-        #line default
-        #line hidden
-        
-        #line 6 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         private static ParseNode _ParseValue(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -188,11 +176,6 @@ namespace ParsleyDemo {
             context.Error("Expecting string, number, lbrace, lbracket, true, false, or null");
             return null;
         }
-        
-        #line default
-        #line hidden
-        
-        #line 12 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         private static ParseNode _ParseBoolean(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -214,75 +197,72 @@ namespace ParsleyDemo {
             context.Error("Expecting true or false");
             return null;
         }
-        
-        #line default
-        #line hidden
-        private static ParseNode _ParseImplicitList(ParserContext context) {
+        private static ParseNode _ParseObjectList(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             if ((JsonParser.comma == context.SymbolId)) {
-                // ImplicitList -> comma Field ImplicitListRightAssoc
+                // ObjectList -> comma Field ObjectListRightAssoc
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 context.Advance();
                 children.Add(JsonParser._ParseField(context));
-                children.AddRange(JsonParser._ParseImplicitListRightAssoc(context).Children);
-                return new ParseNode(JsonParser.ImplicitList, "ImplicitList", children.ToArray(), line, column, position);
+                children.AddRange(JsonParser._ParseObjectListRightAssoc(context).Children);
+                return new ParseNode(JsonParser.ObjectList, "ObjectList", children.ToArray(), line, column, position);
             }
             context.Error("Expecting comma");
             return null;
         }
-        private static ParseNode _ParseImplicitList2(ParserContext context) {
+        private static ParseNode _ParseArrayList(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             if ((JsonParser.comma == context.SymbolId)) {
-                // ImplicitList2 -> comma Value ImplicitList2RightAssoc
+                // ArrayList -> comma Value ArrayListRightAssoc
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 context.Advance();
                 children.AddRange(JsonParser._ParseValue(context).Children);
-                children.AddRange(JsonParser._ParseImplicitList2RightAssoc(context).Children);
-                return new ParseNode(JsonParser.ImplicitList2, "ImplicitList2", children.ToArray(), line, column, position);
+                children.AddRange(JsonParser._ParseArrayListRightAssoc(context).Children);
+                return new ParseNode(JsonParser.ArrayList, "ArrayList", children.ToArray(), line, column, position);
             }
             context.Error("Expecting comma");
             return null;
         }
-        private static ParseNode _ParseImplicitListRightAssoc(ParserContext context) {
+        private static ParseNode _ParseObjectListRightAssoc(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             if ((JsonParser.comma == context.SymbolId)) {
-                // ImplicitListRightAssoc -> comma Field ImplicitListRightAssoc
+                // ObjectListRightAssoc -> comma Field ObjectListRightAssoc
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 context.Advance();
                 children.Add(JsonParser._ParseField(context));
-                children.AddRange(JsonParser._ParseImplicitListRightAssoc(context).Children);
-                return new ParseNode(JsonParser.ImplicitListRightAssoc, "ImplicitListRightAssoc", children.ToArray(), line, column, position);
+                children.AddRange(JsonParser._ParseObjectListRightAssoc(context).Children);
+                return new ParseNode(JsonParser.ObjectListRightAssoc, "ObjectListRightAssoc", children.ToArray(), line, column, position);
             }
             if ((JsonParser.rbrace == context.SymbolId)) {
-                // ImplicitListRightAssoc ->
+                // ObjectListRightAssoc ->
                 ParseNode[] children = new ParseNode[0];
-                return new ParseNode(JsonParser.ImplicitListRightAssoc, "ImplicitListRightAssoc", children, line, column, position);
+                return new ParseNode(JsonParser.ObjectListRightAssoc, "ObjectListRightAssoc", children, line, column, position);
             }
             context.Error("Expecting comma or rbrace");
             return null;
         }
-        private static ParseNode _ParseImplicitList2RightAssoc(ParserContext context) {
+        private static ParseNode _ParseArrayListRightAssoc(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             if ((JsonParser.comma == context.SymbolId)) {
-                // ImplicitList2RightAssoc -> comma Value ImplicitList2RightAssoc
+                // ArrayListRightAssoc -> comma Value ArrayListRightAssoc
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 context.Advance();
                 children.AddRange(JsonParser._ParseValue(context).Children);
-                children.AddRange(JsonParser._ParseImplicitList2RightAssoc(context).Children);
-                return new ParseNode(JsonParser.ImplicitList2RightAssoc, "ImplicitList2RightAssoc", children.ToArray(), line, column, position);
+                children.AddRange(JsonParser._ParseArrayListRightAssoc(context).Children);
+                return new ParseNode(JsonParser.ArrayListRightAssoc, "ArrayListRightAssoc", children.ToArray(), line, column, position);
             }
             if ((JsonParser.rbracket == context.SymbolId)) {
-                // ImplicitList2RightAssoc ->
+                // ArrayListRightAssoc ->
                 ParseNode[] children = new ParseNode[0];
-                return new ParseNode(JsonParser.ImplicitList2RightAssoc, "ImplicitList2RightAssoc", children, line, column, position);
+                return new ParseNode(JsonParser.ArrayListRightAssoc, "ArrayListRightAssoc", children, line, column, position);
             }
             context.Error("Expecting comma or rbracket");
             return null;
@@ -292,9 +272,9 @@ namespace ParsleyDemo {
             int column = context.Column;
             long position = context.Position;
             if ((JsonParser.comma == context.SymbolId)) {
-                // ObjectPart -> ImplicitList rbrace
+                // ObjectPart -> ObjectList rbrace
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.AddRange(JsonParser._ParseImplicitList(context).Children);
+                children.AddRange(JsonParser._ParseObjectList(context).Children);
                 if ((JsonParser.rbrace == context.SymbolId)) {
                     context.Advance();
                     return new ParseNode(JsonParser.ObjectPart, "ObjectPart", children.ToArray(), line, column, position);
@@ -315,9 +295,9 @@ namespace ParsleyDemo {
             int column = context.Column;
             long position = context.Position;
             if ((JsonParser.comma == context.SymbolId)) {
-                // ArrayPart -> ImplicitList2 rbracket
+                // ArrayPart -> ArrayList rbracket
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.AddRange(JsonParser._ParseImplicitList2(context).Children);
+                children.AddRange(JsonParser._ParseArrayList(context).Children);
                 if ((JsonParser.rbracket == context.SymbolId)) {
                     context.Advance();
                     return new ParseNode(JsonParser.ArrayPart, "ArrayPart", children.ToArray(), line, column, position);
@@ -333,8 +313,6 @@ namespace ParsleyDemo {
             context.Error("Expecting comma or rbracket");
             return null;
         }
-        
-        #line 3 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         private static ParseNode _ParseObject(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -349,9 +327,6 @@ namespace ParsleyDemo {
             context.Error("Expecting lbrace");
             return null;
         }
-        
-        #line default
-        #line hidden
         private static ParseNode _ParseObjectPart2(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -372,8 +347,6 @@ namespace ParsleyDemo {
             context.Error("Expecting rbrace or string");
             return null;
         }
-        
-        #line 5 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         private static ParseNode _ParseArray(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -388,9 +361,6 @@ namespace ParsleyDemo {
             context.Error("Expecting lbracket");
             return null;
         }
-        
-        #line default
-        #line hidden
         private static ParseNode _ParseArrayPart2(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -427,16 +397,11 @@ namespace ParsleyDemo {
         /// Json -> Array
         /// </remarks>
         /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #line 2 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         public static ParseNode ParseJson(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return JsonParser._ParseJson(context);
         }
-        
-        #line default
-        #line hidden
         /// <summary>
         /// Parses a production of the form:
         /// Object= "{" [ Field { "," Field } ] "}"
@@ -446,16 +411,11 @@ namespace ParsleyDemo {
         /// Object -> lbrace ObjectPart2
         /// </remarks>
         /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #line 3 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         public static ParseNode ParseObject(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return JsonParser._ParseObject(context);
         }
-        
-        #line default
-        #line hidden
         /// <summary>
         /// Parses a production of the form:
         /// Field= string ":" Value
@@ -465,16 +425,11 @@ namespace ParsleyDemo {
         /// Field -> string colon Value
         /// </remarks>
         /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #line 4 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         public static ParseNode ParseField(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return JsonParser._ParseField(context);
         }
-        
-        #line default
-        #line hidden
         /// <summary>
         /// Parses a production of the form:
         /// Array= "[" [ Value { "," Value } ] "]"
@@ -484,16 +439,11 @@ namespace ParsleyDemo {
         /// Array -> lbracket ArrayPart2
         /// </remarks>
         /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #line 5 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         public static ParseNode ParseArray(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return JsonParser._ParseArray(context);
         }
-        
-        #line default
-        #line hidden
         /// <summary>
         /// Parses a production of the form:
         /// Boolean= true | false
@@ -504,16 +454,11 @@ namespace ParsleyDemo {
         /// Boolean -> false
         /// </remarks>
         /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #line 12 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         public static ParseNode ParseBoolean(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return JsonParser._ParseBoolean(context);
         }
-        
-        #line default
-        #line hidden
         /// <summary>
         /// Parses a derivation of the form:
         /// Json= Object | Array
@@ -524,16 +469,11 @@ namespace ParsleyDemo {
         /// Json -> Array
         /// </remarks>
         /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #line 2 "C:\dev\BuildPack\ParsleyDemo\json.xbnf"
         public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
             return JsonParser._ParseJson(context);
         }
-        
-        #line default
-        #line hidden
     }
     /// <summary>
     /// 

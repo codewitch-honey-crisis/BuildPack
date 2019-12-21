@@ -354,11 +354,11 @@ namespace Parsley
 				{
 					sr = cc.Right as XbnfRefExpression;
 					if (null != sr)
-						sid = string.Concat(sr.Symbol, "listtail");
+						sid = string.Concat(sr.Symbol, "ListTail");
 				}
 			}
 			if (string.IsNullOrEmpty(sid))
-				sid = "ImplicitList";
+				sid = string.Concat(p.Name,"List");
 			var listId = sid;
 			var i = 2;
 			var ss = listId;

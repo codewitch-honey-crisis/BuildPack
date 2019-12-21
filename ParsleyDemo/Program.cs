@@ -9,14 +9,16 @@ namespace ParsleyDemo
 	{
 		static void Main(string[] args)
 		{
-			var text = "3 + a * 5 + 7 / 2";
+			var text = "3 * 5 * -(7 + 7 + 6) + 5 * 2 + -10";
 			var vars = new Dictionary<string, int>();
 			vars["a"] = 1;
 			var exprTokenizer = new ExpressionTokenizer(text);
-			var pt = ExpressionParser.ParseExpression(exprTokenizer);
-			Console.WriteLine("{0} = {1}",text,ExpressionParser.Evaluate(pt,vars));
-			Console.WriteLine();
+			var pt = ExpressionParser.Parse(exprTokenizer);
 			_WriteTree(pt, Console.Out);
+			Console.WriteLine();
+			Console.WriteLine("{0} = {1}", text, ExpressionParser.Evaluate(pt, vars));
+			Console.WriteLine();
+
 			Console.WriteLine("Press any key...");
 			Console.ReadKey();
 			using (var sw = File.OpenText(@"..\..\data.json"))

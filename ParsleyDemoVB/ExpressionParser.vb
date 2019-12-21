@@ -68,8 +68,6 @@ Namespace ParsleyDemo
         Public Const mul As Integer = 13
         Public Const div As Integer = 14
         Public Const whitespace As Integer = 15
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Private Shared Function _ParseExpression(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -87,10 +85,6 @@ Namespace ParsleyDemo
             context.Error("Expecting add, sub, identifier, integer, or lparen")
             Return Nothing
         End Function
-        
-        #End ExternalSource
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",18)
         Private Shared Function _ParseUnary(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -122,10 +116,6 @@ Namespace ParsleyDemo
             context.Error("Expecting add, sub, identifier, integer, or lparen")
             Return Nothing
         End Function
-        
-        #End ExternalSource
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",26)
         Private Shared Function _ParseLeaf(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -160,10 +150,6 @@ Namespace ParsleyDemo
             context.Error("Expecting identifier, integer, or lparen")
             Return Nothing
         End Function
-        
-        #End ExternalSource
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",2)
         Private Shared Function _ParseTerm(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -182,8 +168,6 @@ Namespace ParsleyDemo
             context.Error("Expecting add, sub, identifier, integer, or lparen")
             Return Nothing
         End Function
-        
-        #End ExternalSource
         Private Shared Function _ParseTermPart(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -213,8 +197,6 @@ Namespace ParsleyDemo
             context.Error("Expecting add, sub, #EOS, or rparen")
             Return Nothing
         End Function
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",10)
         Private Shared Function _ParseFactor(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -233,8 +215,6 @@ Namespace ParsleyDemo
             context.Error("Expecting add, sub, identifier, integer, or lparen")
             Return Nothing
         End Function
-        
-        #End ExternalSource
         Private Shared Function _ParseFactorPart(ByVal context As ParserContext) As ParseNode
             Dim line As Integer = context.Line
             Dim column As Integer = context.Column
@@ -275,15 +255,11 @@ Namespace ParsleyDemo
         '''Expression -> Term
         '''</remarks>
         '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Public Shared Function ParseExpression(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return ExpressionParser._ParseExpression(context)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Parses a production of the form:
         '''Term= Factor ( "+" | "-" ) Factor | Factor
@@ -293,15 +269,11 @@ Namespace ParsleyDemo
         '''Term -> Factor TermPart
         '''</remarks>
         '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",2)
         Public Shared Function ParseTerm(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return ExpressionParser._ParseTerm(context)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Parses a production of the form:
         '''Factor= Unary ( "*" | "/" ) Unary | Unary
@@ -311,15 +283,11 @@ Namespace ParsleyDemo
         '''Factor -> Unary FactorPart
         '''</remarks>
         '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",10)
         Public Shared Function ParseFactor(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return ExpressionParser._ParseFactor(context)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Parses a production of the form:
         '''Unary= ( "+" | "-" ) Unary | Leaf
@@ -331,15 +299,11 @@ Namespace ParsleyDemo
         '''Unary -> Leaf
         '''</remarks>
         '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",18)
         Public Shared Function ParseUnary(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return ExpressionParser._ParseUnary(context)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Parses a production of the form:
         '''Leaf= identifier | integer | "(" Expression ")"
@@ -351,15 +315,11 @@ Namespace ParsleyDemo
         '''Leaf -> lparen Expression rparen
         '''</remarks>
         '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",26)
         Public Shared Function ParseLeaf(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return ExpressionParser._ParseLeaf(context)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Parses a derivation of the form:
         '''Expression= Term
@@ -369,15 +329,11 @@ Namespace ParsleyDemo
         '''Expression -> Term
         '''</remarks>
         '''<param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Public Shared Function Parse(ByVal tokenizer As System.Collections.Generic.IEnumerable(Of Token)) As ParseNode
             Dim context As ParserContext = New ParserContext(tokenizer)
             context.EnsureStarted
             Return ExpressionParser._ParseExpression(context)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
         '''Expression= Term
@@ -388,13 +344,9 @@ Namespace ParsleyDemo
         '''</remarks>
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Public Overloads Shared Function Evaluate(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateExpression(node)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
         '''Expression= Term
@@ -406,13 +358,9 @@ Namespace ParsleyDemo
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Public Overloads Shared Function Evaluate(ByVal node As ParseNode, ByVal state As Object) As Integer
             Return ExpressionParser.EvaluateExpression(node, state)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
         '''Expression= Term
@@ -424,16 +372,12 @@ Namespace ParsleyDemo
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Public Overloads Shared Function EvaluateExpression(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Expression = node.SymbolId) Then
                 Return CType(ExpressionParser._ChangeType(ExpressionParser.EvaluateTerm(node.Children(0), state), GetType(Integer)),Integer)
             End If
             Throw New SyntaxException("Expecting Expression", node.Line, node.Column, node.Position)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
         '''Expression= Term
@@ -444,13 +388,9 @@ Namespace ParsleyDemo
         '''</remarks>
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",1)
         Public Overloads Shared Function EvaluateExpression(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateExpression(node, Nothing)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
         '''Term= Factor ( "+" | "-" ) Factor | Factor
@@ -462,8 +402,6 @@ Namespace ParsleyDemo
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",2)
         Public Overloads Shared Function EvaluateTerm(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Term = node.SymbolId) Then
                 If (1 = node.Children.Length) Then
@@ -478,8 +416,6 @@ Namespace ParsleyDemo
             End If
             Throw New SyntaxException("Expecting Term", node.Line, node.Column, node.Position)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
         '''Term= Factor ( "+" | "-" ) Factor | Factor
@@ -490,13 +426,9 @@ Namespace ParsleyDemo
         '''</remarks>
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",2)
         Public Overloads Shared Function EvaluateTerm(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateTerm(node, Nothing)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
         '''Factor= Unary ( "*" | "/" ) Unary | Unary
@@ -508,8 +440,6 @@ Namespace ParsleyDemo
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",10)
         Public Overloads Shared Function EvaluateFactor(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Factor = node.SymbolId) Then
                 If (1 = node.Children.Length) Then
@@ -524,8 +454,6 @@ Namespace ParsleyDemo
             End If
             Throw New SyntaxException("Expecting Factor", node.Line, node.Column, node.Position)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
         '''Factor= Unary ( "*" | "/" ) Unary | Unary
@@ -536,13 +464,9 @@ Namespace ParsleyDemo
         '''</remarks>
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",10)
         Public Overloads Shared Function EvaluateFactor(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateFactor(node, Nothing)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
         '''Unary= ( "+" | "-" ) Unary | Leaf
@@ -556,8 +480,6 @@ Namespace ParsleyDemo
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",18)
         Public Overloads Shared Function EvaluateUnary(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Unary = node.SymbolId) Then
                 If (1 = node.Children.Length) Then
@@ -572,8 +494,6 @@ Namespace ParsleyDemo
             End If
             Throw New SyntaxException("Expecting Unary", node.Line, node.Column, node.Position)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
         '''Unary= ( "+" | "-" ) Unary | Leaf
@@ -586,13 +506,9 @@ Namespace ParsleyDemo
         '''</remarks>
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",18)
         Public Overloads Shared Function EvaluateUnary(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateUnary(node, Nothing)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
         '''Leaf= identifier | integer | "(" Expression ")"
@@ -606,8 +522,6 @@ Namespace ParsleyDemo
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",26)
         Public Overloads Shared Function EvaluateLeaf(ByVal node As ParseNode, ByVal state As Object) As Integer
             If (ExpressionParser.Leaf = node.SymbolId) Then
                 If (node.Children(0).SymbolId = ParsleyDemo.ExpressionParser.identifier) Then
@@ -625,8 +539,6 @@ Namespace ParsleyDemo
             End If
             Throw New SyntaxException("Expecting Leaf", node.Line, node.Column, node.Position)
         End Function
-        
-        #End ExternalSource
         '''<summary>
         '''Evaluates a derivation of the form:
         '''Leaf= identifier | integer | "(" Expression ")"
@@ -639,13 +551,9 @@ Namespace ParsleyDemo
         '''</remarks>
         '''<param name="node">The <see cref="ParseNode"/> to evaluate</param>
         '''<returns>The result of the evaluation</returns>
-        
-        #ExternalSource("C:\dev\BuildPack\ParsleyDemoVB\Expression.xbnf",26)
         Public Overloads Shared Function EvaluateLeaf(ByVal node As ParseNode) As Integer
             Return ExpressionParser.EvaluateLeaf(node, Nothing)
         End Function
-        
-        #End ExternalSource
         Private Shared Function _ChangeType(ByVal obj As Object, ByVal type As System.Type) As Object
             Dim typeConverter As System.ComponentModel.TypeConverter = System.ComponentModel.TypeDescriptor.GetConverter(obj)
             If ((Nothing Is typeConverter)  _

@@ -174,11 +174,11 @@ namespace Parsley
 						for (var j = 1; j < c; ++j)
 							col.Add(rule.Right[j]);
 						col.Add(newId);
-						var o = cfg.GetAttribute(rule.Left, "collapsed", false);
-						if (o is bool && (bool)o)
+						//var o = cfg.GetAttribute(rule.Left, "collapsed", false);
+						//if (o is bool && (bool)o)
 							_SetAttribute(cfg, newId, "collapsed", true);
-						else
-							_SetAttribute(cfg, newId, "substitute", rule.Left);
+						//else
+						//	_SetAttribute(cfg, newId, "substitute", rule.Left);
 						
 						var newRule = new CfgRule(newId);
 						for(int jc=col.Count,j=0;j<jc;++j)
