@@ -16,9 +16,7 @@ Factor<type="int">= Unary { ("*"|"/") Unary } => {
 	int i = 2;
 	// Because of the way the grammar is factored, this can 
 	// end up being Factors when collapsed. We use the "smart"
-	// evaluation to resolve this at runtime. Note that with
-	// Child, the type returned will always be object so we 
-	// must cast
+	// evaluation to resolve this at runtime
 	while (i<Length) {
 		if(node.Children[i-1].SymbolId==mul)
 			result *= (int)Child[i];

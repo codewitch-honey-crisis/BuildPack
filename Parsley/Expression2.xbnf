@@ -1,19 +1,19 @@
-﻿Term<start,type="int">= Factor { ("+"|"-") Factor } => {
-	int result = EvaluateFactor(node.Children[0]);
+﻿Term<start>= Factor { ("+"|"-") Factor } => {
+	int result = (int)EvaluateFactor(node.Children[0]);
 	int i = 2;
 	while (i<Length) 
 	{
 		if(node.Children[i-1].SymbolId==add)
-			result += EvaluateFactor(node.Children[i]);
+			result += (int)EvaluateFactor(node.Children[i]);
 		else // sub
-			result -= EvaluateFactor(node.Children[i]);
+			result -= (int)EvaluateFactor(node.Children[i]);
 		i+=2;
 	}
 	return result;
 }
 
-Factor<type="int">= Unary { ("*"|"/") Unary } => { 
-	int result = EvaluateUnary(node.Children[0]);
+Factor= Unary { ("*"|"/") Unary } => { 
+	int result = (int)EvaluateUnary(node.Children[0]);
 	int i = 2;
 	// Because of the way the grammar is factored, this can 
 	// end up being Factors when collapsed. We have to check
@@ -22,33 +22,33 @@ Factor<type="int">= Unary { ("*"|"/") Unary } => {
 		if(node.Children[i].SymbolId==Unary) // Unary
 		{
 			if(node.Children[i-1].SymbolId==mul) 
-				result *= EvaluateUnary(node.Children[i]);
+				result *= (int)EvaluateUnary(node.Children[i]);
 			else // div
-				result /= EvaluateUnary(node.Children[i]);
+				result /= (int)EvaluateUnary(node.Children[i]);
 		} else // Factor
 		{
 			if(node.Children[i-1].SymbolId==mul) 
-				result *= EvaluateFactor(node.Children[i]);
+				result *= (int)EvaluateFactor(node.Children[i]);
 			else // div
-				result /= EvaluateFactor(node.Children[i]);
+				result /= (int)EvaluateFactor(node.Children[i]);
 		}
 		i+=2;
 	}
 	return result;
 }
-Unary<type="int">= ("+"|"-") Unary | Leaf => {
+Unary= ("+"|"-") Unary | Leaf => {
 	if(node.Children.Length==1)
 		return EvaluateLeaf(node.Children[0]);
 	if(node.Children[0].SymbolId==add)
 		return EvaluateUnary(node.Children[1]);
 	else
-		return -EvaluateUnary(node.Children[1]);
+		return -(int)EvaluateUnary(node.Children[1]);
 }
-Leaf<type="int">= integer | identifier | "(" Term ")" => {
+Leaf= integer | identifier | "(" Term ")" => {
 	if(node.Children.Length==1) // integer | identifer
 	{
 		if(node.Children[1].SymbolId==integer)
-			return node.Children[0].Value;
+			return int.Parse(node.Children[0].Value);
 		else // identifier
 			throw new NotImplementedException("Variables are not implemented.");
 	} else // Term

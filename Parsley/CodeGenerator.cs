@@ -371,6 +371,7 @@ namespace Parsley
 			)
 		{
 			var hasChangeType = false;
+			var hasEvalAny = false;
 			var syms = cfg.FillSymbols();
 			var node = C.ArgRef("node");
 			for(int ic=doc.Productions.Count,i=0;i<ic;++i)
@@ -380,8 +381,7 @@ namespace Parsley
 				if (null!=prod.Code)
 				{
 					var type = new CodeTypeReference(typeof(object));
-					CodeTypeReference typeConverter = null;
-
+					
 					var ti = prod.Attributes.IndexOf("type");
 					if (-1<ti)
 					{
@@ -389,13 +389,6 @@ namespace Parsley
 						if (!string.IsNullOrEmpty(s))
 							type = new CodeTypeReference(CD.CodeDomResolver.TranslateIntrinsicType(s));
 
-						ti = prod.Attributes.IndexOf("typeConverter");
-						if (-1 < ti)
-						{
-							s = prod.Attributes[ti].Value as string;
-							if (!string.IsNullOrEmpty(s))
-								typeConverter = new CodeTypeReference(s);
-						}
 					}
 
 					MemberAttributes attrs; 
@@ -438,6 +431,39 @@ namespace Parsley
 					parser.Members.Add(m);
 					var hasReturn = false;
 					V.Visit(cnd, (ctx) => {
+						var idx = ctx.Target as CodeIndexerExpression;
+						if(null!=idx && 1==idx.Indices.Count)
+						{
+							var to = idx.TargetObject as CodeVariableReferenceExpression;
+							if(null!=to)
+							{
+								int pi;
+								if(0==string.Compare("Child",to.VariableName))
+								{
+									// is a thing like Child[0]
+									hasEvalAny = true;
+									var mi = C.Invoke(C.TypeRef("Parser"), "_EvaluateAny", C.ArrIndexer(C.PropRef(node, "Children"), idx.Indices[0]), C.ArgRef("state"));
+									V.ReplaceTarget(ctx, mi);
+								} else if(-1<(pi=doc.Productions.IndexOf(to.VariableName)))
+								{
+									// is a thing like Factor[0]
+									var p = doc.Productions[pi];
+									if(!p.IsCollapsed && !p.IsHidden)
+									{
+										if (!p.IsTerminal)
+										{
+											var mi = C.Invoke(C.TypeRef("Parser"), string.Concat("Evaluate", p.Name), C.ArrIndexer(C.PropRef(node, "Children"), idx.Indices[0]), C.ArgRef("state"));
+											V.ReplaceTarget(ctx, mi);
+										}
+										else
+										{
+											var pr = C.PropRef(C.ArrIndexer(C.PropRef(node, "Children"), idx.Indices[0]), "Value");
+											V.ReplaceTarget(ctx, pr);
+										}
+									}
+								}
+							}
+						}
 						var v =ctx.Target as CodeVariableReferenceExpression;
 						if (null != v)
 						{
@@ -468,7 +494,25 @@ namespace Parsley
 											}
 										}
 									}
-								} 
+								}
+								else if (v.VariableName.StartsWith("Child", StringComparison.InvariantCulture))
+								{
+									if (5 < v.VariableName.Length)
+									{
+										var s = v.VariableName.Substring(5);
+										int num;
+										if (int.TryParse(s, out num))
+										{
+											if (0 < num)
+											{
+												hasEvalAny = true;
+												var mi = C.Invoke(C.TypeRef("Parser"), "_EvaluateAny", C.ArrIndexer(C.PropRef(node, "Children"), C.Literal(num - 1)), C.ArgRef("state"));
+												V.ReplaceTarget(ctx, mi);
+												
+											}
+										}
+									}
+								}
 								else if(0==string.Compare("Length",v.VariableName,StringComparison.InvariantCulture))
 								{
 									var ffr = C.PropRef(C.PropRef(node, "Children"), "Length");
@@ -559,6 +603,30 @@ namespace Parsley
 				m.Statements.Add(C.Return(C.Invoke(C.VarRef("typeConverter"), "ConvertTo", C.ArgRef("obj"), C.ArgRef("type"))));
 				parser.Members.Add(m);
 			}
+			if(hasEvalAny)
+			{
+				var sid = C.PropRef(node, "SymbolId");
+				var m = C.Method(typeof(object), "_EvaluateAny", MemberAttributes.Private | MemberAttributes.Static, C.Param(C.Type("ParseNode"), "node"), C.Param(typeof(object), "state"));
+				for(int ic=doc.Productions.Count,i=0;i<ic;++i)
+				{
+					var p = doc.Productions[i];
+					if(!p.IsCollapsed && !p.IsHidden)
+					{
+						
+						var sidcmp = cfg.GetIdOfSymbol(p.Name);
+						var sidcf = C.FieldRef(C.TypeRef("Parser"),consts[sidcmp]);
+						var cnd = C.If(C.Eq(sid, sidcf));
+						if (!p.IsTerminal)
+							cnd.TrueStatements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), string.Concat("Evaluate", p.Name), node, C.ArgRef("state"))));
+						else
+							cnd.TrueStatements.Add(C.Return(C.PropRef(node,"Value")));
+						m.Statements.Add(cnd);
+					}
+				}
+				m.Statements.Add(C.Return(C.Null));
+				parser.Members.Add(m);
+			}
+			
 			
 		}
 

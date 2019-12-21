@@ -3171,8 +3171,8 @@ var ctr=_ParseTypeRef(pc);_SkipComments(pc);if(ST.rparen!=pc.SymbolId)_Error("Un
 return new CodeCastExpression(ctr,expr);}static CodeExpression _ParseUnary(_PC pc){_SkipComments(pc);switch(pc.SymbolId){case ST.inc:pc.Advance();var rhs
 =_ParseLeaf(pc);return new CodeBinaryOperatorExpression(rhs,CodeBinaryOperatorType.Assign,new CodeBinaryOperatorExpression(rhs,CodeBinaryOperatorType.Add,
 new CodePrimitiveExpression(1)));case ST.dec:pc.Advance();rhs=_ParseLeaf(pc);return new CodeBinaryOperatorExpression(rhs,CodeBinaryOperatorType.Assign,
-new CodeBinaryOperatorExpression(rhs,CodeBinaryOperatorType.Subtract,new CodePrimitiveExpression(1)));case ST.add:pc.Advance();return _ParseUnary(pc);
-case ST.sub:pc.Advance();rhs=_ParseUnary(pc); var pe=rhs as CodePrimitiveExpression;if(null!=pe){if(pe.Value is int)return new CodePrimitiveExpression(-(int)pe.Value);
+new CodeBinaryOperatorExpression(rhs,CodeBinaryOperatorType.Subtract,new CodePrimitiveExpression(1)));case ST.add:pc.Advance();return _ParseExpression(pc);
+case ST.sub:pc.Advance();rhs=_ParseExpression(pc); var pe=rhs as CodePrimitiveExpression;if(null!=pe){if(pe.Value is int)return new CodePrimitiveExpression(-(int)pe.Value);
 if(pe.Value is long)return new CodePrimitiveExpression(-(long)pe.Value);if(pe.Value is short)return new CodePrimitiveExpression(-(short)pe.Value);if(pe.Value
  is sbyte)return new CodePrimitiveExpression(-(sbyte)pe.Value);if(pe.Value is float)return new CodePrimitiveExpression(-(float)pe.Value);if(pe.Value is
  double)return new CodePrimitiveExpression(-(double)pe.Value);if(pe.Value is decimal)return new CodePrimitiveExpression(-(decimal)pe.Value);}return new

@@ -1,49 +1,58 @@
 ﻿Term<start,type="int">= Factor { ("+"|"-") Factor } => {
-	int result = Factor1;
+	int result = EvaluateFactor(node.Children[0]);
 	int i = 2;
-	while (i<Length) {
+	while (i<Length) 
+	{
 		if(node.Children[i-1].SymbolId==add)
-			result += EvaluateFactor(node.Children[i],state);
-		else
-			result -= EvaluateFactor(node.Children[i],state);
+			result += EvaluateFactor(node.Children[i]);
+		else // sub
+			result -= EvaluateFactor(node.Children[i]);
 		i+=2;
 	}
 	return result;
 }
 
 Factor<type="int">= Unary { ("*"|"/") Unary } => { 
-	int result = Unary1;
+	int result = EvaluateUnary(node.Children[0]);
 	int i = 2;
 	// Because of the way the grammar is factored, this can 
-	// end up being Factors when collapsed
-	while (i<Length) {
-		if(node.Children[i].SymbolId==Unary) {
-			if(node.Children[i-1].SymbolId==mul)
-				result *= EvaluateUnary(node.Children[i],state);
-			else
-				result /= EvaluateUnary(node.Children[i],state);
-		} else {
-			if(node.Children[i-1].SymbolId==mul)
-				result *= EvaluateFactor(node.Children[i],state);
-			else
-				result /= EvaluateFactor(node.Children[i-1],state);
+	// end up being Factors when collapsed. We have to check
+	while (i<Length) 
+	{
+		if(node.Children[i].SymbolId==Unary) // Unary
+		{
+			if(node.Children[i-1].SymbolId==mul) 
+				result *= EvaluateUnary(node.Children[i]);
+			else // div
+				result /= EvaluateUnary(node.Children[i]);
+		} else // Factor
+		{
+			if(node.Children[i-1].SymbolId==mul) 
+				result *= EvaluateFactor(node.Children[i]);
+			else // div
+				result /= EvaluateFactor(node.Children[i]);
 		}
 		i+=2;
 	}
 	return result;
 }
 Unary<type="int">= ("+"|"-") Unary | Leaf => {
-	if(Length==1)
-		return Leaf1;
-	if(SymbolId1==add)
-		return Unary2;
+	if(node.Children.Length==1)
+		return EvaluateLeaf(node.Children[0]);
+	if(node.Children[0].SymbolId==add)
+		return EvaluateUnary(node.Children[1]);
 	else
-		return -Unary2;
+		return -EvaluateUnary(node.Children[1]);
 }
-Leaf<type="int">= integer | "(" Term ")" => {
-	if(Length==1)
-		return integer1;
-	else return Term2; 
+Leaf<type="int">= integer | identifier | "(" Term ")" => {
+	if(node.Children.Length==1) // integer | identifer
+	{
+		if(node.Children[1].SymbolId==integer)
+			return node.Children[0].Value;
+		else // identifier
+			throw new NotImplementedException("Variables are not implemented.");
+	} else // Term
+		return EvaluateTerm(node.Children[1]); 
 }
 // we only need to declare terminals explicitly if we want 
 // constant names for them or to apply attributes to them
@@ -52,4 +61,5 @@ Leaf<type="int">= integer | "(" Term ")" => {
 add="+";
 mul="*";
 integer='[0-9]+';
+identifier='[A-Z_a-z][0-9A-Z_a-z]*';
 whitespace<hidden>='\s+';

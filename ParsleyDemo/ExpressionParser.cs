@@ -16,10 +16,11 @@ namespace ParsleyDemo {
     /// Term= Factor { ( "+" | "-" ) Factor };
     /// Factor= Unary { ( "*" | "/" ) Unary };
     /// Unary= ( "+" | "-" ) Unary | Leaf;
-    /// Leaf= integer | "(" Term ")";
+    /// Leaf= integer | identifier | "(" Term ")";
     /// add= "+";
     /// mul= "*";
     /// integer= '[0-9]+';
+    /// identifier= '[A-Z_a-z][0-9A-Z_a-z]*';
     /// (whitespace)= '\s+';
     /// </summary>
     /// <remarks>The rules for the factored grammar are as follows:
@@ -27,6 +28,7 @@ namespace ParsleyDemo {
     /// Unary -> Implicit Unary
     /// Unary -> Leaf
     /// Leaf -> integer
+    /// Leaf -> identifier
     /// Leaf -> Implicit3 Term Implicit4
     /// TermList -> add Factor TermListRightAssoc TermListRightAssoc2
     /// TermList -> Implicit Factor TermListRightAssoc TermListRightAssoc2
@@ -66,11 +68,12 @@ namespace ParsleyDemo {
         public const int add = 12;
         public const int Implicit = 13;
         public const int integer = 14;
-        public const int Implicit3 = 15;
-        public const int Implicit4 = 16;
-        public const int mul = 17;
-        public const int Implicit2 = 18;
-        public const int whitespace = 19;
+        public const int identifier = 15;
+        public const int Implicit3 = 16;
+        public const int Implicit4 = 17;
+        public const int mul = 18;
+        public const int Implicit2 = 19;
+        public const int whitespace = 20;
         private static ParseNode _ParseUnary(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -91,14 +94,15 @@ namespace ParsleyDemo {
                 children[1] = ExpressionParser._ParseUnary(context);
                 return new ParseNode(ExpressionParser.Unary, "Unary", children, line, column, position);
             }
-            if (((ExpressionParser.integer == context.SymbolId) 
+            if ((((ExpressionParser.integer == context.SymbolId) 
+                        || (ExpressionParser.identifier == context.SymbolId)) 
                         || (ExpressionParser.Implicit3 == context.SymbolId))) {
                 // Unary -> Leaf
                 ParseNode[] children = new ParseNode[1];
                 children[0] = ExpressionParser._ParseLeaf(context);
                 return new ParseNode(ExpressionParser.Unary, "Unary", children, line, column, position);
             }
-            context.Error("Expecting add, Implicit, integer, or Implicit3");
+            context.Error("Expecting add, Implicit, integer, identifier, or Implicit3");
             return null;
         }
         private static ParseNode _ParseLeaf(ParserContext context) {
@@ -109,6 +113,13 @@ namespace ParsleyDemo {
                 // Leaf -> integer
                 ParseNode[] children = new ParseNode[1];
                 children[0] = new ParseNode(ExpressionParser.integer, "integer", context.Value, line, column, position);
+                context.Advance();
+                return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);
+            }
+            if ((ExpressionParser.identifier == context.SymbolId)) {
+                // Leaf -> identifier
+                ParseNode[] children = new ParseNode[1];
+                children[0] = new ParseNode(ExpressionParser.identifier, "identifier", context.Value, line, column, position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);
             }
@@ -125,7 +136,7 @@ namespace ParsleyDemo {
                 }
                 context.Error("Expecting Implicit4");
             }
-            context.Error("Expecting integer or Implicit3");
+            context.Error("Expecting integer, identifier, or Implicit3");
             return null;
         }
         private static ParseNode _ParseTermList(ParserContext context) {
@@ -234,9 +245,10 @@ namespace ParsleyDemo {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
-            if (((((ExpressionParser.add == context.SymbolId) 
+            if ((((((ExpressionParser.add == context.SymbolId) 
                         || (ExpressionParser.Implicit == context.SymbolId)) 
                         || (ExpressionParser.integer == context.SymbolId)) 
+                        || (ExpressionParser.identifier == context.SymbolId)) 
                         || (ExpressionParser.Implicit3 == context.SymbolId))) {
                 // Term -> Factor TermPart
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
@@ -244,7 +256,7 @@ namespace ParsleyDemo {
                 children.AddRange(ExpressionParser._ParseTermPart(context).Children);
                 return new ParseNode(ExpressionParser.Term, "Term", children.ToArray(), line, column, position);
             }
-            context.Error("Expecting add, Implicit, integer, or Implicit3");
+            context.Error("Expecting add, Implicit, integer, identifier, or Implicit3");
             return null;
         }
         private static ParseNode _ParseTermPart(ParserContext context) {
@@ -271,9 +283,10 @@ namespace ParsleyDemo {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
-            if (((((ExpressionParser.add == context.SymbolId) 
+            if ((((((ExpressionParser.add == context.SymbolId) 
                         || (ExpressionParser.Implicit == context.SymbolId)) 
                         || (ExpressionParser.integer == context.SymbolId)) 
+                        || (ExpressionParser.identifier == context.SymbolId)) 
                         || (ExpressionParser.Implicit3 == context.SymbolId))) {
                 // Factor -> Unary FactorPart
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
@@ -281,7 +294,7 @@ namespace ParsleyDemo {
                 children.AddRange(ExpressionParser._ParseFactorPart(context).Children);
                 return new ParseNode(ExpressionParser.Factor, "Factor", children.ToArray(), line, column, position);
             }
-            context.Error("Expecting add, Implicit, integer, or Implicit3");
+            context.Error("Expecting add, Implicit, integer, identifier, or Implicit3");
             return null;
         }
         private static ParseNode _ParseFactorPart(ParserContext context) {
@@ -398,11 +411,12 @@ namespace ParsleyDemo {
         }
         /// <summary>
         /// Parses a production of the form:
-        /// Leaf= integer | "(" Term ")"
+        /// Leaf= integer | identifier | "(" Term ")"
         /// </summary>
         /// <remarks>
         /// The production rules are:
         /// Leaf -> integer
+        /// Leaf -> identifier
         /// Leaf -> Implicit3 Term Implicit4
         /// </remarks>
         /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
@@ -465,16 +479,16 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         public static int EvaluateTerm(ParseNode node, object state) {
             if ((ExpressionParser.Term == node.SymbolId)) {
-                int result = ExpressionParser.EvaluateFactor(node.Children[0], state);
+                int result = ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[0]);
                 int i = 2;
                 for (
                 ; (i < node.Children.Length); 
                 ) {
                     if ((node.Children[(i - 1)].SymbolId == ParsleyDemo.ExpressionParser.add)) {
-                        result = (result + ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i], state));
+                        result = (result + ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]));
                     }
                     else {
-                        result = (result - ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i], state));
+                        result = (result - ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]));
                     }
                     i = (i + 2);
                 }
@@ -508,25 +522,25 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         public static int EvaluateFactor(ParseNode node, object state) {
             if ((ExpressionParser.Factor == node.SymbolId)) {
-                int result = ExpressionParser.EvaluateUnary(node.Children[0], state);
+                int result = ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[0]);
                 int i = 2;
                 for (
                 ; (i < node.Children.Length); 
                 ) {
                     if ((node.Children[i].SymbolId == ParsleyDemo.ExpressionParser.Unary)) {
                         if ((node.Children[(i - 1)].SymbolId == ParsleyDemo.ExpressionParser.mul)) {
-                            result = (result * ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[i], state));
+                            result = (result * ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[i]));
                         }
                         else {
-                            result = (result / ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[i], state));
+                            result = (result / ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[i]));
                         }
                     }
                     else {
                         if ((node.Children[(i - 1)].SymbolId == ParsleyDemo.ExpressionParser.mul)) {
-                            result = (result * ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i], state));
+                            result = (result * ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]));
                         }
                         else {
-                            result = (result / ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[(i - 1)], state));
+                            result = (result / ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children[i]));
                         }
                     }
                     i = (i + 2);
@@ -564,13 +578,13 @@ namespace ParsleyDemo {
         public static int EvaluateUnary(ParseNode node, object state) {
             if ((ExpressionParser.Unary == node.SymbolId)) {
                 if ((node.Children.Length == 1)) {
-                    return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateLeaf(node.Children[0], state), typeof(int))));
+                    return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateLeaf(node.Children[0]), typeof(int))));
                 }
                 if ((node.Children[0].SymbolId == ParsleyDemo.ExpressionParser.add)) {
-                    return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateUnary(node.Children[1], state), typeof(int))));
+                    return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children[1]), typeof(int))));
                 }
                 else {
-                    return ((int)(ExpressionParser._ChangeType((0 - ExpressionParser.EvaluateUnary(node.Children[1], state)), typeof(int))));
+                    return ((int)(ExpressionParser._ChangeType((0 - ParsleyDemo.ExpressionParser.EvaluateUnary)(node.Children[1]), typeof(int))));
                 }
             }
             throw new SyntaxException("Expecting Unary", node.Line, node.Column, node.Position);
@@ -592,11 +606,12 @@ namespace ParsleyDemo {
         }
         /// <summary>
         /// Evaluates a derivation of the form:
-        /// Leaf= integer | "(" Term ")"
+        /// Leaf= integer | identifier | "(" Term ")"
         /// </summary>
         /// <remarks>
         /// The production rules are:
         /// Leaf -> integer
+        /// Leaf -> identifier
         /// Leaf -> Implicit3 Term Implicit4
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
@@ -605,21 +620,27 @@ namespace ParsleyDemo {
         public static int EvaluateLeaf(ParseNode node, object state) {
             if ((ExpressionParser.Leaf == node.SymbolId)) {
                 if ((node.Children.Length == 1)) {
-                    return ((int)(ExpressionParser._ChangeType(node.Children[0].Value, typeof(int))));
+                    if ((node.Children[1].SymbolId == ParsleyDemo.ExpressionParser.integer)) {
+                        return ((int)(ExpressionParser._ChangeType(node.Children[0].Value, typeof(int))));
+                    }
+                    else {
+                        throw new NotImplementedException("Variables are not implemented.");
+                    }
                 }
                 else {
-                    return ((int)(ExpressionParser._ChangeType(ExpressionParser.EvaluateTerm(node.Children[1], state), typeof(int))));
+                    return ((int)(ExpressionParser._ChangeType(ParsleyDemo.ExpressionParser.EvaluateTerm(node.Children[1]), typeof(int))));
                 }
             }
             throw new SyntaxException("Expecting Leaf", node.Line, node.Column, node.Position);
         }
         /// <summary>
         /// Evaluates a derivation of the form:
-        /// Leaf= integer | "(" Term ")"
+        /// Leaf= integer | identifier | "(" Term ")"
         /// </summary>
         /// <remarks>
         /// The production rules are:
         /// Leaf -> integer
+        /// Leaf -> identifier
         /// Leaf -> Implicit3 Term Implicit4
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>

@@ -473,9 +473,9 @@ Namespace ParsleyDemo
 
                 Do While (i < node.Children.Length)
                     If (node.Children((i - 1)).SymbolId = ParsleyDemo.ExpressionParser.add) Then
-                        result = (result + ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(i), state))
+                        result = (result + ExpressionParser.EvaluateFactor(node.Children(i), state))
                     Else
-                        result = (result - ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(i), state))
+                        result = (result - ExpressionParser.EvaluateFactor(node.Children(i), state))
                     End If
                     i = (i + 2)
 
@@ -514,18 +514,10 @@ Namespace ParsleyDemo
                 Dim i As Integer = 2
 
                 Do While (i < node.Children.Length)
-                    If (node.Children(i).SymbolId = ParsleyDemo.ExpressionParser.Unary) Then
-                        If (node.Children((i - 1)).SymbolId = ParsleyDemo.ExpressionParser.mul) Then
-                            result = (result * ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(i), state))
-                        Else
-                            result = (result / ParsleyDemo.ExpressionParser.EvaluateUnary(node.Children(i), state))
-                        End If
+                    If (node.Children((i - 1)).SymbolId = ParsleyDemo.ExpressionParser.mul) Then
+                        result = (result * CType(ExpressionParser._EvaluateAny(node.Children(i), state),Integer))
                     Else
-                        If (node.Children((i - 1)).SymbolId = ParsleyDemo.ExpressionParser.mul) Then
-                            result = (result * ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children(i), state))
-                        Else
-                            result = (result / ParsleyDemo.ExpressionParser.EvaluateFactor(node.Children((i - 1)), state))
-                        End If
+                        result = (result / CType(ExpressionParser._EvaluateAny(node.Children(i), state),Integer))
                     End If
                     i = (i + 2)
 
@@ -631,6 +623,30 @@ Namespace ParsleyDemo
                 Return System.Convert.ChangeType(obj, type)
             End If
             Return typeConverter.ConvertTo(obj, type)
+        End Function
+        Private Shared Function _EvaluateAny(ByVal node As ParseNode, ByVal state As Object) As Object
+            If (node.SymbolId = ExpressionParser.Term) Then
+                Return ExpressionParser.EvaluateTerm(node, state)
+            End If
+            If (node.SymbolId = ExpressionParser.Factor) Then
+                Return ExpressionParser.EvaluateFactor(node, state)
+            End If
+            If (node.SymbolId = ExpressionParser.Unary) Then
+                Return ExpressionParser.EvaluateUnary(node, state)
+            End If
+            If (node.SymbolId = ExpressionParser.Leaf) Then
+                Return ExpressionParser.EvaluateLeaf(node, state)
+            End If
+            If (node.SymbolId = ExpressionParser.add) Then
+                Return node.Value
+            End If
+            If (node.SymbolId = ExpressionParser.mul) Then
+                Return node.Value
+            End If
+            If (node.SymbolId = ExpressionParser.[integer]) Then
+                Return node.Value
+            End If
+            Return Nothing
         End Function
     End Class
 End Namespace

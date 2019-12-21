@@ -94,7 +94,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="ExpressionFinal.xbnf" />
     <None Include="Expression.xbnf" />
+    <None Include="Expression3.xbnf" />
+    <None Include="Expression2.xbnf" />
+    <None Include="Expression1.xbnf" />
     <None Include="json.xbnf" />
     <None Include="Key.snk" />
   </ItemGroup>

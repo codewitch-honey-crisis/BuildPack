@@ -1,0 +1,11 @@
+﻿Term<start>= Factor { ("+"|"-") Factor };
+Factor= Unary { ("*"|"/") Unary };
+Unary= ("+"|"-") Unary | Leaf;
+Leaf= integer | identifier | "(" Term ")";
+// we only need to declare terminals explicitly if we want 
+// constant names for them or to apply attributes to them
+// we don't have to explicitly declare anything but whitespace
+// we can define it all inline above but this is nicer
+integer='[0-9]+';
+identifier='[A-Z_a-z][0-9A-Z_a-z]*';
+whitespace<hidden>='\s+';
