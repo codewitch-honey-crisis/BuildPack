@@ -1,6 +1,6 @@
 ﻿Expression<start,type="int">= Term => { return Term1; }
 Term<type="int">= Factor ("+"|"-") Factor | Factor => {
-	if(1==node.Children.Length)
+	if(1==Length)
 		return Factor1;
 	else if(SymbolId2==add)
 		return Factor1 + Factor3;
@@ -8,7 +8,7 @@ Term<type="int">= Factor ("+"|"-") Factor | Factor => {
 		return Factor1 - Factor3;
 }
 Factor<type="int">= Unary ("*"|"/") Unary | Unary => {
-	if(1==node.Children.Length)
+	if(1==Length)
 		return Unary1;
 	else if(SymbolId2==mul)
 		return Unary1 * Unary3;
@@ -16,7 +16,7 @@ Factor<type="int">= Unary ("*"|"/") Unary | Unary => {
 		return Unary1 / Unary3;
 }
 Unary<type="int">= ("+"|"-") Unary | Leaf => {
-	if (1 == node.Children.Length)
+	if (1 == Length)
 		return Leaf1;
 	else if (SymbolId1 == add)
 		return Unary2;

@@ -468,10 +468,14 @@ namespace Parsley
 											}
 										}
 									}
+								} else if(0==string.Compare("Length",v.VariableName,StringComparison.InvariantCulture))
+								{
+									var ffr = C.PropRef(C.PropRef(node, "Children"), "Length");
+									V.ReplaceTarget(ctx, ffr);
 								}
 								else
 								{
-									if (v.VariableName.StartsWith("SymbolId"))
+									if (v.VariableName.StartsWith("SymbolId",StringComparison.InvariantCulture))
 									{
 										if (8 < v.VariableName.Length)
 										{
