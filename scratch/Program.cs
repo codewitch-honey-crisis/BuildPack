@@ -8,7 +8,7 @@ namespace scratch
 		static void Main(string[] args)
 		{
 
-			var tokenizer = new ExpressionTokenizer("/* foo*/ 2+2 // foo");
+			var tokenizer = new ExpressionTokenizer("/* foo*/ 2+2 * 5 +1// foo");
 			var pt = ExpressionParser.Parse(tokenizer);
 			Console.WriteLine(ExpressionParser.Evaluate(pt));
 		}

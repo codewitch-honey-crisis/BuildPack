@@ -4,19 +4,15 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Parsley
 {
 	using C = CD.CodeDomUtility;
-	using V = CD.CodeDomVisitor;
 	class Program
 	{
 		internal static readonly string CodeBase = Assembly.GetEntryAssembly().GetModules()[0].FullyQualifiedName;
-		internal static readonly string File = Path.GetFileName(CodeBase);
+		internal static readonly string FileName = Path.GetFileName(CodeBase);
 		internal static readonly string Name = _GetName();
 
 		static int Main(string[] args)
@@ -338,7 +334,7 @@ namespace Parsley
 					return attr.ConstructorArguments[0].Value as string;
 				}
 			}
-			return Path.GetFileNameWithoutExtension(File);
+			return Path.GetFileNameWithoutExtension(FileName);
 		}
 		// do our error handling here (release builds)
 		static int _ReportError(Exception ex)
@@ -355,24 +351,24 @@ namespace Parsley
 			// even if the executable file was renamed.
 			t.WriteLine("{0} generates a recursive descent parser and optional lexer spec", Name);
 			t.WriteLine();
-			t.Write(File);
+			t.Write(FileName);
 			t.WriteLine(" <inputfile> [/output <outputfile>] [/rolex <rolexfile>]");
 			t.WriteLine("	[/gplex <gplexfile>] [/gplexclass <gplexcodeclass>]");
 			t.WriteLine("	[/namespace <codenamespace>] [/class <codeclass>]");
 			t.WriteLine("	[/langage <codelanguage>] ");
 			t.WriteLine("	[/noshared] [/verbose] [/ifstale]");
 			t.WriteLine();
-			t.WriteLine("   <inputfile>		The XBNF input file to use.");
-			t.WriteLine("   <outputfile>		The output file to use - default stdout.");
-			t.WriteLine("   <rolexfile>		Output a Rolex lexer specification to the specified file");
+			t.WriteLine("	<inputfile>		The XBNF input file to use.");
+			t.WriteLine("	<outputfile>		The output file to use - default stdout.");
+			t.WriteLine("	<rolexfile>		Output a Rolex lexer specification to the specified file");
 			t.WriteLine("	<gplexfile>		Generate Gplex lexer specification to the specified file file. Will also generate supporting C# files (C# only)");
-			t.WriteLine("	<gplexcodeclass>Generate Gplex lexer specification with the specified class name. - default takes the name from <gplexfile>");
-			t.WriteLine("   <codenamespace>	Generate code under the specified namespace - default none"); 
-			t.WriteLine("   <codelanguage>	Generate code in the specified language - default derived from <outputfile> or C#.");
-			t.WriteLine("   <codeclass>		Generate code with the specified class name - default derived from <outputfile> or the grammar.");
-			t.WriteLine("   <noshared>		Do not include shared library prerequisites");
-			t.WriteLine("   <verbose>		Output all messages from the generation process");
-			t.WriteLine("   <ifstale>		Do not generate unless <outputfile> or <rolexfile> is older than <inputfile>.");
+			t.WriteLine("	<gplexcodeclass>	Generate Gplex lexer specification with the specified class name. - default takes the name from <gplexfile>");
+			t.WriteLine("	<codenamespace>		Generate code under the specified namespace - default none"); 
+			t.WriteLine("	<codelanguage>		Generate code in the specified language - default derived from <outputfile> or C#.");
+			t.WriteLine("	<codeclass>		Generate code with the specified class name - default derived from <outputfile> or the grammar.");
+			t.WriteLine("	<noshared>		Do not include shared library prerequisites");
+			t.WriteLine("	<verbose>		Output all messages from the generation process");
+			t.WriteLine("	<ifstale>		Do not generate unless <outputfile> or <rolexfile> is older than <inputfile>.");
 			t.WriteLine();
 			t.WriteLine("Any other switch displays this screen and exits.");
 			t.WriteLine();

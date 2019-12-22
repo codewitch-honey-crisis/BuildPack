@@ -97,7 +97,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Export\gplex.lex" />
     <EmbeddedResource Include="Export\GplexTokenizer.lex" />
     <None Include="Expression5.xbnf" />
     <None Include="Expression4.xbnf" />

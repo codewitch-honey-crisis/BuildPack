@@ -21,7 +21,9 @@ namespace ParsleyDemo {
     /// mul= "*";
     /// integer= '[0-9]+';
     /// identifier= '[A-Z_a-z][0-9A-Z_a-z]*';
-    /// (whitespace)= '\s+';
+    /// (whitespace)= '[ \t\r\n]+';
+    /// (lineComment)= "//";
+    /// (blockComment)= "/*";
     /// </summary>
     /// <remarks>The rules for the factored grammar are as follows:
     /// Unary -> add Unary
@@ -74,6 +76,8 @@ namespace ParsleyDemo {
         public const int mul = 18;
         public const int Implicit2 = 19;
         public const int whitespace = 20;
+        public const int lineComment = 21;
+        public const int blockComment = 22;
         private static ParseNode _ParseUnary(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
@@ -617,22 +621,22 @@ namespace ParsleyDemo {
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
         /// <returns>The result of the evaluation</returns>
-		public static object EvaluateLeaf(ParseNode node, object state) {
-			if ((ExpressionParser.Leaf == node.SymbolId)) {
-				if ((node.Children.Length == 1)) {
-					if ((node.Children[1].SymbolId == ParsleyDemo.ExpressionParser.integer)) {
-						return int.Parse(node.Children[0].Value);
-					}
-					else {
-						throw new NotImplementedException("Variables are not implemented.");
-					}
-				}
-				else {
-					return ParsleyDemo.ExpressionParser.EvaluateTerm(node.Children[1]);
-				}
-			}
-			throw new SyntaxException("Expecting Leaf", node.Line, node.Column, node.Position);
-		}
+        public static object EvaluateLeaf(ParseNode node, object state) {
+            if ((ExpressionParser.Leaf == node.SymbolId)) {
+                if ((node.Children.Length == 1)) {
+                    if ((node.Children[1].SymbolId == ParsleyDemo.ExpressionParser.integer)) {
+                        return int.Parse(node.Children[0].Value);
+                    }
+                    else {
+                        throw new NotImplementedException("Variables are not implemented.");
+                    }
+                }
+                else {
+                    return ParsleyDemo.ExpressionParser.EvaluateTerm(node.Children[1]);
+                }
+            }
+            throw new SyntaxException("Expecting Leaf", node.Line, node.Column, node.Position);
+        }
         /// <summary>
         /// Evaluates a derivation of the form:
         /// Leaf= integer | identifier | "(" Term ")"
@@ -647,197 +651,6 @@ namespace ParsleyDemo {
         /// <returns>The result of the evaluation</returns>
         public static object EvaluateLeaf(ParseNode node) {
             return ExpressionParser.EvaluateLeaf(node, null);
-        }
-    }
-    /// <summary>
-    /// 
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
-    internal class SyntaxException : Exception {
-        private int _line;
-        private int _column;
-        private long _position;
-        /// <summary>
-        /// Creates a syntax exception with the specified arguments
-        /// </summary>
-        /// <param name="message">The error message</param>
-        /// <param name="line">The line where the error occurred</param>
-        /// <param name="column">The column where the error occured</param>
-        /// <param name="position">The position where the error occured</param>
-        public SyntaxException(string message, int line, int column, long position) : 
-                base(SyntaxException._GetMessage(message, line, column, position)) {
-            this._line = line;
-            this._column = column;
-            this._position = position;
-        }
-        /// <summary>
-        /// The line where the error occurred
-        /// </summary>
-        public int Line {
-            get {
-                return this._line;
-            }
-        }
-        /// <summary>
-        /// The column where the error occurred
-        /// </summary>
-        public int Column {
-            get {
-                return this._column;
-            }
-        }
-        /// <summary>
-        /// The position where the error occurred
-        /// </summary>
-        public long Position {
-            get {
-                return this._position;
-            }
-        }
-        static string _GetMessage(string message, int line, int column, long position) {
-            return string.Format("{0} at line {1}, column {2}, position {3}", message, line, column, position);
-        }
-    }
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
-    internal partial class ParseNode {
-        private int _symbolId;
-        private string _symbol;
-        private string _value;
-        private int _line;
-        private int _column;
-        private long _position;
-        private ParseNode[] _children;
-        public ParseNode(int symbolId, string symbol, ParseNode[] children, int line, int column, long position) {
-            this._symbolId = symbolId;
-            this._symbol = symbol;
-            this._value = null;
-            this._children = children;
-            this._line = line;
-            this._column = column;
-            this._position = position;
-        }
-        public ParseNode(int symbolId, string symbol, string value, int line, int column, long position) {
-            this._symbolId = symbolId;
-            this._symbol = symbol;
-            this._value = value;
-            this._children = null;
-            this._line = line;
-            this._column = column;
-            this._position = position;
-        }
-        public bool IsNonTerminal {
-            get {
-                return (null != this._children);
-            }
-        }
-        public ParseNode[] Children {
-            get {
-                return this._children;
-            }
-        }
-        public int SymbolId {
-            get {
-                return this._symbolId;
-            }
-        }
-        public string Symbol {
-            get {
-                return this._symbol;
-            }
-        }
-        public string Value {
-            get {
-                return this._value;
-            }
-        }
-        public int Line {
-            get {
-                return this._line;
-            }
-        }
-        public int Column {
-            get {
-                return this._column;
-            }
-        }
-        public long Position {
-            get {
-                return this._position;
-            }
-        }
-    }
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
-    internal partial class ParserContext : Object, IDisposable {
-        private int _state;
-        private IEnumerator<Token> _e;
-        private Token _t;
-        public ParserContext(IEnumerable<Token> tokenizer) {
-            this._e = tokenizer.GetEnumerator();
-            this._state = -1;
-            this._t.SymbolId = -1;
-        }
-        public void EnsureStarted() {
-            if ((-1 == this._state)) {
-                this.Advance();
-            }
-        }
-        public int SymbolId {
-            get {
-                return this._t.SymbolId;
-            }
-        }
-        public string Value {
-            get {
-                return this._t.Value;
-            }
-        }
-        public int Line {
-            get {
-                return this._t.Line;
-            }
-        }
-        public int Column {
-            get {
-                return this._t.Column;
-            }
-        }
-        public long Position {
-            get {
-                return this._t.Position;
-            }
-        }
-        public bool IsEnded {
-            get {
-                return (-2 == this._state);
-            }
-        }
-        public bool Advance() {
-            if ((false == this._e.MoveNext())) {
-                this._t.SymbolId = -2;
-                this._state = -2;
-            }
-            else {
-                this._state = 0;
-                this._t = this._e.Current;
-                return true;
-            }
-            return false;
-        }
-        public void Error(string message, object arg1, object arg2, object arg3) {
-            throw new SyntaxException(string.Format(message, arg1, arg2, arg3), this.Line, this.Column, this.Position);
-        }
-        public void Error(string message, object arg1, object arg2) {
-            throw new SyntaxException(string.Format(message, arg1, arg2), this.Line, this.Column, this.Position);
-        }
-        public void Error(string message, object arg) {
-            throw new SyntaxException(string.Format(message, arg), this.Line, this.Column, this.Position);
-        }
-        public void Error(string message) {
-            throw new SyntaxException(message, this.Line, this.Column, this.Position);
-        }
-        public void Dispose() {
-            this._e.Dispose();
-            this._state = -3;
         }
     }
 }
