@@ -27,9 +27,11 @@ namespace Parsley
 			string inputfile = null;
 			string outputfile = null;
 			string rolexfile = null;
+			string gplexfile = null;
+			string gplexcodeclass = null;
 			string codenamespace = null;
 			string codelanguage = null;
-			string name = null;
+			string codeclass = null;
 			bool verbose = false;
 			bool noshared = false;
 			bool ifstale = false;
@@ -58,11 +60,11 @@ namespace Parsley
 							++i; // advance 
 							codenamespace= args[i];
 							break;
-						case "/name":
+						case "/class":
 							if (args.Length - 1 == i) // check if we're at the end
 								throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i].Substring(1)));
 							++i; // advance 
-							name = args[i];
+							codeclass = args[i];
 							break;
 						case "/language":
 							if (args.Length - 1 == i) // check if we're at the end
@@ -91,9 +93,45 @@ namespace Parsley
 							++i; // advance 
 							rolexfile = args[i];
 							break;
+						case "/gplex":
+							if (args.Length - 1 == i) // check if we're at the end
+								throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i].Substring(1)));
+							++i; // advance 
+							gplexfile = args[i];
+							break;
+						case "/gplexclass":
+							if (args.Length - 1 == i) // check if we're at the end
+								throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i].Substring(1)));
+							++i; // advance 
+							gplexcodeclass = args[i];
+							break;
+
 						default:
 							throw new ArgumentException(string.Format("Unknown switch {0}", args[i]));
 					}
+				}
+				if (null == codeclass)
+				{
+					if (null != outputfile)
+						codeclass = Path.GetFileNameWithoutExtension(outputfile);
+					else
+						codeclass = Path.GetFileNameWithoutExtension(inputfile);
+				}
+				
+				string gplexshared = null;
+				string gplexcode = null;
+				if(null!=gplexfile)
+				{
+					if (null == gplexcodeclass)
+					{
+						gplexcodeclass = Path.GetFileNameWithoutExtension(gplexfile);
+					}
+					var dir = Path.GetDirectoryName(gplexfile);
+					if(!noshared)
+					{
+						gplexshared = Path.Combine(dir, "GplexShared.cs");
+					}
+					gplexcode = Path.Combine(dir, string.Concat(gplexcodeclass,"Tokenizer.cs"));
 				}
 				var stale = true;
 				if (ifstale && null != outputfile)
@@ -104,6 +142,9 @@ namespace Parsley
 					if (!stale && null != rolexfile)
 						if (_IsStale(inputfile, rolexfile))
 							stale = true;
+					if (!stale && null != gplexfile)
+						if (_IsStale(inputfile, gplexfile))
+							stale = true;
 					// see if our exe has changed
 					if (!stale && _IsStale(CodeBase, outputfile))
 						stale = true;
@@ -111,20 +152,31 @@ namespace Parsley
 
 				if (!stale)
 				{
-					if (null == rolexfile)
-						Console.Error.WriteLine("{0} skipped {1} because it was not stale.", Name, outputfile);
-					else
-						Console.Error.WriteLine("{0} skipped {1} and {2} because they were not stale.", Name, outputfile, rolexfile);
+					Console.WriteLine("Skipped building of the following because they were not stale:");
+					if (null != outputfile)
+						Console.Error.WriteLine(outputfile);
+					if (null != rolexfile)
+						Console.Error.WriteLine(rolexfile);
+					if(null!=gplexfile)
+						Console.Error.WriteLine(gplexfile);
+					if (null != gplexshared)
+						Console.Error.WriteLine(gplexshared);
+					if (null != gplexcode)
+						Console.Error.WriteLine(gplexcode);
 				}
 				else
 				{
+					Console.Error.WriteLine("{0} is building the following:",Name);
 					if (null != outputfile)
-					{
-						if (null == rolexfile)
-							Console.Error.WriteLine("{0} is building {1}.", Name, outputfile);
-						else
-							Console.Error.WriteLine("{0} is building {1} and {2}.", Name, outputfile, rolexfile);
-					}
+						Console.Error.WriteLine(outputfile);
+					if (null != rolexfile)
+						Console.Error.WriteLine(rolexfile);	
+					if (null != gplexfile)
+						Console.Error.WriteLine(gplexfile);
+					if (null != gplexshared)
+						Console.Error.WriteLine(gplexshared);
+					if (null != gplexcode)
+						Console.Error.WriteLine(gplexcode);
 					if (string.IsNullOrEmpty(codelanguage))
 					{
 						if (!string.IsNullOrEmpty(outputfile))
@@ -135,12 +187,12 @@ namespace Parsley
 						}
 						if (string.IsNullOrEmpty(codelanguage))
 							codelanguage = "cs";
+						
 					}
-					if (null == name)
-					{
-						if(null!=outputfile)
-							name = Path.GetFileNameWithoutExtension(outputfile);
-					}
+					var s = codelanguage.ToUpperInvariant();
+					if (null != gplexfile && s != "CS" && s != "C#" && s != "CSHARP")
+						Console.Error.WriteLine("Warning: Gplex only targets C# but the langauge specified was {0}. This will require the C# code to be compiled separately and referenced from the main project.", codelanguage);
+
 					var doc = XbnfDocument.ReadFrom(inputfile);
 					var cfg = XbnfConvert.ToCfg(doc);
 					var msgs = cfg.TryPrepareLL1();
@@ -150,7 +202,7 @@ namespace Parsley
 							Console.Error.WriteLine(msg);
 					}
 					CfgException.ThrowIfErrors(msgs);
-					var ccu = CodeGenerator.GenerateCompileUnit(doc,cfg,name,codenamespace);
+					var ccu = CodeGenerator.GenerateCompileUnit(doc,cfg,codeclass,codenamespace);
 					var ccuNS = ccu.Namespaces[ccu.Namespaces.Count - 1];
 					var ccuShared = CodeGenerator.GenerateSharedCompileUnit(codenamespace);
 					var sNS = ccuShared.Namespaces[ccuShared.Namespaces.Count - 1];
@@ -216,6 +268,46 @@ namespace Parsley
 						output.Close();
 						output = null;
 					}
+					if(null!=gplexfile)
+					{
+						if(!noshared)
+						{
+							using (var sr = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Parsley.Export.GplexShared.Prototype.cs")))
+								s = sr.ReadToEnd();
+							s = s.Replace("Parsley_codenamespace", codenamespace);
+							using (var sw = new StreamWriter(System.IO.File.Open(gplexshared, FileMode.OpenOrCreate, FileAccess.ReadWrite)))
+							{
+								sw.BaseStream.SetLength(0);
+								sw.Write(s);
+								sw.Flush();
+							}
+						}
+						s= XbnfConvert.ToGplexSpec(doc, cfg, codenamespace, gplexcodeclass);
+						using (var sw = new StreamWriter(System.IO.File.Open(gplexfile, FileMode.OpenOrCreate, FileAccess.ReadWrite)))
+						{
+							sw.BaseStream.SetLength(0);
+							sw.Write(s);
+							sw.Flush();
+						}
+						if (null != gplexcode)
+						{
+							using (var sr = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Parsley.Export.GplexDepends.Prototype.cs")))
+								s = sr.ReadToEnd();
+							if (null != codenamespace)
+							{
+								s = string.Concat("namespace ", codenamespace, Environment.NewLine, "{", Environment.NewLine, s, "}", Environment.NewLine);
+							}
+							s = s.Replace("Parsley_codeclass", gplexcodeclass);
+							s = s.Replace("Parsley_constants", XbnfConvert.ToGplexSymbolConstants(doc, cfg));
+							using (var sw = new StreamWriter(System.IO.File.Open(gplexcode, FileMode.OpenOrCreate, FileAccess.ReadWrite)))
+							{
+								sw.BaseStream.SetLength(0);
+								sw.Write(s);
+								sw.Flush();
+							}
+						}
+					}
+					
 
 				}
 			}
@@ -265,16 +357,19 @@ namespace Parsley
 			t.WriteLine();
 			t.Write(File);
 			t.WriteLine(" <inputfile> [/output <outputfile>] [/rolex <rolexfile>]");
-			t.WriteLine("   [/namespace <codenamespace>] [/name <classname>]");
-			t.WriteLine("	[/langage <codelanguage>] [/noshared] [/verbose]");
-			t.WriteLine("	[/ifstale]");
+			t.WriteLine("	[/gplex <gplexfile>] [/gplexclass <gplexcodeclass>]");
+			t.WriteLine("	[/namespace <codenamespace>] [/class <codeclass>]");
+			t.WriteLine("	[/langage <codelanguage>] ");
+			t.WriteLine("	[/noshared] [/verbose] [/ifstale]");
 			t.WriteLine();
-			t.WriteLine("   <inputfile>		The input project file to use.");
+			t.WriteLine("   <inputfile>		The XBNF input file to use.");
 			t.WriteLine("   <outputfile>		The output file to use - default stdout.");
 			t.WriteLine("   <rolexfile>		Output a Rolex lexer specification to the specified file");
-			t.WriteLine("   <codenamespace>	Generate code under the specified namespace - default none");
-			t.WriteLine("   <classname>		Generate code with the specified class name - default derived from <outputfile> or the grammar.");
+			t.WriteLine("	<gplexfile>		Generate Gplex lexer specification to the specified file file. Will also generate supporting C# files (C# only)");
+			t.WriteLine("	<gplexcodeclass>Generate Gplex lexer specification with the specified class name. - default takes the name from <gplexfile>");
+			t.WriteLine("   <codenamespace>	Generate code under the specified namespace - default none"); 
 			t.WriteLine("   <codelanguage>	Generate code in the specified language - default derived from <outputfile> or C#.");
+			t.WriteLine("   <codeclass>		Generate code with the specified class name - default derived from <outputfile> or the grammar.");
 			t.WriteLine("   <noshared>		Do not include shared library prerequisites");
 			t.WriteLine("   <verbose>		Output all messages from the generation process");
 			t.WriteLine("   <ifstale>		Do not generate unless <outputfile> or <rolexfile> is older than <inputfile>.");

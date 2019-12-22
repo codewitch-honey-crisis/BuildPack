@@ -62,4 +62,7 @@ add="+";
 mul="*";
 integer='[0-9]+';
 identifier='[A-Z_a-z][0-9A-Z_a-z]*';
-whitespace<hidden>='\s+';
+whitespace<hidden>='[ \t\r\n]+';
+// for testing:
+lineComment<hidden,blockEnd="\n">="//";
+blockComment<hidden,blockEnd="*/">="/*";

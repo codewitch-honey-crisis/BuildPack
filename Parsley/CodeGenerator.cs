@@ -419,7 +419,8 @@ namespace Parsley
 					var cnst = consts[syms.IndexOf(prod.Name)];
 					var fr = C.FieldRef(C.TypeRef("Parser"), cnst);
 					var cnd = C.If(C.Eq(fr, C.PropRef(node, "SymbolId")));
-					cnd.TrueStatements.AddRange(CD.SlangParser.ParseStatements(prod.Code, true));
+					var stmts = CD.SlangParser.ParseStatements(prod.Code, true);
+					cnd.TrueStatements.AddRange(stmts);
 					m.Statements.Add(cnd);
 					m.Statements.Add(C.Throw(C.New(C.Type("SyntaxException"), C.Literal(string.Concat("Expecting ", prod.Name)), C.PropRef(node, "Line"), C.PropRef(node, "Column"), C.PropRef(node, "Position"))));
 					parser.Members.Add(m);

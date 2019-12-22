@@ -388,8 +388,6 @@ namespace CD
 
 		CodeDomResolverScope _FillScope(CodeDomResolverScope result)
 		{
-			//if (result.TypeRef != null && "System.Collections.Generic.IEnumerable`1" == result.TypeRef.BaseType)
-			//	System.Diagnostics.Debugger.Break();
 			CodeCompileUnit ccu = null;
 			object p;
 			if (null == result.Expression)
@@ -1208,8 +1206,6 @@ namespace CD
 		}
 		object _ResolveTypeImpl(CodeTypeReference type,int resolutionType = _ResolveAssemblies | _ResolveCompileUnits)
 		{
-			if (type.BaseType == "Token")
-				System.Diagnostics.Debugger.Break();
 			object result = null;
 			if(null!=type.ArrayElementType && 1<=type.ArrayRank)
 			{

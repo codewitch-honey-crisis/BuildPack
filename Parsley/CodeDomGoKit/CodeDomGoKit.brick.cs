@@ -798,8 +798,8 @@ var f=member as CodeMemberField;if(null!=f){if(null==f.Type)throw new InvalidOpe
 }var e=member as CodeMemberEvent;if(null!=e){if(null==e.Type)throw new InvalidOperationException("The event declaration's type was null");return e.Type;
 }var m=member as CodeMemberMethod;if(null!=m){if(null==m.ReturnType)return new CodeTypeReference(typeof(void));return m.ReturnType;}var p=member as CodeMemberProperty;
 if(null!=p){if(null==p.Type)throw new InvalidOperationException("The property declaration's type was null");return p.Type;}throw new InvalidOperationException("The specified member does not have a type");
-}CodeDomResolverScope _FillScope(CodeDomResolverScope result){ CodeCompileUnit ccu=null;object p;if(null==result.Expression){if(null!=result.TypeRef){
-p=result.TypeRef;if(null==ccu)ccu=_GetRef(p,_rootKey)as CodeCompileUnit;while(null!=(p=_GetRef(p,_parentKey))){var expr=p as CodeExpression;if(null!=expr)
+}CodeDomResolverScope _FillScope(CodeDomResolverScope result){CodeCompileUnit ccu=null;object p;if(null==result.Expression){if(null!=result.TypeRef){p
+=result.TypeRef;if(null==ccu)ccu=_GetRef(p,_rootKey)as CodeCompileUnit;while(null!=(p=_GetRef(p,_parentKey))){var expr=p as CodeExpression;if(null!=expr)
 {result.Expression=expr;break;}}}}if(null==result.Statement){if(null!=result.Expression){p=result.Expression;if(null==ccu)ccu=_GetRef(p,_rootKey)as CodeCompileUnit;
 while(null!=(p=_GetRef(p,_parentKey))){var stmt=p as CodeStatement;if(null==ccu)ccu=_GetRef(p,_rootKey)as CodeCompileUnit;if(null!=stmt){result.Statement
 =stmt;break;}}}else if(null!=result.TypeRef){p=result.TypeRef;if(null==ccu)ccu=_GetRef(p,_rootKey)as CodeCompileUnit;while(null!=(p=_GetRef(p,_parentKey)))
@@ -976,19 +976,19 @@ if(0<s.Length)s=string.Concat(pfx,".",type.BaseType);else s=type.BaseType;var ct
 ctrs.Add(ctr);}var t=_DualResolve(ctrs);if(null==t)return false;if(0<type.TypeArguments.Count){var types=new Type[type.TypeArguments.Count];for(var i=
 0;i<types.Length;i++){if(!IsValidType(type.TypeArguments[i],scope))return false;}}return true;}object _DualResolve(IList<CodeTypeReference>ctrs){foreach
 (var ctr in ctrs){var t=_ResolveTypeImpl(ctr,_ResolveCompileUnits);if(null!=t)return t;}foreach(var ctr in ctrs){var t=_ResolveTypeImpl(ctr,_ResolveAssemblies);
-if(null!=t)return t;}return null;}object _ResolveTypeImpl(CodeTypeReference type,int resolutionType=_ResolveAssemblies|_ResolveCompileUnits){if(type.BaseType
-=="Token")System.Diagnostics.Debugger.Break();object result=null;if(null!=type.ArrayElementType&&1<=type.ArrayRank){ return typeof(Array);}if(_ResolveCompileUnits
-==(resolutionType&_ResolveCompileUnits)){foreach(var ccu in CompileUnits){CodeDomVisitor.Visit(ccu,(ctx)=>{var td=ctx.Target as CodeTypeDeclaration;if
-(null!=td){var name=_GetGenericName(td);CodeObject p=td;while((p=_GetRef(p,_parentKey)as CodeObject)!=null){var ptd=p as CodeTypeDeclaration;if(null!=
-ptd){name=string.Concat(_GetGenericName(ptd),"+",name);td=ptd;}var ns=p as CodeNamespace;if(null!=ns&&!string.IsNullOrEmpty(ns.Name)){name=string.Concat(ns.Name,
-".",name);}}if(name==type.BaseType){td=ctx.Target as CodeTypeDeclaration;result=td;ctx.Cancel=true;}}},CodeDomVisitTargets.Types|CodeDomVisitTargets.TypeRefs
-|CodeDomVisitTargets.Members);if(null!=result)return result;}}if(_ResolveAssemblies==(resolutionType&_ResolveAssemblies)){Type t;if(_typeCache.TryGetValue(type,
-out t))return t;foreach(var ccu in CompileUnits){var corlib=typeof(string).Assembly;var rt=corlib.GetType(type.BaseType,false,false);result=rt;if(null
-!=result){_typeCache.Add(type,rt);return result;}foreach(var astr in ccu.ReferencedAssemblies){var asm=_LoadAsm(astr);rt=asm.GetType(type.BaseType,false,
-false);result=rt;if(null!=result){_typeCache.Add(type,rt);return result;}}}if(0==CompileUnits.Count){var corlib=typeof(string).Assembly;var rt=corlib.GetType(type.BaseType,
-false,false);result=rt;if(null!=result){_typeCache.Add(type,rt);return result;}}_typeCache.Add(type,null);}return result;}Assembly _LoadAsm(string asm)
-{if(File.Exists(asm)){return Assembly.LoadFile(Path.GetFullPath(asm));}else if(asm.StartsWith(@"\\")){return Assembly.LoadFile(asm);}AssemblyName an=null;
-try{an=new AssemblyName(asm);}catch{an=null;}if(null!=an){return Assembly.Load(an);}return Assembly.Load(asm);}/// <summary>
+if(null!=t)return t;}return null;}object _ResolveTypeImpl(CodeTypeReference type,int resolutionType=_ResolveAssemblies|_ResolveCompileUnits){object result
+=null;if(null!=type.ArrayElementType&&1<=type.ArrayRank){ return typeof(Array);}if(_ResolveCompileUnits==(resolutionType&_ResolveCompileUnits)){foreach
+(var ccu in CompileUnits){CodeDomVisitor.Visit(ccu,(ctx)=>{var td=ctx.Target as CodeTypeDeclaration;if(null!=td){var name=_GetGenericName(td);CodeObject
+ p=td;while((p=_GetRef(p,_parentKey)as CodeObject)!=null){var ptd=p as CodeTypeDeclaration;if(null!=ptd){name=string.Concat(_GetGenericName(ptd),"+",name);
+td=ptd;}var ns=p as CodeNamespace;if(null!=ns&&!string.IsNullOrEmpty(ns.Name)){name=string.Concat(ns.Name,".",name);}}if(name==type.BaseType){td=ctx.Target
+ as CodeTypeDeclaration;result=td;ctx.Cancel=true;}}},CodeDomVisitTargets.Types|CodeDomVisitTargets.TypeRefs|CodeDomVisitTargets.Members);if(null!=result)
+return result;}}if(_ResolveAssemblies==(resolutionType&_ResolveAssemblies)){Type t;if(_typeCache.TryGetValue(type,out t))return t;foreach(var ccu in CompileUnits)
+{var corlib=typeof(string).Assembly;var rt=corlib.GetType(type.BaseType,false,false);result=rt;if(null!=result){_typeCache.Add(type,rt);return result;
+}foreach(var astr in ccu.ReferencedAssemblies){var asm=_LoadAsm(astr);rt=asm.GetType(type.BaseType,false,false);result=rt;if(null!=result){_typeCache.Add(type,
+rt);return result;}}}if(0==CompileUnits.Count){var corlib=typeof(string).Assembly;var rt=corlib.GetType(type.BaseType,false,false);result=rt;if(null!=
+result){_typeCache.Add(type,rt);return result;}}_typeCache.Add(type,null);}return result;}Assembly _LoadAsm(string asm){if(File.Exists(asm)){return Assembly.LoadFile(Path.GetFullPath(asm));
+}else if(asm.StartsWith(@"\\")){return Assembly.LoadFile(asm);}AssemblyName an=null;try{an=new AssemblyName(asm);}catch{an=null;}if(null!=an){return Assembly.Load(an);
+}return Assembly.Load(asm);}/// <summary>
 /// Clears the type cache
 /// </summary>
 public void ClearCache(){_typeCache.Clear();}/// <summary>
@@ -3502,10 +3502,10 @@ int n;if(int.TryParse(num,out n)){s=s.Substring(i).Trim();if('\"'==s[0])s=s.Subs
 dirs){for(int ic=dirs.Count,i=0;i<ic;++i){var dir=dirs[i];var l=dir as CodeLinePragma;if(null!=l){stmt.LinePragma=l;dirs.RemoveAt(i);--i;--ic;continue;
 }var d=dir as CodeDirective;if(null!=d){stmt.StartDirectives.Add(d);dirs.RemoveAt(i);--i;--ic;}}}static void _AddEndDirs(CodeStatement stmt,IList<object>
 dirs){for(int ic=dirs.Count,i=0;i<ic;++i){var dir=dirs[i];var d=dir as CodeDirective;if(null!=d){stmt.EndDirectives.Add(d);dirs.RemoveAt(i);--i;--ic;}
-}}static CodeStatement _ParseStatement(_PC pc,bool includeComments=false){if(21==pc.Current.Line)System.Diagnostics.Debugger.Break();var dirs=_ParseDirectives(pc);
-if(includeComments&&(ST.lineComment==pc.SymbolId||ST.blockComment==pc.SymbolId)){var c=_ParseCommentStatement(pc);_AddStartDirs(c,dirs);dirs.AddRange(_ParseDirectives(pc,true));
-_AddEndDirs(c,dirs);return c;}_SkipComments(pc);dirs.AddRange(_ParseDirectives(pc));var pc2=pc.GetLookAhead();pc2.EnsureStarted();CodeVariableDeclarationStatement
- vs=null;try{vs=_ParseVariableDeclaration(pc2);}catch{vs=null;}if(null!=vs){ _ParseVariableDeclaration(pc);_AddStartDirs(vs,dirs);_SkipComments(pc);dirs.AddRange(_ParseDirectives(pc,true));
+}}static CodeStatement _ParseStatement(_PC pc,bool includeComments=false){var dirs=_ParseDirectives(pc);if(includeComments&&(ST.lineComment==pc.SymbolId
+||ST.blockComment==pc.SymbolId)){var c=_ParseCommentStatement(pc);_AddStartDirs(c,dirs);dirs.AddRange(_ParseDirectives(pc,true));_AddEndDirs(c,dirs);return
+ c;}_SkipComments(pc);dirs.AddRange(_ParseDirectives(pc));var pc2=pc.GetLookAhead();pc2.EnsureStarted();CodeVariableDeclarationStatement vs=null;try{vs
+=_ParseVariableDeclaration(pc2);}catch{vs=null;}if(null!=vs){ _ParseVariableDeclaration(pc);_AddStartDirs(vs,dirs);_SkipComments(pc);dirs.AddRange(_ParseDirectives(pc,true));
 return vs;}pc2=pc.GetLookAhead();pc2.EnsureStarted();CodeExpression e;try{_ParseDirectives(pc2,false);_SkipComments(pc);e=_ParseExpression(pc2);}catch
 {e=null;}if(null!=e){_SkipComments(pc2);if(ST.semi==pc2.SymbolId){pc2.Advance();_ParseExpression(pc);_SkipComments(pc);pc.Advance(); CodeStatement r=null;
 var bo=e as CodeBinaryOperatorExpression;if(null!=bo&&CodeBinaryOperatorType.Assign==bo.Operator)r=new CodeAssignStatement(bo.Left,bo.Right);else r=new
@@ -3758,25 +3758,24 @@ public static CodeObject GetNextUnresolvedElement(IEnumerable<CodeCompileUnit>co
 {tr.UserData.Remove("slang:unresolved");return;} throw new NotImplementedException();}}static void _Patch(CodeObjectCreateExpression oc,CodeDomVisitContext
  ctx,CodeDomResolver res){if(null!=oc){oc.UserData.Remove("slang:unresolved");if(1==oc.Parameters.Count){if(_IsDelegate(oc.Parameters[0],res)){var del
 =_GetDelegateFromFields(oc,oc.Parameters[0],res);CodeDomVisitor.ReplaceTarget(ctx,del);}}}}static void _Patch(CodeMemberProperty prop,CodeDomVisitContext
- ctx,CodeDomResolver resolver){if(null!=prop){ if(null==prop.PrivateImplementationType){if(prop.Name=="Current")System.Diagnostics.Debugger.Break();var
- scope=resolver.GetScope(prop);var td=scope.DeclaringType;var binder=new CodeDomBinder(scope);for(int ic=td.BaseTypes.Count,i=0;i<ic;++i){var ctr=td.BaseTypes[i];
-var t=resolver.TryResolveType(ctr,scope);if(null!=t){var ma=binder.GetPropertyGroup(t,prop.Name,BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly);
-if(0<ma.Length){var p=binder.SelectProperty(BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly,ma,null,_GetParameterTypes(prop.Parameters),
-null);if(null!=p)prop.ImplementationTypes.Add(ctr);}}}}prop.UserData.Remove("slang:unresolved");}}static void _Patch(CodeBinaryOperatorExpression op,CodeDomVisitContext
- ctx,CodeDomResolver resolver){if(null!=op){var scope=resolver.GetScope(op);if(CodeBinaryOperatorType.IdentityEquality==op.Operator){if(_HasUnresolved(op.Left))
-return;var tr1=resolver.GetTypeOfExpression(op.Left);if(resolver.IsValueType(tr1)){if(_HasUnresolved(op.Right))return;var tr2=resolver.GetTypeOfExpression(op.Right);
-if(resolver.IsValueType(tr2)){op.Operator=CodeBinaryOperatorType.ValueEquality;}}op.UserData.Remove("slang:unresolved");}else if(CodeBinaryOperatorType.IdentityInequality==op.Operator)
-{if(_HasUnresolved(op.Left))return;var tr1=resolver.GetTypeOfExpression(op.Left);if(resolver.IsValueType(tr1)){if(_HasUnresolved(op.Right))return;var tr2
-=resolver.GetTypeOfExpression(op.Right);if(resolver.IsValueType(tr2)){ op.Operator=CodeBinaryOperatorType.ValueEquality;var newOp=new CodeBinaryOperatorExpression(new
- CodePrimitiveExpression(false),CodeBinaryOperatorType.ValueEquality,op);CodeDomVisitor.ReplaceTarget(ctx,newOp);}}op.UserData.Remove("slang:unresolved");
-}}}static void _Patch(CodeMemberMethod meth,CodeDomVisitContext ctx,CodeDomResolver resolver){if(null!=meth){ if(null==meth.PrivateImplementationType)
-{var scope=resolver.GetScope(meth);var td=scope.DeclaringType;var binder=new CodeDomBinder(scope);for(int ic=td.BaseTypes.Count,i=0;i<ic;++i){var ctr=
-td.BaseTypes[i];var t=resolver.TryResolveType(ctr,scope);if(null!=t){var ma=binder.GetMethodGroup(t,meth.Name,BindingFlags.Instance|BindingFlags.Public
-|BindingFlags.DeclaredOnly);if(0<ma.Length){var m=binder.SelectMethod(BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly,ma,_GetParameterTypes(meth.Parameters),
-null);if(null!=m)meth.ImplementationTypes.Add(ctr);}}}}meth.UserData.Remove("slang:unresolved");if("Main"==meth.Name&&(meth.Attributes&MemberAttributes.ScopeMask)
-==MemberAttributes.Static){if(0==meth.Parameters.Count&&null==meth.ReturnType||"System.Void"==meth.ReturnType.BaseType){var epm=new CodeEntryPointMethod();
-epm.Attributes=meth.Attributes;epm.LinePragma=meth.LinePragma;epm.StartDirectives.AddRange(meth.StartDirectives);epm.EndDirectives.AddRange(meth.EndDirectives);
-epm.Comments.AddRange(meth.Comments);epm.CustomAttributes.AddRange(meth.CustomAttributes);epm.ReturnTypeCustomAttributes.AddRange(meth.ReturnTypeCustomAttributes);
+ ctx,CodeDomResolver resolver){if(null!=prop){ if(null==prop.PrivateImplementationType){var scope=resolver.GetScope(prop);var td=scope.DeclaringType;var
+ binder=new CodeDomBinder(scope);for(int ic=td.BaseTypes.Count,i=0;i<ic;++i){var ctr=td.BaseTypes[i];var t=resolver.TryResolveType(ctr,scope);if(null!=
+t){var ma=binder.GetPropertyGroup(t,prop.Name,BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly);if(0<ma.Length){var p=binder.SelectProperty(BindingFlags.Instance
+|BindingFlags.Public|BindingFlags.DeclaredOnly,ma,null,_GetParameterTypes(prop.Parameters),null);if(null!=p)prop.ImplementationTypes.Add(ctr);}}}}prop.UserData.Remove("slang:unresolved");
+}}static void _Patch(CodeBinaryOperatorExpression op,CodeDomVisitContext ctx,CodeDomResolver resolver){if(null!=op){var scope=resolver.GetScope(op);if
+(CodeBinaryOperatorType.IdentityEquality==op.Operator){if(_HasUnresolved(op.Left))return;var tr1=resolver.GetTypeOfExpression(op.Left);if(resolver.IsValueType(tr1))
+{if(_HasUnresolved(op.Right))return;var tr2=resolver.GetTypeOfExpression(op.Right);if(resolver.IsValueType(tr2)){op.Operator=CodeBinaryOperatorType.ValueEquality;
+}}op.UserData.Remove("slang:unresolved");}else if(CodeBinaryOperatorType.IdentityInequality==op.Operator){if(_HasUnresolved(op.Left))return;var tr1=resolver.GetTypeOfExpression(op.Left);
+if(resolver.IsValueType(tr1)){if(_HasUnresolved(op.Right))return;var tr2=resolver.GetTypeOfExpression(op.Right);if(resolver.IsValueType(tr2)){ op.Operator
+=CodeBinaryOperatorType.ValueEquality;var newOp=new CodeBinaryOperatorExpression(new CodePrimitiveExpression(false),CodeBinaryOperatorType.ValueEquality,
+op);CodeDomVisitor.ReplaceTarget(ctx,newOp);}}op.UserData.Remove("slang:unresolved");}}}static void _Patch(CodeMemberMethod meth,CodeDomVisitContext ctx,CodeDomResolver
+ resolver){if(null!=meth){ if(null==meth.PrivateImplementationType){var scope=resolver.GetScope(meth);var td=scope.DeclaringType;var binder=new CodeDomBinder(scope);
+for(int ic=td.BaseTypes.Count,i=0;i<ic;++i){var ctr=td.BaseTypes[i];var t=resolver.TryResolveType(ctr,scope);if(null!=t){var ma=binder.GetMethodGroup(t,
+meth.Name,BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly);if(0<ma.Length){var m=binder.SelectMethod(BindingFlags.Instance|BindingFlags.Public
+|BindingFlags.DeclaredOnly,ma,_GetParameterTypes(meth.Parameters),null);if(null!=m)meth.ImplementationTypes.Add(ctr);}}}}meth.UserData.Remove("slang:unresolved");
+if("Main"==meth.Name&&(meth.Attributes&MemberAttributes.ScopeMask)==MemberAttributes.Static){if(0==meth.Parameters.Count&&null==meth.ReturnType||"System.Void"
+==meth.ReturnType.BaseType){var epm=new CodeEntryPointMethod();epm.Attributes=meth.Attributes;epm.LinePragma=meth.LinePragma;epm.StartDirectives.AddRange(meth.StartDirectives);
+epm.EndDirectives.AddRange(meth.EndDirectives);epm.Comments.AddRange(meth.Comments);epm.CustomAttributes.AddRange(meth.CustomAttributes);epm.ReturnTypeCustomAttributes.AddRange(meth.ReturnTypeCustomAttributes);
 epm.TypeParameters.AddRange(meth.TypeParameters);epm.PrivateImplementationType=meth.PrivateImplementationType;epm.ImplementationTypes.AddRange(meth.ImplementationTypes);
 epm.Name=meth.Name;epm.Statements.AddRange(meth.Statements);CodeDomVisitor.ReplaceTarget(ctx,epm);}}}}static CodeTypeReference[]_GetParameterTypes(CodeParameterDeclarationExpressionCollection
  parms){var result=new CodeTypeReference[parms.Count];for(var i=0;i<result.Length;i++)result[i]=parms[i].Type;return result;}static void _Patch(CodeVariableReferenceExpression

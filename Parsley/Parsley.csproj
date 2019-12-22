@@ -60,6 +60,9 @@
     <Content Include="Export\SyntaxException.cs" />
     <Content Include="Export\Token.cs" />
     <Compile Include="DeslangedExport.cs" />
+    <EmbeddedResource Include="Export\GplexDepends.Prototype.cs" />
+    <EmbeddedResource Include="Export\GplexShared.Prototype.cs" />
+    <None Include="Export\GplexDepends.Prototype.shim.cs" />
     <Compile Include="LL1\CfgLL1Conflict.cs" />
     <Compile Include="LL1\CfgLL1ParseTable.cs" />
     <Compile Include="LL1\CfgLL1Progress.cs" />
@@ -94,6 +97,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Export\gplex.lex" />
+    <EmbeddedResource Include="Export\GplexTokenizer.lex" />
     <None Include="Expression5.xbnf" />
     <None Include="Expression4.xbnf" />
     <None Include="ExpressionFinal.xbnf" />
@@ -104,7 +109,9 @@
     <None Include="json.xbnf" />
     <None Include="Key.snk" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(SolutionDir)CSBrick\bin\Release\csbrick.exe" "$(SolutionDir)CodeDomGoKit\CodeDomGoKit.csproj" /output "$(ProjectDir)CodeDomGoKit\CodeDomGoKit.brick.cs"

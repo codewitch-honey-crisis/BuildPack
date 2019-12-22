@@ -163,8 +163,6 @@ namespace CD
 				// TODO: make sure the member is actually public
 				if (null == prop.PrivateImplementationType)
 				{
-					if (prop.Name == "Current")
-						System.Diagnostics.Debugger.Break();
 					var scope = resolver.GetScope(prop);
 					var td = scope.DeclaringType;
 					var binder = new CodeDomBinder(scope);
@@ -340,8 +338,6 @@ namespace CD
 						return;
 					}
 				}
-				//else if (vr.VariableName == "done")
-				//	System.Diagnostics.Debugger.Break();
 				// we need to replace it.
 				if (scope.ArgumentTypes.ContainsKey(vr.VariableName))
 				{

@@ -113,7 +113,7 @@ internal partial class Deslanged {
                                                             new CodeCommentStatement("Indicates the value of the token", true),
                                                             new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[] {
                                                 new CodeCommentStatement("<summary>", true),
-                                                new CodeCommentStatement("Shim for slang. Not actually used", true),
+                                                new CodeCommentStatement("Represents a lexeme/token", true),
                                                 new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0])}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0]);
         }
     }

@@ -192,9 +192,6 @@ namespace CD
 		}
 		static CodeStatement _ParseStatement(_PC pc,bool includeComments=false)
 		{
-			if (21 == pc.Current.Line)
-				System.Diagnostics.Debugger.Break();
-
 			var dirs = _ParseDirectives(pc);
 			if (includeComments && (ST.lineComment == pc.SymbolId || ST.blockComment == pc.SymbolId))
 			{
