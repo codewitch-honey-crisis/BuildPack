@@ -32,8 +32,7 @@ namespace Parsley
 			bool noshared = false;
 			bool ifstale = false;
 
-			HashSet<string> exclude = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-			exclude.Add(@"Properties\AssemblyInfo.cs");
+			
 			try
 			{
 				if (0 == args.Length)
@@ -190,70 +189,95 @@ namespace Parsley
 						Console.Error.WriteLine("Warning: Gplex only targets C# but the langauge specified was {0}. This will require the C# code to be compiled separately and referenced from the main project.", codelanguage);
 
 					var doc = XbnfDocument.ReadFrom(inputfile);
-					var cfg = XbnfConvert.ToCfg(doc);
-					var msgs = cfg.TryPrepareLL1();
-					foreach (var msg in msgs)
+					var isLexerOnly = false; 
+					if (!doc.HasNonTerminalProductions)
 					{
-						if(verbose || ErrorLevel.Message!=msg.ErrorLevel)
-							Console.Error.WriteLine(msg);
-					}
-					CfgException.ThrowIfErrors(msgs);
-					var ccu = CodeGenerator.GenerateCompileUnit(doc,cfg,codeclass,codenamespace);
-					var ccuNS = ccu.Namespaces[ccu.Namespaces.Count - 1];
-					var ccuShared = CodeGenerator.GenerateSharedCompileUnit(codenamespace);
-					var sNS = ccuShared.Namespaces[ccuShared.Namespaces.Count - 1];
-					var parserContext = C.GetByName("ParserContext",sNS.Types);
-					var parseNode = C.GetByName("ParseNode", sNS.Types);
-					var syntaxException = C.GetByName("SyntaxException", sNS.Types);
-					ccuNS.Types.Add(syntaxException);
-					ccuNS.Types.Add(parseNode);
-					ccuNS.Types.Add(parserContext);
-					ccu.ReferencedAssemblies.Add(typeof(TypeConverter).Assembly.GetName().ToString());
-					CD.SlangPatcher.Patch(ccu, ccuShared);
-					var co = CD.SlangPatcher.GetNextUnresolvedElement(ccu);
-					if(null!=co)
-					{
-						Console.Error.WriteLine("Warning: Not all of the elements could be resolved. The generated code may not be correct in all languages.");
-						Console.Error.WriteLine("  Next unresolved: {0}", C.ToString(co).Trim());
-					}
-					if(!noshared)
-					{
-						// we just needed these for slang resolution
-						ccuNS.Types.Remove(syntaxException);
-						ccuNS.Types.Remove(parseNode);
-						ccuNS.Types.Remove(parserContext);
-					}
-					foreach (CodeNamespace ns in ccu.Namespaces)
-					{
-						var hasColNS = false;
-						foreach (CodeNamespaceImport nsi in ns.Imports)
+						// this is purely a lexer file
+						isLexerOnly = true;
+						// we need to prepare it by marking every terminal
+						// with an attribute if it isn't already. we use 
+						// "terminal" because it doesn't impact terminals
+						// in any way, but this way the CfgDocument can
+						// "see" them.
+						for(int ic = doc.Productions.Count,i=0;i<ic;++i)
 						{
-							if (0 == string.Compare(nsi.Namespace, "System.Collections.Generic",StringComparison.InvariantCulture))
-							{
-								hasColNS = true;
-								break;
-							}
+							var p = doc.Productions[i];
+							if(0==p.Attributes.Count)
+								p.Attributes.Add(new XbnfAttribute("terminal", true));
+							
 						}
-						if (!hasColNS)
-							ns.Imports.Add(new CodeNamespaceImport("System.Collections.Generic"));
 					}
-					var prov = CodeDomProvider.CreateProvider(codelanguage);
-					
-					if (null != outputfile)
+					var cfg = XbnfConvert.ToCfg(doc);
+					if (!isLexerOnly)
 					{
-						var sw = new StreamWriter(outputfile);
-						sw.BaseStream.SetLength(0);
-						output = sw;
+						var msgs = cfg.TryPrepareLL1();
+						foreach (var msg in msgs)
+						{
+							if (verbose || ErrorLevel.Message != msg.ErrorLevel)
+								Console.Error.WriteLine(msg);
+						}
+						CfgException.ThrowIfErrors(msgs);
+
+						var ccu = CodeGenerator.GenerateCompileUnit(doc, cfg, codeclass, codenamespace);
+						var ccuNS = ccu.Namespaces[ccu.Namespaces.Count - 1];
+						var ccuShared = CodeGenerator.GenerateSharedCompileUnit(codenamespace);
+						var sNS = ccuShared.Namespaces[ccuShared.Namespaces.Count - 1];
+						var parserContext = C.GetByName("ParserContext", sNS.Types);
+						var parseNode = C.GetByName("ParseNode", sNS.Types);
+						var syntaxException = C.GetByName("SyntaxException", sNS.Types);
+						ccuNS.Types.Add(syntaxException);
+						ccuNS.Types.Add(parseNode);
+						ccuNS.Types.Add(parserContext);
+						ccu.ReferencedAssemblies.Add(typeof(TypeConverter).Assembly.GetName().ToString());
+						CD.SlangPatcher.Patch(ccu, ccuShared);
+						var co = CD.SlangPatcher.GetNextUnresolvedElement(ccu);
+						if (null != co)
+						{
+							Console.Error.WriteLine("Warning: Not all of the elements could be resolved. The generated code may not be correct in all languages.");
+							Console.Error.WriteLine("  Next unresolved: {0}", C.ToString(co).Trim());
+						}
+						if (!noshared)
+						{
+							// we just needed these for slang resolution
+							ccuNS.Types.Remove(syntaxException);
+							ccuNS.Types.Remove(parseNode);
+							ccuNS.Types.Remove(parserContext);
+						}
+						foreach (CodeNamespace ns in ccu.Namespaces)
+						{
+							var hasColNS = false;
+							foreach (CodeNamespaceImport nsi in ns.Imports)
+							{
+								if (0 == string.Compare(nsi.Namespace, "System.Collections.Generic", StringComparison.InvariantCulture))
+								{
+									hasColNS = true;
+									break;
+								}
+							}
+							if (!hasColNS)
+								ns.Imports.Add(new CodeNamespaceImport("System.Collections.Generic"));
+						}
+						var prov = CodeDomProvider.CreateProvider(codelanguage);
+
+						if (null != outputfile)
+						{
+							var sw = new StreamWriter(outputfile);
+							sw.BaseStream.SetLength(0);
+							output = sw;
+						}
+						else
+							output = Console.Out;
+						var opts = new CodeGeneratorOptions();
+						opts.VerbatimOrder = true;
+						opts.BlankLinesBetweenMembers = false;
+						prov.GenerateCodeFromCompileUnit(ccu, output, opts);
+						output.Flush();
+						output.Close();
+						output = null;
 					}
 					else
-						output = Console.Out;
-					var opts = new CodeGeneratorOptions();
-					opts.VerbatimOrder = true;
-					opts.BlankLinesBetweenMembers = false;
-					prov.GenerateCodeFromCompileUnit(ccu, output, opts);
-					output.Flush();
-					output.Close();
-					output = null;
+						Console.Error.WriteLine("{0} skipped parser generation because there are no non-terminals defined.", Name);
+
 					if(null!=rolexfile)
 					{
 						var sw = new StreamWriter(rolexfile);

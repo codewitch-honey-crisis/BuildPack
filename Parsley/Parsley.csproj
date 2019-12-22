@@ -94,6 +94,7 @@
     <Compile Include="Xbnf\XbnfRepeatExpression.cs" />
     <Compile Include="Xbnf\XbnfConvert.cs" />
     <Compile Include="Xbnf\XbnfUnaryExpression.cs" />
+    <None Include="Slang.xbnf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

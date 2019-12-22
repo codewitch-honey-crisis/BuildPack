@@ -52,6 +52,14 @@ namespace Parsley
 				}
 			}
 		}
+		public bool HasNonTerminalProductions {
+			get {
+				for (int ic = Productions.Count, i = 0; i < ic; ++i)
+					if (!Productions[i].IsTerminal)
+						return true;
+				return false;
+			}
+		}
 		public XbnfProductionList Productions { get; } = new XbnfProductionList();
 		public IList<XbnfMessage> TryValidate(IList<XbnfMessage> result = null)
 		{
