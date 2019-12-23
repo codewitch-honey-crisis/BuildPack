@@ -11,8 +11,6 @@ namespace Parsley
 
 		public override bool IsTerminal {
 			get {
-				if (null == Left && null == Right)
-					return true;
 				if (null != Left && !Left.IsTerminal)
 					return false;
 				if (null != Right && !Right.IsTerminal)

@@ -15,4 +15,8 @@
     <Compile Remove="DontInclude1.cs" />
   </ItemGroup>
 
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="&quot;$(SolutionDir)Parsley\bin\Release\parsley.exe&quot; &quot;$(ProjectDir)Slang.xbnf&quot; /gplex &quot;$(ProjectDir)Slang.lex&quot; /namespace CD&#xD;&#xA;&quot;$(SolutionDir)Gplex\bin\Release\gplex.exe&quot; &quot;$(ProjectDir)Slang.lex&quot;" />
+  </Target>
+
 </Project>

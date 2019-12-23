@@ -1,16 +1,37 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using ParsleyDemo;
+using System.Reflection;
+using CD;
 namespace scratch
 {
+	// line comment
+	/* block comment */
 	class Program
 	{
 		static void Main(string[] args)
 		{
-
-			var tokenizer = new ExpressionTokenizer("/* foo*/ 2+2 * 5 +1// foo");
-			var pt = ExpressionParser.Parse(tokenizer);
-			Console.WriteLine(ExpressionParser.Evaluate(pt));
+			var @namespace = "test";
+			#region fetch consts
+			var consts = new Dictionary<int, string>();
+			foreach (var f in typeof(SlangTokenizer).GetFields(BindingFlags.Public | BindingFlags.Static))
+			{
+				if(f.FieldType==typeof(int) && f.IsLiteral)
+				{
+					var i = (int)f.GetValue(null);
+					if(-3<i)
+						consts[i]= f.Name;
+				}
+			}
+			#endregion Fetch consts
+			using (var stm = File.Open(@"..\..\..\Program.cs", FileMode.Open))
+			{
+				
+				var tokenizer = new SlangTokenizer(stm);
+				foreach (var tok in tokenizer)
+					Console.WriteLine("{0}: {1}", consts[tok.SymbolId], tok.Value);
+			}
+			
 		}
 	}
 }

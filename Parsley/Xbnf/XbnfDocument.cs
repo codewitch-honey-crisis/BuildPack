@@ -60,6 +60,26 @@ namespace Parsley
 				return false;
 			}
 		}
+		static XbnfExpression _FindNonTerminal(XbnfExpression expr)
+		{
+			var re = expr as XbnfRefExpression;
+			if(null!=re)
+				return re;
+			var bo = expr as XbnfBinaryExpression;
+			if(bo!=null)
+			{
+				var res = _FindNonTerminal(bo.Left);
+				if (null != res)
+					return res;
+				res = _FindNonTerminal(bo.Right);
+				if (null != res)
+					return res;
+			}
+			var ue = expr as XbnfUnaryExpression;
+			if(null!=ue)
+				return _FindNonTerminal(ue.Expression);
+			return null;
+		}
 		public XbnfProductionList Productions { get; } = new XbnfProductionList();
 		public IList<XbnfMessage> TryValidate(IList<XbnfMessage> result = null)
 		{

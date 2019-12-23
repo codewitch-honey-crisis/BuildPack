@@ -580,7 +580,12 @@ namespace Parsley
 			}
 			var rxe = e as XbnfRegexExpression;
 			if (null != rxe)
-				return first?rxe.Value:string.Concat("(", rxe.Value, ")");
+			{
+				var r = rxe.Value;
+				if (gplex)
+					r = r.Replace("\"", "\\\"");
+				return first ? r : string.Concat("(", r, ")");
+			}
 			var rfe = e as XbnfRefExpression;
 			if (null != rfe)
 				_ToRegex(d, d.Productions[rfe.Symbol].Expression,first,gplex);
@@ -602,7 +607,7 @@ namespace Parsley
 			}
 			var oc = e as XbnfConcatExpression;
 			if (null != oc)
-				return string.Concat(_ToRegex(d, oe.Left,false,gplex), _ToRegex(d, oe.Right,false,gplex));
+				return string.Concat(_ToRegex(d, oc.Left,false,gplex), _ToRegex(d, oc.Right,false,gplex));
 			var ope = e as XbnfOptionalExpression;
 			if (null != ope)
 				return string.Concat("(", _ToRegex(d, ope.Expression,true,gplex), ")?");

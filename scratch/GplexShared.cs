@@ -1,4 +1,4 @@
-namespace ParsleyDemo
+namespace CD
 {
 	/// <summary>
 	/// Represents a lexeme/token
