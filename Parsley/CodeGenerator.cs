@@ -61,6 +61,8 @@ namespace Parsley
 			cfg.RebuildCache();
 			if (!string.IsNullOrEmpty(@namespace))
 				ns.Name = @namespace;
+			result.ReferencedAssemblies.Add(typeof(HashSet<>).Assembly.GetName().FullName);
+			result.ReferencedAssemblies.Add(typeof(CodeObject).Assembly.GetName().FullName);
 			ns.Imports.Add(new CodeNamespaceImport("System"));
 			ns.Imports.Add(new CodeNamespaceImport("System.Collections.Generic"));
 			result.Namespaces.Add(ns);
@@ -110,13 +112,15 @@ namespace Parsley
 					consts[i] = "EosSymbol";
 				}
 			}
-			var predict = cfg.FillPredict();
-			var follows = cfg.FillFollows();
-
-			//var rmap1=_BuildRuleMap(cfg.ToLL1ParseTable(), "Leaf");
-			//var es = new HashSet<string>();
-			//var rmap2=_BuildRuleMap(follows, es, "Leaf", predict["Leaf"]);
-			//_BuildParserParseFunctions(parser,doc,cfg,consts,predict,follows);
+			// add the user code blocks
+			for(int ic = doc.Code.Count,i=0;i<ic;++i)
+			{
+				var code = doc.Code[i];
+				if(null!=code&&!string.IsNullOrWhiteSpace(code.Value))
+				{
+					parser.Members.AddRange(CD.SlangParser.ParseMembers(code.Value, "Parser"));
+				}
+			}
 			CfgLL1ParseTable tbl = null;
 			// we don't care about conflicts here because we can backtrack:
 			cfg.TryToLL1ParseTable(out tbl);
@@ -124,7 +128,7 @@ namespace Parsley
 			var hasEval = false;
 			for (int ic=doc.Productions.Count,i=0;i<ic;++i)
 			{
-				if(null!=doc.Productions[i].Code)
+				if(null!=doc.Productions[i].Action)
 				{
 					hasEval = true;
 					break;
@@ -206,7 +210,10 @@ namespace Parsley
 				var l = C.VarRef("line");
 				var c = C.VarRef("column");
 				var p = C.VarRef("position");
-
+				var pi = doc.Productions.IndexOf(nt);
+				XbnfProduction prod = null;
+				if (-1 < pi)
+					prod = doc.Productions[pi];
 				foreach (var kvp in rmap)
 				{
 					foreach (CodeCommentStatement comment in C.ToComments(kvp.Key))
@@ -220,10 +227,11 @@ namespace Parsley
 						//if ("Leaf" == rules[0].Left)
 						//	System.Diagnostics.Debugger.Break();
 						var stmts = new CodeStatementCollection();
-						_BuildParseRule(cfg, consts, context, syms, nt, stmts, l, c, p, kvp, rule, null);
+						_BuildParseRule(cfg, prod,consts, context, syms, nt, stmts, l, c, p, kvp, rule, null);
 						parseNtImpl.Statements.AddRange(stmts);
 					}
 					#endregion Non-Backtracking
+					// more complicated backtracking case
 					#region Backtracking
 					else
 					{
@@ -233,7 +241,7 @@ namespace Parsley
 							return cfg.Rules.IndexOf(x) - cfg.Rules.IndexOf(y);
 						});*/
 
-						var cnd = C.If(_BuildIfRuleExprsCnd(syms, consts, context, kvp.Value));
+						var cnd = C.If(_BuildIfRuleExprsCnd(prod,syms, consts, context, kvp.Value));
 						cnd.TrueStatements.Add(vd);
 						var collapsed = new HashSet<string>();
 						var r = rules[0];
@@ -261,7 +269,7 @@ namespace Parsley
 							cnd.TrueStatements.Add(C.Let(C.VarRef("pc2"), C.Invoke(context, "GetLookAhead")));
 							cnd.TrueStatements.Add(C.Invoke(C.VarRef("pc2"), "EnsureStarted"));
 							var stmts = new CodeStatementCollection();
-							_BuildParseRule(cfg, consts, C.VarRef("pc2"), syms, nt, stmts, l, c, p, kvp, rule, context);
+							_BuildParseRule(cfg,prod, consts, C.VarRef("pc2"), syms, nt, stmts, l, c, p, kvp, rule, context);
 							// we use except. handing to process our alternatives so we don't 
 							// need to double the code size
 							var tcf = new CodeTryCatchFinallyStatement();
@@ -281,7 +289,7 @@ namespace Parsley
 						if (hasEmpty)
 						{
 							var stmts = new CodeStatementCollection();
-							_BuildParseRule(cfg, consts, context, syms, nt, stmts, l, c, p, kvp, lastRule, null);
+							_BuildParseRule(cfg,prod, consts, context, syms, nt, stmts, l, c, p, kvp, lastRule, null);
 							cnd.TrueStatements.AddRange(stmts);
 						}
 						cnd.TrueStatements.Add(C.Throw(C.VarRef(vex.Name)));
@@ -293,33 +301,54 @@ namespace Parsley
 				_BuildErrorList(row,exp);
 				parseNtImpl.Statements.Add(C.Call(context, "Error", C.Literal(string.Concat("Expecting ", exp.ToString()))));
 				parseNtImpl.Statements.Add(C.Return(C.Null));
-
-				var pi = doc.Productions.IndexOf(nt);
-				XbnfProduction prod = null;
-				if (-1 < pi)
-					prod = doc.Productions[pi];
-				if (null != prod && !prod.IsCollapsed)
+				if (null != prod)
 				{
-					var stmts = new CodeStatementCollection();
-					stmts.Add(C.Var(C.Type("ParserContext"), "context", C.New(C.Type("ParserContext"), C.ArgRef("tokenizer"))));
-					stmts.Add(C.Call(C.VarRef("context"), "EnsureStarted"));
-					stmts.Add(C.Return(C.Invoke(C.TypeRef("Parser"), parseNtImpl.Name, C.VarRef("context"))));
-					var ctr = C.Type(typeof(IEnumerable<>));
-					ctr.TypeArguments.Add(C.Type("Token"));
-					var parseNt = C.Method(parseNtImpl.ReturnType, parseNtImpl.Name.Substring(1), MemberAttributes.Public | MemberAttributes.Static, C.Param(ctr, "tokenizer"));
-					var rs = new StringBuilder();
-					foreach (var r in cfg.FillNonTerminalRules(prod.Name))
-						rs.AppendLine(r.ToString());
-					parseNt.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nParses a production of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"tokenizer\">The tokenizer to parse with</param><returns>A <see cref=\"ParseNode\" /> representing the parsed tokens</returns>", prod.ToString("p").TrimEnd(), rs.ToString().TrimEnd()), true));
-					parseNt.Statements.AddRange(stmts);
-					parser.Members.Add(parseNt);
-					if (0 == string.Compare(nt, cfg.StartSymbol, StringComparison.InvariantCulture))
+					if (null != prod.Where && null != prod.Where.Value)
 					{
-						var parse = C.Method(parseNt.ReturnType, "Parse", MemberAttributes.Public | MemberAttributes.Static, (CodeParameterDeclarationExpression[])parseNt.Parameters.ToArray(typeof(CodeParameterDeclarationExpression)));
-						parse.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nParses a production of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"tokenizer\">The tokenizer to parse with</param><returns>A <see cref=\"ParseNode\" /> representing the parsed tokens</returns>", prod.ToString("p").TrimEnd(), rs.ToString().TrimEnd()), true));
-						parse.Statements.AddRange(stmts);
-						parser.Members.Add(parse);
+						var stmts = CD.SlangParser.ParseStatements(prod.Where.Value, true);
+						var whereImpl = C.Method(typeof(bool), string.Concat("_Where", nt), MemberAttributes.Static | MemberAttributes.Private, C.Param(C.Type("ParserContext"), "context"));
+						whereImpl.Statements.AddRange(stmts);
+						var hasReturn = false;
+						V.Visit(whereImpl, (ctx) =>
+						{
+							var r = ctx.Target as CodeMethodReturnStatement;
+							if (null != r)
+							{
+								hasReturn = true;
+								ctx.Cancel = true;
+							}
+						});
+						if (!hasReturn)
+						{
+							whereImpl.Statements.Add(C.Return(C.True));
+						}
+						parser.Members.Add(whereImpl);
 					}
+					if (!prod.IsCollapsed)
+					{
+
+						var stmts = new CodeStatementCollection();
+						stmts.Add(C.Var(C.Type("ParserContext"), "context", C.New(C.Type("ParserContext"), C.ArgRef("tokenizer"))));
+						stmts.Add(C.Call(C.VarRef("context"), "EnsureStarted"));
+						stmts.Add(C.Return(C.Invoke(C.TypeRef("Parser"), parseNtImpl.Name, C.VarRef("context"))));
+						var ctr = C.Type(typeof(IEnumerable<>));
+						ctr.TypeArguments.Add(C.Type("Token"));
+						var parseNt = C.Method(parseNtImpl.ReturnType, parseNtImpl.Name.Substring(1), MemberAttributes.Public | MemberAttributes.Static, C.Param(ctr, "tokenizer"));
+						var rs = new StringBuilder();
+						foreach (var r in cfg.FillNonTerminalRules(prod.Name))
+							rs.AppendLine(r.ToString());
+						parseNt.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nParses a production of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"tokenizer\">The tokenizer to parse with</param><returns>A <see cref=\"ParseNode\" /> representing the parsed tokens</returns>", prod.ToString("p").TrimEnd(), rs.ToString().TrimEnd()), true));
+						parseNt.Statements.AddRange(stmts);
+						parser.Members.Add(parseNt);
+						if (0 == string.Compare(nt, cfg.StartSymbol, StringComparison.InvariantCulture))
+						{
+							var parse = C.Method(parseNt.ReturnType, "Parse", MemberAttributes.Public | MemberAttributes.Static, (CodeParameterDeclarationExpression[])parseNt.Parameters.ToArray(typeof(CodeParameterDeclarationExpression)));
+							parse.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nParses a production of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"tokenizer\">The tokenizer to parse with</param><returns>A <see cref=\"ParseNode\" /> representing the parsed tokens</returns>", prod.ToString("p").TrimEnd(), rs.ToString().TrimEnd()), true));
+							parse.Statements.AddRange(stmts);
+							parser.Members.Add(parse);
+						}
+					}
+					
 				}
 			}
 		}
@@ -356,9 +385,9 @@ namespace Parsley
 				exp.Append(string.Concat(" or ", terms[ic - 1]));
 		}
 
-		private static void _BuildParseRule(CfgDocument cfg, string[] consts, CodeExpression context, IList<string> syms, string nt, CodeStatementCollection stmts, CodeVariableReferenceExpression l, CodeVariableReferenceExpression c, CodeVariableReferenceExpression p, KeyValuePair<string, ICollection<string>> kvp, CfgRule rule,CodeExpression recover)
+		private static void _BuildParseRule(CfgDocument cfg, XbnfProduction prod, string[] consts, CodeExpression context, IList<string> syms, string nt, CodeStatementCollection stmts, CodeVariableReferenceExpression l, CodeVariableReferenceExpression c, CodeVariableReferenceExpression p, KeyValuePair<string, ICollection<string>> kvp, CfgRule rule,CodeExpression recover)
 		{
-			var cnd = C.If(_BuildIfRuleExprsCnd(syms, consts, context, kvp.Value));
+			var cnd = C.If(_BuildIfRuleExprsCnd(prod,syms, consts, context, kvp.Value));
 			var collapsed = new HashSet<string>();
 
 			for (int jc = rule.Right.Count, j = 0; j < jc; ++j)
@@ -487,7 +516,7 @@ namespace Parsley
 			{
 				var prod = doc.Productions[i];
 				var isStart = ReferenceEquals(doc.StartProduction, prod);
-				if (null!=prod.Code)
+				if (null!=prod.Action && null!=prod.Action.Value)
 				{
 					var type = new CodeTypeReference(typeof(object));
 					
@@ -528,7 +557,7 @@ namespace Parsley
 					var cnst = consts[syms.IndexOf(prod.Name)];
 					var fr = C.FieldRef(C.TypeRef("Parser"), cnst);
 					var cnd = C.If(C.Eq(fr, C.PropRef(node, "SymbolId")));
-					var stmts = CD.SlangParser.ParseStatements(prod.Code, true);
+					var stmts = CD.SlangParser.ParseStatements(prod.Action.Value, true);
 					cnd.TrueStatements.AddRange(stmts);
 					m.Statements.Add(cnd);
 					m.Statements.Add(C.Throw(C.New(C.Type("SyntaxException"), C.Literal(string.Concat("Expecting ", prod.Name)), C.PropRef(node, "Line"), C.PropRef(node, "Column"), C.PropRef(node, "Position"))));
@@ -770,7 +799,7 @@ namespace Parsley
 
 			return rmap;
 		}
-		private static CodeExpression _BuildIfRuleExprsCnd(IList<string> syms, string[] consts, CodeExpression context, IEnumerable<string> cmps)
+		private static CodeExpression _BuildIfRuleExprsCnd(XbnfProduction prod,IList<string> syms, string[] consts, CodeExpression context, IEnumerable<string> cmps)
 		{
 			var exprs = new CodeExpressionCollection();
 			foreach (var s in cmps)
@@ -783,37 +812,33 @@ namespace Parsley
 					exprs.Add(C.Eq(fr, C.PropRef(context, "SymbolId")));
 				}
 			}
+			CodeExpression result = null;
 			switch (exprs.Count)
 			{
 				case 0:
 					return null;
 				case 1:
-					return exprs[0];
+					result = exprs[0];
+					break;
 				default:
-					return C.BinOp(exprs, CodeBinaryOperatorType.BooleanOr);
+					result =  C.BinOp(exprs, CodeBinaryOperatorType.BooleanOr);
+					break;
 			}
+			if(null!=prod && null!=prod.Where)
+			{
+				// add the semantic constraint
+				var inv = C.Invoke(C.TypeRef("Parser"), string.Concat("_Where", prod.Name), C.Invoke(context, "GetLookAhead", C.True));
+				result = C.And(result, inv);
+			}
+			return result;
 		}
-		private static CodeExpression _BuildIfRuleExprsCnd(IList<string> syms, string[] consts, CodeExpression context, KeyValuePair<CfgRule, ICollection<string>> r)
+		private static CodeExpression _BuildIfRuleExprsCnd(XbnfProduction prod,IList<string> syms, string[] consts, CodeExpression context, KeyValuePair<CfgRule, ICollection<string>> r)
 		{
-			var exprs = new CodeExpressionCollection();
+			var cmps = new List<string>();
 			foreach (var s in r.Value)
-			{
 				if (null != s)
-				{
-					var si = syms.IndexOf(s);
-					var fr = C.FieldRef(C.TypeRef("Parser"), consts[si]);
-					exprs.Add(C.Eq(fr, C.PropRef(context, "SymbolId")));
-				}
-			}
-			switch (exprs.Count)
-			{
-				case 0:
-					return null;
-				case 1:
-					return exprs[0];
-				default:
-					return C.BinOp(exprs, CodeBinaryOperatorType.BooleanOr);
-			}
+					cmps.Add(s);
+			return _BuildIfRuleExprsCnd(prod,syms, consts, context, cmps);
 		}
 
 		static void _FixParserContext(CodeTypeDeclaration parserContext)

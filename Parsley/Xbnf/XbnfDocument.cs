@@ -52,6 +52,8 @@ namespace Parsley
 				}
 			}
 		}
+		public IList<XbnfCode> Code { get; } = new List<XbnfCode>();
+
 		public bool HasNonTerminalProductions {
 			get {
 				for (int ic = Productions.Count, i = 0; i < ic; ++i)
@@ -153,7 +155,21 @@ namespace Parsley
 			var result = new XbnfDocument();
 			while (-1 != pc.Current)
 			{
-				result.Productions.Add(XbnfProduction.Parse(pc));
+				pc.TrySkipCCommentsAndWhiteSpace();
+				if (pc.Current == '{')
+				{
+					pc.Advance();
+					var l = pc.Line;
+					var c = pc.Column;
+					var p = pc.Position;
+					var s = ReadCode(pc);
+					pc.Expecting('}');
+					pc.Advance();
+					var code = new XbnfCode(s);
+					code.SetLocation(l, c, p);
+					result.Code.Add(code);
+				} else
+					result.Productions.Add(XbnfProduction.Parse(pc));
 				// have to do this so trailing whitespace
 				// doesn't get read as a production
 				pc.TryReadCCommentsAndWhitespace();
@@ -178,7 +194,44 @@ namespace Parsley
 			using (var pc = ParseContext.CreateFromUrl(url))
 				return Parse(pc);
 		}
+		static internal string ReadCode(ParseContext pc)
+		{
+			var sb = new StringBuilder();
+			var i = 1;
+			var skipRead = false;
+			while (skipRead || -1 != pc.Advance())
+			{
+				skipRead = false;
+				if ('{' == pc.Current)
+				{
+					sb.Append((char)pc.Current);
+					++i;
+				}
+				else if ('}' == pc.Current)
+				{
+					--i;
+					if (0 == i)
+						break;
+					sb.Append((char)pc.Current);
+				}
+				else if ('\"' == pc.Current)
+				{
+					pc.ClearCapture();
+					pc.TryReadCString();
+					sb.Append(pc.GetCapture());
+					skipRead = true;
+				}
+				else
+					sb.Append((char)pc.Current);
+				pc.ClearCapture();
+				if (pc.TryReadCCommentsAndWhitespace())
+					skipRead = true;
+				sb.Append(pc.GetCapture());
 
+			}
+
+			return sb.ToString();
+		}
 		#region Value semantics
 		public bool Equals(XbnfDocument rhs)
 		{

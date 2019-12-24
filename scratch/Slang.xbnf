@@ -1,12 +1,23 @@
 ﻿// Slang.xbnf
-// This is the XBNF lexer spec for Slang (gplex version - unicode enabled)
-verbatimIdentifier<terminal>="@" identifier;
+// This is the XBNF spec for Slang (gplex version - unicode enabled)
+Term<start>= Factor { ("+"|"-") Factor };
+Factor= Unary { ("*"|"/") Unary };
+Unary= ("+"|"-") Unary | Leaf;
+Leaf=	Identifier				|
+		verbatimStringLiteral	|
+		integerLiteral			| 
+		floatLiteral			|
+		stringLiteral			|
+		"(" Term ")"			;
+Identifier = verbatimIdentifier | identifier : where { return !Keywords.Contains(context.Value);}
+verbatimIdentifier='@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
+verbatimStringLiteral='@"([^"|""])*"';
 keyword='abstract|as|ascending|async|await|base|bool|break|byte|case|catch|char|checked|class|const|continue|decimal|default|delegate|descending|do|double|dynamic|else|enum|equals|explicit|extern|event|false|finally|fixed|float|for|foreach|get|global|goto|if|implicit|int|interface|internal|is|lock|long|namespace|new|null|object|operator|out|override|params|partial|private|protected|public|readonly|ref|return|sbyte|sealed|set|short|sizeof|stackalloc|static|string|struct|switch|this|throw|true|try|typeof|uint|ulong|unchecked|unsafe|ushort|using|var|virtual|void|volatile|while|yield';
 identifier='(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
-lineComment='\/\/[^\n]*';
-blockComment<blockEnd="*/">="/*";
-verbatimStringLiteral='@"([^"|""])*"';
 stringLiteral='"([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*"';
+
+lineComment<hidden>='\/\/[^\n]*';
+blockComment<hidden,blockEnd="*/">="/*";
 characterLiteral='[\u0027]([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})[\u0027]';
 whitespace<hidden>='[ \t\r\n\v\f]+';
 lte="<=";
@@ -49,3 +60,17 @@ dot=".";
 integerLiteral = '(0x[0-9A-Fa-f]{1,16}|(0|[1-9][0-9]*))([Uu][Ll]?|[Ll][Uu]?)?';
 floatLiteral= '((0|[1-9][0-9]*)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)';
 directive<blockEnd="\n">='#[ \t]*[a-z]+[ \t]*';
+// helpers
+{
+	static HashSet<string> Keywords=_BuildKeywords();
+	static HashSet<string> _BuildKeywords() 
+	{
+		var result = new HashSet<string>();
+		string[] sa = "abstract|as|ascending|async|await|base|bool|break|byte|case|catch|char|checked|class|const|continue|decimal|default|delegate|descending|do|double|dynamic|else|enum|equals|explicit|extern|event|false|finally|fixed|float|for|foreach|get|global|goto|if|implicit|int|interface|internal|is|lock|long|namespace|new|null|object|operator|out|override|params|partial|private|protected|public|readonly|ref|return|sbyte|sealed|set|short|sizeof|stackalloc|static|string|struct|switch|this|throw|true|try|typeof|uint|ulong|unchecked|unsafe|ushort|using|var|virtual|void|volatile|while|yield".Split(new char[] {'|'});
+		
+		for(var i = 0;i<sa.Length;++i) 
+			result.Add(sa[i]);
+		
+		return result;
+	}
+}

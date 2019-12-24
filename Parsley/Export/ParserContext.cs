@@ -37,6 +37,13 @@ namespace Parsley
 				throw new NotSupportedException("This parser context does not support lookahead.");
 			return new ParserContext(_el.LookAhead.GetEnumerator(), true);
 		}
+		public ParserContext GetLookAhead(bool start)
+		{
+			var result= GetLookAhead();
+			if (start)
+				result.EnsureStarted();
+			return result;
+		}
 		public int AdvanceCount { get { return _advanceCount; } }
 		public void ResetAdvanceCount() { _advanceCount = 0; }
 		public int SymbolId { get { return _t.SymbolId; } }

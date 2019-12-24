@@ -344,8 +344,8 @@ namespace ParsleyDemo {
                 children[0] = new ParseNode(ExpressionParser.Implicit3, "Implicit3", context.Value, line, column, position);
                 context.Advance();
                 children[1] = ExpressionParser._ParseTerm(context);
-                children[2] = new ParseNode(ExpressionParser.Implicit4, "Implicit4", context.Value, line, column, position);
                 if ((ExpressionParser.Implicit4 == context.SymbolId)) {
+                    children[2] = new ParseNode(ExpressionParser.Implicit4, "Implicit4", context.Value, line, column, position);
                     context.Advance();
                 }
                 return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);

@@ -20,7 +20,7 @@ namespace Parsley
 			int column;
 			pc.TrySkipCCommentsAndWhiteSpace();
 			position = pc.Position; line = pc.Line; column = pc.Column;
-			while (-1 != pc.Current && ']' != pc.Current && ')' != pc.Current && '}' != pc.Current && ';' != pc.Current)
+			while (-1 != pc.Current && ']' != pc.Current && ')' != pc.Current && '}' != pc.Current && ';' != pc.Current && ':'!=pc.Current)
 			{
 				pc.TrySkipCCommentsAndWhiteSpace();
 				position = pc.Position; line = pc.Line; column = pc.Column;
@@ -106,6 +106,7 @@ namespace Parsley
 					case ')':
 					case '}':
 					case '=':
+					case ':':
 						return current;
 
 					default:

@@ -216,6 +216,7 @@ namespace Parsley
 						{
 							if (verbose || ErrorLevel.Message != msg.ErrorLevel)
 								Console.Error.WriteLine(msg);
+
 						}
 						CfgException.ThrowIfErrors(msgs);
 #else // if NOPREPARELL1
@@ -228,6 +229,13 @@ namespace Parsley
 							--i;
 						}
 						Console.Error.WriteLine(cfg.ToString());
+						var msgs = cfg.TryValidateLL1();
+						foreach (var msg in msgs)
+						{
+							if (verbose || ErrorLevel.Message != msg.ErrorLevel)
+								Console.Error.WriteLine(msg);
+
+						}
 #endif // !NOPREPARELL1
 						var ccu = CodeGenerator.GenerateCompileUnit(doc, cfg, codeclass, codenamespace);
 						var ccuNS = ccu.Namespaces[ccu.Namespaces.Count - 1];
@@ -253,7 +261,7 @@ namespace Parsley
 							Console.Error.WriteLine("Warning: Not all of the elements could be resolved. The generated code may not be correct in all languages.");
 							Console.Error.WriteLine("  Next unresolved: {0}", C.ToString(co).Trim());
 						}
-						if (!noshared)
+						if (noshared)
 						{
 							// we just needed these for slang resolution
 							ccuNS.Types.Remove(syntaxException);

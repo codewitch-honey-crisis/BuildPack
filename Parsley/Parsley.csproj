@@ -79,6 +79,7 @@
     <Compile Include="Xbnf\XbnfAttribute.cs" />
     <Compile Include="Xbnf\XbnfAttributeList.cs" />
     <Compile Include="Xbnf\XbnfBinaryExpression.cs" />
+    <Compile Include="Xbnf\XbnfCode.cs" />
     <Compile Include="Xbnf\XbnfConcatExpression.cs" />
     <Compile Include="Xbnf\XbnfDocument.cs" />
     <Compile Include="Xbnf\XbnfException.cs" />

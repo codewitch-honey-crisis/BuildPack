@@ -47,6 +47,48 @@ namespace CD
 				return result;
 			}
 		}
+		/// <summary>
+		/// Reads a <see cref="CodeTypeMemberCollection"/> from the specified <see cref="TextReader"/>
+		/// </summary>
+		/// <param name="reader">The reader to read from</param>
+		/// <param name="typeName">The optional name of the declaring type of this member</param>
+		/// <returns>A <see cref="CodeTypeMemberCollection"/> representing the parsed code</returns>
+		public static CodeTypeMemberCollection ReadMembersFrom(TextReader reader,string typeName=null)
+			=> ParseMembers(TextReaderEnumerable.FromReader(reader),typeName);
+		/// <summary>
+		/// Reads a <see cref="CodeTypeMemberCollection"/> from the specified file
+		/// </summary>
+		/// <param name="filename">The file to read</param>
+		/// <param name="typeName">The optional name of the declaring type of this member</param>
+		/// <returns>A <see cref="CodeTypeMemberCollection"/> representing the parsed code</returns>
+		public static CodeTypeMemberCollection ReadMembersFrom(string filename,string typeName)
+			=> ParseMembers(new FileReaderEnumerable(filename),typeName);
+		/// <summary>
+		/// Reads a <see cref="CodeTypeMemberCollection"/> from the specified URL
+		/// </summary>
+		/// <param name="url">The URL to read</param>
+		/// <param name="typeName">The optional name of the declaring type of this member</param>
+		/// <returns>A <see cref="CodeTypeMemberCollection"/> representing the parsed code</returns>
+		public static CodeTypeMemberCollection ReadMembersFromUrl(string url,string typeName)
+			=> ParseMembers(new UrlReaderEnumerable(url),typeName);
+		/// <summary>
+		/// Parses a <see cref="CodeTypeMemberCollection"/> from the specified input
+		/// </summary>
+		/// <param name="input">The input to parse</param>
+		/// <param name="typeName">The optional name of the declaring type of this member</param>
+		/// <returns>A <see cref="CodeTypeMemberCollection"/> representing the parsed code</returns>
+		public static CodeTypeMemberCollection ParseMembers(IEnumerable<char> input, string typeName = null)
+		{
+			using (var e = new ST(input).GetEnumerator())
+			{
+				var pc = new _PC(e);
+				pc.EnsureStarted();
+				var result = _ParseMembers(pc,typeName);
+				if (!pc.IsEnded)
+					throw new SlangSyntaxException("Unrecognized remainder in member", pc.Current.Line, pc.Current.Column, pc.Current.Position);
+				return result;
+			}
+		}
 		static MemberAttributes _BuildMemberAttributes(ICollection<string> modifiers)
 		{
 			var result = (MemberAttributes)0;
@@ -215,7 +257,13 @@ namespace CD
 			//_Error("Expecting identifier on private member declaration", pc.Current);
 
 		}
-
+		static CodeTypeMemberCollection _ParseMembers(_PC pc,string typeName=null)
+		{
+			var result = new CodeTypeMemberCollection();
+			while (!pc.IsEnded && ST.rbrace != pc.SymbolId)
+				result.Add(_ParseMember(pc, typeName));
+			return result;
+		}
 		static CodeTypeMember _ParseMember(_PC pc,string typeName=null)
 		{
 			var comments = new CodeCommentStatementCollection();

@@ -36,11 +36,16 @@ namespace Parsley
 			}
 			else
 			{
+				var s = Filename;
+				if (string.IsNullOrEmpty(s))
+					s = "in-memory XBNF document";
 				if (-1 != ErrorCode)
-					return string.Format("{0}: {1} code {2} at line {3}, column {4}, position {5}",
-						ErrorLevel, Message, ErrorCode, Line, Column, Position);
-				return string.Format("{0}: {1} at line {2}, column {3}, position {4}",
-						ErrorLevel, Message, Line, Column, Position);
+					return string.Format("{0}: {1} code {2} at line {3}, column {4}, position {5} in {6}",
+						ErrorLevel, Message, ErrorCode, Line, Column, Position, s);
+				return string.Format("{0}: {1} at line {2}, column {3}, position {4} in {5}",
+						ErrorLevel, Message, Line, Column, Position, s);
+
+
 			}
 		}
 		public XbnfMessage Clone()

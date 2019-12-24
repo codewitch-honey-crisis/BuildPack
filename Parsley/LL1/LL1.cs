@@ -371,8 +371,11 @@ namespace Parsley
 							found = true;
 					if (!found)
 					{
-						var r = cfg.FillNonTerminalRules(sym)[0];
-						result.Add(new CfgMessage(ErrorLevel.Warning, -1, string.Concat("Unreachable symbol \"", sym, "\""),r.Line,r.Column,r.Position, cfg.Filename));
+						if (cfg.IsNonTerminal(sym))
+						{
+							var r = cfg.FillNonTerminalRules(sym)[0];
+							result.Add(new CfgMessage(ErrorLevel.Warning, -1, string.Concat("Unreachable symbol \"", sym, "\""), r.Line, r.Column, r.Position, cfg.Filename));
+						}
 					}
 				}
 			}

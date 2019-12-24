@@ -3277,9 +3277,36 @@ public static CodeTypeMember ReadMemberFromUrl(string url)=>ParseMember(new UrlR
 /// <returns>A <see cref="CodeTypeMember"/> representing the parsed code</returns>
 public static CodeTypeMember ParseMember(IEnumerable<char>input){using(var e=new ST(input).GetEnumerator()){var pc=new _PC(e);pc.EnsureStarted();var result
 =_ParseMember(pc);if(!pc.IsEnded)throw new SlangSyntaxException("Unrecognized remainder in member",pc.Current.Line,pc.Current.Column,pc.Current.Position);
-return result;}}static MemberAttributes _BuildMemberAttributes(ICollection<string>modifiers){var result=(MemberAttributes)0;foreach(var kw in modifiers)
-{switch(kw){case"protected":if(modifiers.Contains("internal"))result=(result&~MemberAttributes.AccessMask)|MemberAttributes.FamilyOrAssembly;else result
-=(result&~MemberAttributes.AccessMask)|MemberAttributes.Family;break;case"internal":if(modifiers.Contains("protected"))result=(result&~MemberAttributes.AccessMask)
+return result;}}/// <summary>
+/// Reads a <see cref="CodeTypeMemberCollection"/> from the specified <see cref="TextReader"/>
+/// </summary>
+/// <param name="reader">The reader to read from</param>
+/// <param name="typeName">The optional name of the declaring type of this member</param>
+/// <returns>A <see cref="CodeTypeMemberCollection"/> representing the parsed code</returns>
+public static CodeTypeMemberCollection ReadMembersFrom(TextReader reader,string typeName=null)=>ParseMembers(TextReaderEnumerable.FromReader(reader),typeName);
+/// <summary>
+/// Reads a <see cref="CodeTypeMemberCollection"/> from the specified file
+/// </summary>
+/// <param name="filename">The file to read</param>
+/// <param name="typeName">The optional name of the declaring type of this member</param>
+/// <returns>A <see cref="CodeTypeMemberCollection"/> representing the parsed code</returns>
+public static CodeTypeMemberCollection ReadMembersFrom(string filename,string typeName)=>ParseMembers(new FileReaderEnumerable(filename),typeName);/// <summary>
+/// Reads a <see cref="CodeTypeMemberCollection"/> from the specified URL
+/// </summary>
+/// <param name="url">The URL to read</param>
+/// <param name="typeName">The optional name of the declaring type of this member</param>
+/// <returns>A <see cref="CodeTypeMemberCollection"/> representing the parsed code</returns>
+public static CodeTypeMemberCollection ReadMembersFromUrl(string url,string typeName)=>ParseMembers(new UrlReaderEnumerable(url),typeName);/// <summary>
+/// Parses a <see cref="CodeTypeMemberCollection"/> from the specified input
+/// </summary>
+/// <param name="input">The input to parse</param>
+/// <param name="typeName">The optional name of the declaring type of this member</param>
+/// <returns>A <see cref="CodeTypeMemberCollection"/> representing the parsed code</returns>
+public static CodeTypeMemberCollection ParseMembers(IEnumerable<char>input,string typeName=null){using(var e=new ST(input).GetEnumerator()){var pc=new
+ _PC(e);pc.EnsureStarted();var result=_ParseMembers(pc,typeName);if(!pc.IsEnded)throw new SlangSyntaxException("Unrecognized remainder in member",pc.Current.Line,
+pc.Current.Column,pc.Current.Position);return result;}}static MemberAttributes _BuildMemberAttributes(ICollection<string>modifiers){var result=(MemberAttributes)0;
+foreach(var kw in modifiers){switch(kw){case"protected":if(modifiers.Contains("internal"))result=(result&~MemberAttributes.AccessMask)|MemberAttributes.FamilyOrAssembly;
+else result=(result&~MemberAttributes.AccessMask)|MemberAttributes.Family;break;case"internal":if(modifiers.Contains("protected"))result=(result&~MemberAttributes.AccessMask)
 |MemberAttributes.FamilyOrAssembly;else result=(result&~MemberAttributes.AccessMask)|MemberAttributes.FamilyAndAssembly;break;case"const":result=(result
 &~MemberAttributes.ScopeMask)|MemberAttributes.Const;break;case"new":result=(result&~MemberAttributes.VTableMask)|MemberAttributes.New;break;case"override":
 result=(result&~MemberAttributes.ScopeMask)|MemberAttributes.Override;break;case"public":if(modifiers.Contains("virtual"))result=(result&~MemberAttributes.AccessMask)
@@ -3303,19 +3330,21 @@ string>(ptr,s);} var idx=ptr.BaseType.LastIndexOfAny(new char[]{'.','+'});if(0>i
 _Error("Missing member name on private member declaration",pc.Current);return new KeyValuePair<CodeTypeReference,string>(null,ptr.BaseType);}else{pc.Advance();
 _SkipComments(pc);if(ST.keyword==pc.SymbolId&&"this"==pc.Value){pc.Advance();return new KeyValuePair<CodeTypeReference,string>(ptr,"this");}_Error("Illegal private member implementation type.",
 pc.Current);}}name=ptr.BaseType.Substring(idx+1);ptr.BaseType=ptr.BaseType.Substring(0,idx);_ParseTypeRef(pc,false); return new KeyValuePair<CodeTypeReference,
-string>(ptr,name);}var n=pc.Value;pc.Advance();return new KeyValuePair<CodeTypeReference,string>(null,n);}static CodeTypeMember _ParseMember(_PC pc,string
- typeName=null){var comments=new CodeCommentStatementCollection();var dirs=_ParseDirectives(pc);while(ST.lineComment==pc.SymbolId||ST.blockComment==pc.SymbolId)
-{comments.Add(_ParseCommentStatement(pc));}dirs.AddRange(_ParseDirectives(pc));IList<KeyValuePair<string,CodeAttributeDeclaration>>customAttrs=null;if
-(ST.lbracket==pc.SymbolId)customAttrs=_ParseCustomAttributes(pc);var attrs=_ParseMemberAttributes(pc);var isEvent=false;if(ST.keyword==pc.SymbolId&&("partial"==pc.Value
-||"class"==pc.Value||"struct"==pc.Value||"enum"==pc.Value)){var ctd=_ParseType(pc,true);for(var i=comments.Count-1;0<=i;--i)ctd.Comments.Insert(0,comments[i]);
-_AddStartDirs(ctd,dirs);return ctd;}if(ST.keyword==pc.SymbolId&&pc.Value=="event"){pc.Advance();_SkipComments(pc);isEvent=true;}else{var pc2=pc.GetLookAhead();
-pc2.EnsureStarted();pc2.Advance();_SkipComments(pc2); if(ST.identifier==pc.SymbolId&&(string.IsNullOrEmpty(typeName)||typeName==pc.Value)&&ST.lparen==pc2.SymbolId)
-{if(attrs.Contains("abstract"))_Error("Constructors cannot be abstract",pc.Current);if(attrs.Contains("const"))_Error("Constructors cannot be const",pc.Current);
- var ctorName=pc.Value;pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);if(ST.lparen!=pc.SymbolId)_Error("Expecting ( in constructor declaration",
-pc.Current);pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);var parms=_ParseParamDecls(pc,ST.rparen,false);
-CodeTypeMember mctor=null;_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);if(!attrs.Contains("static")){var ctor=new CodeConstructor();
-mctor=ctor;ctor.Name=ctorName;ctor.Attributes=_BuildMemberAttributes(attrs);_AddStartDirs(ctor,dirs);_AddCustomAttributes(customAttrs,null,ctor.CustomAttributes);
-ctor.Parameters.AddRange(parms);if(ST.colon==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor - expecting chained or base constructor args",
+string>(ptr,name);}var n=pc.Value;pc.Advance();return new KeyValuePair<CodeTypeReference,string>(null,n);}static CodeTypeMemberCollection _ParseMembers(_PC
+ pc,string typeName=null){var result=new CodeTypeMemberCollection();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId)result.Add(_ParseMember(pc,typeName));return
+ result;}static CodeTypeMember _ParseMember(_PC pc,string typeName=null){var comments=new CodeCommentStatementCollection();var dirs=_ParseDirectives(pc);
+while(ST.lineComment==pc.SymbolId||ST.blockComment==pc.SymbolId){comments.Add(_ParseCommentStatement(pc));}dirs.AddRange(_ParseDirectives(pc));IList<KeyValuePair<string,
+CodeAttributeDeclaration>>customAttrs=null;if(ST.lbracket==pc.SymbolId)customAttrs=_ParseCustomAttributes(pc);var attrs=_ParseMemberAttributes(pc);var
+ isEvent=false;if(ST.keyword==pc.SymbolId&&("partial"==pc.Value||"class"==pc.Value||"struct"==pc.Value||"enum"==pc.Value)){var ctd=_ParseType(pc,true);
+for(var i=comments.Count-1;0<=i;--i)ctd.Comments.Insert(0,comments[i]);_AddStartDirs(ctd,dirs);return ctd;}if(ST.keyword==pc.SymbolId&&pc.Value=="event")
+{pc.Advance();_SkipComments(pc);isEvent=true;}else{var pc2=pc.GetLookAhead();pc2.EnsureStarted();pc2.Advance();_SkipComments(pc2); if(ST.identifier==pc.SymbolId
+&&(string.IsNullOrEmpty(typeName)||typeName==pc.Value)&&ST.lparen==pc2.SymbolId){if(attrs.Contains("abstract"))_Error("Constructors cannot be abstract",
+pc.Current);if(attrs.Contains("const"))_Error("Constructors cannot be const",pc.Current); var ctorName=pc.Value;pc.Advance();_SkipComments(pc);if(pc.IsEnded)
+_Error("Unterminated constructor",pc.Current);if(ST.lparen!=pc.SymbolId)_Error("Expecting ( in constructor declaration",pc.Current);pc.Advance();_SkipComments(pc);
+if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);var parms=_ParseParamDecls(pc,ST.rparen,false);CodeTypeMember mctor=null;_SkipComments(pc);
+if(pc.IsEnded)_Error("Unterminated constructor",pc.Current);if(!attrs.Contains("static")){var ctor=new CodeConstructor();mctor=ctor;ctor.Name=ctorName;
+ctor.Attributes=_BuildMemberAttributes(attrs);_AddStartDirs(ctor,dirs);_AddCustomAttributes(customAttrs,null,ctor.CustomAttributes);ctor.Parameters.AddRange(parms);
+if(ST.colon==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor - expecting chained or base constructor args",
 pc.Current);if(ST.keyword==pc.SymbolId){switch(pc.Value){case"base":pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor - expecting base constructor args",
 pc.Current);if(ST.lparen!=pc.SymbolId)_Error("Expecting ( in base constructor args",pc.Current); if(pc.IsEnded)_Error("Unterminated constructor - expecting base constructor args",
 pc.Current);ctor.BaseConstructorArgs.AddRange(_ParseArguments(pc,ST.rparen,false));break;case"this":pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated constructor - expecting chained constructor args",

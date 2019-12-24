@@ -43,7 +43,8 @@ namespace Parsley
 		public XbnfAttributeList Attributes { get; } = new XbnfAttributeList();
 		public string Name { get; set; } = null;
 		public XbnfExpression Expression { get; set; } = null;
-		public string Code { get; set; } = null;
+		public XbnfCode Action { get; set; } = null;
+		public XbnfCode Where { get; set; } = null;
 		public XbnfProduction Clone()
 		{
 			var result = new XbnfProduction();
@@ -52,7 +53,7 @@ namespace Parsley
 				result.Attributes.Add(Attributes[i].Clone());
 			if(null!=Expression)
 				result.Expression = Expression.Clone();
-			result.Code = Code;
+			result.Action = Action;
 			return result;
 		}
 		object ICloneable.Clone()
@@ -92,10 +93,16 @@ namespace Parsley
 				sb.Append("= ");
 				sb.Append(Expression);
 			}
-			if (null != Code && ("pc"==fmt || string.IsNullOrEmpty(fmt)))
+			if (null != Action && ("pc"==fmt || string.IsNullOrEmpty(fmt)))
 			{
 				sb.Append(" => {");
-				sb.Append(Code);
+				sb.Append(Action);
+				sb.Append("}");
+			}
+			if (null != Where && ("pc" == fmt || string.IsNullOrEmpty(fmt)))
+			{
+				sb.Append(" : where {");
+				sb.Append(Where);
 				sb.Append("}");
 			}
 			else if("p"!=fmt)
@@ -127,65 +134,66 @@ namespace Parsley
 				pc.Advance();
 			}
 			pc.TrySkipCCommentsAndWhiteSpace();
-			pc.Expecting(';', '=');
+			// pc.Expecting(';', '='); // ';' is for supporting terminals with abstract definitions. 
+			pc.Expecting('=');
 			if ('='==pc.Current)
 			{
 				pc.Advance();
 				result.Expression = XbnfExpression.Parse(pc);
 			}
-			pc.Expecting(';','=');
+			pc.Expecting(';','=',':');
 			result.SetLocation(l, c, p);
 			if (';' == pc.Current)
 			{
 				pc.Advance();
 				return result;
 			}
-			pc.Advance();
-			pc.Expecting('>');
-			pc.Advance();
-			pc.TrySkipCCommentsAndWhiteSpace();
-			pc.Expecting('{');
-			pc.Advance();
-			var sb = new StringBuilder();
-			var i = 1;
-			var skipRead = false;
-			while(skipRead || -1!=pc.Advance())
+			if ('=' == pc.Current)
 			{
-				skipRead = false;
-				if ('{' == pc.Current)
-				{
-					sb.Append((char)pc.Current);
-					++i;
-				}
-				else if ('}' == pc.Current)
-				{
-					--i;
-					if (0 == i)
-						break;
-					sb.Append((char)pc.Current);
-				}
-				else if ('\"' == pc.Current)
-				{
-					pc.ClearCapture();
-					pc.TryReadCString();
-					sb.Append(pc.GetCapture());
-					skipRead = true;
-				} else
-					sb.Append((char)pc.Current);
-				pc.ClearCapture();
-				if (pc.TryReadCCommentsAndWhitespace())
-					skipRead = true;
-				sb.Append(pc.GetCapture());
-				
-			}
-			pc.Expecting('}');
-			pc.Advance();
-			pc.TrySkipCCommentsAndWhiteSpace();
-			if (';' == pc.Current)
 				pc.Advance();
-			result.Code = sb.ToString();
+				pc.Expecting('>');
+				pc.Advance();
+				pc.TrySkipCCommentsAndWhiteSpace();
+				pc.Expecting('{');
+				pc.Advance();
+				l = pc.Line;
+				c = pc.Column;
+				p = pc.Position;
+				var s = XbnfDocument.ReadCode(pc);
+				pc.Expecting('}');
+				pc.Advance();
+				result.Action = new XbnfCode(s);
+				result.SetLocation(l, c, p);
+			}
+			pc.TrySkipCCommentsAndWhiteSpace();
+			if(pc.Current == ':')
+			{
+				pc.Advance();
+				pc.TrySkipCCommentsAndWhiteSpace();
+				l = pc.Line;
+				c = pc.Column;
+				p = pc.Position;
+				var ident = XbnfExpression.ParseIdentifier(pc);
+				if (0!=string.Compare("where", ident,StringComparison.InvariantCulture))
+					throw new ExpectingException(string.Format("Expecting \"where\" at line {0}, column {1}, position {2}", l, c, p));
+				pc.TrySkipCCommentsAndWhiteSpace();
+				pc.Expecting('{');
+				pc.Advance();
+				l = pc.Line;
+				c = pc.Column;
+				p = pc.Position;
+				var s = XbnfDocument.ReadCode(pc);
+				pc.Expecting('}');
+				pc.Advance();
+				result.Where = new XbnfCode(s);
+				result.Where.SetLocation(l, c, p);
+			}
+			
+			
 			return result;
 		}
+
+		
 		#region Value semantics
 		public bool Equals(XbnfProduction rhs)
 		{
@@ -193,7 +201,7 @@ namespace Parsley
 			if (ReferenceEquals(rhs, null)) return false;
 			if(Name == rhs.Name)
 			{
-				if (Code == rhs.Code)
+				if (Action == rhs.Action)
 				{
 					if (Expression == rhs.Expression)
 					{
@@ -217,8 +225,8 @@ namespace Parsley
 			
 			if (null != Name)
 				result ^=Name.GetHashCode();
-			if (null != Code)
-				result ^= Code.GetHashCode();
+			if (null != Action)
+				result ^= Action.GetHashCode();
 			if (null != Expression)
 				result ^= Expression.GetHashCode();
 
