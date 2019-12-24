@@ -7,18 +7,38 @@ namespace Parsley
 	{
 		private int _state;
 		private IEnumerator<object> _e;
+		private LookAheadEnumerator<object> _el;
 		private Token _t;
-		public ParserContext(IEnumerable<object> tokenizer)
+		private int _advanceCount;
+		public ParserContext(IEnumerable<object> tokenizer) : this(tokenizer.GetEnumerator(),true)
 		{
-			_e = tokenizer.GetEnumerator();
+			
+		}
+		private ParserContext(IEnumerator<object> enumerator,bool wrap)
+		{
+			_e = enumerator;
+			if (wrap)
+			{
+				_el = new LookAheadEnumerator<object>(enumerator);
+				_e = _el; // we need both pointers to point to the lookahead
+			}
 			_state = -1;
 			_t.SymbolId = -1;
+			_advanceCount = 0;
 		}
 		public void EnsureStarted()
 		{
 			if (-1 == _state)
 				Advance();
 		}
+		public ParserContext GetLookAhead()
+		{
+			if (null == _el)
+				throw new NotSupportedException("This parser context does not support lookahead.");
+			return new ParserContext(_el.LookAhead.GetEnumerator(), true);
+		}
+		public int AdvanceCount { get { return _advanceCount; } }
+		public void ResetAdvanceCount() { _advanceCount = 0; }
 		public int SymbolId { get { return _t.SymbolId; } }
 		public string Value { get { return _t.Value; } }
 		public int Line { get { return _t.Line; } }
@@ -34,6 +54,10 @@ namespace Parsley
 			}
 			else
 			{
+				// sanity check. should never happen
+				if (int.MaxValue == _advanceCount)
+					_advanceCount = -1;
+				++_advanceCount;
 				_state = 0;
 				_t = (Token)_e.Current;
 				return true;

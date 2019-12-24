@@ -39,15 +39,15 @@ namespace Parsley
 				{
 					if (null != f.Symbol)
 					{
-						CfgLL1ParseTableEntry re;
-						re.Rule = f.Rule;
+						CfgLL1ParseTableEntry re = new CfgLL1ParseTableEntry(new CfgRule[] { f.Rule });
 						CfgLL1ParseTableEntry or;
 						if (d.TryGetValue(f.Symbol, out or))
 						{
+							or.Rules.Add(f.Rule);
 							result.Add(new CfgMessage(ErrorLevel.Error, 1,
 										string.Format(
 											"first first conflict between {0} and {1} on {2}",
-											or.Rule,
+											or.Rules[0],
 											f.Rule,
 											f.Symbol), f.Rule.Line, f.Rule.Column, f.Rule.Position, cfg.Filename));
 						}
@@ -65,6 +65,7 @@ namespace Parsley
 							CfgLL1ParseTableEntry or;
 							if (d.TryGetValue(fe, out or))
 							{
+								or.Rules.Add(f.Rule);
 								// we can override conflict handling with the followsConflict
 								// attribute. If specified (first/last/error - error is default) it will choose
 								// the first or last rule respectively.
@@ -73,15 +74,17 @@ namespace Parsley
 									result.Add(new CfgMessage(ErrorLevel.Error, -1,
 										string.Format(
 											"first follows conflict between {0} and {1} on {2}",
-											or.Rule,
+											or.Rules[0],
 											f.Rule,
 											fe), f.Rule.Line, f.Rule.Column, f.Rule.Position, cfg.Filename));
 								else if ("last" == fc)
-									d[fe] = new CfgLL1ParseTableEntry(f.Rule);
+								{
+									d[fe] = new CfgLL1ParseTableEntry(new CfgRule[] { f.Rule });
+								}
 							}
 							else
 							{
-								d.Add(fe, new CfgLL1ParseTableEntry(f.Rule));
+								d.Add(fe, new CfgLL1ParseTableEntry(new CfgRule[] { f.Rule }));
 							}
 							if (null != progress)
 								progress.Report(new CfgLL1Progress(CfgLL1Status.CreatingParseTable, j));

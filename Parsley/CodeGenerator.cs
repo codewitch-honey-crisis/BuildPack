@@ -26,10 +26,20 @@ namespace Parsley
 			parseNode.CustomAttributes.Add(GeneratedCodeAttribute);
 			var syntaxException = Deslanged.SyntaxException.Namespaces[Deslanged.SyntaxException.Namespaces.Count - 1].Types[0];
 			syntaxException.CustomAttributes.Add(GeneratedCodeAttribute);
+			var laTypes = Deslanged.LookAheadEnumerator.Namespaces[Deslanged.LookAheadEnumerator.Namespaces.Count - 1].Types;
+			var lookAheadEnumerator = C.GetByName("LookAheadEnumerator",laTypes);
+			var lookAheadEnumeratorEnumerable = C.GetByName("LookAheadEnumeratorEnumerable", laTypes);
+			var lookAheadEnumeratorEnumerator = C.GetByName("LookAheadEnumeratorEnumerator", laTypes);
+			lookAheadEnumerator.CustomAttributes.Add(GeneratedCodeAttribute);
+			lookAheadEnumeratorEnumerable.CustomAttributes.Add(GeneratedCodeAttribute);
+			lookAheadEnumeratorEnumerator.CustomAttributes.Add(GeneratedCodeAttribute);
 			_FixParserContext(parserContext);
 			ns.Types.Add(syntaxException);
 			ns.Types.Add(parseNode);
 			ns.Types.Add(parserContext);
+			ns.Types.Add(lookAheadEnumerator);
+			ns.Types.Add(lookAheadEnumeratorEnumerable);
+			ns.Types.Add(lookAheadEnumeratorEnumerator);
 			var result = new CodeCompileUnit();
 			result.Namespaces.Add(ns);
 			V.Visit(result, (ctx) => {
@@ -102,7 +112,15 @@ namespace Parsley
 			}
 			var predict = cfg.FillPredict();
 			var follows = cfg.FillFollows();
-			_BuildParserParseFunctions(parser,doc,cfg,consts,predict,follows);
+
+			//var rmap1=_BuildRuleMap(cfg.ToLL1ParseTable(), "Leaf");
+			//var es = new HashSet<string>();
+			//var rmap2=_BuildRuleMap(follows, es, "Leaf", predict["Leaf"]);
+			//_BuildParserParseFunctions(parser,doc,cfg,consts,predict,follows);
+			CfgLL1ParseTable tbl = null;
+			// we don't care about conflicts here because we can backtrack:
+			cfg.TryToLL1ParseTable(out tbl);
+			_BuildParserParseFunctions(parser, doc, cfg,consts,tbl);
 			var hasEval = false;
 			for (int ic=doc.Productions.Count,i=0;i<ic;++i)
 			{
@@ -112,8 +130,14 @@ namespace Parsley
 					break;
 				}
 			}
-			if(hasEval)
-				_BuildParserEvalFunctions(parser, doc, cfg,consts, predict, follows);
+			//
+			// FOR TESTING:			
+			// hasEval = false;
+			//
+			//
+			
+			if (hasEval)
+				_BuildParserEvalFunctions(parser, doc, cfg,consts);
 			ns.Types.Add(parser);
 			V.Visit(result, (ctx) => {
 				var ctr = ctx.Target as CodeTypeReference;
@@ -157,217 +181,302 @@ namespace Parsley
 			}
 			return result;
 		}
-
 		static void _BuildParserParseFunctions(
 			CodeTypeDeclaration parser,
 			XbnfDocument doc,
 			CfgDocument cfg,
 			string[] consts,
-			IDictionary<string, ICollection<(CfgRule Rule, string Symbol)>> predict,
-			IDictionary<string,ICollection<string>> follows
+			CfgLL1ParseTable parseTable
 			)
+
 		{
-			
-			var syms = cfg.FillSymbols();
-			
 			var context = C.ArgRef("context");
-			var nts = cfg.FillNonTerminals();
-			for (int ic = nts.Count, i = 0; i < ic; ++i)
+			var syms = cfg.FillSymbols();
+			syms.Remove("#ERROR");
+			syms.Remove("#EOS");
+			foreach(var row in parseTable)
 			{
-				var es = new HashSet<string>();
-				var nt = nts[i];
-				var m = C.Method(C.Type("ParseNode"), string.Concat("_Parse", nt), MemberAttributes.Private | MemberAttributes.Static, C.Param("ParserContext", "context"));
-				m.Statements.Add(C.Var(typeof(int), "line", C.PropRef(C.ArgRef("context"), "Line")));
-				m.Statements.Add(C.Var(typeof(int), "column", C.PropRef(C.ArgRef("context"), "Column")));
-				m.Statements.Add(C.Var(typeof(long), "position", C.PropRef(C.ArgRef("context"), "Position")));
+				var nt = row.Key;
+				var rmap = _BuildRuleMap(parseTable, nt);
+				var parseNtImpl = C.Method(C.Type("ParseNode"), string.Concat("_Parse", nt), MemberAttributes.Private | MemberAttributes.Static, C.Param(C.Type("ParserContext"), "context"));
+				parser.Members.Add(parseNtImpl);
+				parseNtImpl.Statements.Add(C.Var(typeof(int), "line", C.PropRef(C.ArgRef("context"), "Line")));
+				parseNtImpl.Statements.Add(C.Var(typeof(int), "column", C.PropRef(C.ArgRef("context"), "Column")));
+				parseNtImpl.Statements.Add(C.Var(typeof(long), "position", C.PropRef(C.ArgRef("context"), "Position")));
 				var l = C.VarRef("line");
 				var c = C.VarRef("column");
 				var p = C.VarRef("position");
-				var pred = predict[nt];
-				Dictionary<CfgRule, ICollection<string>> rmap = _BuildRuleMap(follows, es, nt, pred);
-				foreach (var r in rmap)
-				{
-					var cnd = _BuildIfRuleExprsCnd(syms, consts, context, r);
-					if (null == cnd)
-						continue;
-					// _Parse{nt}()
-					var cs = C.If(cnd);
-					m.Statements.Add(cs);
-					cs.TrueStatements.Add(new CodeCommentStatement(r.Key.ToString()));
 
-					var collapsed = new HashSet<string>();
-					for (int jc = r.Key.Right.Count, j = 0; j < jc; ++j)
+				foreach (var kvp in rmap)
+				{
+					foreach (CodeCommentStatement comment in C.ToComments(kvp.Key))
+						parseNtImpl.Statements.Add(comment);
+					var rules = row.Value[kvp.Value.First()].Rules;
+					// simple, non backtracking case
+					#region Non-Backtracking
+					if (1 == rules.Count)
 					{
-						var o = cfg.GetAttribute(r.Key.Right[j], "collapsed");
-						if (o is bool && (bool)o)
-							collapsed.Add(r.Key.Right[j]);
+						var rule = rules[0];
+						//if ("Leaf" == rules[0].Left)
+						//	System.Diagnostics.Debugger.Break();
+						var stmts = new CodeStatementCollection();
+						_BuildParseRule(cfg, consts, context, syms, nt, stmts, l, c, p, kvp, rule, null);
+						parseNtImpl.Statements.AddRange(stmts);
 					}
-					if (0 == collapsed.Count)
-						cs.TrueStatements.Add(C.Var(C.Type("ParseNode", 1), "children", C.NewArr("ParseNode", r.Key.Right.Count)));
-					else {
-						var lt = C.Type(typeof(List<>));
-						lt.TypeArguments.Add(C.Type("ParseNode"));
-						cs.TrueStatements.Add(C.Var(lt, "children", C.New(lt)));
-					}
-					for (int jc = r.Key.Right.Count, j = 0; j < jc; ++j)
-					{
-						var s = r.Key.Right[j];
-						if (cfg.IsNonTerminal(s))
-						{
-							var pinv = C.Invoke(C.TypeRef("Parser"), string.Concat("_Parse", s), C.ArgRef("context"));
-							if (0 == collapsed.Count)
-								cs.TrueStatements.Add(C.Let(C.ArrIndexer(C.VarRef("children"), C.Literal(j)), pinv));
-							else
-							{
-								if(collapsed.Contains(s))
-								{
-									cs.TrueStatements.Add(C.Call(C.VarRef("children"), "AddRange", C.PropRef(pinv, "Children")));
-								} else
-									cs.TrueStatements.Add(C.Call(C.VarRef("children"), "Add", pinv));
-							}
-						}
-						else
-						{
-							var ts = s;
-							var subs = cfg.GetAttribute(s, "substitute") as string;
-							if (!string.IsNullOrEmpty(subs))
-							{
-								ts = subs;
-							}
-							var si = syms.IndexOf(ts);
-							var fr = C.FieldRef(C.TypeRef("Parser"), consts[si]);
-							var np = C.New(C.Type("ParseNode"), fr,C.Literal(ts), C.FieldRef(context, "Value"),l,c,p);
-							if(0==collapsed.Count)
-								cs.TrueStatements.Add(C.Let(C.ArrIndexer(C.VarRef("children"), C.Literal(j)), np));
-							else if(!collapsed.Contains(s))
-								cs.TrueStatements.Add(C.Call(C.VarRef("children"),"Add", np));
-							if (0 != j)
-							{
-								var ccs = C.If(C.Eq(fr, C.FieldRef(context, "SymbolId")));
-								cs.TrueStatements.Add(ccs);
-								cs.TrueStatements.Add(C.Call(context, "Error", C.Literal(string.Concat("Expecting ", s))));
-								cs = ccs;
-							}
-							cs.TrueStatements.Add(C.Call(context, "Advance"));
-							
-						}
-					}
-					var subst=cfg.GetAttribute(nt,"substitute") as string;
-					if(!string.IsNullOrEmpty(subst))
-					{
-						nt = subst;
-					}
-					var ffr = C.FieldRef(C.TypeRef("Parser"), consts[syms.IndexOf(nt)]);
-					if (0 == collapsed.Count)
-						cs.TrueStatements.Add(C.Return(C.New(C.Type("ParseNode"), ffr, C.Literal(nt), C.VarRef("children"), l, c, p)));
+					#endregion Non-Backtracking
+					#region Backtracking
 					else
-						cs.TrueStatements.Add(C.Return(C.New(C.Type("ParseNode"), ffr, C.Literal(nt), C.Invoke(C.VarRef("children"),"ToArray"),l,c,p)));
-					
-					var ppi = doc.Productions.IndexOf(nt);
-					if(-1<ppi)
 					{
-						var prod = doc.Productions[ppi];
-						//if (0 < prod.Line && !string.IsNullOrEmpty(doc.Filename))
-						//	m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
-					}
+						var vd = C.Var(C.Type("ParserContext"), "pc2");
+						// sort the conflicting rules by grammar priority.
+						/*rules.Sort((x,y) => {
+							return cfg.Rules.IndexOf(x) - cfg.Rules.IndexOf(y);
+						});*/
 
-				}
-
-				var cc = es.Count - 1;
-				var exp = new StringBuilder();
-				exp.Append("Expecting ");
-				// english sucks
-				if (1 == cc)
-				{
-					var delim = "";
-					foreach (var s in es)
-					{
-						exp.Append(delim);
-						exp.Append(s);
-						delim = " or ";
-					}
-				}
-				else if (0 < cc)
-				{
-					var delim = "";
-					foreach (var s in es)
-					{
-						exp.Append(delim);
-						if (0 == cc)
-							exp.Append("or ");
-						exp.Append(s);
-						delim = ", ";
-						--cc;
-					}
-				}
-				else if (0 == cc)
-					exp.Append(es.First());
-
-				m.Statements.Add(C.Call(context, "Error", C.Literal(exp.ToString())));
-				m.Statements.Add(C.Return(C.Null));
-				var pi = doc.Productions.IndexOf(nt);
-				if (!string.IsNullOrEmpty(doc.Filename))
-				{
-					if (-1 < pi)
-					{
-						var prod = doc.Productions[pi];
-						if (0 != prod.Line)
+						var cnd = C.If(_BuildIfRuleExprsCnd(syms, consts, context, kvp.Value));
+						cnd.TrueStatements.Add(vd);
+						var collapsed = new HashSet<string>();
+						var r = rules[0];
+						for (int jc = r.Right.Count, j = 0; j < jc; ++j)
 						{
-							//m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
+							var o = cfg.GetAttribute(r.Right[j], "collapsed");
+							if (o is bool && (bool)o)
+								collapsed.Add(r.Right[j]);
 						}
+						var vex = C.Var(typeof(Exception), "lastExcept", C.Null);
+						cnd.TrueStatements.Add(vex);
+						// evaluate the rules in order, excepting the 
+						// empty rule (epsilon) which we always process 
+						// last
+						var hasEmpty = false;
+						CfgRule lastRule = null;
+						foreach (var rule in rules)
+						{
+							if (0 == rule.Right.Count)
+							{
+								lastRule = rule;
+								hasEmpty = true;
+								continue;
+							}
+							cnd.TrueStatements.Add(C.Let(C.VarRef("pc2"), C.Invoke(context, "GetLookAhead")));
+							cnd.TrueStatements.Add(C.Invoke(C.VarRef("pc2"), "EnsureStarted"));
+							var stmts = new CodeStatementCollection();
+							_BuildParseRule(cfg, consts, C.VarRef("pc2"), syms, nt, stmts, l, c, p, kvp, rule, context);
+							// we use except. handing to process our alternatives so we don't 
+							// need to double the code size
+							var tcf = new CodeTryCatchFinallyStatement();
+							cnd.TrueStatements.Add(new CodeCommentStatement(rule.ToString()));
+							cnd.TrueStatements.Add(tcf);
+							var cc = new CodeCatchClause("ex", C.Type("SyntaxException"));
+							cc.Statements.Add(C.If(C.IdentEq(C.VarRef(vex.Name), C.Null),
+								C.Let(C.VarRef(vex.Name), C.VarRef("ex")))
+								);
+							tcf.CatchClauses.Add(cc);
+							tcf.TryStatements.AddRange(stmts);
+							var exps = new StringBuilder();
+							_BuildErrorList(new List<string>(kvp.Value),exps);
+							tcf.TryStatements.Add(C.Call(context, "Error", C.Literal(string.Concat("Expecting ", exps.ToString()))));
+							tcf.FinallyStatements.Add(new CodeSnippetStatement()); // have to make sure it renders
+						}
+						if (hasEmpty)
+						{
+							var stmts = new CodeStatementCollection();
+							_BuildParseRule(cfg, consts, context, syms, nt, stmts, l, c, p, kvp, lastRule, null);
+							cnd.TrueStatements.AddRange(stmts);
+						}
+						cnd.TrueStatements.Add(C.Throw(C.VarRef(vex.Name)));
+						parseNtImpl.Statements.Add(cnd);
 					}
+					#endregion Backtracking
 				}
-				parser.Members.Add(m);
-			}
-			var rs = new StringBuilder();
+				StringBuilder exp = new StringBuilder();
+				_BuildErrorList(row,exp);
+				parseNtImpl.Statements.Add(C.Call(context, "Error", C.Literal(string.Concat("Expecting ", exp.ToString()))));
+				parseNtImpl.Statements.Add(C.Return(C.Null));
 
-			for (int ic = doc.Productions.Count,i=0;i<ic;++i)
-			{
-				var prod = doc.Productions[i];
-				if (!prod.IsTerminal && !prod.IsCollapsed)
+				var pi = doc.Productions.IndexOf(nt);
+				XbnfProduction prod = null;
+				if (-1 < pi)
+					prod = doc.Productions[pi];
+				if (null != prod && !prod.IsCollapsed)
 				{
-					var s = prod.Name;
-					var t = new CodeTypeReference(typeof(IEnumerable<>));
-					t.TypeArguments.Add(C.Type("Token"));
-					var m = C.Method(C.Type("ParseNode"), string.Concat("Parse", s), MemberAttributes.Static | MemberAttributes.Public, C.Param(t, "tokenizer"));
-					m.Statements.Add(C.Var(C.Type("ParserContext"), "context", C.New(C.Type("ParserContext"), C.ArgRef("tokenizer"))));
-					m.Statements.Add(C.Call(C.VarRef("context"), "EnsureStarted"));
-					m.Statements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), string.Concat("_Parse", s), C.VarRef("context"))));
-					//if (!string.IsNullOrEmpty(doc.Filename) && 0 != prod.Line)
-					//	m.LinePragma = new CodeLinePragma(doc.Filename, prod.Line);
-					rs.Clear();
+					var stmts = new CodeStatementCollection();
+					stmts.Add(C.Var(C.Type("ParserContext"), "context", C.New(C.Type("ParserContext"), C.ArgRef("tokenizer"))));
+					stmts.Add(C.Call(C.VarRef("context"), "EnsureStarted"));
+					stmts.Add(C.Return(C.Invoke(C.TypeRef("Parser"), parseNtImpl.Name, C.VarRef("context"))));
+					var ctr = C.Type(typeof(IEnumerable<>));
+					ctr.TypeArguments.Add(C.Type("Token"));
+					var parseNt = C.Method(parseNtImpl.ReturnType, parseNtImpl.Name.Substring(1), MemberAttributes.Public | MemberAttributes.Static, C.Param(ctr, "tokenizer"));
+					var rs = new StringBuilder();
 					foreach (var r in cfg.FillNonTerminalRules(prod.Name))
 						rs.AppendLine(r.ToString());
-					m.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nParses a production of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"tokenizer\">The tokenizer to parse with</param><returns>A <see cref=\"ParseNode\" /> representing the parsed tokens</returns>",prod.ToString("p").TrimEnd(),rs.ToString().TrimEnd()),true));
-					parser.Members.Add(m);
+					parseNt.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nParses a production of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"tokenizer\">The tokenizer to parse with</param><returns>A <see cref=\"ParseNode\" /> representing the parsed tokens</returns>", prod.ToString("p").TrimEnd(), rs.ToString().TrimEnd()), true));
+					parseNt.Statements.AddRange(stmts);
+					parser.Members.Add(parseNt);
+					if (0 == string.Compare(nt, cfg.StartSymbol, StringComparison.InvariantCulture))
+					{
+						var parse = C.Method(parseNt.ReturnType, "Parse", MemberAttributes.Public | MemberAttributes.Static, (CodeParameterDeclarationExpression[])parseNt.Parameters.ToArray(typeof(CodeParameterDeclarationExpression)));
+						parse.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nParses a production of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"tokenizer\">The tokenizer to parse with</param><returns>A <see cref=\"ParseNode\" /> representing the parsed tokens</returns>", prod.ToString("p").TrimEnd(), rs.ToString().TrimEnd()), true));
+						parse.Statements.AddRange(stmts);
+						parser.Members.Add(parse);
+					}
 				}
 			}
-			var pprod = doc.StartProduction;
-			var ss = pprod.Name;
-			var et = new CodeTypeReference(typeof(IEnumerable<>));
-			et.TypeArguments.Add(C.Type("Token"));
-			var sm = C.Method(C.Type("ParseNode"), "Parse", MemberAttributes.Static | MemberAttributes.Public, C.Param(et, "tokenizer"));
-			sm.Statements.Add(C.Var(C.Type("ParserContext"), "context", C.New(C.Type("ParserContext"), C.ArgRef("tokenizer"))));
-			sm.Statements.Add(C.Call(C.VarRef("context"), "EnsureStarted"));
-			sm.Statements.Add(C.Return(C.Invoke(C.TypeRef("Parser"), string.Concat("_Parse", ss), C.VarRef("context"))));
-			rs.Clear();
-			foreach (var r in cfg.FillNonTerminalRules(pprod.Name))
-				rs.AppendLine(r.ToString());
-			sm.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nParses a derivation of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"tokenizer\">The tokenizer to parse with</param><returns>A <see cref=\"ParseNode\" /> representing the parsed tokens</returns>", pprod.ToString("p").TrimEnd(), rs.ToString().TrimEnd()), true));
-
-			//if (!string.IsNullOrEmpty(doc.Filename) && 0 != pprod.Line)
-			//	sm.LinePragma = new CodeLinePragma(doc.Filename, pprod.Line);
-
-			parser.Members.Add(sm);
-
 		}
+		private static void _BuildErrorList(IList<string> terms, StringBuilder exp)
+		{
+			
+			exp.Append(terms[0]);
+			int ic = terms.Count;
+			if (2 < ic)
+			{
+				for (var i = 1; i < ic - 1; ++i)
+					exp.Append(string.Concat(", ", terms[i]));
+				exp.Append(",");
+			}
+			if (1 < ic)
+				exp.Append(string.Concat(" or ", terms[ic - 1]));
+		}
+		private static void _BuildErrorList(KeyValuePair<string, IDictionary<string, CfgLL1ParseTableEntry>> row, StringBuilder exp)
+		{
+			var terms = new List<string>();
+			foreach (var col in row.Value)
+				if (null != col.Value.Rules && 0 < col.Value.Rules.Count)
+					terms.Add(col.Key);
+
+			exp.Append(terms[0]);
+			int ic = terms.Count;
+			if (2 < ic)
+			{
+				for (var i = 1; i < ic - 1; ++i)
+					exp.Append(string.Concat(", ", terms[i]));
+				exp.Append(",");
+			}
+			if (1 < ic)
+				exp.Append(string.Concat(" or ", terms[ic - 1]));
+		}
+
+		private static void _BuildParseRule(CfgDocument cfg, string[] consts, CodeExpression context, IList<string> syms, string nt, CodeStatementCollection stmts, CodeVariableReferenceExpression l, CodeVariableReferenceExpression c, CodeVariableReferenceExpression p, KeyValuePair<string, ICollection<string>> kvp, CfgRule rule,CodeExpression recover)
+		{
+			var cnd = C.If(_BuildIfRuleExprsCnd(syms, consts, context, kvp.Value));
+			var collapsed = new HashSet<string>();
+
+			for (int jc = rule.Right.Count, j = 0; j < jc; ++j)
+			{
+				var o = cfg.GetAttribute(rule.Right[j], "collapsed");
+				if (o is bool && (bool)o)
+					collapsed.Add(rule.Right[j]);
+			}
+			if (0 == collapsed.Count)
+				cnd.TrueStatements.Add(C.Var(C.Type("ParseNode", 1), "children", C.NewArr("ParseNode", rule.Right.Count)));
+			else
+			{
+				var lt = C.Type(typeof(List<>));
+				lt.TypeArguments.Add(C.Type("ParseNode"));
+				cnd.TrueStatements.Add(C.Var(lt, "children", C.New(lt)));
+			}
+
+			for (int jc = rule.Right.Count, j = 0; j < jc; ++j)
+			{
+				var s = rule.Right[j];
+				if (cfg.IsNonTerminal(s))
+				{
+					var pinv = C.Invoke(C.TypeRef("Parser"), string.Concat("_Parse", s), context);
+					if (0 == collapsed.Count)
+						cnd.TrueStatements.Add(C.Let(C.ArrIndexer(C.VarRef("children"), C.Literal(j)), pinv));
+					else
+					{
+						if (collapsed.Contains(s))
+						{
+							cnd.TrueStatements.Add(C.Call(C.VarRef("children"), "AddRange", C.PropRef(pinv, "Children")));
+						}
+						else
+							cnd.TrueStatements.Add(C.Call(C.VarRef("children"), "Add", pinv));
+					}
+				}
+				else // s is terminal
+				{
+					var cnd2 = cnd;
+					var ts = s;
+					var subs = cfg.GetAttribute(s, "substitute") as string;
+					if (!string.IsNullOrEmpty(subs))
+					{
+						ts = subs;
+					}
+					var si = syms.IndexOf(ts);
+					var fr = C.FieldRef(C.TypeRef("Parser"), consts[si]);
+					var np = C.New(C.Type("ParseNode"), fr, C.Literal(ts), C.FieldRef(context, "Value"), l, c, p);
+					if (0 != j)
+					{
+						var ccs = C.If(C.Eq(fr, C.FieldRef(context, "SymbolId")));
+						cnd2.TrueStatements.Add(ccs);
+						cnd2 = ccs;
+					}
+					if (!collapsed.Contains(ts))
+					{
+						if (0 == collapsed.Count)
+							cnd2.TrueStatements.Add(C.Let(C.ArrIndexer(C.VarRef("children"), C.Literal(j)), np));
+						else
+							cnd2.TrueStatements.Add(C.Call(C.VarRef("children"), "Add", np));
+					}
+					
+					cnd2.TrueStatements.Add(C.Call(context, "Advance"));
+
+				}
+			}
+			var subst = cfg.GetAttribute(nt, "substitute") as string;
+			if (!string.IsNullOrEmpty(subst))
+			{
+				nt = subst;
+			}
+			var ffr = C.FieldRef(C.TypeRef("Parser"), consts[syms.IndexOf(nt)]);
+			if(null!=recover)
+			{
+				cnd.TrueStatements.Add(C.Var(typeof(int), "adv", C.Zero));
+				cnd.TrueStatements.Add(C.While(C.Lt(C.VarRef("adv"), C.FieldRef(context, "AdvanceCount")),
+					C.Call(recover,"Advance"),
+					C.Let(C.VarRef("adv"),C.Add(C.VarRef("adv"),C.One))
+					));
+
+			}
+			if (0 == collapsed.Count)
+				cnd.TrueStatements.Add(C.Return(C.New(C.Type("ParseNode"), ffr, C.Literal(nt), C.VarRef("children"), l, c, p)));
+			else
+				cnd.TrueStatements.Add(C.Return(C.New(C.Type("ParseNode"), ffr, C.Literal(nt), C.Invoke(C.VarRef("children"), "ToArray"), l, c, p)));
+			stmts.Add(cnd);
+			
+		}
+
+		static IDictionary<string,ICollection<string>> _BuildRuleMap(CfgLL1ParseTable parseTable,string nt)
+		{
+			var result = new Dictionary<string, ICollection<string>>(StringComparer.InvariantCulture);
+			var row = parseTable[nt];
+			foreach(var col in row)
+			{
+				ICollection<string> terms;
+				var strs = new StringBuilder();
+				if (null != col.Value.Rules && 0 < col.Value.Rules.Count)
+				{
+					foreach (var r in col.Value.Rules)
+						strs.AppendLine(r.ToString());
+					if (!result.TryGetValue(strs.ToString(), out terms))
+					{
+						terms = new HashSet<string>();
+						result.Add(strs.ToString(), terms);
+					}
+
+					terms.Add(col.Key);
+				}
+			}
+
+			return result;
+		}
+		
 		static void _BuildParserEvalFunctions(
 			CodeTypeDeclaration parser,
 			XbnfDocument doc,
 			CfgDocument cfg,
-			string[] consts,
-			IDictionary<string, ICollection<(CfgRule Rule, string Symbol)>> predict,
-			IDictionary<string, ICollection<string>> follows
+			string[] consts
 			)
 		{
 			var hasChangeType = false;
@@ -634,7 +743,7 @@ namespace Parsley
 			
 			
 		}
-
+		
 		private static Dictionary<CfgRule, ICollection<string>> _BuildRuleMap(IDictionary<string, ICollection<string>> follows, HashSet<string> es, string nt, ICollection<(CfgRule Rule, string Symbol)> pred)
 		{
 			var rmap = new Dictionary<CfgRule, ICollection<string>>();
@@ -661,7 +770,29 @@ namespace Parsley
 
 			return rmap;
 		}
-
+		private static CodeExpression _BuildIfRuleExprsCnd(IList<string> syms, string[] consts, CodeExpression context, IEnumerable<string> cmps)
+		{
+			var exprs = new CodeExpressionCollection();
+			foreach (var s in cmps)
+			{
+				if (null !=s)
+				{
+					var si = syms.IndexOf(s);
+					
+					var fr = C.FieldRef(C.TypeRef("Parser"), (-1 < si) ? consts[si]:"EosSymbol");
+					exprs.Add(C.Eq(fr, C.PropRef(context, "SymbolId")));
+				}
+			}
+			switch (exprs.Count)
+			{
+				case 0:
+					return null;
+				case 1:
+					return exprs[0];
+				default:
+					return C.BinOp(exprs, CodeBinaryOperatorType.BooleanOr);
+			}
+		}
 		private static CodeExpression _BuildIfRuleExprsCnd(IList<string> syms, string[] consts, CodeExpression context, KeyValuePair<CfgRule, ICollection<string>> r)
 		{
 			var exprs = new CodeExpressionCollection();
@@ -696,7 +827,9 @@ namespace Parsley
 						if (0 == string.Compare("System.Collections.Generic.IEnumerable`1", ctr.BaseType, StringComparison.InvariantCulture) ||
 							(0 == string.Compare("IEnumerable`1", ctr.BaseType, StringComparison.InvariantCulture)) ||
 							(0 == string.Compare("System.Collections.IEnumerator`1", ctr.BaseType, StringComparison.InvariantCulture)) ||
-							(0 == string.Compare("IEnumerator`1", ctr.BaseType, StringComparison.InvariantCulture)))
+							(0 == string.Compare("IEnumerator`1", ctr.BaseType, StringComparison.InvariantCulture)) ||
+							(0==string.Compare("Parsley.LookAheadEnumerator`1",ctr.BaseType,StringComparison.InvariantCulture)) ||
+							(0 == string.Compare("LookAheadEnumerator`1", ctr.BaseType, StringComparison.InvariantCulture)))
 						{
 							if (0 == string.Compare("System.Object", ctr.TypeArguments[0].BaseType, StringComparison.InvariantCultureIgnoreCase))
 							{

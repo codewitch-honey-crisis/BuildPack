@@ -1,7 +1,7 @@
-﻿using System;
+﻿//#define NOPREPARELL1
+using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
@@ -210,6 +210,7 @@ namespace Parsley
 					var cfg = XbnfConvert.ToCfg(doc);
 					if (!isLexerOnly)
 					{
+#if !NOPREPARELL1
 						var msgs = cfg.TryPrepareLL1();
 						foreach (var msg in msgs)
 						{
@@ -217,7 +218,17 @@ namespace Parsley
 								Console.Error.WriteLine(msg);
 						}
 						CfgException.ThrowIfErrors(msgs);
-
+#else // if NOPREPARELL1
+						CfgDocument ocfg = null;
+						var i = 20;
+						while (0<i && ocfg != cfg)
+						{
+							ocfg = cfg.Clone();
+							cfg.EliminateLeftRecursion();
+							--i;
+						}
+						Console.Error.WriteLine(cfg.ToString());
+#endif // !NOPREPARELL1
 						var ccu = CodeGenerator.GenerateCompileUnit(doc, cfg, codeclass, codenamespace);
 						var ccuNS = ccu.Namespaces[ccu.Namespaces.Count - 1];
 						var ccuShared = CodeGenerator.GenerateSharedCompileUnit(codenamespace);
@@ -225,9 +236,15 @@ namespace Parsley
 						var parserContext = C.GetByName("ParserContext", sNS.Types);
 						var parseNode = C.GetByName("ParseNode", sNS.Types);
 						var syntaxException = C.GetByName("SyntaxException", sNS.Types);
+						var lookAheadEnumerator = C.GetByName("LookAheadEnumerator", sNS.Types);
+						var lookAheadEnumeratorEnumerable = C.GetByName("LookAheadEnumeratorEnumerable", sNS.Types);
+						var lookAheadEnumeratorEnumerator = C.GetByName("LookAheadEnumeratorEnumerator", sNS.Types);
 						ccuNS.Types.Add(syntaxException);
 						ccuNS.Types.Add(parseNode);
 						ccuNS.Types.Add(parserContext);
+						ccuNS.Types.Add(lookAheadEnumerator);
+						ccuNS.Types.Add(lookAheadEnumeratorEnumerable);
+						ccuNS.Types.Add(lookAheadEnumeratorEnumerator);
 						ccu.ReferencedAssemblies.Add(typeof(TypeConverter).Assembly.GetName().ToString());
 						CD.SlangPatcher.Patch(ccu, ccuShared);
 						var co = CD.SlangPatcher.GetNextUnresolvedElement(ccu);
@@ -242,6 +259,9 @@ namespace Parsley
 							ccuNS.Types.Remove(syntaxException);
 							ccuNS.Types.Remove(parseNode);
 							ccuNS.Types.Remove(parserContext);
+							ccuNS.Types.Remove(lookAheadEnumerator);
+							ccuNS.Types.Remove(lookAheadEnumeratorEnumerable);
+							ccuNS.Types.Remove(lookAheadEnumeratorEnumerator);
 						}
 						foreach (CodeNamespace ns in ccu.Namespaces)
 						{

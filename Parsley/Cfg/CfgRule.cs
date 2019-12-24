@@ -67,7 +67,7 @@ namespace Parsley
 			if (null != Left)
 				result ^= Left.GetHashCode();
 			result ^= CollectionUtility.GetHashCode(Right);
-			return result;
+			return result;// ToString().GetHashCode();
 		}
 		public static bool operator ==(CfgRule lhs, CfgRule rhs)
 		{

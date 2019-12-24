@@ -735,6 +735,166 @@ namespace Parsley
 		{
 			return Join(Split(collection, oldValue, equalityComparer), newValues);
 		}
+		public static void Sort<T>(this IList<T> list) where T:IComparable<T>
+		{
+			_Sort(list, 0, list.Count - 1);
+		}
+		public static void Sort<T>(this IList<T> list,IComparer<T> comparer=null)
+		{
+			if (null == comparer)
+				comparer = Comparer<T>.Default;
+			_Sort(list, 0, list.Count - 1,comparer);
+		}
+		public static void Sort<T>(this IList<T> list, Comparison<T> comparison)
+		{
+			_Sort(list, 0, list.Count - 1, comparison);
+		}
+		static void _Sort<T>(IList<T> arr, int left, int right) where T:IComparable<T>
+		{
+			if (left < right)
+			{
+				int pivot = _Partition(arr, left, right);
 
+				if (1 < pivot)
+				{
+					_Sort(arr, left, pivot - 1);
+				}
+				if (pivot + 1 < right)
+				{
+					_Sort(arr, pivot + 1, right);
+				}
+			}
+		}
+		static void _Sort<T>(IList<T> arr, int left, int right, Comparison<T> comparison)
+		{
+			if (left < right)
+			{
+				int pivot = _Partition(arr, left, right, comparison);
+
+				if (1 < pivot)
+				{
+					_Sort(arr, left, pivot - 1, comparison);
+				}
+				if (pivot + 1 < right)
+				{
+					_Sort(arr, pivot + 1, right, comparison);
+				}
+			}
+		}
+
+		static int _Partition<T>(IList<T> arr, int left, int right, Comparison<T> comparison)
+		{
+			T pivot = arr[left];
+			while (true)
+			{
+
+				while (0 > comparison(pivot, arr[left])) // arr[left] < pivot
+				{
+					left++;
+				}
+
+				while (0 > comparison(arr[right], pivot)) // arr[right] > pivot
+				{
+					right--;
+				}
+
+				if (left < right)
+				{
+					if (0 == comparison(arr[left], arr[right])) return right;
+
+					T swap = arr[left];
+					arr[left] = arr[right];
+					arr[right] = swap;
+
+
+				}
+				else
+				{
+					return right;
+				}
+			}
+		}
+		static void _Sort<T>(IList<T> arr, int left, int right,IComparer<T> comparer=null) 
+		{
+
+			if (left < right)
+			{
+				int pivot = _Partition(arr, left, right, comparer);
+
+				if (1 < pivot)
+				{
+					_Sort(arr, left, pivot - 1, comparer);
+				}
+				if (pivot + 1 < right)
+				{
+					_Sort(arr, pivot + 1, right, comparer);
+				}
+			}
+		}
+
+		static int _Partition<T>(IList<T> arr, int left, int right,IComparer<T> comparer) 
+		{
+			T pivot = arr[left];
+			while (true)
+			{
+
+				while (0> comparer.Compare(pivot,arr[left])) // arr[left] < pivot
+				{
+					left++;
+				}
+
+				while (0>comparer.Compare(arr[right],pivot)) // arr[right] > pivot
+				{
+					right--;
+				}
+
+				if (left < right)
+				{
+					if (0==comparer.Compare(arr[left],arr[right])) return right;
+
+					T swap = arr[left];
+					arr[left] = arr[right];
+					arr[right] = swap;
+
+
+				}
+				else
+				{
+					return right;
+				}
+			}
+		}
+		static int _Partition<T>(IList<T> arr, int left, int right) where T:IComparable<T>
+		{
+			T pivot = arr[left];
+			while (true)
+			{
+
+				while (0 > pivot.CompareTo(arr[left])) // arr[left] < pivot
+				{
+					left++;
+				}
+
+				while (0 > arr[right].CompareTo(pivot)) // arr[right] > pivot
+				{
+					right--;
+				}
+
+				if (left < right)
+				{
+					if (0 == arr[left].CompareTo(arr[right])) return right;
+
+					T swap = arr[left];
+					arr[left] = arr[right];
+					arr[right] = swap;
+
+
+				}
+				else
+				{
+					return right;
+				}
+			}
+		}
 	}
 }

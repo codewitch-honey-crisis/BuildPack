@@ -11,7 +11,6 @@ namespace scratch
 	{
 		static void Main(string[] args)
 		{
-			var @namespace = "test";
 			#region fetch consts
 			var consts = new Dictionary<int, string>();
 			foreach (var f in typeof(SlangTokenizer).GetFields(BindingFlags.Public | BindingFlags.Static))

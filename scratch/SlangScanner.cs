@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  DESKTOP-U8QJ4Q2
-//  DateTime: 12/22/2019 7:22:47 PM
+//  DateTime: 12/24/2019 12:10:29 AM
 //  UserName: gazto
-//  GPLEX input file <C:\dev\BuildPack\scratch\Slang.lex - 12/22/2019 7:22:47 PM>
+//  GPLEX input file <C:\dev\BuildPack\scratch\Slang.lex - 12/24/2019 12:10:28 AM>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: unicode, verbose, noParser, stack, minimize

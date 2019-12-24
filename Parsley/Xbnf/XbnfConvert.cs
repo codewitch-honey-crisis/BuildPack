@@ -791,7 +791,7 @@ namespace Parsley
 			var expr =
 				new XbnfOrExpression(
 					new XbnfConcatExpression(
-						new XbnfRefExpression(listId), re.Expression), re.Expression);
+						new XbnfRefExpression(listId), re.Expression), re.Expression); ;
 			foreach (var nt in _GetDysjunctions(d, syms, tmap, attrs, rules, p, expr))
 			{
 				var l = new List<string>();

@@ -6,10 +6,11 @@ namespace Parsley
 {
 	public struct CfgLL1ParseTableEntry
 	{
-		public CfgRule Rule;
-		public CfgLL1ParseTableEntry(CfgRule rule)
+		public IList<CfgRule> Rules { get; } 
+		public CfgLL1ParseTableEntry(IEnumerable<CfgRule> rules)
 		{
-			Rule = rule;
+			Rules = new List<CfgRule>();
+			Rules.AddRange(rules);
 		}
 	}
 	public class CfgLL1ParseTable : Dictionary<string, IDictionary<string, CfgLL1ParseTableEntry>>
@@ -52,7 +53,7 @@ namespace Parsley
 						IDictionary<string, CfgLL1ParseTableEntry> d;
 						if (TryGetValue(nt, out d) && d.TryGetValue(t, out lr))
 						{
-							var r = lr.Rule;
+							var r = lr.Rules[0];
 							sb.Append(_MakeSafeCsv(r.Left));
 							sb.Append(" ->");
 							foreach (var sym in r.Right)
@@ -99,9 +100,9 @@ namespace Parsley
 					var tid = stbl.IndexOf(rr.Key);
 					if (0 > tid) throw new ArgumentException(string.Concat("Terminal \"", rr.Key, "\" not present in the symbol table"), "symbolTable");
 					tid -= Count;
-					result[ntid][tid] = new int[rr.Value.Rule.Right.Count];
+					result[ntid][tid] = new int[rr.Value.Rules[0].Right.Count];
 					var i = 0;
-					foreach (var sym in rr.Value.Rule.Right)
+					foreach (var sym in rr.Value.Rules[0].Right)
 					{
 						var sid = stbl.IndexOf(sym);
 						if (0 > sid) throw new ArgumentException(string.Concat("Symbol \"", sym, "\" not present in the symbol table"), "symbolTable");

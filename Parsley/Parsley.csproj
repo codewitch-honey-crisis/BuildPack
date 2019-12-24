@@ -56,7 +56,7 @@
     <Compile Include="Common\IMessage.cs" />
     <Compile Include="Collections\ListDictionary.cs" />
     <Content Include="Export\ParseNode.cs" />
-    <Content Include="Export\ParserContext.cs" />
+    <None Include="Export\ParserContext.cs" />
     <Content Include="Export\SyntaxException.cs" />
     <Content Include="Export\Token.cs" />
     <Compile Include="DeslangedExport.cs" />
@@ -68,6 +68,7 @@
     <Compile Include="LL1\CfgLL1Progress.cs" />
     <Compile Include="LL1\LL1.cs" />
     <Compile Include="Collections\OrderedCollectionEqualityComparer.cs" />
+    <Compile Include="Export\LookAheadEnumerator.cs" />
     <Compile Include="ParseContext\ParseContext.BaseExtensions.cs" />
     <Compile Include="ParseContext\ParseContext.cs" />
     <Compile Include="ParseContext\ParseContext.Json.cs" />
@@ -115,7 +116,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(SolutionDir)CSBrick\bin\Release\csbrick.exe" "$(SolutionDir)CodeDomGoKit\CodeDomGoKit.csproj" /output "$(ProjectDir)CodeDomGoKit\CodeDomGoKit.brick.cs"
-"$(SolutionDir)Deslang\bin\Release\deslang.exe" "$(ProjectDir)Export\Parser.cs" "$(ProjectDir)Export\Token.cs" "$(ProjectDir)Export\ParserContext.cs" "$(ProjectDir)Export\ParseNode.cs" "$(ProjectDir)Export\SyntaxException.cs" /output "$(ProjectDir)DeslangedExport.cs" /ifstale
+"$(SolutionDir)Deslang\bin\Release\deslang.exe" "$(ProjectDir)Export\Parser.cs" "$(ProjectDir)Export\Token.cs" "$(ProjectDir)Export\ParserContext.cs" "$(ProjectDir)Export\ParseNode.cs" "$(ProjectDir)Export\SyntaxException.cs" "$(ProjectDir)Export\LookAheadEnumerator.cs" /output "$(ProjectDir)DeslangedExport.cs" /ifstale
 </PreBuildEvent>
   </PropertyGroup>
 </Project>
