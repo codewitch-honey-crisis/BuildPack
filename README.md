@@ -59,3 +59,23 @@ See the **DeslangDemo** project for a simple, contrived example, and **Rolex** f
 ## CSBrick
 
 CSBrick takes a C# Visual Studio Project, gathering all compilable source files in the project (except AssemblyInfo.cs) and merges them all into one minified C# source file. The reason for this is as a workaround for lack of out of the box static linking in .NET. Basically, you can include this merged source file instead of referencing the project it came from so you can create a project without 3rd party dependencies on other non-system assemblies. This is important for build tools since nobody wants to drag DLL's around with their exe that performs a pre-build step. So use this to make your build tools when you must reference an external library (like **CodeDOM Go Kit**). For a simple example, just run **CSBrick** and watch it spit out the **scratch** project to the console, minified. For a real world example, **Deslang** uses it to include **CodeDomGoKit** and **Rolex** uses it to include **Regex**
+
+## Gplex
+
+### Gplex is not my software.
+
+I've included it for completeness since my projects use it and because the one on GitHub I could find will not build without the binaries which are hard to find.
+
+
+Gardens Point LEX Copyright
+
+Copyright © 2006-2011 Queensland University of Technology (QUT). All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification are permitted provided that the following conditions are met:
+
+1.	Redistribution of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+2.	Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE GPLEX PROJECT “AS IS’ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL THE GPPG PROJECT OR QUT BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+The views and conclusions contained in the software and documentation are those of the authors and should not be interpreted as representing official policies, either expressed or implied, of the GPLEX project or QUT.
