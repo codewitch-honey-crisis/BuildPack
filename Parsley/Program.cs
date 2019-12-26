@@ -248,7 +248,7 @@ namespace Parsley
 							Console.Error.WriteLine(cfg.ToString());
 						}
 						CfgException.ThrowIfErrors(msgs);
-						var ccu = CodeGenerator.GenerateCompileUnit(doc, cfg, codeclass, codenamespace);
+						var ccu = CodeGenerator.GenerateCompileUnit(doc, cfg, codeclass, codenamespace,fast);
 						var ccuNS = ccu.Namespaces[ccu.Namespaces.Count - 1];
 						var ccuShared = CodeGenerator.GenerateSharedCompileUnit(codenamespace);
 						var sNS = ccuShared.Namespaces[ccuShared.Namespaces.Count - 1];
@@ -273,7 +273,7 @@ namespace Parsley
 								var vd = ctx.Target as CodeVariableDeclarationStatement;
 								if (null != vd && CD.CodeDomResolver.IsNullOrVoidType(vd.Type))
 									vd.Type = C.Type("var");
-							});
+							},CD.CodeDomVisitTargets.All & ~(CD.CodeDomVisitTargets.Expressions | CD.CodeDomVisitTargets.Comments | CD.CodeDomVisitTargets.Attributes | CD.CodeDomVisitTargets.Directives | CD.CodeDomVisitTargets.Types|CD.CodeDomVisitTargets.TypeRefs));
 						}
 						else
 						{

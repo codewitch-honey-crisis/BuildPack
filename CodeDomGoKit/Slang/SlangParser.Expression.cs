@@ -531,6 +531,7 @@ namespace CD
 						case "float":
 						case "double":
 						case "decimal":
+						case "object":
 							e = new CodeTypeReferenceExpression(_TranslateIntrinsicType(pc.Value,pc));
 							pc.Advance();
 							break;

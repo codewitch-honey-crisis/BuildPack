@@ -819,8 +819,8 @@ BindingFlags.Instance|BindingFlags.Static|BindingFlags.Public|BindingFlags.NonPu
 /// </summary>
 /// <param name="type">The type to evaluate</param>
 /// <returns>True if the type is null or void, otherwise false</returns>
-public static bool IsNullOrVoidType(CodeTypeReference type){return null==type||(0==type.ArrayRank&&0==string.Compare("System.Void",type.BaseType,StringComparison.InvariantCulture));
-}/// <summary>
+public static bool IsNullOrVoidType(CodeTypeReference type){ return null==type||(0==type.ArrayRank&&0==string.Compare("System.Void",type.BaseType,StringComparison.InvariantCulture)
+||(0==type.ArrayRank&&0==string.Compare("var",type.BaseType,StringComparison.InvariantCulture)));}/// <summary>
 /// Indicates whether the specified type is a value type
 /// </summary>
 /// <param name="type">The type</param>
@@ -3189,8 +3189,8 @@ break;case"new":if(!pc.Advance())_Error("Unterminated new expression.",pc.Curren
 pc.Current);switch(pc.SymbolId){case ST.lparen:var exprs=_ParseArguments(pc,ST.rparen,false);var ce=new CodeObjectCreateExpression(ctr);ce.Parameters.AddRange(exprs);
 e=ce; e.UserData.Add("slang:unresolved",true);break;case ST.lbracket: e=_ParseArrayCreatePart(ctr,pc);break;default:_Error(string.Format("Unrecognized token {0} in new expression",
 pc.Value),pc.Current);break;}break;case"bool":case"char":case"string":case"byte":case"sbyte":case"short":case"ushort":case"int":case"uint":case"long":
-case"ulong":case"float":case"double":case"decimal":e=new CodeTypeReferenceExpression(_TranslateIntrinsicType(pc.Value,pc));pc.Advance();break;default:
-_Error(string.Format("Unexpected keyword {0} found in expression",pc.Value),pc.Current);break;}break;case ST.identifier:e=new CodeVariableReferenceExpression(pc.Value);
+case"ulong":case"float":case"double":case"decimal":case"object":e=new CodeTypeReferenceExpression(_TranslateIntrinsicType(pc.Value,pc));pc.Advance();break;
+default:_Error(string.Format("Unexpected keyword {0} found in expression",pc.Value),pc.Current);break;}break;case ST.identifier:e=new CodeVariableReferenceExpression(pc.Value);
 e.UserData.Add("slang:unresolved",true);pc.Advance();_SkipComments(pc); break;}if(null==e)_Error(string.Format("Unexpected token {0} in input",pc.Value),
 pc.Current);return e;}static CodeArrayCreateExpression _ParseArrayCreatePart(CodeTypeReference type,_PC pc){ var result=new CodeArrayCreateExpression();
 var mods=new List<int>();var arrType=type;_SkipComments(pc);if(!pc.Advance())_Error("Unterminated array create expression",pc.Current);_SkipComments(pc);
@@ -3575,9 +3575,11 @@ if(ST.dec==pc.SymbolId)throw new NotSupportedException("Postfix decrement is not
 ctr)result.UserData.Add("slang:unresolved",true);pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated variable declaration statement",pc.Current);
 if(ST.eq==pc.SymbolId){pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated variable declaration initializer",pc.Current);result.InitExpression
 =_ParseExpression(pc);_SkipComments(pc);if(ST.semi!=pc.SymbolId)_Error("Invalid expression in variable declaration initializer",pc.Current);pc.Advance();
-return result;}else if(null==ctr)_Error("Var variable declarations must have an initializer",pc.Current);_SkipComments(pc);if(ST.semi!=pc.SymbolId)_Error("Invalid expression in variable declaration initializer",
-pc.Current);pc.Advance();return result;}static CodeMethodReturnStatement _ParseReturnStatement(_PC pc){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated return statement",
-pc.Current);if(ST.semi==pc.SymbolId){pc.Advance();return new CodeMethodReturnStatement();}var e=_ParseExpression(pc);_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated return statement",
+if(null==result.Type||0==result.Type.ArrayRank&&0==string.Compare(result.Type.BaseType,"System.Void",StringComparison.InvariantCulture))result.Type=new
+ CodeTypeReference("var"); return result;}else if(null==ctr)_Error("Var variable declarations must have an initializer",pc.Current);_SkipComments(pc);
+if(ST.semi!=pc.SymbolId)_Error("Invalid expression in variable declaration initializer",pc.Current);pc.Advance();return result;}static CodeMethodReturnStatement
+ _ParseReturnStatement(_PC pc){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated return statement",pc.Current);if(ST.semi==pc.SymbolId)
+{pc.Advance();return new CodeMethodReturnStatement();}var e=_ParseExpression(pc);_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated return statement",
 pc.Current);if(ST.semi!=pc.SymbolId)_Error("Invalid expression in return statement",pc.Current);pc.Advance();return new CodeMethodReturnStatement(e);}
 static CodeThrowExceptionStatement _ParseThrowStatement(_PC pc){ pc.Advance();_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated throw statement",pc.Current);
 if(ST.semi==pc.SymbolId){pc.Advance();return new CodeThrowExceptionStatement();}var e=_ParseExpression(pc);_SkipComments(pc);if(pc.IsEnded)_Error("Unterminated throw statement",
@@ -3834,13 +3836,14 @@ if(null!=mr){var mi=new CodeMethodInvokeExpression(mr);mi.Parameters.AddRange(di
 }}}static bool _HasUnresolved(CodeObject target){if(target.UserData.Contains("slang:unresolved"))return true;var result=false;CodeDomVisitor.Visit(target,
 (ctx)=>{var co=ctx.Target as CodeObject;if(null!=co&&co.UserData.Contains("slang:unresolved")){result=true;ctx.Cancel=true;}});return result;}static void
  _Patch(CodeVariableDeclarationStatement vd,CodeDomVisitContext ctx,CodeDomResolver resolver){if(null!=vd){if(vd.Name=="done")System.Diagnostics.Debug.WriteLine("debug var decl hit");
-if(CodeDomResolver.IsNullOrVoidType(vd.Type)){if(null==vd.InitExpression)throw new ArgumentException("The code contains an incomplete variable declaration.",
-"resolver");if(!_HasUnresolved(vd.InitExpression)){var t=resolver.GetTypeOfExpression(vd.InitExpression,resolver.GetScope(vd.InitExpression));vd.Type=
-t;if(!CodeDomResolver.IsNullOrVoidType(t)){if(vd.Name=="done")System.Diagnostics.Debug.WriteLine("debug var decl resolved");vd.UserData.Remove("slang:unresolved");
-}}}}}static void _Patch(CodeFieldReferenceExpression fr,CodeDomVisitContext ctx,CodeDomResolver resolver){if(null!=fr){ if(!fr.TargetObject.UserData.Contains("slang:unresolved"))
-{var scope=resolver.GetScope(fr);var binder=new CodeDomBinder(scope);var t=resolver.GetTypeOfExpression(fr.TargetObject);if(null!=t&&CodeDomResolver.IsNullOrVoidType(t)
-&&fr.TargetObject is CodeVariableReferenceExpression)return; var isStatic=false;var tre=fr.TargetObject as CodeTypeReferenceExpression;if(null!=tre)isStatic
-=true;var tt=resolver.TryResolveType(isStatic?tre.Type:t,scope);if(null==tt)throw new InvalidOperationException(string.Format("The type {0} could not be resolved.",
+if(CodeDomResolver.IsNullOrVoidType(vd.Type)||(0==vd.Type.ArrayRank&&0==vd.Type.TypeArguments.Count&&0==string.Compare("var",vd.Type.BaseType,StringComparison.InvariantCulture)))
+{if(null==vd.InitExpression)throw new ArgumentException("The code contains an incomplete variable declaration.","resolver");if(!_HasUnresolved(vd.InitExpression))
+{var t=resolver.GetTypeOfExpression(vd.InitExpression,resolver.GetScope(vd.InitExpression));vd.Type=t;if(!CodeDomResolver.IsNullOrVoidType(t)){if(vd.Name
+=="done")System.Diagnostics.Debug.WriteLine("debug var decl resolved");vd.UserData.Remove("slang:unresolved");}}}}}static void _Patch(CodeFieldReferenceExpression
+ fr,CodeDomVisitContext ctx,CodeDomResolver resolver){if(null!=fr){ if(!fr.TargetObject.UserData.Contains("slang:unresolved")){var scope=resolver.GetScope(fr);
+var binder=new CodeDomBinder(scope);var t=resolver.GetTypeOfExpression(fr.TargetObject);if(null!=t&&CodeDomResolver.IsNullOrVoidType(t)&&fr.TargetObject
+ is CodeVariableReferenceExpression)return; var isStatic=false;var tre=fr.TargetObject as CodeTypeReferenceExpression;if(null!=tre)isStatic=true;var tt
+=resolver.TryResolveType(isStatic?tre.Type:t,scope);if(null==tt)throw new InvalidOperationException(string.Format("The type {0} could not be resolved.",
 t.BaseType));var td=tt as CodeTypeDeclaration; var m=binder.GetField(tt,fr.FieldName,_BindFlags);if(null!=m){fr.UserData.Remove("slang:unresolved");return;
 }m=binder.GetEvent(tt,fr.FieldName,_BindFlags);if(null!=m){var er=new CodeEventReferenceExpression(fr.TargetObject,fr.FieldName);CodeDomVisitor.ReplaceTarget(ctx,
 er);return;}var ml=binder.GetMethodGroup(tt,fr.FieldName,_BindFlags);if(0<ml.Length){var mr=new CodeMethodReferenceExpression(fr.TargetObject,fr.FieldName);

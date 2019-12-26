@@ -507,6 +507,8 @@ namespace CD
 				if (ST.semi != pc.SymbolId)
 					_Error("Invalid expression in variable declaration initializer", pc.Current);
 				pc.Advance();
+				if (null == result.Type || 0==result.Type.ArrayRank && 0==string.Compare(result.Type.BaseType,"System.Void",StringComparison.InvariantCulture))
+					result.Type = new CodeTypeReference("var"); // we fake it out in case it isn't processed. This way it's at least correct in C#
 				return result;
 			}
 			else if (null == ctr)

@@ -11,7 +11,8 @@ namespace scratch
 	{
 		static void Main()
 		{
-			var tokenizer = new SlangTokenizer("new object[] = { new object() }");
+		
+			var tokenizer = new SlangTokenizer("!new object().ToString()");
 			var pt = SlangParser.Parse(tokenizer);
 			_WriteTree(pt, Console.Out);
 		}

@@ -564,7 +564,9 @@ namespace CD
 		/// <returns>True if the type is null or void, otherwise false</returns>
 		public static bool IsNullOrVoidType(CodeTypeReference type)
 		{
-			return null == type || (0 == type.ArrayRank && 0 == string.Compare("System.Void", type.BaseType,StringComparison.InvariantCulture));
+			// HACK: we special case for slang's unresolved var variable type.
+			return null == type || (0 == type.ArrayRank && 0 == string.Compare("System.Void", type.BaseType, StringComparison.InvariantCulture) ||
+				 (0 == type.ArrayRank && 0 == string.Compare("var", type.BaseType, StringComparison.InvariantCulture)));
 				
 		}
 		/// <summary>

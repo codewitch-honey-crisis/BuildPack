@@ -502,7 +502,7 @@ namespace CD
 			{
 				if (vd.Name == "done")
 					System.Diagnostics.Debug.WriteLine("debug var decl hit");
-				if (CodeDomResolver.IsNullOrVoidType(vd.Type))
+				if (CodeDomResolver.IsNullOrVoidType(vd.Type) || (0 == vd.Type.ArrayRank && 0 == vd.Type.TypeArguments.Count && 0 == string.Compare("var", vd.Type.BaseType, StringComparison.InvariantCulture))) 
 				{
 					if (null == vd.InitExpression)
 						throw new ArgumentException("The code contains an incomplete variable declaration.", "resolver");

@@ -1,8 +1,18 @@
 ﻿// Slang.xbnf
 // This is the XBNF spec for Slang (gplex version - unicode enabled)
-Expression<start>=Term;
-Term= Factor { ("+"|"-") Factor };
-Factor= Unary { ("*"|"/"|"%") Unary };
+// TODO: honestly not sure if left vs right associativity matters here, so we're ignoring it
+// it has worked thus far in the past so I have no reason to change it but I'm leaving this
+// to do here in case something eventually happens to blow up.
+Expression<start>=AssignExpression;
+RelationalExpression = TermExpression { ("<"|"<="|">"|">=") TermExpression };
+EqualityExpression = RelationalExpression { ("=="|"!=") RelationalExpression };
+BitwiseAndExpression = EqualityExpression { "&" EqualityExpression };
+BitwiseOrExpression = BitwiseAndExpression { "|" BitwiseAndExpression };
+AndExpression= BitwiseOrExpression { "&&" BitwiseOrExpression };
+OrExpression= AndExpression { "||" AndExpression };
+AssignExpression= OrExpression { ("="|"+="|"-="|"*="|"/="|"%="|"&="|"|=") OrExpression };
+TermExpression= FactorExpression { ("+"|"-") FactorExpression };
+FactorExpression= UnaryExpression { ("*"|"/"|"%") UnaryExpression };
 MemberFieldRef = "." Identifier;
 MemberInvokeRef = "(" [ MethodArg { "," MethodArg } ] ")";
 MemberIndexerRef = "[" Expression { "," Expression } "]";
@@ -30,35 +40,43 @@ TypeElement = TypeBase [ TypeGenericPart ];
 TypeGenericPart= "<" [ Type { "," Type } ] ">";
 TypeArraySpec= "[" { ArraySpecRank } "]";
 TypeArraySpecRank = comma;
-Cast<virtual,firsts="lparen"> { 
-	return _ParseCast(context);
+CastExpression<virtual,firsts="lparen"> { 
+	return _ParseCastExpression(context);
 }
 // much easier to code this as a virtual
 ArraySpec<virtual,firsts="lbracket"> {
 	return _ParseArraySpec(context);
 }
-New= newObj TypeElement ( NewObjectPart | NewArrayPart );
-NewObjectPart= "(" [ Expression { "," Expression } ] ")";
-NewArrayPart= ArraySpec;
+NewExpression= newObj TypeElement ( NewObjectPart | NewArrayPart );
+NewObjectPart<collapsed>= "(" [ Expression { "," Expression } ] ")";
+NewArrayPart<collapsed>= ArraySpec;
 
 // this is necessary so we can get Parsley to generate a 
-// method called ParseTypeCastPart() which we use
+// method called ParseTypeCastExpressionPart() which we use
 // when resolving casts
-TypeCastPart<include,collapsed>= Type ")"; 
+TypeCastExpressionPart<include,collapsed>= Type ")"; 
 ArraySpecExpressionList<include,collapsed>= Expression { "," Expression } "]";
 ArrayInitializer<include>= "=" "{" [ Expression { "," Expression } ] "}";
-SubExpression<collapsed> = "(" Expression ")" : where { return !_IsCast(context);}
+SubExpression<collapsed> = "(" Expression ")" : where { return !_IsCastExpression(context);}
 // use the where clause to override first first conflict:
-Unary= ("+"|"-") Unary | SubExpression | Leaf : where { return true;}
-Leaf=	( Identifier | IntrinsicType )	{ MemberAnyRef }	|
-		verbatimStringLiteral								|
-		integerLiteral										| 
-		floatLiteral										|
-		stringLiteral										|
-		Cast												|
-		typeOf "(" Type ")"									|
-		nameOf "(" Identifier ")"							|
-		New;
+UnaryExpression= ("+"|"-"|"!") UnaryExpression | ("++"|"--") PrimaryExpression | SubExpression | PrimaryExpression : where { return true;}
+PrimaryExpression=	
+		( Identifier | IntrinsicType )	{ MemberAnyRef }	|
+		verbatimStringLiteral { MemberAnyRef}				|
+		characterLiteral { MemberAnyRef }					|
+		integerLiteral { MemberAnyRef}						| 
+		floatLiteral { MemberAnyRef}						|
+		stringLiteral  { MemberAnyRef}						|
+		boolLiteral { MemberAnyRef}							|
+		nullLiteral											|
+		CastExpression										|
+		typeOf "(" Type ")"	{ MemberAnyRef }				|
+		nameOf "(" Identifier ")" { MemberAnyRef }			|
+		defaultOf "(" Type ")" { MemberAnyRef }				|
+		NewExpression { MemberAnyRef }						|
+		thisRef { MemberAnyRef }							|
+		baseRef { MemberAnyRef }							;
+
 		
 // Identifier exists as a non-terminal solely to attach a semantic constraint to identifiers.
 // we collapse it because we don't need it in the final parse tree but in the grammar 
@@ -68,14 +86,13 @@ Identifier<collapsed> = verbatimIdentifier | identifier : where { return !Keywor
 // be careful about the order of the terminals.
 // remember they have priorities in the final lexer
 
+verbatimIdentifier='@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
 // begin keywords
 outKeyword="out";
 refKeyword="ref";
-// end keywords
-
-verbatimIdentifier='@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
 typeOf="typeof";
 nameOf="nameOf";
+defaultOf="default";
 newObj="new";
 stringType="string";
 boolType="bool";
@@ -92,13 +109,14 @@ uintType="uint";
 longType="long";
 ulongType="ulong";
 objectType="object";
+boolLiteral = "true|false";
+nullLiteral = "null";
+thisRef = "this";
+baseRef = "base";
 verbatimStringLiteral='@"([^"|""])*"';
 identifier='(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
 stringLiteral='"([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*"';
-lineComment<hidden>='\/\/[^\n]*';
-blockComment<hidden,blockEnd="*/">="/*";
 characterLiteral='[\u0027]([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})[\u0027]';
-whitespace<hidden>='[ \t\r\n\v\f]+';
 lte="<=";
 lt="<";
 gte=">=";
@@ -136,9 +154,12 @@ colonColon="::";
 colon=":";
 semi=";";
 dot=".";
-integerLiteral = '(0x[0-9A-Fa-f]{1,16}|(0|[1-9][0-9]*))([Uu][Ll]?|[Ll][Uu]?)?';
-floatLiteral= '((0|[1-9][0-9]*)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)';
-directive<blockEnd="\n">='#[ \t]*[a-z]+[ \t]*';
+integerLiteral = '(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)?';
+floatLiteral= '(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)';
+directive<blockEnd="\n">='#[ \t]*[a-z]+';
+lineComment<hidden>='\/\/[^\n]*';
+blockComment<hidden,blockEnd="*/">="/*";
+whitespace<hidden>='[ \t\r\n\v\f]+';
 // helpers
 {
 	static HashSet<string> Keywords=_BuildKeywords();
@@ -152,18 +173,18 @@ directive<blockEnd="\n">='#[ \t]*[a-z]+[ \t]*';
 		
 		return result;
 	}
-	static ParseNode _ParseCast(ParserContext context) {
+	static ParseNode _ParseCastExpression(ParserContext context) {
 		int line = context.Line;
-        int column = context.Column;
-        long position = context.Position;
+		int column = context.Column;
+		long position = context.Position;
 
 		if("("!=context.Value)
 			context.Error("Expecting ( as start of expression or cast");
 		ParseNode lp = new ParseNode(SlangParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position);
 		context.Advance();
-		ParseNode type = ParseTypeCastPart(context);
+		ParseNode type = ParseTypeCastExpressionPart(context);
 		ParseNode expr = ParseExpression(context);
-		return new ParseNode(SlangParser.Cast, "Cast", new ParseNode[] {type,expr}, line, column, position);
+		return new ParseNode(SlangParser.CastExpression, "CastExpression", new ParseNode[] {type,expr}, line, column, position);
 	}
 	static ParseNode _ParseArraySpec(ParserContext context) 
 	{
@@ -188,17 +209,15 @@ directive<blockEnd="\n">='#[ \t]*[a-z]+[ \t]*';
 			init=ParseArrayInitializer(context);
 			return new ParseNode(SlangParser.ArraySpec,"ArraySpec", new ParseNode[] {expr ,init},line,column,position);
 		}
-		
-		
 	}
-	static bool _IsCast(ParserContext context) {
+	static bool _IsCastExpression(ParserContext context) {
 		context = context.GetLookAhead(true);
 		try 
 		{
 			if("("!=context.Value)
 				return false;
 			context.Advance();
-			ParseNode type = ParseTypeCastPart(context);
+			ParseNode type = ParseTypeCastExpressionPart(context);
 			ParseNode expr = ParseExpression(context);
 			return true;
 		}
