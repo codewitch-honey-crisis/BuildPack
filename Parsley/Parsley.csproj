@@ -68,7 +68,7 @@
     <Compile Include="LL1\CfgLL1Progress.cs" />
     <Compile Include="LL1\LL1.cs" />
     <Compile Include="Collections\OrderedCollectionEqualityComparer.cs" />
-    <Compile Include="Export\LookAheadEnumerator.cs" />
+    <Content Include="Export\LookAheadEnumerator.cs" />
     <Compile Include="ParseContext\ParseContext.BaseExtensions.cs" />
     <Compile Include="ParseContext\ParseContext.cs" />
     <Compile Include="ParseContext\ParseContext.Json.cs" />
@@ -114,6 +114,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(SolutionDir)CSBrick\bin\Release\csbrick.exe" "$(SolutionDir)CodeDomGoKit\CodeDomGoKit.csproj" /output "$(ProjectDir)CodeDomGoKit\CodeDomGoKit.brick.cs"

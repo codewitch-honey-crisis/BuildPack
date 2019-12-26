@@ -20,9 +20,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlangDemo", "SlangDemo\SlangDemo.csproj", "{47A1489D-78EB-40C6-ACED-A3E1B7CFC55D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deslang", "Deslang\Deslang.csproj", "{0286AC77-D7C2-4681-A319-E5C6A2B2B7C1}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F1935A78-6ECA-4AA9-9BE2-0C64BE4297C7} = {F1935A78-6ECA-4AA9-9BE2-0C64BE4297C7}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeslangDemo", "DeslangDemo\DeslangDemo.csproj", "{687A2CA3-6111-4858-9D47-7A1A54BE5F69}"
 EndProject
@@ -33,6 +30,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegexDemo", "RegexDemo\RegexDemo.csproj", "{2268BA9E-7F22-40FA-8866-79CB4492F398}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "scratch", "scratch\scratch.csproj", "{3C517D16-E8D6-4411-8495-F9F6B54418B6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DD05A876-2846-43F3-B14A-E919D22C20DD} = {DD05A876-2846-43F3-B14A-E919D22C20DD}
+		{440C9EA8-409C-4B1D-88B7-A2B5FFF87700} = {440C9EA8-409C-4B1D-88B7-A2B5FFF87700}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parsley", "Parsley\Parsley.csproj", "{DD05A876-2846-43F3-B14A-E919D22C20DD}"
 	ProjectSection(ProjectDependencies) = postProject

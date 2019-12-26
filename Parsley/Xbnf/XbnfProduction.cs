@@ -1,29 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Parsley
 {
 	public class XbnfProduction : XbnfNode, IEquatable<XbnfProduction>, ICloneable
 	{
-		public XbnfProduction(string name,XbnfExpression expression=null)
+		public XbnfProduction(string name, XbnfExpression expression = null)
 		{
 			Name = name;
 			Expression = expression;
 		}
+		public bool IsVirtual {
+			get {
+				return null == Expression && null != Body;
+			}
+		}
+		public bool IsAbstract {
+			get {
+				return null == Expression && null == Body;
+			}
+		}
 		public bool IsTerminal {
 			get {
-				if (null != Expression && Expression.IsTerminal)
-					return true;
-				var i = Attributes.IndexOf("terminal");
-				if(-1<i && Attributes[i].Value is bool && (bool)Attributes[i].Value)
-					return true;
+				if (null != Expression)
+				{
+					if (Expression.IsTerminal)
+						return true;
+					var i = Attributes.IndexOf("terminal");
+					if (-1 < i && Attributes[i].Value is bool && (bool)Attributes[i].Value)
+						return true;
+				}
 				return false;
 			}
 		}
 		public bool IsHidden {
 			get {
-				if(!IsTerminal)
+				if (!IsTerminal)
 					return false;
 				var i = Attributes.IndexOf("hidden");
 				if (-1 < i && Attributes[i].Value is bool && (bool)Attributes[i].Value)
@@ -45,13 +57,14 @@ namespace Parsley
 		public XbnfExpression Expression { get; set; } = null;
 		public XbnfCode Action { get; set; } = null;
 		public XbnfCode Where { get; set; } = null;
+		public XbnfCode Body { get; set; } = null;
 		public XbnfProduction Clone()
 		{
 			var result = new XbnfProduction();
 			result.Name = Name;
-			for(int ic=Attributes.Count,i=0;i<ic;++i)
+			for (int ic = Attributes.Count, i = 0; i < ic; ++i)
 				result.Attributes.Add(Attributes[i].Clone());
-			if(null!=Expression)
+			if (null != Expression)
 				result.Expression = Expression.Clone();
 			result.Action = Action;
 			return result;
@@ -77,11 +90,11 @@ namespace Parsley
 			else
 				sb.Append(Name);
 			var ic = Attributes.Count;
-			if(0<ic && "p"!=fmt && "xc"!=fmt)
+			if (0 < ic && "p" != fmt && "xc" != fmt)
 			{
 				sb.Append("<");
 				var delim = "";
-				for (var i = 0;i<ic;++i)
+				for (var i = 0; i < ic; ++i)
 				{
 					sb.Append(delim);
 					sb.Append(Attributes[i]);
@@ -89,11 +102,12 @@ namespace Parsley
 				}
 				sb.Append(">");
 			}
-			if (null != Expression) {
+			if (null != Expression)
+			{
 				sb.Append("= ");
 				sb.Append(Expression);
 			}
-			if (null != Action && ("pc"==fmt || string.IsNullOrEmpty(fmt)))
+			if (null != Action && ("pc" == fmt || string.IsNullOrEmpty(fmt)))
 			{
 				sb.Append(" => {");
 				sb.Append(Action);
@@ -105,7 +119,7 @@ namespace Parsley
 				sb.Append(Where);
 				sb.Append("}");
 			}
-			else if("p"!=fmt)
+			else if ("p" != fmt)
 				sb.Append(";");
 			return sb.ToString();
 		}
@@ -117,9 +131,9 @@ namespace Parsley
 			var c = pc.Column;
 			var p = pc.Position;
 			// read identifier
-			result.Name=ParseIdentifier(pc);
+			result.Name = ParseIdentifier(pc);
 			// read attributes
-			if ('<'==pc.Current)
+			if ('<' == pc.Current)
 			{
 				pc.Advance();
 				while (-1 != pc.Current && '>' != pc.Current)
@@ -134,27 +148,63 @@ namespace Parsley
 				pc.Advance();
 			}
 			pc.TrySkipCCommentsAndWhiteSpace();
-			// pc.Expecting(';', '='); // ';' is for supporting terminals with abstract definitions. 
-			pc.Expecting('=');
-			if ('='==pc.Current)
-			{
-				pc.Advance();
-				result.Expression = XbnfExpression.Parse(pc);
-			}
-			pc.Expecting(';','=',':');
-			result.SetLocation(l, c, p);
-			if (';' == pc.Current)
-			{
-				pc.Advance();
-				return result;
-			}
+			pc.Expecting('=',';', '{');
 			if ('=' == pc.Current)
 			{
 				pc.Advance();
-				pc.Expecting('>');
-				pc.Advance();
+				result.Expression = XbnfExpression.Parse(pc);
+
+				pc.Expecting(';', '=', ':');
+				result.SetLocation(l, c, p);
+				if (';' == pc.Current)
+				{
+					pc.Advance();
+					return result;
+				}
+				if ('=' == pc.Current)
+				{
+					pc.Advance();
+					pc.Expecting('>');
+					pc.Advance();
+					pc.TrySkipCCommentsAndWhiteSpace();
+					pc.Expecting('{');
+					pc.Advance();
+					l = pc.Line;
+					c = pc.Column;
+					p = pc.Position;
+					var s = XbnfDocument.ReadCode(pc);
+					pc.Expecting('}');
+					pc.Advance();
+					result.Action = new XbnfCode(s);
+					result.SetLocation(l, c, p);
+				}
 				pc.TrySkipCCommentsAndWhiteSpace();
-				pc.Expecting('{');
+				if (pc.Current == ':')
+				{
+					pc.Advance();
+					pc.TrySkipCCommentsAndWhiteSpace();
+					l = pc.Line;
+					c = pc.Column;
+					p = pc.Position;
+					var ident = XbnfExpression.ParseIdentifier(pc);
+					if (0 != string.Compare("where", ident, StringComparison.InvariantCulture))
+						throw new ExpectingException(string.Format("Expecting \"where\" at line {0}, column {1}, position {2}", l, c, p));
+					pc.TrySkipCCommentsAndWhiteSpace();
+					pc.Expecting('{');
+					pc.Advance();
+					l = pc.Line;
+					c = pc.Column;
+					p = pc.Position;
+					var s = XbnfDocument.ReadCode(pc);
+					pc.Expecting('}');
+					pc.Advance();
+					result.Where = new XbnfCode(s);
+					result.Where.SetLocation(l, c, p);
+				}
+			}
+			else if (';' != pc.Current)
+			{
+				// '{' - virtual non-terminal definition
 				pc.Advance();
 				l = pc.Line;
 				c = pc.Column;
@@ -162,44 +212,25 @@ namespace Parsley
 				var s = XbnfDocument.ReadCode(pc);
 				pc.Expecting('}');
 				pc.Advance();
-				result.Action = new XbnfCode(s);
+				result.Body = new XbnfCode(s);
 				result.SetLocation(l, c, p);
 			}
-			pc.TrySkipCCommentsAndWhiteSpace();
-			if(pc.Current == ':')
+			else
 			{
+				// abstract 
 				pc.Advance();
-				pc.TrySkipCCommentsAndWhiteSpace();
-				l = pc.Line;
-				c = pc.Column;
-				p = pc.Position;
-				var ident = XbnfExpression.ParseIdentifier(pc);
-				if (0!=string.Compare("where", ident,StringComparison.InvariantCulture))
-					throw new ExpectingException(string.Format("Expecting \"where\" at line {0}, column {1}, position {2}", l, c, p));
-				pc.TrySkipCCommentsAndWhiteSpace();
-				pc.Expecting('{');
-				pc.Advance();
-				l = pc.Line;
-				c = pc.Column;
-				p = pc.Position;
-				var s = XbnfDocument.ReadCode(pc);
-				pc.Expecting('}');
-				pc.Advance();
-				result.Where = new XbnfCode(s);
-				result.Where.SetLocation(l, c, p);
+				result.SetLocation(l, c, p);
 			}
-			
-			
 			return result;
 		}
 
-		
+
 		#region Value semantics
 		public bool Equals(XbnfProduction rhs)
 		{
 			if (ReferenceEquals(rhs, this)) return true;
 			if (ReferenceEquals(rhs, null)) return false;
-			if(Name == rhs.Name)
+			if (Name == rhs.Name)
 			{
 				if (Action == rhs.Action)
 				{
@@ -220,11 +251,11 @@ namespace Parsley
 		public override int GetHashCode()
 		{
 			var result = 0;
-			for(int ic=Attributes.Count,i=0;i<ic;++i)
+			for (int ic = Attributes.Count, i = 0; i < ic; ++i)
 				result ^= Attributes[i].GetHashCode();
-			
+
 			if (null != Name)
-				result ^=Name.GetHashCode();
+				result ^= Name.GetHashCode();
 			if (null != Action)
 				result ^= Action.GetHashCode();
 			if (null != Expression)

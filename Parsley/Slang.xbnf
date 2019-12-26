@@ -1,21 +1,82 @@
 ﻿// Slang.xbnf
 // This is the XBNF spec for Slang (gplex version - unicode enabled)
-Term<start>= Factor { ("+"|"-") Factor };
-Factor= Unary { ("*"|"/") Unary };
-Unary= ("+"|"-") Unary | Leaf;
+Expression<start>=Term;
+Term= Factor { ("+"|"-") Factor };
+Factor= MemberRef { ("*"|"/"|"%") MemberRef };
+MemberRef = Unary | Unary { MemberAnyRef }+;
+MemberFieldRef = "." Identifier;
+MemberInvokeRef = "(" [ MethodArg { "," MethodArg } ] ")";
+MemberIndexerRef = "[" Expression { "," Expression } "]";
+MemberAnyRef<collapsed> = MemberFieldRef | MemberInvokeRef | MemberIndexerRef;
+MethodArg = [ outKeyword | refKeyword ] Expression;
+TypeRef = Type;
+TypeBase = identifier { "."  identifier };
+Type=TypeElement { TypeArraySpec };
+TypeCastPart<include>= Type ")";
+TypeElement = TypeBase [ TypeGenericPart ];
+TypeGenericPart= "<" [ Type { "," Type } ] ">";
+TypeArraySpec= "[" { ArraySpecRank } "]";
+TypeArraySpecRank = comma;
+Cast<abstract>;
+ExpressionOrCast<firsts="lparen"> {
+	// possibly a cast, or possibly a subexpression
+	// we can't know for sure so this gets complicated
+	// basically we need to backtrack.
+	ParseNode expr;
+	var pc2 = context.GetLookAhead(true);
+	try
+	{
+		expr = _ParseCast(pc2);
+	}
+	catch(Exception ex) {
+		try
+		{
+			if (!context.Advance())
+				context.Error("Unterminated cast or subexpression");
+			expr=ParseExpression(context);
+			if(")"!=context.Value)
+				context.Error("Invalid cast or subexpression");
+			context.Advance();
+			return expr;
+		}
+		catch(Exception eex)
+		{
+			throw eex;
+		}
+	}
+	// now advance our actual pc
+	// TODO: see if we can't use the dump feature
+	// on the lookahead so we don't have to 
+	// parse again. Minor, but sloppy.
+	return _ParseCast(context);
+}
+Unary= ("+"|"-") Unary | ExpressionOrCast | Leaf ;
+// TODO: Need to put in grammar for type. Itself is ambiguous.
+// this gets tough because FIRST i need to eliminate conflict errors
+// and possibly left recursion errors? for any nonterm that has a 
+// where condition associated with it
 Leaf=	Identifier				|
 		verbatimStringLiteral	|
 		integerLiteral			| 
 		floatLiteral			|
-		stringLiteral			|
-		"(" Term ")"			;
-Identifier = verbatimIdentifier | identifier : where { return !Keywords.Contains(context.Value);}
+		stringLiteral			;
+// Identifier exists as a non-terminal solely to attach a semantic constraint to identifiers.
+// we collapse it because we don't need it in the final parse tree but in the grammar 
+// we have to refer to "Identifier" instead of identifier or verbatimIdentifer.
+Identifier<collapsed> = verbatimIdentifier | identifier : where { return !Keywords.Contains(context.Value); }
+
+// be careful about the order of the terminals.
+// remember they have priorities in the final lexer
+
+// begin keywords
+outKeyword="out";
+refKeyword="ref";
+// end keywords
+
 verbatimIdentifier='@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
 verbatimStringLiteral='@"([^"|""])*"';
-keyword='abstract|as|ascending|async|await|base|bool|break|byte|case|catch|char|checked|class|const|continue|decimal|default|delegate|descending|do|double|dynamic|else|enum|equals|explicit|extern|event|false|finally|fixed|float|for|foreach|get|global|goto|if|implicit|int|interface|internal|is|lock|long|namespace|new|null|object|operator|out|override|params|partial|private|protected|public|readonly|ref|return|sbyte|sealed|set|short|sizeof|stackalloc|static|string|struct|switch|this|throw|true|try|typeof|uint|ulong|unchecked|unsafe|ushort|using|var|virtual|void|volatile|while|yield';
 identifier='(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
 stringLiteral='"([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*"';
-
 lineComment<hidden>='\/\/[^\n]*';
 blockComment<hidden,blockEnd="*/">="/*";
 characterLiteral='[\u0027]([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})[\u0027]';
@@ -72,5 +133,18 @@ directive<blockEnd="\n">='#[ \t]*[a-z]+[ \t]*';
 			result.Add(sa[i]);
 		
 		return result;
+	}
+	static ParseNode _ParseCast(ParserContext context) {
+		int line = context.Line;
+        int column = context.Column;
+        long position = context.Position;
+
+		if("("!=context.Value)
+			context.Error("Expecting ( as start of expression or cast");
+		ParseNode lp = new ParseNode(SlangParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position);
+		context.Advance();
+		ParseNode type = ParseTypeCastPart(context);
+		ParseNode expr = ParseExpression(context);
+		return new ParseNode(SlangParser.Cast, "Cast", new ParseNode[] {type,expr}, line, column, position);
 	}
 }

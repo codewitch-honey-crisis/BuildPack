@@ -149,7 +149,13 @@ namespace Parsley
 			}
 			var fc = cfg.FillLL1Conflicts();
 			foreach (var f in fc)
-				result.Add(new CfgMessage(ErrorLevel.Error, -1, string.Format("Grammar has unresolvable first-{0} conflict between {1} and {2} on symbol {3}", f.Kind == CfgLL1ConflictKind.FirstFirst ? "first" : "follows", f.Rule1, f.Rule2, f.Symbol),f.Rule2.Line,f.Rule2.Column,f.Rule2.Position, cfg.Filename));
+			{
+				// if we have a custom constraint on this we don't necessarily error.
+				if(null!=cfg.GetAttribute(f.Rule1.Left,"constrained") || null!=cfg.GetAttribute(f.Rule2.Left,"constrained"))
+					result.Add(new CfgMessage(ErrorLevel.Message, -1, string.Format("First-{0} conflict between {1} and {2} on symbol {3} was bypassed do to a constraint in the grammar", f.Kind == CfgLL1ConflictKind.FirstFirst ? "first" : "follows", f.Rule1, f.Rule2, f.Symbol), f.Rule2.Line, f.Rule2.Column, f.Rule2.Position, cfg.Filename));
+				else
+					result.Add(new CfgMessage(ErrorLevel.Error, -1, string.Format("Grammar has unresolvable first-{0} conflict between {1} and {2} on symbol {3}", f.Kind == CfgLL1ConflictKind.FirstFirst ? "first" : "follows", f.Rule1, f.Rule2, f.Symbol), f.Rule2.Line, f.Rule2.Column, f.Rule2.Position, cfg.Filename));
+			}
 			cfg.TryValidateLL1(result);
 			return result;
 		}

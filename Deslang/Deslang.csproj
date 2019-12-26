@@ -44,6 +44,11 @@
   <ItemGroup>
     <Content Include="ParseNode.cs" />
     <Compile Include="CodeDomGoKit.brick.cs" />
+    <Content Include="Export\CompiledTokenizer.cs" />
+    <Content Include="Export\CompiledTokenizerTemplate.cs" />
+    <Content Include="Export\TableTokenizer.cs" />
+    <Content Include="Export\TableTokenizerTemplate.cs" />
+    <Content Include="Export\Token.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Shared\CodeDomBuilder.cs" />

@@ -13,14 +13,56 @@ namespace CD {
     using System.Collections.Generic;
     
     /// <summary>Parses the following grammar:
+    /// Expression= Term;
     /// Term= Factor { ( "+" | "-" ) Factor };
-    /// Factor= Unary { ( "*" | "/" ) Unary };
-    /// Unary= ( "+" | "-" ) Unary | Leaf;
-    /// Leaf= Identifier | verbatimStringLiteral | integerLiteral | floatLiteral | stringLiteral | "(" Term ")";
-    /// Identifier= verbatimIdentifier | identifier;
+    /// Factor= Unary { ( "*" | "/" | "%" ) Unary };
+    /// MemberFieldRef= "." Identifier;
+    /// MemberInvokeRef= "(" [ MethodArg { "," MethodArg } ] ")";
+    /// MemberIndexerRef= "[" Expression { "," Expression } "]";
+    /// {MemberAnyRef}= MemberFieldRef | MemberInvokeRef | MemberIndexerRef;
+    /// MethodArg= [ outKeyword | refKeyword ] Expression;
+    /// TypeRef= Type;
+    /// IntrinsicType= boolType | charType | stringType | floatType | doubleType | decimalType | sbyteType | byteType | shortType | ushortType | intType | uintType | longType | ulongType | objectType;
+    /// TypeBase= identifier { "." identifier } | IntrinsicType;
+    /// Type= TypeElement { TypeArraySpec };
+    /// TypeElement= TypeBase [ TypeGenericPart ];
+    /// TypeGenericPart= "<" [ Type { "," Type } ] ">";
+    /// TypeArraySpec= "[" { ArraySpecRank } "]";
+    /// TypeArraySpecRank= comma;
+    /// Cast;
+    /// ArraySpec;
+    /// New= newObj TypeElement ( NewObjectPart | NewArrayPart );
+    /// NewObjectPart= "(" [ Expression { "," Expression } ] ")";
+    /// NewArrayPart= ArraySpec;
+    /// {TypeCastPart}= Type ")";
+    /// {ArraySpecExpressionList}= Expression { "," Expression } "]";
+    /// ArrayInitializer= "=" "{" [ Expression { "," Expression } ] "}";
+    /// {SubExpression}= "(" Expression ")";
+    /// Unary= ( "+" | "-" ) Unary | SubExpression | Leaf;
+    /// Leaf= ( Identifier | IntrinsicType ) { MemberAnyRef } | verbatimStringLiteral | integerLiteral | floatLiteral | stringLiteral | Cast | typeOf "(" Type ")" | nameOf "(" Identifier ")" | New;
+    /// {Identifier}= verbatimIdentifier | identifier;
+    /// outKeyword= "out";
+    /// refKeyword= "ref";
     /// verbatimIdentifier= '@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
+    /// typeOf= "typeof";
+    /// nameOf= "nameOf";
+    /// newObj= "new";
+    /// stringType= "string";
+    /// boolType= "bool";
+    /// charType= "char";
+    /// floatType= "float";
+    /// doubleType= "double";
+    /// decimalType= "decimal";
+    /// sbyteType= "sbyte";
+    /// byteType= "byte";
+    /// shortType= "short";
+    /// ushortType= "ushort";
+    /// intType= "int";
+    /// uintType= "uint";
+    /// longType= "long";
+    /// ulongType= "ulong";
+    /// objectType= "object";
     /// verbatimStringLiteral= '@"([^"|""])*"';
-    /// keyword= 'abstract|as|ascending|async|await|base|bool|break|byte|case|catch|char|checked|class|const|continue|decimal|default|delegate|descending|do|double|dynamic|else|enum|equals|explicit|extern|event|false|finally|fixed|float|for|foreach|get|global|goto|if|implicit|int|interface|internal|is|lock|long|namespace|new|null|object|operator|out|override|params|partial|private|protected|public|readonly|ref|return|sbyte|sealed|set|short|sizeof|stackalloc|static|string|struct|switch|this|throw|true|try|typeof|uint|ulong|unchecked|unsafe|ushort|using|var|virtual|void|volatile|while|yield';
     /// identifier= '(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
     /// stringLiteral= '"([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*"';
     /// (lineComment)= '\/\/[^\n]*';
@@ -69,206 +111,1336 @@ namespace CD {
     /// directive= '#[ \t]*[a-z]+[ \t]*';
     /// </summary>
     /// <remarks>The rules for the factored grammar are as follows:
+    /// Expression -> Term
+    /// MemberFieldRef -> dot Identifier
+    /// MemberAnyRef -> MemberFieldRef
+    /// MemberAnyRef -> MemberInvokeRef
+    /// MemberAnyRef -> MemberIndexerRef
+    /// MethodArg -> outKeyword Expression
+    /// MethodArg -> refKeyword Expression
+    /// MethodArg -> Expression
+    /// TypeRef -> Type
+    /// IntrinsicType -> boolType
+    /// IntrinsicType -> charType
+    /// IntrinsicType -> stringType
+    /// IntrinsicType -> floatType
+    /// IntrinsicType -> doubleType
+    /// IntrinsicType -> decimalType
+    /// IntrinsicType -> sbyteType
+    /// IntrinsicType -> byteType
+    /// IntrinsicType -> shortType
+    /// IntrinsicType -> ushortType
+    /// IntrinsicType -> intType
+    /// IntrinsicType -> uintType
+    /// IntrinsicType -> longType
+    /// IntrinsicType -> ulongType
+    /// IntrinsicType -> objectType
+    /// TypeBase -> IntrinsicType
+    /// TypeArraySpecRank -> comma
+    /// Cast -> lparen
+    /// ArraySpec -> lbracket
+    /// NewArrayPart -> ArraySpec
+    /// TypeCastPart -> Type rparen
+    /// SubExpression -> lparen Expression rparen
     /// Unary -> add Unary
     /// Unary -> sub Unary
+    /// Unary -> SubExpression
     /// Unary -> Leaf
-    /// Leaf -> Identifier
     /// Leaf -> verbatimStringLiteral
     /// Leaf -> integerLiteral
     /// Leaf -> floatLiteral
     /// Leaf -> stringLiteral
-    /// Leaf -> lparen Term rparen
+    /// Leaf -> Cast
+    /// Leaf -> typeOf lparen Type rparen
+    /// Leaf -> nameOf lparen Identifier rparen
+    /// Leaf -> New
     /// Identifier -> verbatimIdentifier
     /// Identifier -> identifier
     /// TermList -> add Factor TermListRightAssoc TermListRightAssoc2
     /// TermList -> sub Factor TermListRightAssoc TermListRightAssoc2
-    /// FactorList -> mul Unary FactorListRightAssoc FactorListRightAssoc2
-    /// FactorList -> div Unary FactorListRightAssoc FactorListRightAssoc2
+    /// FactorList -> mul Unary FactorListRightAssoc FactorListRightAssoc2 FactorListRightAssoc3
+    /// FactorList -> div Unary FactorListRightAssoc FactorListRightAssoc2 FactorListRightAssoc3
+    /// FactorList -> mod Unary FactorListRightAssoc FactorListRightAssoc2 FactorListRightAssoc3
+    /// MemberInvokeRefList -> comma MethodArg MemberInvokeRefListRightAssoc
+    /// MemberIndexerRefList -> comma Expression MemberIndexerRefListRightAssoc
+    /// TypeBaseList -> dot identifier TypeBaseListRightAssoc
+    /// TypeArraySpecList -> TypeArraySpec TypeArraySpecListRightAssoc
+    /// TypeGenericPartList -> comma Type TypeGenericPartListRightAssoc
+    /// ArraySpecRankList -> ArraySpecRank ArraySpecRankListRightAssoc
+    /// NewObjectPartList -> comma Expression NewObjectPartListRightAssoc
+    /// ArraySpecExpressionListList -> comma Expression ArraySpecExpressionListListRightAssoc
+    /// ArrayInitializerList -> comma Expression ArrayInitializerListRightAssoc
+    /// MemberAnyRefList -> MemberAnyRef MemberAnyRefListRightAssoc
+    /// MemberAnyRefList2 -> MemberAnyRef MemberAnyRefList2RightAssoc
     /// TermListRightAssoc -> add Factor TermListRightAssoc
     /// TermListRightAssoc ->
     /// FactorListRightAssoc -> mul Unary FactorListRightAssoc
     /// FactorListRightAssoc ->
+    /// FactorListRightAssoc2 -> mod Unary FactorListRightAssoc2
+    /// FactorListRightAssoc2 ->
+    /// MemberInvokeRefListRightAssoc -> comma MethodArg MemberInvokeRefListRightAssoc
+    /// MemberInvokeRefListRightAssoc ->
+    /// MemberIndexerRefListRightAssoc -> comma Expression MemberIndexerRefListRightAssoc
+    /// MemberIndexerRefListRightAssoc ->
+    /// TypeBaseListRightAssoc -> dot identifier TypeBaseListRightAssoc
+    /// TypeBaseListRightAssoc ->
+    /// TypeArraySpecListRightAssoc -> TypeArraySpec TypeArraySpecListRightAssoc
+    /// TypeArraySpecListRightAssoc ->
+    /// TypeGenericPartListRightAssoc -> comma Type TypeGenericPartListRightAssoc
+    /// TypeGenericPartListRightAssoc ->
+    /// ArraySpecRankListRightAssoc -> ArraySpecRank ArraySpecRankListRightAssoc
+    /// ArraySpecRankListRightAssoc ->
+    /// NewObjectPartListRightAssoc -> comma Expression NewObjectPartListRightAssoc
+    /// NewObjectPartListRightAssoc ->
+    /// ArraySpecExpressionListListRightAssoc -> comma Expression ArraySpecExpressionListListRightAssoc
+    /// ArraySpecExpressionListListRightAssoc ->
+    /// ArrayInitializerListRightAssoc -> comma Expression ArrayInitializerListRightAssoc
+    /// ArrayInitializerListRightAssoc ->
+    /// MemberAnyRefListRightAssoc -> MemberAnyRef MemberAnyRefListRightAssoc
+    /// MemberAnyRefListRightAssoc ->
+    /// MemberAnyRefList2RightAssoc -> MemberAnyRef MemberAnyRefList2RightAssoc
+    /// MemberAnyRefList2RightAssoc ->
     /// Term -> Factor TermPart
     /// TermPart -> TermList
     /// TermPart ->
     /// Factor -> Unary FactorPart
     /// FactorPart -> FactorList
     /// FactorPart ->
+    /// MemberInvokeRefPart -> MemberInvokeRefList rparen
+    /// MemberInvokeRefPart -> rparen
+    /// MemberIndexerRef -> lbracket Expression MemberIndexerRefPart
+    /// MemberIndexerRefPart -> MemberIndexerRefList rbracket
+    /// MemberIndexerRefPart -> rbracket
+    /// TypeBase -> identifier TypeBasePart
+    /// TypeBasePart -> TypeBaseList
+    /// TypeBasePart ->
+    /// Type -> TypeElement TypePart
+    /// TypePart -> TypeArraySpecList
+    /// TypePart ->
+    /// TypeElement -> TypeBase TypeElementPart
+    /// TypeElementPart -> TypeGenericPart
+    /// TypeElementPart ->
+    /// TypeGenericPartPart -> TypeGenericPartList gt
+    /// TypeGenericPartPart -> gt
+    /// TypeArraySpec -> lbracket TypeArraySpecPart
+    /// TypeArraySpecPart -> ArraySpecRankList rbracket
+    /// TypeArraySpecPart -> rbracket
+    /// New -> newObj TypeElement NewPart
+    /// NewPart -> NewObjectPart
+    /// NewPart -> NewArrayPart
+    /// NewObjectPartPart -> NewObjectPartList rparen
+    /// NewObjectPartPart -> rparen
+    /// ArraySpecExpressionList -> Expression ArraySpecExpressionListPart
+    /// ArraySpecExpressionListPart -> ArraySpecExpressionListList rbracket
+    /// ArraySpecExpressionListPart -> rbracket
+    /// ArrayInitializerPart -> ArrayInitializerList rbrace
+    /// ArrayInitializerPart -> rbrace
+    /// Leaf -> Identifier LeafPart
+    /// LeafPart -> MemberAnyRefList
+    /// LeafPart ->
+    /// Leaf -> IntrinsicType LeafPart2
+    /// LeafPart2 -> MemberAnyRefList2
+    /// LeafPart2 ->
     /// TermListRightAssoc2 -> sub Factor TermListRightAssoc2
     /// TermListRightAssoc2 ->
-    /// FactorListRightAssoc2 -> div Unary FactorListRightAssoc2
-    /// FactorListRightAssoc2 ->
+    /// FactorListRightAssoc3 -> div Unary FactorListRightAssoc3
+    /// FactorListRightAssoc3 ->
+    /// MemberInvokeRef -> lparen MemberInvokeRefPart2
+    /// MemberInvokeRefPart2 -> rparen
+    /// MemberInvokeRefPart2 -> MethodArg MemberInvokeRefPart
+    /// TypeGenericPart -> lt TypeGenericPartPart2
+    /// TypeGenericPartPart2 -> gt
+    /// TypeGenericPartPart2 -> Type TypeGenericPartPart
+    /// NewObjectPart -> lparen NewObjectPartPart2
+    /// NewObjectPartPart2 -> rparen
+    /// NewObjectPartPart2 -> Expression NewObjectPartPart
+    /// ArrayInitializer -> eq lbrace ArrayInitializerPart2
+    /// ArrayInitializerPart2 -> rbrace
+    /// ArrayInitializerPart2 -> Expression ArrayInitializerPart
     /// </remarks>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
     internal partial class SlangParser {
         internal const int ErrorSymbol = -1;
         internal const int EosSymbol = -2;
-        public const int Unary = 0;
-        public const int Leaf = 1;
-        public const int Identifier = 2;
-        public const int TermList = 3;
-        public const int FactorList = 4;
-        public const int TermListRightAssoc = 5;
-        public const int FactorListRightAssoc = 6;
-        public const int Term = 7;
-        public const int TermPart = 8;
-        public const int Factor = 9;
-        public const int FactorPart = 10;
-        public const int TermListRightAssoc2 = 11;
-        public const int FactorListRightAssoc2 = 12;
-        public const int add = 13;
-        public const int sub = 14;
-        public const int verbatimStringLiteral = 15;
-        public const int integerLiteral = 16;
-        public const int floatLiteral = 17;
-        public const int stringLiteral = 18;
-        public const int lparen = 19;
-        public const int rparen = 20;
-        public const int verbatimIdentifier = 21;
-        public const int identifier2 = 22;
-        public const int mul = 23;
-        public const int div = 24;
-        public const int lineComment = 25;
-        public const int blockComment = 26;
-        public const int whitespace = 27;
-        public const int directive = 28;
-        static HashSet<string> Keywords = CD.SlangParser._BuildKeywords();
+        public const int Expression = 0;
+        public const int MemberFieldRef = 1;
+        public const int MemberAnyRef = 2;
+        public const int MethodArg = 3;
+        public const int TypeRef = 4;
+        public const int IntrinsicType = 5;
+        public const int TypeBase = 6;
+        public const int TypeArraySpecRank = 7;
+        public const int Cast = 8;
+        public const int ArraySpec = 9;
+        public const int NewArrayPart = 10;
+        public const int TypeCastPart = 11;
+        public const int SubExpression = 12;
+        public const int Unary = 13;
+        public const int Leaf = 14;
+        public const int Identifier = 15;
+        public const int TermList = 16;
+        public const int FactorList = 17;
+        public const int MemberInvokeRefList = 18;
+        public const int MemberIndexerRefList = 19;
+        public const int TypeBaseList = 20;
+        public const int TypeArraySpecList = 21;
+        public const int TypeGenericPartList = 22;
+        public const int ArraySpecRankList = 23;
+        public const int NewObjectPartList = 24;
+        public const int ArraySpecExpressionListList = 25;
+        public const int ArrayInitializerList = 26;
+        public const int MemberAnyRefList = 27;
+        public const int MemberAnyRefList2 = 28;
+        public const int TermListRightAssoc = 29;
+        public const int FactorListRightAssoc = 30;
+        public const int FactorListRightAssoc2 = 31;
+        public const int MemberInvokeRefListRightAssoc = 32;
+        public const int MemberIndexerRefListRightAssoc = 33;
+        public const int TypeBaseListRightAssoc = 34;
+        public const int TypeArraySpecListRightAssoc = 35;
+        public const int TypeGenericPartListRightAssoc = 36;
+        public const int ArraySpecRankListRightAssoc = 37;
+        public const int NewObjectPartListRightAssoc = 38;
+        public const int ArraySpecExpressionListListRightAssoc = 39;
+        public const int ArrayInitializerListRightAssoc = 40;
+        public const int MemberAnyRefListRightAssoc = 41;
+        public const int MemberAnyRefList2RightAssoc = 42;
+        public const int Term = 43;
+        public const int TermPart = 44;
+        public const int Factor = 45;
+        public const int FactorPart = 46;
+        public const int MemberInvokeRefPart = 47;
+        public const int MemberIndexerRef = 48;
+        public const int MemberIndexerRefPart = 49;
+        public const int TypeBasePart = 50;
+        public const int Type = 51;
+        public const int TypePart = 52;
+        public const int TypeElement = 53;
+        public const int TypeElementPart = 54;
+        public const int TypeGenericPartPart = 55;
+        public const int TypeArraySpec = 56;
+        public const int TypeArraySpecPart = 57;
+        public const int New = 58;
+        public const int NewPart = 59;
+        public const int NewObjectPartPart = 60;
+        public const int ArraySpecExpressionList = 61;
+        public const int ArraySpecExpressionListPart = 62;
+        public const int ArrayInitializerPart = 63;
+        public const int LeafPart = 64;
+        public const int LeafPart2 = 65;
+        public const int TermListRightAssoc2 = 66;
+        public const int FactorListRightAssoc3 = 67;
+        public const int MemberInvokeRef = 68;
+        public const int MemberInvokeRefPart2 = 69;
+        public const int TypeGenericPart = 70;
+        public const int TypeGenericPartPart2 = 71;
+        public const int NewObjectPart = 72;
+        public const int NewObjectPartPart2 = 73;
+        public const int ArrayInitializer = 74;
+        public const int ArrayInitializerPart2 = 75;
+        public const int dot = 76;
+        public const int outKeyword = 77;
+        public const int refKeyword = 78;
+        public const int boolType = 79;
+        public const int charType = 80;
+        public const int stringType = 81;
+        public const int floatType = 82;
+        public const int doubleType = 83;
+        public const int decimalType = 84;
+        public const int sbyteType = 85;
+        public const int byteType = 86;
+        public const int shortType = 87;
+        public const int ushortType = 88;
+        public const int intType = 89;
+        public const int uintType = 90;
+        public const int longType = 91;
+        public const int ulongType = 92;
+        public const int objectType = 93;
+        public const int comma = 94;
+        public const int lparen = 95;
+        public const int lbracket = 96;
+        public const int rparen = 97;
+        public const int add = 98;
+        public const int sub = 99;
+        public const int verbatimStringLiteral = 100;
+        public const int integerLiteral = 101;
+        public const int floatLiteral = 102;
+        public const int stringLiteral = 103;
+        public const int typeOf = 104;
+        public const int nameOf = 105;
+        public const int verbatimIdentifier = 106;
+        public const int identifier2 = 107;
+        public const int mul = 108;
+        public const int div = 109;
+        public const int mod = 110;
+        public const int ArraySpecRank = 111;
+        public const int rbracket = 112;
+        public const int gt = 113;
+        public const int newObj = 114;
+        public const int rbrace = 115;
+        public const int lt = 116;
+        public const int eq = 117;
+        public const int lbrace = 118;
+        public const int lineComment = 119;
+        public const int blockComment = 120;
+        public const int whitespace = 121;
+        public const int directive = 122;
+        static HashSet<string> Keywords = _BuildKeywords();
         static HashSet<string> _BuildKeywords() {
-            HashSet<string> result = new HashSet<string>();
+            var result = new HashSet<string>();
             string[] sa = @"abstract|as|ascending|async|await|base|bool|break|byte|case|catch|char|checked|class|const|continue|decimal|default|delegate|descending|do|double|dynamic|else|enum|equals|explicit|extern|event|false|finally|fixed|float|for|foreach|get|global|goto|if|implicit|int|interface|internal|is|lock|long|namespace|new|null|object|operator|out|override|params|partial|private|protected|public|readonly|ref|return|sbyte|sealed|set|short|sizeof|stackalloc|static|string|struct|switch|this|throw|true|try|typeof|uint|ulong|unchecked|unsafe|ushort|using|var|virtual|void|volatile|while|yield".Split(new char[] {
                         '|'});
-            for (int i = 0; (i < sa.Length); i = (i + 1)) {
+            for (var i = 0; (i < sa.Length); i = (i + 1)) {
                 result.Add(sa[i]);
             }
             return result;
         }
-        private static ParseNode _ParseUnary(ParserContext context) {
+        static ParseNode _ParseCast(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
-            // Unary -> add Unary
-            if ((SlangParser.add == context.SymbolId)) {
-                ParseNode[] children = new ParseNode[2];
-                children[0] = new ParseNode(SlangParser.add, "add", context.Value, line, column, position);
-                context.Advance();
-                children[1] = SlangParser._ParseUnary(context);
-                return new ParseNode(SlangParser.Unary, "Unary", children, line, column, position);
+            if (("(" != context.Value)) {
+                context.Error("Expecting ( as start of expression or cast");
             }
-            // Unary -> sub Unary
-            if ((SlangParser.sub == context.SymbolId)) {
-                ParseNode[] children = new ParseNode[2];
-                children[0] = new ParseNode(SlangParser.sub, "sub", context.Value, line, column, position);
-                context.Advance();
-                children[1] = SlangParser._ParseUnary(context);
-                return new ParseNode(SlangParser.Unary, "Unary", children, line, column, position);
+            ParseNode lp = new ParseNode(SlangParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position);
+            context.Advance();
+            ParseNode type = ParseTypeCastPart(context);
+            ParseNode expr = ParseExpression(context);
+            return new ParseNode(SlangParser.Cast, "Cast", new ParseNode[] {
+                        type,
+                        expr}, line, column, position);
+        }
+        static ParseNode _ParseArraySpec(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            if (("[" != context.Value)) {
+                context.Error("Expecting start of array spec");
             }
-            // Unary -> Leaf
-            if ((((((((SlangParser.verbatimIdentifier == context.SymbolId) 
-                        || (SlangParser.identifier2 == context.SymbolId)) 
+            ParseNode lb = null;
+            ParseNode expr = null;
+            ParseNode init = null;
+            ParserContext pc = context.GetLookAhead(true);
+            pc.Advance();
+            if (("]" != pc.Value)) {
+                lb = new ParseNode(SlangParser.lbracket, "lbracket", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                expr = ParseArraySpecExpressionList(context);
+                return new ParseNode(SlangParser.ArraySpec, "ArraySpec", new ParseNode[] {
+                            expr}, line, column, position);
+            }
+            else {
+                expr = ParseTypeArraySpec(context);
+                init = ParseArrayInitializer(context);
+                return new ParseNode(SlangParser.ArraySpec, "ArraySpec", new ParseNode[] {
+                            expr,
+                            init}, line, column, position);
+            }
+        }
+        static bool _IsCast(ParserContext context) {
+            context = context.GetLookAhead(true);
+            try {
+                if (("(" != context.Value)) {
+                    return false;
+                }
+                context.Advance();
+                ParseNode type = ParseTypeCastPart(context);
+                ParseNode expr = ParseExpression(context);
+                return true;
+            }
+            catch (Exception ex) {
+            }
+            return false;
+        }
+        private static ParseNode ParseExpression(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // Expression -> Term
+            if ((((((((((((((((((((((((((((SlangParser.add == context.SymbolId) 
+                        || (SlangParser.sub == context.SymbolId)) 
+                        || (SlangParser.lparen == context.SymbolId)) 
                         || (SlangParser.verbatimStringLiteral == context.SymbolId)) 
                         || (SlangParser.integerLiteral == context.SymbolId)) 
                         || (SlangParser.floatLiteral == context.SymbolId)) 
                         || (SlangParser.stringLiteral == context.SymbolId)) 
-                        || (SlangParser.lparen == context.SymbolId))) {
+                        || (SlangParser.typeOf == context.SymbolId)) 
+                        || (SlangParser.nameOf == context.SymbolId)) 
+                        || (SlangParser.newObj == context.SymbolId)) 
+                        || (SlangParser.verbatimIdentifier == context.SymbolId)) 
+                        || (SlangParser.identifier2 == context.SymbolId)) 
+                        || (SlangParser.boolType == context.SymbolId)) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId))) {
                 ParseNode[] children = new ParseNode[1];
-                children[0] = SlangParser._ParseLeaf(context);
-                return new ParseNode(SlangParser.Unary, "Unary", children, line, column, position);
+                children[0] = SlangParser.ParseTerm(context);
+                return new ParseNode(SlangParser.Expression, "Expression", children, line, column, position);
             }
-            context.Error("Expecting add, sub, verbatimIdentifier, identifier, verbatimStringLiteral, intege" +
-                    "rLiteral, floatLiteral, stringLiteral, or lparen");
+            context.Error(@"Expecting add, sub, lparen, verbatimStringLiteral, integerLiteral, floatLiteral, stringLiteral, typeOf, nameOf, newObj, verbatimIdentifier, identifier, boolType, charType, stringType, floatType, doubleType, decimalType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, or objectType at line {0}, column {1}, position {2}", line, column, position);
             return null;
         }
         /// <summary>
         /// Parses a production of the form:
-        /// Unary= ( "+" | "-" ) Unary | Leaf
+        /// Expression= Term
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Expression -> Term
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseExpression(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseExpression(context);
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// Expression= Term
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Expression -> Term
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseExpression(context);
+        }
+        private static ParseNode ParseMemberFieldRef(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MemberFieldRef -> dot Identifier
+            if ((SlangParser.dot == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.dot == context.SymbolId))) {
+                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.AddRange(SlangParser.ParseIdentifier(context).Children);
+                return new ParseNode(SlangParser.MemberFieldRef, "MemberFieldRef", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting dot at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// MemberFieldRef= "." Identifier
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// MemberFieldRef -> dot Identifier
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseMemberFieldRef(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseMemberFieldRef(context);
+        }
+        private static ParseNode ParseMemberAnyRef(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MemberAnyRef -> MemberFieldRef
+            if ((SlangParser.dot == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                children[0] = SlangParser.ParseMemberFieldRef(context);
+                return new ParseNode(SlangParser.MemberAnyRef, "MemberAnyRef", children, line, column, position);
+            }
+            // MemberAnyRef -> MemberInvokeRef
+            if ((SlangParser.lparen == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                children[0] = SlangParser.ParseMemberInvokeRef(context);
+                return new ParseNode(SlangParser.MemberAnyRef, "MemberAnyRef", children, line, column, position);
+            }
+            // MemberAnyRef -> MemberIndexerRef
+            if ((SlangParser.lbracket == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                children[0] = SlangParser.ParseMemberIndexerRef(context);
+                return new ParseNode(SlangParser.MemberAnyRef, "MemberAnyRef", children, line, column, position);
+            }
+            context.Error("Expecting dot, lparen, or lbracket at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseMethodArg(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MethodArg -> outKeyword Expression
+            if ((SlangParser.outKeyword == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[2];
+                if ((false 
+                            == (SlangParser.outKeyword == context.SymbolId))) {
+                    context.Error("Expecting outKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.outKeyword, "outKeyword", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                children[1] = SlangParser.ParseExpression(context);
+                return new ParseNode(SlangParser.MethodArg, "MethodArg", children, line, column, position);
+            }
+            // MethodArg -> refKeyword Expression
+            if ((SlangParser.refKeyword == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[2];
+                if ((false 
+                            == (SlangParser.refKeyword == context.SymbolId))) {
+                    context.Error("Expecting refKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.refKeyword, "refKeyword", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                children[1] = SlangParser.ParseExpression(context);
+                return new ParseNode(SlangParser.MethodArg, "MethodArg", children, line, column, position);
+            }
+            // MethodArg -> Expression
+            if ((((((((((((((((((((((((((((SlangParser.add == context.SymbolId) 
+                        || (SlangParser.sub == context.SymbolId)) 
+                        || (SlangParser.lparen == context.SymbolId)) 
+                        || (SlangParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (SlangParser.integerLiteral == context.SymbolId)) 
+                        || (SlangParser.floatLiteral == context.SymbolId)) 
+                        || (SlangParser.stringLiteral == context.SymbolId)) 
+                        || (SlangParser.typeOf == context.SymbolId)) 
+                        || (SlangParser.nameOf == context.SymbolId)) 
+                        || (SlangParser.newObj == context.SymbolId)) 
+                        || (SlangParser.verbatimIdentifier == context.SymbolId)) 
+                        || (SlangParser.identifier2 == context.SymbolId)) 
+                        || (SlangParser.boolType == context.SymbolId)) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[1];
+                children[0] = SlangParser.ParseExpression(context);
+                return new ParseNode(SlangParser.MethodArg, "MethodArg", children, line, column, position);
+            }
+            context.Error(@"Expecting outKeyword, refKeyword, add, sub, lparen, verbatimStringLiteral, integerLiteral, floatLiteral, stringLiteral, typeOf, nameOf, newObj, verbatimIdentifier, identifier, boolType, charType, stringType, floatType, doubleType, decimalType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, or objectType at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// MethodArg= [ outKeyword | refKeyword ] Expression
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// MethodArg -> outKeyword Expression
+        /// MethodArg -> refKeyword Expression
+        /// MethodArg -> Expression
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseMethodArg(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseMethodArg(context);
+        }
+        private static ParseNode ParseTypeRef(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeRef -> Type
+            if (((((((((((((((((SlangParser.boolType == context.SymbolId) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId)) 
+                        || (SlangParser.identifier2 == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[1];
+                children[0] = SlangParser.ParseType(context);
+                return new ParseNode(SlangParser.TypeRef, "TypeRef", children, line, column, position);
+            }
+            context.Error("Expecting boolType, charType, stringType, floatType, doubleType, decimalType, sby" +
+                    "teType, byteType, shortType, ushortType, intType, uintType, longType, ulongType," +
+                    " objectType, or identifier at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// TypeRef= Type
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// TypeRef -> Type
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseTypeRef(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseTypeRef(context);
+        }
+        private static ParseNode ParseIntrinsicType(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // IntrinsicType -> boolType
+            if ((SlangParser.boolType == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.boolType == context.SymbolId))) {
+                    context.Error("Expecting boolType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.boolType, "boolType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.IntrinsicType, "IntrinsicType", children, line, column, position);
+            }
+            // IntrinsicType -> charType
+            if ((SlangParser.charType == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.charType == context.SymbolId))) {
+                    context.Error("Expecting charType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.charType, "charType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.IntrinsicType, "IntrinsicType", children, line, column, position);
+            }
+            // IntrinsicType -> stringType
+            if ((SlangParser.stringType == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.stringType == context.SymbolId))) {
+                    context.Error("Expecting stringType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.stringType, "stringType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.IntrinsicType, "IntrinsicType", children, line, column, position);
+            }
+            // IntrinsicType -> floatType
+            if ((SlangParser.floatType == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.floatType == context.SymbolId))) {
+                    context.Error("Expecting floatType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.floatType, "floatType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.IntrinsicType, "IntrinsicType", children, line, column, position);
+            }
+            // IntrinsicType -> doubleType
+            if ((SlangParser.doubleType == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.doubleType == context.SymbolId))) {
+                    context.Error("Expecting doubleType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.doubleType, "doubleType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.IntrinsicType, "IntrinsicType", children, line, column, position);
+            }
+            // IntrinsicType -> decimalType
+            if ((SlangParser.decimalType == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.decimalType == context.SymbolId))) {
+                    context.Error("Expecting decimalType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.decimalType, "decimalType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.IntrinsicType, "IntrinsicType", children, line, column, position);
+            }
+            // IntrinsicType -> sbyteType
+            if ((SlangParser.sbyteType == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.sbyteType == context.SymbolId))) {
+                    context.Error("Expecting sbyteType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.sbyteType, "sbyteType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.IntrinsicType, "IntrinsicType", children, line, column, position);
+            }
+            // IntrinsicType -> byteType
+            if ((SlangParser.byteType == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.byteType == context.SymbolId))) {
+                    context.Error("Expecting byteType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.byteType, "byteType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.IntrinsicType, "IntrinsicType", children, line, column, position);
+            }
+            // IntrinsicType -> shortType
+            if ((SlangParser.shortType == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.shortType == context.SymbolId))) {
+                    context.Error("Expecting shortType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.shortType, "shortType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.IntrinsicType, "IntrinsicType", children, line, column, position);
+            }
+            // IntrinsicType -> ushortType
+            if ((SlangParser.ushortType == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.ushortType == context.SymbolId))) {
+                    context.Error("Expecting ushortType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.ushortType, "ushortType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.IntrinsicType, "IntrinsicType", children, line, column, position);
+            }
+            // IntrinsicType -> intType
+            if ((SlangParser.intType == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.intType == context.SymbolId))) {
+                    context.Error("Expecting intType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.intType, "intType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.IntrinsicType, "IntrinsicType", children, line, column, position);
+            }
+            // IntrinsicType -> uintType
+            if ((SlangParser.uintType == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.uintType == context.SymbolId))) {
+                    context.Error("Expecting uintType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.uintType, "uintType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.IntrinsicType, "IntrinsicType", children, line, column, position);
+            }
+            // IntrinsicType -> longType
+            if ((SlangParser.longType == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.longType == context.SymbolId))) {
+                    context.Error("Expecting longType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.longType, "longType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.IntrinsicType, "IntrinsicType", children, line, column, position);
+            }
+            // IntrinsicType -> ulongType
+            if ((SlangParser.ulongType == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.ulongType == context.SymbolId))) {
+                    context.Error("Expecting ulongType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.ulongType, "ulongType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.IntrinsicType, "IntrinsicType", children, line, column, position);
+            }
+            // IntrinsicType -> objectType
+            if ((SlangParser.objectType == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.objectType == context.SymbolId))) {
+                    context.Error("Expecting objectType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.objectType, "objectType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.IntrinsicType, "IntrinsicType", children, line, column, position);
+            }
+            context.Error("Expecting boolType, charType, stringType, floatType, doubleType, decimalType, sby" +
+                    "teType, byteType, shortType, ushortType, intType, uintType, longType, ulongType," +
+                    " or objectType at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// IntrinsicType= boolType | charType | stringType | floatType | doubleType | decimalType | sbyteType | byteType | shortType | ushortType | intType | uintType | longType | ulongType | objectType
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// IntrinsicType -> boolType
+        /// IntrinsicType -> charType
+        /// IntrinsicType -> stringType
+        /// IntrinsicType -> floatType
+        /// IntrinsicType -> doubleType
+        /// IntrinsicType -> decimalType
+        /// IntrinsicType -> sbyteType
+        /// IntrinsicType -> byteType
+        /// IntrinsicType -> shortType
+        /// IntrinsicType -> ushortType
+        /// IntrinsicType -> intType
+        /// IntrinsicType -> uintType
+        /// IntrinsicType -> longType
+        /// IntrinsicType -> ulongType
+        /// IntrinsicType -> objectType
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseIntrinsicType(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseIntrinsicType(context);
+        }
+        private static ParseNode ParseTypeBase(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeBase -> IntrinsicType
+            if ((((((((((((((((SlangParser.boolType == context.SymbolId) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[1];
+                children[0] = SlangParser.ParseIntrinsicType(context);
+                return new ParseNode(SlangParser.TypeBase, "TypeBase", children, line, column, position);
+            }
+            // TypeBase -> identifier TypeBasePart
+            if ((SlangParser.identifier2 == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.identifier2 == context.SymbolId))) {
+                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.AddRange(SlangParser.ParseTypeBasePart(context).Children);
+                return new ParseNode(SlangParser.TypeBase, "TypeBase", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting boolType, charType, stringType, floatType, doubleType, decimalType, sby" +
+                    "teType, byteType, shortType, ushortType, intType, uintType, longType, ulongType," +
+                    " objectType, or identifier at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// TypeBase= identifier { "." identifier } | IntrinsicType
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// TypeBase -> IntrinsicType
+        /// TypeBase -> identifier TypeBasePart
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseTypeBase(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseTypeBase(context);
+        }
+        private static ParseNode ParseTypeArraySpecRank(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeArraySpecRank -> comma
+            if ((SlangParser.comma == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.comma, "comma", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.TypeArraySpecRank, "TypeArraySpecRank", children, line, column, position);
+            }
+            context.Error("Expecting comma at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// TypeArraySpecRank= comma
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// TypeArraySpecRank -> comma
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseTypeArraySpecRank(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseTypeArraySpecRank(context);
+        }
+        private static ParseNode ParseCast(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // Cast -> lparen
+            if ((SlangParser.lparen == context.SymbolId)) {
+                return _ParseCast(context);
+            }
+            context.Error("Expecting lparen at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// Cast
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Cast -> lparen
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseCast(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseCast(context);
+        }
+        private static ParseNode ParseArraySpec(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // ArraySpec -> lbracket
+            if ((SlangParser.lbracket == context.SymbolId)) {
+                return _ParseArraySpec(context);
+            }
+            context.Error("Expecting lbracket at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// ArraySpec
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// ArraySpec -> lbracket
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseArraySpec(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseArraySpec(context);
+        }
+        private static ParseNode ParseNewArrayPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // NewArrayPart -> ArraySpec
+            if ((SlangParser.lbracket == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                children[0] = SlangParser.ParseArraySpec(context);
+                return new ParseNode(SlangParser.NewArrayPart, "NewArrayPart", children, line, column, position);
+            }
+            context.Error("Expecting lbracket at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// NewArrayPart= ArraySpec
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// NewArrayPart -> ArraySpec
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseNewArrayPart(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseNewArrayPart(context);
+        }
+        private static ParseNode ParseTypeCastPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeCastPart -> Type rparen
+            if (((((((((((((((((SlangParser.boolType == context.SymbolId) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId)) 
+                        || (SlangParser.identifier2 == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = SlangParser.ParseType(context);
+                if ((false 
+                            == (SlangParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(SlangParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.TypeCastPart, "TypeCastPart", children, line, column, position);
+            }
+            context.Error("Expecting boolType, charType, stringType, floatType, doubleType, decimalType, sby" +
+                    "teType, byteType, shortType, ushortType, intType, uintType, longType, ulongType," +
+                    " objectType, or identifier at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseSubExpression(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // SubExpression -> lparen Expression rparen
+            if (((SlangParser.lparen == context.SymbolId) 
+                        && SlangParser._WhereSubExpression(context.GetLookAhead(true)))) {
+                ParseNode[] children = new ParseNode[3];
+                if ((false 
+                            == (SlangParser.lparen == context.SymbolId))) {
+                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                children[1] = SlangParser.ParseExpression(context);
+                if ((false 
+                            == (SlangParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[2] = new ParseNode(SlangParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.SubExpression, "SubExpression", children, line, column, position);
+            }
+            context.Error("Expecting lparen at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static bool _WhereSubExpression(ParserContext context) {
+            return (false == _IsCast(context));
+        }
+        private static ParseNode ParseUnary(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // Unary -> add Unary
+            if (((SlangParser.add == context.SymbolId) 
+                        && SlangParser._WhereUnary(context.GetLookAhead(true)))) {
+                ParseNode[] children = new ParseNode[2];
+                if ((false 
+                            == (SlangParser.add == context.SymbolId))) {
+                    context.Error("Expecting add at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.add, "add", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                children[1] = SlangParser.ParseUnary(context);
+                return new ParseNode(SlangParser.Unary, "Unary", children, line, column, position);
+            }
+            // Unary -> sub Unary
+            if (((SlangParser.sub == context.SymbolId) 
+                        && SlangParser._WhereUnary(context.GetLookAhead(true)))) {
+                ParseNode[] children = new ParseNode[2];
+                if ((false 
+                            == (SlangParser.sub == context.SymbolId))) {
+                    context.Error("Expecting sub at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.sub, "sub", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                children[1] = SlangParser.ParseUnary(context);
+                return new ParseNode(SlangParser.Unary, "Unary", children, line, column, position);
+            }
+            // Unary -> SubExpression
+            // Unary -> Leaf
+            if (((SlangParser.lparen == context.SymbolId) 
+                        && SlangParser._WhereUnary(context.GetLookAhead(true)))) {
+                ParserContext pc2;
+                System.Exception lastExcept = null;
+                pc2 = context.GetLookAhead();
+                pc2.EnsureStarted();
+                // Unary -> SubExpression
+                try {
+                    if (((SlangParser.lparen == pc2.SymbolId) 
+                                && SlangParser._WhereUnary(pc2.GetLookAhead(true)))) {
+                        System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                        children.AddRange(SlangParser.ParseSubExpression(pc2).Children);
+                        int adv = 0;
+                        for (
+                        ; (adv < pc2.AdvanceCount); 
+                        ) {
+                            context.Advance();
+                            adv = (adv + 1);
+                        }
+                        return new ParseNode(SlangParser.Unary, "Unary", children.ToArray(), line, column, position);
+                    }
+                    context.Error("Expecting lparen");
+                }
+                catch (SyntaxException ex) {
+                    if ((lastExcept == null)) {
+                        lastExcept = ex;
+                    }
+                }
+                finally {
+
+                }
+                pc2 = context.GetLookAhead();
+                pc2.EnsureStarted();
+                // Unary -> Leaf
+                try {
+                    if (((SlangParser.lparen == pc2.SymbolId) 
+                                && SlangParser._WhereUnary(pc2.GetLookAhead(true)))) {
+                        ParseNode[] children = new ParseNode[1];
+                        children[0] = SlangParser.ParseLeaf(pc2);
+                        int adv = 0;
+                        for (
+                        ; (adv < pc2.AdvanceCount); 
+                        ) {
+                            context.Advance();
+                            adv = (adv + 1);
+                        }
+                        return new ParseNode(SlangParser.Unary, "Unary", children, line, column, position);
+                    }
+                    context.Error("Expecting lparen");
+                }
+                catch (SyntaxException ex) {
+                    if ((lastExcept == null)) {
+                        lastExcept = ex;
+                    }
+                }
+                finally {
+
+                }
+                throw lastExcept;
+            }
+            // Unary -> Leaf
+            if ((((((((((((((((((((((((((SlangParser.verbatimStringLiteral == context.SymbolId) 
+                        || (SlangParser.integerLiteral == context.SymbolId)) 
+                        || (SlangParser.floatLiteral == context.SymbolId)) 
+                        || (SlangParser.stringLiteral == context.SymbolId)) 
+                        || (SlangParser.typeOf == context.SymbolId)) 
+                        || (SlangParser.nameOf == context.SymbolId)) 
+                        || (SlangParser.newObj == context.SymbolId)) 
+                        || (SlangParser.verbatimIdentifier == context.SymbolId)) 
+                        || (SlangParser.identifier2 == context.SymbolId)) 
+                        || (SlangParser.boolType == context.SymbolId)) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId)) 
+                        && SlangParser._WhereUnary(context.GetLookAhead(true)))) {
+                ParseNode[] children = new ParseNode[1];
+                children[0] = SlangParser.ParseLeaf(context);
+                return new ParseNode(SlangParser.Unary, "Unary", children, line, column, position);
+            }
+            context.Error(@"Expecting add, sub, lparen, verbatimStringLiteral, integerLiteral, floatLiteral, stringLiteral, typeOf, nameOf, newObj, verbatimIdentifier, identifier, boolType, charType, stringType, floatType, doubleType, decimalType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, or objectType at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static bool _WhereUnary(ParserContext context) {
+            return true;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// Unary= ( "+" | "-" ) Unary | SubExpression | Leaf
         /// </summary>
         /// <remarks>
         /// The production rules are:
         /// Unary -> add Unary
         /// Unary -> sub Unary
+        /// Unary -> SubExpression
         /// Unary -> Leaf
         /// </remarks>
         /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         public static ParseNode ParseUnary(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
-            return SlangParser._ParseUnary(context);
+            return SlangParser.ParseUnary(context);
         }
-        private static ParseNode _ParseLeaf(ParserContext context) {
+        private static ParseNode ParseLeaf(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
-            // Leaf -> Identifier
-            if (((SlangParser.verbatimIdentifier == context.SymbolId) 
-                        || (SlangParser.identifier2 == context.SymbolId))) {
-                ParseNode[] children = new ParseNode[1];
-                children[0] = SlangParser._ParseIdentifier(context);
-                return new ParseNode(SlangParser.Leaf, "Leaf", children, line, column, position);
-            }
             // Leaf -> verbatimStringLiteral
             if ((SlangParser.verbatimStringLiteral == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[1];
-                children[0] = new ParseNode(SlangParser.verbatimStringLiteral, "verbatimStringLiteral", context.Value, line, column, position);
+                if ((false 
+                            == (SlangParser.verbatimStringLiteral == context.SymbolId))) {
+                    context.Error("Expecting verbatimStringLiteral at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.verbatimStringLiteral, "verbatimStringLiteral", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(SlangParser.Leaf, "Leaf", children, line, column, position);
             }
             // Leaf -> integerLiteral
             if ((SlangParser.integerLiteral == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[1];
-                children[0] = new ParseNode(SlangParser.integerLiteral, "integerLiteral", context.Value, line, column, position);
+                if ((false 
+                            == (SlangParser.integerLiteral == context.SymbolId))) {
+                    context.Error("Expecting integerLiteral at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.integerLiteral, "integerLiteral", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(SlangParser.Leaf, "Leaf", children, line, column, position);
             }
             // Leaf -> floatLiteral
             if ((SlangParser.floatLiteral == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[1];
-                children[0] = new ParseNode(SlangParser.floatLiteral, "floatLiteral", context.Value, line, column, position);
+                if ((false 
+                            == (SlangParser.floatLiteral == context.SymbolId))) {
+                    context.Error("Expecting floatLiteral at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.floatLiteral, "floatLiteral", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(SlangParser.Leaf, "Leaf", children, line, column, position);
             }
             // Leaf -> stringLiteral
             if ((SlangParser.stringLiteral == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[1];
-                children[0] = new ParseNode(SlangParser.stringLiteral, "stringLiteral", context.Value, line, column, position);
-                context.Advance();
-                return new ParseNode(SlangParser.Leaf, "Leaf", children, line, column, position);
-            }
-            // Leaf -> lparen Term rparen
-            if ((SlangParser.lparen == context.SymbolId)) {
-                ParseNode[] children = new ParseNode[3];
-                children[0] = new ParseNode(SlangParser.lparen, "lparen", context.Value, line, column, position);
-                context.Advance();
-                children[1] = SlangParser._ParseTerm(context);
-                if ((SlangParser.rparen == context.SymbolId)) {
-                    children[2] = new ParseNode(SlangParser.rparen, "rparen", context.Value, line, column, position);
-                    context.Advance();
+                if ((false 
+                            == (SlangParser.stringLiteral == context.SymbolId))) {
+                    context.Error("Expecting stringLiteral at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
                 }
+                children[0] = new ParseNode(SlangParser.stringLiteral, "stringLiteral", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
                 return new ParseNode(SlangParser.Leaf, "Leaf", children, line, column, position);
             }
-            context.Error("Expecting verbatimIdentifier, identifier, verbatimStringLiteral, integerLiteral, " +
-                    "floatLiteral, stringLiteral, or lparen");
+            // Leaf -> Cast
+            if ((SlangParser.lparen == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                children[0] = SlangParser.ParseCast(context);
+                return new ParseNode(SlangParser.Leaf, "Leaf", children, line, column, position);
+            }
+            // Leaf -> typeOf lparen Type rparen
+            if ((SlangParser.typeOf == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[4];
+                if ((false 
+                            == (SlangParser.typeOf == context.SymbolId))) {
+                    context.Error("Expecting typeOf at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.typeOf, "typeOf", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                if ((false 
+                            == (SlangParser.lparen == context.SymbolId))) {
+                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(SlangParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                children[2] = SlangParser.ParseType(context);
+                if ((false 
+                            == (SlangParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[3] = new ParseNode(SlangParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.Leaf, "Leaf", children, line, column, position);
+            }
+            // Leaf -> nameOf lparen Identifier rparen
+            if ((SlangParser.nameOf == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.nameOf == context.SymbolId))) {
+                    context.Error("Expecting nameOf at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.nameOf, "nameOf", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                if ((false 
+                            == (SlangParser.lparen == context.SymbolId))) {
+                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.AddRange(SlangParser.ParseIdentifier(context).Children);
+                if ((false 
+                            == (SlangParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(SlangParser.Leaf, "Leaf", children.ToArray(), line, column, position);
+            }
+            // Leaf -> New
+            if ((SlangParser.newObj == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                children[0] = SlangParser.ParseNew(context);
+                return new ParseNode(SlangParser.Leaf, "Leaf", children, line, column, position);
+            }
+            // Leaf -> Identifier LeafPart
+            if (((SlangParser.verbatimIdentifier == context.SymbolId) 
+                        || (SlangParser.identifier2 == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseIdentifier(context).Children);
+                children.AddRange(SlangParser.ParseLeafPart(context).Children);
+                return new ParseNode(SlangParser.Leaf, "Leaf", children.ToArray(), line, column, position);
+            }
+            // Leaf -> IntrinsicType LeafPart2
+            if ((((((((((((((((SlangParser.boolType == context.SymbolId) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(SlangParser.ParseIntrinsicType(context));
+                children.AddRange(SlangParser.ParseLeafPart2(context).Children);
+                return new ParseNode(SlangParser.Leaf, "Leaf", children.ToArray(), line, column, position);
+            }
+            context.Error(@"Expecting verbatimStringLiteral, integerLiteral, floatLiteral, stringLiteral, lparen, typeOf, nameOf, newObj, verbatimIdentifier, identifier, boolType, charType, stringType, floatType, doubleType, decimalType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, or objectType at line {0}, column {1}, position {2}", line, column, position);
             return null;
         }
         /// <summary>
         /// Parses a production of the form:
-        /// Leaf= Identifier | verbatimStringLiteral | integerLiteral | floatLiteral | stringLiteral | "(" Term ")"
+        /// Leaf= ( Identifier | IntrinsicType ) { MemberAnyRef } | verbatimStringLiteral | integerLiteral | floatLiteral | stringLiteral | Cast | typeOf "(" Type ")" | nameOf "(" Identifier ")" | New
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Leaf -> Identifier
         /// Leaf -> verbatimStringLiteral
         /// Leaf -> integerLiteral
         /// Leaf -> floatLiteral
         /// Leaf -> stringLiteral
-        /// Leaf -> lparen Term rparen
+        /// Leaf -> Cast
+        /// Leaf -> typeOf lparen Type rparen
+        /// Leaf -> nameOf lparen Identifier rparen
+        /// Leaf -> New
+        /// Leaf -> Identifier LeafPart
+        /// Leaf -> IntrinsicType LeafPart2
         /// </remarks>
         /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
         public static ParseNode ParseLeaf(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
-            return SlangParser._ParseLeaf(context);
+            return SlangParser.ParseLeaf(context);
         }
-        private static ParseNode _ParseIdentifier(ParserContext context) {
+        private static ParseNode ParseIdentifier(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
@@ -276,7 +1448,11 @@ namespace CD {
             if (((SlangParser.verbatimIdentifier == context.SymbolId) 
                         && SlangParser._WhereIdentifier(context.GetLookAhead(true)))) {
                 ParseNode[] children = new ParseNode[1];
-                children[0] = new ParseNode(SlangParser.verbatimIdentifier, "verbatimIdentifier", context.Value, line, column, position);
+                if ((false 
+                            == (SlangParser.verbatimIdentifier == context.SymbolId))) {
+                    context.Error("Expecting verbatimIdentifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.verbatimIdentifier, "verbatimIdentifier", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(SlangParser.Identifier, "Identifier", children, line, column, position);
             }
@@ -284,154 +1460,746 @@ namespace CD {
             if (((SlangParser.identifier2 == context.SymbolId) 
                         && SlangParser._WhereIdentifier(context.GetLookAhead(true)))) {
                 ParseNode[] children = new ParseNode[1];
-                children[0] = new ParseNode(SlangParser.identifier2, "identifier", context.Value, line, column, position);
+                if ((false 
+                            == (SlangParser.identifier2 == context.SymbolId))) {
+                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(SlangParser.Identifier, "Identifier", children, line, column, position);
             }
-            context.Error("Expecting verbatimIdentifier or identifier");
+            context.Error("Expecting verbatimIdentifier or identifier at line {0}, column {1}, position {2}", line, column, position);
             return null;
         }
         private static bool _WhereIdentifier(ParserContext context) {
-            return (false == CD.SlangParser.Keywords.Contains(context.Value));
+            return (false == Keywords.Contains(context.Value));
         }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Identifier= verbatimIdentifier | identifier
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Identifier -> verbatimIdentifier
-        /// Identifier -> identifier
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode ParseIdentifier(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return SlangParser._ParseIdentifier(context);
-        }
-        private static ParseNode _ParseTermList(ParserContext context) {
+        private static ParseNode ParseTermList(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             // TermList -> add Factor TermListRightAssoc TermListRightAssoc2
             if ((SlangParser.add == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(SlangParser.add, "add", context.Value, line, column, position));
+                if ((false 
+                            == (SlangParser.add == context.SymbolId))) {
+                    context.Error("Expecting add at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.add, "add", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(SlangParser._ParseFactor(context));
-                children.AddRange(SlangParser._ParseTermListRightAssoc(context).Children);
-                children.AddRange(SlangParser._ParseTermListRightAssoc2(context).Children);
+                children.Add(SlangParser.ParseFactor(context));
+                children.AddRange(SlangParser.ParseTermListRightAssoc(context).Children);
+                children.AddRange(SlangParser.ParseTermListRightAssoc2(context).Children);
                 return new ParseNode(SlangParser.TermList, "TermList", children.ToArray(), line, column, position);
             }
             // TermList -> sub Factor TermListRightAssoc TermListRightAssoc2
             if ((SlangParser.sub == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(SlangParser.sub, "sub", context.Value, line, column, position));
+                if ((false 
+                            == (SlangParser.sub == context.SymbolId))) {
+                    context.Error("Expecting sub at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.sub, "sub", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(SlangParser._ParseFactor(context));
-                children.AddRange(SlangParser._ParseTermListRightAssoc(context).Children);
-                children.AddRange(SlangParser._ParseTermListRightAssoc2(context).Children);
+                children.Add(SlangParser.ParseFactor(context));
+                children.AddRange(SlangParser.ParseTermListRightAssoc(context).Children);
+                children.AddRange(SlangParser.ParseTermListRightAssoc2(context).Children);
                 return new ParseNode(SlangParser.TermList, "TermList", children.ToArray(), line, column, position);
             }
-            context.Error("Expecting add or sub");
+            context.Error("Expecting add or sub at line {0}, column {1}, position {2}", line, column, position);
             return null;
         }
-        private static ParseNode _ParseFactorList(ParserContext context) {
+        private static ParseNode ParseFactorList(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
-            // FactorList -> mul Unary FactorListRightAssoc FactorListRightAssoc2
+            // FactorList -> mul Unary FactorListRightAssoc FactorListRightAssoc2 FactorListRightAssoc3
             if ((SlangParser.mul == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(SlangParser.mul, "mul", context.Value, line, column, position));
+                if ((false 
+                            == (SlangParser.mul == context.SymbolId))) {
+                    context.Error("Expecting mul at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.mul, "mul", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(SlangParser._ParseUnary(context));
-                children.AddRange(SlangParser._ParseFactorListRightAssoc(context).Children);
-                children.AddRange(SlangParser._ParseFactorListRightAssoc2(context).Children);
+                children.Add(SlangParser.ParseUnary(context));
+                children.AddRange(SlangParser.ParseFactorListRightAssoc(context).Children);
+                children.AddRange(SlangParser.ParseFactorListRightAssoc2(context).Children);
+                children.AddRange(SlangParser.ParseFactorListRightAssoc3(context).Children);
                 return new ParseNode(SlangParser.FactorList, "FactorList", children.ToArray(), line, column, position);
             }
-            // FactorList -> div Unary FactorListRightAssoc FactorListRightAssoc2
+            // FactorList -> div Unary FactorListRightAssoc FactorListRightAssoc2 FactorListRightAssoc3
             if ((SlangParser.div == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(SlangParser.div, "div", context.Value, line, column, position));
+                if ((false 
+                            == (SlangParser.div == context.SymbolId))) {
+                    context.Error("Expecting div at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.div, "div", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(SlangParser._ParseUnary(context));
-                children.AddRange(SlangParser._ParseFactorListRightAssoc(context).Children);
-                children.AddRange(SlangParser._ParseFactorListRightAssoc2(context).Children);
+                children.Add(SlangParser.ParseUnary(context));
+                children.AddRange(SlangParser.ParseFactorListRightAssoc(context).Children);
+                children.AddRange(SlangParser.ParseFactorListRightAssoc2(context).Children);
+                children.AddRange(SlangParser.ParseFactorListRightAssoc3(context).Children);
                 return new ParseNode(SlangParser.FactorList, "FactorList", children.ToArray(), line, column, position);
             }
-            context.Error("Expecting mul or div");
+            // FactorList -> mod Unary FactorListRightAssoc FactorListRightAssoc2 FactorListRightAssoc3
+            if ((SlangParser.mod == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.mod == context.SymbolId))) {
+                    context.Error("Expecting mod at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.mod, "mod", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseUnary(context));
+                children.AddRange(SlangParser.ParseFactorListRightAssoc(context).Children);
+                children.AddRange(SlangParser.ParseFactorListRightAssoc2(context).Children);
+                children.AddRange(SlangParser.ParseFactorListRightAssoc3(context).Children);
+                return new ParseNode(SlangParser.FactorList, "FactorList", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting mul, div, or mod at line {0}, column {1}, position {2}", line, column, position);
             return null;
         }
-        private static ParseNode _ParseTermListRightAssoc(ParserContext context) {
+        private static ParseNode ParseMemberInvokeRefList(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MemberInvokeRefList -> comma MethodArg MemberInvokeRefListRightAssoc
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseMethodArg(context));
+                children.AddRange(SlangParser.ParseMemberInvokeRefListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.MemberInvokeRefList, "MemberInvokeRefList", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting comma at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseMemberIndexerRefList(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MemberIndexerRefList -> comma Expression MemberIndexerRefListRightAssoc
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseExpression(context));
+                children.AddRange(SlangParser.ParseMemberIndexerRefListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.MemberIndexerRefList, "MemberIndexerRefList", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting comma at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseTypeBaseList(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeBaseList -> dot identifier TypeBaseListRightAssoc
+            if ((SlangParser.dot == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.dot == context.SymbolId))) {
+                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                if ((false 
+                            == (SlangParser.identifier2 == context.SymbolId))) {
+                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.AddRange(SlangParser.ParseTypeBaseListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.TypeBaseList, "TypeBaseList", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting dot at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseTypeArraySpecList(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeArraySpecList -> TypeArraySpec TypeArraySpecListRightAssoc
+            if ((SlangParser.lbracket == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(SlangParser.ParseTypeArraySpec(context));
+                children.AddRange(SlangParser.ParseTypeArraySpecListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.TypeArraySpecList, "TypeArraySpecList", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting lbracket at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseTypeGenericPartList(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeGenericPartList -> comma Type TypeGenericPartListRightAssoc
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseType(context));
+                children.AddRange(SlangParser.ParseTypeGenericPartListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.TypeGenericPartList, "TypeGenericPartList", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting comma at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseArraySpecRankList(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // ArraySpecRankList -> ArraySpecRank ArraySpecRankListRightAssoc
+            if ((SlangParser.ArraySpecRank == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.ArraySpecRank == context.SymbolId))) {
+                    context.Error("Expecting ArraySpecRank at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.ArraySpecRank, "ArraySpecRank", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.AddRange(SlangParser.ParseArraySpecRankListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.ArraySpecRankList, "ArraySpecRankList", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting ArraySpecRank at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseNewObjectPartList(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // NewObjectPartList -> comma Expression NewObjectPartListRightAssoc
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseExpression(context));
+                children.AddRange(SlangParser.ParseNewObjectPartListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.NewObjectPartList, "NewObjectPartList", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting comma at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseArraySpecExpressionListList(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // ArraySpecExpressionListList -> comma Expression ArraySpecExpressionListListRightAssoc
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseExpression(context));
+                children.AddRange(SlangParser.ParseArraySpecExpressionListListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.ArraySpecExpressionListList, "ArraySpecExpressionListList", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting comma at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseArrayInitializerList(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // ArrayInitializerList -> comma Expression ArrayInitializerListRightAssoc
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseExpression(context));
+                children.AddRange(SlangParser.ParseArrayInitializerListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.ArrayInitializerList, "ArrayInitializerList", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting comma at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseMemberAnyRefList(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MemberAnyRefList -> MemberAnyRef MemberAnyRefListRightAssoc
+            if ((((SlangParser.dot == context.SymbolId) 
+                        || (SlangParser.lparen == context.SymbolId)) 
+                        || (SlangParser.lbracket == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseMemberAnyRef(context).Children);
+                children.AddRange(SlangParser.ParseMemberAnyRefListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.MemberAnyRefList, "MemberAnyRefList", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting dot, lparen, or lbracket at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseMemberAnyRefList2(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MemberAnyRefList2 -> MemberAnyRef MemberAnyRefList2RightAssoc
+            if ((((SlangParser.dot == context.SymbolId) 
+                        || (SlangParser.lparen == context.SymbolId)) 
+                        || (SlangParser.lbracket == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseMemberAnyRef(context).Children);
+                children.AddRange(SlangParser.ParseMemberAnyRefList2RightAssoc(context).Children);
+                return new ParseNode(SlangParser.MemberAnyRefList2, "MemberAnyRefList2", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting dot, lparen, or lbracket at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseTermListRightAssoc(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             // TermListRightAssoc -> add Factor TermListRightAssoc
             if ((SlangParser.add == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(SlangParser.add, "add", context.Value, line, column, position));
+                if ((false 
+                            == (SlangParser.add == context.SymbolId))) {
+                    context.Error("Expecting add at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.add, "add", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(SlangParser._ParseFactor(context));
-                children.AddRange(SlangParser._ParseTermListRightAssoc(context).Children);
+                children.Add(SlangParser.ParseFactor(context));
+                children.AddRange(SlangParser.ParseTermListRightAssoc(context).Children);
                 return new ParseNode(SlangParser.TermListRightAssoc, "TermListRightAssoc", children.ToArray(), line, column, position);
             }
             // TermListRightAssoc ->
-            if ((((SlangParser.sub == context.SymbolId) 
+            if (((((((SlangParser.sub == context.SymbolId) 
                         || (SlangParser.EosSymbol == context.SymbolId)) 
-                        || (SlangParser.rparen == context.SymbolId))) {
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.rparen == context.SymbolId)) 
+                        || (SlangParser.rbracket == context.SymbolId)) 
+                        || (SlangParser.rbrace == context.SymbolId))) {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(SlangParser.TermListRightAssoc, "TermListRightAssoc", children, line, column, position);
             }
-            context.Error("Expecting add, sub, #EOS, or rparen");
+            context.Error("Expecting add, sub, #EOS, comma, rparen, rbracket, or rbrace at line {0}, column " +
+                    "{1}, position {2}", line, column, position);
             return null;
         }
-        private static ParseNode _ParseFactorListRightAssoc(ParserContext context) {
+        private static ParseNode ParseFactorListRightAssoc(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             // FactorListRightAssoc -> mul Unary FactorListRightAssoc
             if ((SlangParser.mul == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(SlangParser.mul, "mul", context.Value, line, column, position));
+                if ((false 
+                            == (SlangParser.mul == context.SymbolId))) {
+                    context.Error("Expecting mul at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.mul, "mul", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(SlangParser._ParseUnary(context));
-                children.AddRange(SlangParser._ParseFactorListRightAssoc(context).Children);
+                children.Add(SlangParser.ParseUnary(context));
+                children.AddRange(SlangParser.ParseFactorListRightAssoc(context).Children);
                 return new ParseNode(SlangParser.FactorListRightAssoc, "FactorListRightAssoc", children.ToArray(), line, column, position);
             }
             // FactorListRightAssoc ->
-            if ((((((SlangParser.div == context.SymbolId) 
+            if ((((((((((SlangParser.mod == context.SymbolId) 
+                        || (SlangParser.div == context.SymbolId)) 
                         || (SlangParser.add == context.SymbolId)) 
                         || (SlangParser.sub == context.SymbolId)) 
                         || (SlangParser.EosSymbol == context.SymbolId)) 
-                        || (SlangParser.rparen == context.SymbolId))) {
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.rparen == context.SymbolId)) 
+                        || (SlangParser.rbracket == context.SymbolId)) 
+                        || (SlangParser.rbrace == context.SymbolId))) {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(SlangParser.FactorListRightAssoc, "FactorListRightAssoc", children, line, column, position);
             }
-            context.Error("Expecting mul, div, add, sub, #EOS, or rparen");
+            context.Error("Expecting mul, mod, div, add, sub, #EOS, comma, rparen, rbracket, or rbrace at li" +
+                    "ne {0}, column {1}, position {2}", line, column, position);
             return null;
         }
-        private static ParseNode _ParseTerm(ParserContext context) {
+        private static ParseNode ParseFactorListRightAssoc2(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // FactorListRightAssoc2 -> mod Unary FactorListRightAssoc2
+            if ((SlangParser.mod == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.mod == context.SymbolId))) {
+                    context.Error("Expecting mod at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.mod, "mod", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseUnary(context));
+                children.AddRange(SlangParser.ParseFactorListRightAssoc2(context).Children);
+                return new ParseNode(SlangParser.FactorListRightAssoc2, "FactorListRightAssoc2", children.ToArray(), line, column, position);
+            }
+            // FactorListRightAssoc2 ->
+            if (((((((((SlangParser.div == context.SymbolId) 
+                        || (SlangParser.add == context.SymbolId)) 
+                        || (SlangParser.sub == context.SymbolId)) 
+                        || (SlangParser.EosSymbol == context.SymbolId)) 
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.rparen == context.SymbolId)) 
+                        || (SlangParser.rbracket == context.SymbolId)) 
+                        || (SlangParser.rbrace == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.FactorListRightAssoc2, "FactorListRightAssoc2", children, line, column, position);
+            }
+            context.Error("Expecting mod, div, add, sub, #EOS, comma, rparen, rbracket, or rbrace at line {0" +
+                    "}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseMemberInvokeRefListRightAssoc(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MemberInvokeRefListRightAssoc -> comma MethodArg MemberInvokeRefListRightAssoc
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseMethodArg(context));
+                children.AddRange(SlangParser.ParseMemberInvokeRefListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.MemberInvokeRefListRightAssoc, "MemberInvokeRefListRightAssoc", children.ToArray(), line, column, position);
+            }
+            // MemberInvokeRefListRightAssoc ->
+            if ((SlangParser.rparen == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.MemberInvokeRefListRightAssoc, "MemberInvokeRefListRightAssoc", children, line, column, position);
+            }
+            context.Error("Expecting comma or rparen at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseMemberIndexerRefListRightAssoc(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MemberIndexerRefListRightAssoc -> comma Expression MemberIndexerRefListRightAssoc
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseExpression(context));
+                children.AddRange(SlangParser.ParseMemberIndexerRefListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.MemberIndexerRefListRightAssoc, "MemberIndexerRefListRightAssoc", children.ToArray(), line, column, position);
+            }
+            // MemberIndexerRefListRightAssoc ->
+            if ((SlangParser.rbracket == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.MemberIndexerRefListRightAssoc, "MemberIndexerRefListRightAssoc", children, line, column, position);
+            }
+            context.Error("Expecting comma or rbracket at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseTypeBaseListRightAssoc(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeBaseListRightAssoc -> dot identifier TypeBaseListRightAssoc
+            if ((SlangParser.dot == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.dot == context.SymbolId))) {
+                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                if ((false 
+                            == (SlangParser.identifier2 == context.SymbolId))) {
+                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.AddRange(SlangParser.ParseTypeBaseListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.TypeBaseListRightAssoc, "TypeBaseListRightAssoc", children.ToArray(), line, column, position);
+            }
+            // TypeBaseListRightAssoc ->
+            if (((((((SlangParser.lt == context.SymbolId) 
+                        || (SlangParser.lbracket == context.SymbolId)) 
+                        || (SlangParser.rparen == context.SymbolId)) 
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.gt == context.SymbolId)) 
+                        || (SlangParser.lparen == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.TypeBaseListRightAssoc, "TypeBaseListRightAssoc", children, line, column, position);
+            }
+            context.Error("Expecting dot, lt, lbracket, rparen, comma, gt, or lparen at line {0}, column {1}" +
+                    ", position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseTypeArraySpecListRightAssoc(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeArraySpecListRightAssoc -> TypeArraySpec TypeArraySpecListRightAssoc
+            if ((SlangParser.lbracket == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(SlangParser.ParseTypeArraySpec(context));
+                children.AddRange(SlangParser.ParseTypeArraySpecListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.TypeArraySpecListRightAssoc, "TypeArraySpecListRightAssoc", children.ToArray(), line, column, position);
+            }
+            // TypeArraySpecListRightAssoc ->
+            if ((((SlangParser.rparen == context.SymbolId) 
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.gt == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.TypeArraySpecListRightAssoc, "TypeArraySpecListRightAssoc", children, line, column, position);
+            }
+            context.Error("Expecting lbracket, rparen, comma, or gt at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseTypeGenericPartListRightAssoc(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeGenericPartListRightAssoc -> comma Type TypeGenericPartListRightAssoc
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseType(context));
+                children.AddRange(SlangParser.ParseTypeGenericPartListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.TypeGenericPartListRightAssoc, "TypeGenericPartListRightAssoc", children.ToArray(), line, column, position);
+            }
+            // TypeGenericPartListRightAssoc ->
+            if ((SlangParser.gt == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.TypeGenericPartListRightAssoc, "TypeGenericPartListRightAssoc", children, line, column, position);
+            }
+            context.Error("Expecting comma or gt at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseArraySpecRankListRightAssoc(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // ArraySpecRankListRightAssoc -> ArraySpecRank ArraySpecRankListRightAssoc
+            if ((SlangParser.ArraySpecRank == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.ArraySpecRank == context.SymbolId))) {
+                    context.Error("Expecting ArraySpecRank at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.ArraySpecRank, "ArraySpecRank", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.AddRange(SlangParser.ParseArraySpecRankListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.ArraySpecRankListRightAssoc, "ArraySpecRankListRightAssoc", children.ToArray(), line, column, position);
+            }
+            // ArraySpecRankListRightAssoc ->
+            if ((SlangParser.rbracket == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.ArraySpecRankListRightAssoc, "ArraySpecRankListRightAssoc", children, line, column, position);
+            }
+            context.Error("Expecting ArraySpecRank or rbracket at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseNewObjectPartListRightAssoc(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // NewObjectPartListRightAssoc -> comma Expression NewObjectPartListRightAssoc
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseExpression(context));
+                children.AddRange(SlangParser.ParseNewObjectPartListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.NewObjectPartListRightAssoc, "NewObjectPartListRightAssoc", children.ToArray(), line, column, position);
+            }
+            // NewObjectPartListRightAssoc ->
+            if ((SlangParser.rparen == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.NewObjectPartListRightAssoc, "NewObjectPartListRightAssoc", children, line, column, position);
+            }
+            context.Error("Expecting comma or rparen at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseArraySpecExpressionListListRightAssoc(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // ArraySpecExpressionListListRightAssoc -> comma Expression ArraySpecExpressionListListRightAssoc
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseExpression(context));
+                children.AddRange(SlangParser.ParseArraySpecExpressionListListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.ArraySpecExpressionListListRightAssoc, "ArraySpecExpressionListListRightAssoc", children.ToArray(), line, column, position);
+            }
+            // ArraySpecExpressionListListRightAssoc ->
+            if ((SlangParser.rbracket == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.ArraySpecExpressionListListRightAssoc, "ArraySpecExpressionListListRightAssoc", children, line, column, position);
+            }
+            context.Error("Expecting comma or rbracket at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseArrayInitializerListRightAssoc(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // ArrayInitializerListRightAssoc -> comma Expression ArrayInitializerListRightAssoc
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseExpression(context));
+                children.AddRange(SlangParser.ParseArrayInitializerListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.ArrayInitializerListRightAssoc, "ArrayInitializerListRightAssoc", children.ToArray(), line, column, position);
+            }
+            // ArrayInitializerListRightAssoc ->
+            if ((SlangParser.rbrace == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.ArrayInitializerListRightAssoc, "ArrayInitializerListRightAssoc", children, line, column, position);
+            }
+            context.Error("Expecting comma or rbrace at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseMemberAnyRefListRightAssoc(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MemberAnyRefListRightAssoc -> MemberAnyRef MemberAnyRefListRightAssoc
+            if ((((SlangParser.dot == context.SymbolId) 
+                        || (SlangParser.lparen == context.SymbolId)) 
+                        || (SlangParser.lbracket == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseMemberAnyRef(context).Children);
+                children.AddRange(SlangParser.ParseMemberAnyRefListRightAssoc(context).Children);
+                return new ParseNode(SlangParser.MemberAnyRefListRightAssoc, "MemberAnyRefListRightAssoc", children.ToArray(), line, column, position);
+            }
+            // MemberAnyRefListRightAssoc ->
+            if (((((((((((SlangParser.mul == context.SymbolId) 
+                        || (SlangParser.mod == context.SymbolId)) 
+                        || (SlangParser.div == context.SymbolId)) 
+                        || (SlangParser.add == context.SymbolId)) 
+                        || (SlangParser.sub == context.SymbolId)) 
+                        || (SlangParser.EosSymbol == context.SymbolId)) 
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.rparen == context.SymbolId)) 
+                        || (SlangParser.rbracket == context.SymbolId)) 
+                        || (SlangParser.rbrace == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.MemberAnyRefListRightAssoc, "MemberAnyRefListRightAssoc", children, line, column, position);
+            }
+            context.Error("Expecting dot, lparen, lbracket, mul, mod, div, add, sub, #EOS, comma, rparen, rb" +
+                    "racket, or rbrace at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseMemberAnyRefList2RightAssoc(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MemberAnyRefList2RightAssoc -> MemberAnyRef MemberAnyRefList2RightAssoc
+            if ((((SlangParser.dot == context.SymbolId) 
+                        || (SlangParser.lparen == context.SymbolId)) 
+                        || (SlangParser.lbracket == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseMemberAnyRef(context).Children);
+                children.AddRange(SlangParser.ParseMemberAnyRefList2RightAssoc(context).Children);
+                return new ParseNode(SlangParser.MemberAnyRefList2RightAssoc, "MemberAnyRefList2RightAssoc", children.ToArray(), line, column, position);
+            }
+            // MemberAnyRefList2RightAssoc ->
+            if (((((((((((SlangParser.mul == context.SymbolId) 
+                        || (SlangParser.mod == context.SymbolId)) 
+                        || (SlangParser.div == context.SymbolId)) 
+                        || (SlangParser.add == context.SymbolId)) 
+                        || (SlangParser.sub == context.SymbolId)) 
+                        || (SlangParser.EosSymbol == context.SymbolId)) 
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.rparen == context.SymbolId)) 
+                        || (SlangParser.rbracket == context.SymbolId)) 
+                        || (SlangParser.rbrace == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.MemberAnyRefList2RightAssoc, "MemberAnyRefList2RightAssoc", children, line, column, position);
+            }
+            context.Error("Expecting dot, lparen, lbracket, mul, mod, div, add, sub, #EOS, comma, rparen, rb" +
+                    "racket, or rbrace at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseTerm(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             // Term -> Factor TermPart
-            if ((((((((((SlangParser.add == context.SymbolId) 
+            if ((((((((((((((((((((((((((((SlangParser.add == context.SymbolId) 
                         || (SlangParser.sub == context.SymbolId)) 
-                        || (SlangParser.verbatimIdentifier == context.SymbolId)) 
-                        || (SlangParser.identifier2 == context.SymbolId)) 
+                        || (SlangParser.lparen == context.SymbolId)) 
                         || (SlangParser.verbatimStringLiteral == context.SymbolId)) 
                         || (SlangParser.integerLiteral == context.SymbolId)) 
                         || (SlangParser.floatLiteral == context.SymbolId)) 
                         || (SlangParser.stringLiteral == context.SymbolId)) 
-                        || (SlangParser.lparen == context.SymbolId))) {
+                        || (SlangParser.typeOf == context.SymbolId)) 
+                        || (SlangParser.nameOf == context.SymbolId)) 
+                        || (SlangParser.newObj == context.SymbolId)) 
+                        || (SlangParser.verbatimIdentifier == context.SymbolId)) 
+                        || (SlangParser.identifier2 == context.SymbolId)) 
+                        || (SlangParser.boolType == context.SymbolId)) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId))) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(SlangParser._ParseFactor(context));
-                children.AddRange(SlangParser._ParseTermPart(context).Children);
+                children.Add(SlangParser.ParseFactor(context));
+                children.AddRange(SlangParser.ParseTermPart(context).Children);
                 return new ParseNode(SlangParser.Term, "Term", children.ToArray(), line, column, position);
             }
-            context.Error("Expecting add, sub, verbatimIdentifier, identifier, verbatimStringLiteral, intege" +
-                    "rLiteral, floatLiteral, stringLiteral, or lparen");
+            context.Error(@"Expecting add, sub, lparen, verbatimStringLiteral, integerLiteral, floatLiteral, stringLiteral, typeOf, nameOf, newObj, verbatimIdentifier, identifier, boolType, charType, stringType, floatType, doubleType, decimalType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, or objectType at line {0}, column {1}, position {2}", line, column, position);
             return null;
         }
         /// <summary>
@@ -446,23 +2214,9 @@ namespace CD {
         public static ParseNode ParseTerm(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
-            return SlangParser._ParseTerm(context);
+            return SlangParser.ParseTerm(context);
         }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Term= Factor { ( "+" | "-" ) Factor }
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Term -> Factor TermPart
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return SlangParser._ParseTerm(context);
-        }
-        private static ParseNode _ParseTermPart(ParserContext context) {
+        private static ParseNode ParseTermPart(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
@@ -470,44 +2224,65 @@ namespace CD {
             if (((SlangParser.add == context.SymbolId) 
                         || (SlangParser.sub == context.SymbolId))) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.AddRange(SlangParser._ParseTermList(context).Children);
+                children.AddRange(SlangParser.ParseTermList(context).Children);
                 return new ParseNode(SlangParser.TermPart, "TermPart", children.ToArray(), line, column, position);
             }
             // TermPart ->
-            if (((SlangParser.EosSymbol == context.SymbolId) 
-                        || (SlangParser.rparen == context.SymbolId))) {
+            if ((((((SlangParser.EosSymbol == context.SymbolId) 
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.rparen == context.SymbolId)) 
+                        || (SlangParser.rbracket == context.SymbolId)) 
+                        || (SlangParser.rbrace == context.SymbolId))) {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(SlangParser.TermPart, "TermPart", children, line, column, position);
             }
-            context.Error("Expecting add, sub, #EOS, or rparen");
+            context.Error("Expecting add, sub, #EOS, comma, rparen, rbracket, or rbrace at line {0}, column " +
+                    "{1}, position {2}", line, column, position);
             return null;
         }
-        private static ParseNode _ParseFactor(ParserContext context) {
+        private static ParseNode ParseFactor(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             // Factor -> Unary FactorPart
-            if ((((((((((SlangParser.add == context.SymbolId) 
+            if ((((((((((((((((((((((((((((SlangParser.add == context.SymbolId) 
                         || (SlangParser.sub == context.SymbolId)) 
-                        || (SlangParser.verbatimIdentifier == context.SymbolId)) 
-                        || (SlangParser.identifier2 == context.SymbolId)) 
+                        || (SlangParser.lparen == context.SymbolId)) 
                         || (SlangParser.verbatimStringLiteral == context.SymbolId)) 
                         || (SlangParser.integerLiteral == context.SymbolId)) 
                         || (SlangParser.floatLiteral == context.SymbolId)) 
                         || (SlangParser.stringLiteral == context.SymbolId)) 
-                        || (SlangParser.lparen == context.SymbolId))) {
+                        || (SlangParser.typeOf == context.SymbolId)) 
+                        || (SlangParser.nameOf == context.SymbolId)) 
+                        || (SlangParser.newObj == context.SymbolId)) 
+                        || (SlangParser.verbatimIdentifier == context.SymbolId)) 
+                        || (SlangParser.identifier2 == context.SymbolId)) 
+                        || (SlangParser.boolType == context.SymbolId)) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId))) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(SlangParser._ParseUnary(context));
-                children.AddRange(SlangParser._ParseFactorPart(context).Children);
+                children.Add(SlangParser.ParseUnary(context));
+                children.AddRange(SlangParser.ParseFactorPart(context).Children);
                 return new ParseNode(SlangParser.Factor, "Factor", children.ToArray(), line, column, position);
             }
-            context.Error("Expecting add, sub, verbatimIdentifier, identifier, verbatimStringLiteral, intege" +
-                    "rLiteral, floatLiteral, stringLiteral, or lparen");
+            context.Error(@"Expecting add, sub, lparen, verbatimStringLiteral, integerLiteral, floatLiteral, stringLiteral, typeOf, nameOf, newObj, verbatimIdentifier, identifier, boolType, charType, stringType, floatType, doubleType, decimalType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, or objectType at line {0}, column {1}, position {2}", line, column, position);
             return null;
         }
         /// <summary>
         /// Parses a production of the form:
-        /// Factor= Unary { ( "*" | "/" ) Unary }
+        /// Factor= Unary { ( "*" | "/" | "%" ) Unary }
         /// </summary>
         /// <remarks>
         /// The production rules are:
@@ -517,74 +2292,1017 @@ namespace CD {
         public static ParseNode ParseFactor(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
-            return SlangParser._ParseFactor(context);
+            return SlangParser.ParseFactor(context);
         }
-        private static ParseNode _ParseFactorPart(ParserContext context) {
+        private static ParseNode ParseFactorPart(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             // FactorPart -> FactorList
-            if (((SlangParser.mul == context.SymbolId) 
-                        || (SlangParser.div == context.SymbolId))) {
+            if ((((SlangParser.mul == context.SymbolId) 
+                        || (SlangParser.div == context.SymbolId)) 
+                        || (SlangParser.mod == context.SymbolId))) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.AddRange(SlangParser._ParseFactorList(context).Children);
+                children.AddRange(SlangParser.ParseFactorList(context).Children);
                 return new ParseNode(SlangParser.FactorPart, "FactorPart", children.ToArray(), line, column, position);
             }
             // FactorPart ->
-            if (((((SlangParser.add == context.SymbolId) 
+            if ((((((((SlangParser.add == context.SymbolId) 
                         || (SlangParser.sub == context.SymbolId)) 
                         || (SlangParser.EosSymbol == context.SymbolId)) 
-                        || (SlangParser.rparen == context.SymbolId))) {
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.rparen == context.SymbolId)) 
+                        || (SlangParser.rbracket == context.SymbolId)) 
+                        || (SlangParser.rbrace == context.SymbolId))) {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(SlangParser.FactorPart, "FactorPart", children, line, column, position);
             }
-            context.Error("Expecting mul, div, add, sub, #EOS, or rparen");
+            context.Error("Expecting mul, div, mod, add, sub, #EOS, comma, rparen, rbracket, or rbrace at li" +
+                    "ne {0}, column {1}, position {2}", line, column, position);
             return null;
         }
-        private static ParseNode _ParseTermListRightAssoc2(ParserContext context) {
+        private static ParseNode ParseMemberInvokeRefPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MemberInvokeRefPart -> MemberInvokeRefList rparen
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseMemberInvokeRefList(context).Children);
+                if ((false 
+                            == (SlangParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(SlangParser.MemberInvokeRefPart, "MemberInvokeRefPart", children.ToArray(), line, column, position);
+            }
+            // MemberInvokeRefPart -> rparen
+            if ((SlangParser.rparen == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.MemberInvokeRefPart, "MemberInvokeRefPart", children, line, column, position);
+            }
+            context.Error("Expecting comma or rparen at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseMemberIndexerRef(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MemberIndexerRef -> lbracket Expression MemberIndexerRefPart
+            if ((SlangParser.lbracket == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.lbracket == context.SymbolId))) {
+                    context.Error("Expecting lbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.lbracket, "lbracket", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseExpression(context));
+                children.AddRange(SlangParser.ParseMemberIndexerRefPart(context).Children);
+                return new ParseNode(SlangParser.MemberIndexerRef, "MemberIndexerRef", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting lbracket at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// MemberIndexerRef= "[" Expression { "," Expression } "]"
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// MemberIndexerRef -> lbracket Expression MemberIndexerRefPart
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseMemberIndexerRef(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseMemberIndexerRef(context);
+        }
+        private static ParseNode ParseMemberIndexerRefPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MemberIndexerRefPart -> MemberIndexerRefList rbracket
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseMemberIndexerRefList(context).Children);
+                if ((false 
+                            == (SlangParser.rbracket == context.SymbolId))) {
+                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(SlangParser.MemberIndexerRefPart, "MemberIndexerRefPart", children.ToArray(), line, column, position);
+            }
+            // MemberIndexerRefPart -> rbracket
+            if ((SlangParser.rbracket == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.rbracket == context.SymbolId))) {
+                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.MemberIndexerRefPart, "MemberIndexerRefPart", children, line, column, position);
+            }
+            context.Error("Expecting comma or rbracket at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseTypeBasePart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeBasePart -> TypeBaseList
+            if ((SlangParser.dot == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseTypeBaseList(context).Children);
+                return new ParseNode(SlangParser.TypeBasePart, "TypeBasePart", children.ToArray(), line, column, position);
+            }
+            // TypeBasePart ->
+            if (((((((SlangParser.lt == context.SymbolId) 
+                        || (SlangParser.lbracket == context.SymbolId)) 
+                        || (SlangParser.rparen == context.SymbolId)) 
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.gt == context.SymbolId)) 
+                        || (SlangParser.lparen == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.TypeBasePart, "TypeBasePart", children, line, column, position);
+            }
+            context.Error("Expecting dot, lt, lbracket, rparen, comma, gt, or lparen at line {0}, column {1}" +
+                    ", position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseType(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // Type -> TypeElement TypePart
+            if (((((((((((((((((SlangParser.boolType == context.SymbolId) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId)) 
+                        || (SlangParser.identifier2 == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(SlangParser.ParseTypeElement(context));
+                children.AddRange(SlangParser.ParseTypePart(context).Children);
+                return new ParseNode(SlangParser.Type, "Type", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting boolType, charType, stringType, floatType, doubleType, decimalType, sby" +
+                    "teType, byteType, shortType, ushortType, intType, uintType, longType, ulongType," +
+                    " objectType, or identifier at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// Type= TypeElement { TypeArraySpec }
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Type -> TypeElement TypePart
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseType(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseType(context);
+        }
+        private static ParseNode ParseTypePart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypePart -> TypeArraySpecList
+            if ((SlangParser.lbracket == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseTypeArraySpecList(context).Children);
+                return new ParseNode(SlangParser.TypePart, "TypePart", children.ToArray(), line, column, position);
+            }
+            // TypePart ->
+            if ((((SlangParser.rparen == context.SymbolId) 
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.gt == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.TypePart, "TypePart", children, line, column, position);
+            }
+            context.Error("Expecting lbracket, rparen, comma, or gt at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseTypeElement(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeElement -> TypeBase TypeElementPart
+            if (((((((((((((((((SlangParser.boolType == context.SymbolId) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId)) 
+                        || (SlangParser.identifier2 == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(SlangParser.ParseTypeBase(context));
+                children.AddRange(SlangParser.ParseTypeElementPart(context).Children);
+                return new ParseNode(SlangParser.TypeElement, "TypeElement", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting boolType, charType, stringType, floatType, doubleType, decimalType, sby" +
+                    "teType, byteType, shortType, ushortType, intType, uintType, longType, ulongType," +
+                    " objectType, or identifier at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// TypeElement= TypeBase [ TypeGenericPart ]
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// TypeElement -> TypeBase TypeElementPart
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseTypeElement(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseTypeElement(context);
+        }
+        private static ParseNode ParseTypeElementPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeElementPart -> TypeGenericPart
+            if ((SlangParser.lt == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                children[0] = SlangParser.ParseTypeGenericPart(context);
+                return new ParseNode(SlangParser.TypeElementPart, "TypeElementPart", children, line, column, position);
+            }
+            // TypeElementPart ->
+            if ((((((SlangParser.lbracket == context.SymbolId) 
+                        || (SlangParser.rparen == context.SymbolId)) 
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.gt == context.SymbolId)) 
+                        || (SlangParser.lparen == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.TypeElementPart, "TypeElementPart", children, line, column, position);
+            }
+            context.Error("Expecting lt, lbracket, rparen, comma, gt, or lparen at line {0}, column {1}, pos" +
+                    "ition {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseTypeGenericPartPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeGenericPartPart -> TypeGenericPartList gt
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseTypeGenericPartList(context).Children);
+                if ((false 
+                            == (SlangParser.gt == context.SymbolId))) {
+                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.gt, "gt", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(SlangParser.TypeGenericPartPart, "TypeGenericPartPart", children.ToArray(), line, column, position);
+            }
+            // TypeGenericPartPart -> gt
+            if ((SlangParser.gt == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.gt == context.SymbolId))) {
+                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.gt, "gt", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.TypeGenericPartPart, "TypeGenericPartPart", children, line, column, position);
+            }
+            context.Error("Expecting comma or gt at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseTypeArraySpec(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeArraySpec -> lbracket TypeArraySpecPart
+            if ((SlangParser.lbracket == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.lbracket == context.SymbolId))) {
+                    context.Error("Expecting lbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.lbracket, "lbracket", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.AddRange(SlangParser.ParseTypeArraySpecPart(context).Children);
+                return new ParseNode(SlangParser.TypeArraySpec, "TypeArraySpec", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting lbracket at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// TypeArraySpec= "[" { ArraySpecRank } "]"
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// TypeArraySpec -> lbracket TypeArraySpecPart
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseTypeArraySpec(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseTypeArraySpec(context);
+        }
+        private static ParseNode ParseTypeArraySpecPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeArraySpecPart -> ArraySpecRankList rbracket
+            if ((SlangParser.ArraySpecRank == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseArraySpecRankList(context).Children);
+                if ((false 
+                            == (SlangParser.rbracket == context.SymbolId))) {
+                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(SlangParser.TypeArraySpecPart, "TypeArraySpecPart", children.ToArray(), line, column, position);
+            }
+            // TypeArraySpecPart -> rbracket
+            if ((SlangParser.rbracket == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.rbracket == context.SymbolId))) {
+                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.TypeArraySpecPart, "TypeArraySpecPart", children, line, column, position);
+            }
+            context.Error("Expecting ArraySpecRank or rbracket at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseNew(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // New -> newObj TypeElement NewPart
+            if ((SlangParser.newObj == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.newObj == context.SymbolId))) {
+                    context.Error("Expecting newObj at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.newObj, "newObj", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(SlangParser.ParseTypeElement(context));
+                children.AddRange(SlangParser.ParseNewPart(context).Children);
+                return new ParseNode(SlangParser.New, "New", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting newObj at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// New= newObj TypeElement ( NewObjectPart | NewArrayPart )
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// New -> newObj TypeElement NewPart
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseNew(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseNew(context);
+        }
+        private static ParseNode ParseNewPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // NewPart -> NewObjectPart
+            if ((SlangParser.lparen == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                children[0] = SlangParser.ParseNewObjectPart(context);
+                return new ParseNode(SlangParser.NewPart, "NewPart", children, line, column, position);
+            }
+            // NewPart -> NewArrayPart
+            if ((SlangParser.lbracket == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                children[0] = SlangParser.ParseNewArrayPart(context);
+                return new ParseNode(SlangParser.NewPart, "NewPart", children, line, column, position);
+            }
+            context.Error("Expecting lparen or lbracket at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseNewObjectPartPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // NewObjectPartPart -> NewObjectPartList rparen
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseNewObjectPartList(context).Children);
+                if ((false 
+                            == (SlangParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(SlangParser.NewObjectPartPart, "NewObjectPartPart", children.ToArray(), line, column, position);
+            }
+            // NewObjectPartPart -> rparen
+            if ((SlangParser.rparen == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.NewObjectPartPart, "NewObjectPartPart", children, line, column, position);
+            }
+            context.Error("Expecting comma or rparen at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseArraySpecExpressionList(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // ArraySpecExpressionList -> Expression ArraySpecExpressionListPart
+            if ((((((((((((((((((((((((((((SlangParser.add == context.SymbolId) 
+                        || (SlangParser.sub == context.SymbolId)) 
+                        || (SlangParser.lparen == context.SymbolId)) 
+                        || (SlangParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (SlangParser.integerLiteral == context.SymbolId)) 
+                        || (SlangParser.floatLiteral == context.SymbolId)) 
+                        || (SlangParser.stringLiteral == context.SymbolId)) 
+                        || (SlangParser.typeOf == context.SymbolId)) 
+                        || (SlangParser.nameOf == context.SymbolId)) 
+                        || (SlangParser.newObj == context.SymbolId)) 
+                        || (SlangParser.verbatimIdentifier == context.SymbolId)) 
+                        || (SlangParser.identifier2 == context.SymbolId)) 
+                        || (SlangParser.boolType == context.SymbolId)) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(SlangParser.ParseExpression(context));
+                children.AddRange(SlangParser.ParseArraySpecExpressionListPart(context).Children);
+                return new ParseNode(SlangParser.ArraySpecExpressionList, "ArraySpecExpressionList", children.ToArray(), line, column, position);
+            }
+            context.Error(@"Expecting add, sub, lparen, verbatimStringLiteral, integerLiteral, floatLiteral, stringLiteral, typeOf, nameOf, newObj, verbatimIdentifier, identifier, boolType, charType, stringType, floatType, doubleType, decimalType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, or objectType at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseArraySpecExpressionListPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // ArraySpecExpressionListPart -> ArraySpecExpressionListList rbracket
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseArraySpecExpressionListList(context).Children);
+                if ((false 
+                            == (SlangParser.rbracket == context.SymbolId))) {
+                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(SlangParser.ArraySpecExpressionListPart, "ArraySpecExpressionListPart", children.ToArray(), line, column, position);
+            }
+            // ArraySpecExpressionListPart -> rbracket
+            if ((SlangParser.rbracket == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.rbracket == context.SymbolId))) {
+                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.ArraySpecExpressionListPart, "ArraySpecExpressionListPart", children, line, column, position);
+            }
+            context.Error("Expecting comma or rbracket at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseArrayInitializerPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // ArrayInitializerPart -> ArrayInitializerList rbrace
+            if ((SlangParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseArrayInitializerList(context).Children);
+                if ((false 
+                            == (SlangParser.rbrace == context.SymbolId))) {
+                    context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.rbrace, "rbrace", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(SlangParser.ArrayInitializerPart, "ArrayInitializerPart", children.ToArray(), line, column, position);
+            }
+            // ArrayInitializerPart -> rbrace
+            if ((SlangParser.rbrace == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.rbrace == context.SymbolId))) {
+                    context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.rbrace, "rbrace", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.ArrayInitializerPart, "ArrayInitializerPart", children, line, column, position);
+            }
+            context.Error("Expecting comma or rbrace at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseLeafPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // LeafPart -> MemberAnyRefList
+            if ((((SlangParser.dot == context.SymbolId) 
+                        || (SlangParser.lparen == context.SymbolId)) 
+                        || (SlangParser.lbracket == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseMemberAnyRefList(context).Children);
+                return new ParseNode(SlangParser.LeafPart, "LeafPart", children.ToArray(), line, column, position);
+            }
+            // LeafPart ->
+            if (((((((((((SlangParser.mul == context.SymbolId) 
+                        || (SlangParser.mod == context.SymbolId)) 
+                        || (SlangParser.div == context.SymbolId)) 
+                        || (SlangParser.add == context.SymbolId)) 
+                        || (SlangParser.sub == context.SymbolId)) 
+                        || (SlangParser.EosSymbol == context.SymbolId)) 
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.rparen == context.SymbolId)) 
+                        || (SlangParser.rbracket == context.SymbolId)) 
+                        || (SlangParser.rbrace == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.LeafPart, "LeafPart", children, line, column, position);
+            }
+            context.Error("Expecting dot, lparen, lbracket, mul, mod, div, add, sub, #EOS, comma, rparen, rb" +
+                    "racket, or rbrace at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseLeafPart2(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // LeafPart2 -> MemberAnyRefList2
+            if ((((SlangParser.dot == context.SymbolId) 
+                        || (SlangParser.lparen == context.SymbolId)) 
+                        || (SlangParser.lbracket == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(SlangParser.ParseMemberAnyRefList2(context).Children);
+                return new ParseNode(SlangParser.LeafPart2, "LeafPart2", children.ToArray(), line, column, position);
+            }
+            // LeafPart2 ->
+            if (((((((((((SlangParser.mul == context.SymbolId) 
+                        || (SlangParser.mod == context.SymbolId)) 
+                        || (SlangParser.div == context.SymbolId)) 
+                        || (SlangParser.add == context.SymbolId)) 
+                        || (SlangParser.sub == context.SymbolId)) 
+                        || (SlangParser.EosSymbol == context.SymbolId)) 
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.rparen == context.SymbolId)) 
+                        || (SlangParser.rbracket == context.SymbolId)) 
+                        || (SlangParser.rbrace == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(SlangParser.LeafPart2, "LeafPart2", children, line, column, position);
+            }
+            context.Error("Expecting dot, lparen, lbracket, mul, mod, div, add, sub, #EOS, comma, rparen, rb" +
+                    "racket, or rbrace at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseTermListRightAssoc2(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             // TermListRightAssoc2 -> sub Factor TermListRightAssoc2
             if ((SlangParser.sub == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(SlangParser.sub, "sub", context.Value, line, column, position));
+                if ((false 
+                            == (SlangParser.sub == context.SymbolId))) {
+                    context.Error("Expecting sub at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.sub, "sub", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(SlangParser._ParseFactor(context));
-                children.AddRange(SlangParser._ParseTermListRightAssoc2(context).Children);
+                children.Add(SlangParser.ParseFactor(context));
+                children.AddRange(SlangParser.ParseTermListRightAssoc2(context).Children);
                 return new ParseNode(SlangParser.TermListRightAssoc2, "TermListRightAssoc2", children.ToArray(), line, column, position);
             }
             // TermListRightAssoc2 ->
-            if (((SlangParser.EosSymbol == context.SymbolId) 
-                        || (SlangParser.rparen == context.SymbolId))) {
+            if ((((((SlangParser.EosSymbol == context.SymbolId) 
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.rparen == context.SymbolId)) 
+                        || (SlangParser.rbracket == context.SymbolId)) 
+                        || (SlangParser.rbrace == context.SymbolId))) {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(SlangParser.TermListRightAssoc2, "TermListRightAssoc2", children, line, column, position);
             }
-            context.Error("Expecting sub, #EOS, or rparen");
+            context.Error("Expecting sub, #EOS, comma, rparen, rbracket, or rbrace at line {0}, column {1}, " +
+                    "position {2}", line, column, position);
             return null;
         }
-        private static ParseNode _ParseFactorListRightAssoc2(ParserContext context) {
+        private static ParseNode ParseFactorListRightAssoc3(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
-            // FactorListRightAssoc2 -> div Unary FactorListRightAssoc2
+            // FactorListRightAssoc3 -> div Unary FactorListRightAssoc3
             if ((SlangParser.div == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(SlangParser.div, "div", context.Value, line, column, position));
+                if ((false 
+                            == (SlangParser.div == context.SymbolId))) {
+                    context.Error("Expecting div at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.div, "div", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(SlangParser._ParseUnary(context));
-                children.AddRange(SlangParser._ParseFactorListRightAssoc2(context).Children);
-                return new ParseNode(SlangParser.FactorListRightAssoc2, "FactorListRightAssoc2", children.ToArray(), line, column, position);
+                children.Add(SlangParser.ParseUnary(context));
+                children.AddRange(SlangParser.ParseFactorListRightAssoc3(context).Children);
+                return new ParseNode(SlangParser.FactorListRightAssoc3, "FactorListRightAssoc3", children.ToArray(), line, column, position);
             }
-            // FactorListRightAssoc2 ->
-            if (((((SlangParser.add == context.SymbolId) 
+            // FactorListRightAssoc3 ->
+            if ((((((((SlangParser.add == context.SymbolId) 
                         || (SlangParser.sub == context.SymbolId)) 
                         || (SlangParser.EosSymbol == context.SymbolId)) 
-                        || (SlangParser.rparen == context.SymbolId))) {
+                        || (SlangParser.comma == context.SymbolId)) 
+                        || (SlangParser.rparen == context.SymbolId)) 
+                        || (SlangParser.rbracket == context.SymbolId)) 
+                        || (SlangParser.rbrace == context.SymbolId))) {
                 ParseNode[] children = new ParseNode[0];
-                return new ParseNode(SlangParser.FactorListRightAssoc2, "FactorListRightAssoc2", children, line, column, position);
+                return new ParseNode(SlangParser.FactorListRightAssoc3, "FactorListRightAssoc3", children, line, column, position);
             }
-            context.Error("Expecting div, add, sub, #EOS, or rparen");
+            context.Error("Expecting div, add, sub, #EOS, comma, rparen, rbracket, or rbrace at line {0}, co" +
+                    "lumn {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseMemberInvokeRef(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MemberInvokeRef -> lparen MemberInvokeRefPart2
+            if ((SlangParser.lparen == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.lparen == context.SymbolId))) {
+                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.AddRange(SlangParser.ParseMemberInvokeRefPart2(context).Children);
+                return new ParseNode(SlangParser.MemberInvokeRef, "MemberInvokeRef", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting lparen at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// MemberInvokeRef= "(" [ MethodArg { "," MethodArg } ] ")"
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// MemberInvokeRef -> lparen MemberInvokeRefPart2
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseMemberInvokeRef(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseMemberInvokeRef(context);
+        }
+        private static ParseNode ParseMemberInvokeRefPart2(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // MemberInvokeRefPart2 -> rparen
+            if ((SlangParser.rparen == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.MemberInvokeRefPart2, "MemberInvokeRefPart2", children, line, column, position);
+            }
+            // MemberInvokeRefPart2 -> MethodArg MemberInvokeRefPart
+            if ((((((((((((((((((((((((((((((SlangParser.outKeyword == context.SymbolId) 
+                        || (SlangParser.refKeyword == context.SymbolId)) 
+                        || (SlangParser.add == context.SymbolId)) 
+                        || (SlangParser.sub == context.SymbolId)) 
+                        || (SlangParser.lparen == context.SymbolId)) 
+                        || (SlangParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (SlangParser.integerLiteral == context.SymbolId)) 
+                        || (SlangParser.floatLiteral == context.SymbolId)) 
+                        || (SlangParser.stringLiteral == context.SymbolId)) 
+                        || (SlangParser.typeOf == context.SymbolId)) 
+                        || (SlangParser.nameOf == context.SymbolId)) 
+                        || (SlangParser.newObj == context.SymbolId)) 
+                        || (SlangParser.verbatimIdentifier == context.SymbolId)) 
+                        || (SlangParser.identifier2 == context.SymbolId)) 
+                        || (SlangParser.boolType == context.SymbolId)) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(SlangParser.ParseMethodArg(context));
+                children.AddRange(SlangParser.ParseMemberInvokeRefPart(context).Children);
+                return new ParseNode(SlangParser.MemberInvokeRefPart2, "MemberInvokeRefPart2", children.ToArray(), line, column, position);
+            }
+            context.Error(@"Expecting rparen, outKeyword, refKeyword, add, sub, lparen, verbatimStringLiteral, integerLiteral, floatLiteral, stringLiteral, typeOf, nameOf, newObj, verbatimIdentifier, identifier, boolType, charType, stringType, floatType, doubleType, decimalType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, or objectType at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseTypeGenericPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeGenericPart -> lt TypeGenericPartPart2
+            if ((SlangParser.lt == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.lt == context.SymbolId))) {
+                    context.Error("Expecting lt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.lt, "lt", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.AddRange(SlangParser.ParseTypeGenericPartPart2(context).Children);
+                return new ParseNode(SlangParser.TypeGenericPart, "TypeGenericPart", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting lt at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// TypeGenericPart= "<" [ Type { "," Type } ] ">"
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// TypeGenericPart -> lt TypeGenericPartPart2
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseTypeGenericPart(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseTypeGenericPart(context);
+        }
+        private static ParseNode ParseTypeGenericPartPart2(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TypeGenericPartPart2 -> gt
+            if ((SlangParser.gt == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.gt == context.SymbolId))) {
+                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.gt, "gt", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.TypeGenericPartPart2, "TypeGenericPartPart2", children, line, column, position);
+            }
+            // TypeGenericPartPart2 -> Type TypeGenericPartPart
+            if (((((((((((((((((SlangParser.boolType == context.SymbolId) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId)) 
+                        || (SlangParser.identifier2 == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(SlangParser.ParseType(context));
+                children.AddRange(SlangParser.ParseTypeGenericPartPart(context).Children);
+                return new ParseNode(SlangParser.TypeGenericPartPart2, "TypeGenericPartPart2", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting gt, boolType, charType, stringType, floatType, doubleType, decimalType," +
+                    " sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongT" +
+                    "ype, objectType, or identifier at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseNewObjectPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // NewObjectPart -> lparen NewObjectPartPart2
+            if ((SlangParser.lparen == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.lparen == context.SymbolId))) {
+                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.AddRange(SlangParser.ParseNewObjectPartPart2(context).Children);
+                return new ParseNode(SlangParser.NewObjectPart, "NewObjectPart", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting lparen at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// NewObjectPart= "(" [ Expression { "," Expression } ] ")"
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// NewObjectPart -> lparen NewObjectPartPart2
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseNewObjectPart(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseNewObjectPart(context);
+        }
+        private static ParseNode ParseNewObjectPartPart2(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // NewObjectPartPart2 -> rparen
+            if ((SlangParser.rparen == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.NewObjectPartPart2, "NewObjectPartPart2", children, line, column, position);
+            }
+            // NewObjectPartPart2 -> Expression NewObjectPartPart
+            if ((((((((((((((((((((((((((((SlangParser.add == context.SymbolId) 
+                        || (SlangParser.sub == context.SymbolId)) 
+                        || (SlangParser.lparen == context.SymbolId)) 
+                        || (SlangParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (SlangParser.integerLiteral == context.SymbolId)) 
+                        || (SlangParser.floatLiteral == context.SymbolId)) 
+                        || (SlangParser.stringLiteral == context.SymbolId)) 
+                        || (SlangParser.typeOf == context.SymbolId)) 
+                        || (SlangParser.nameOf == context.SymbolId)) 
+                        || (SlangParser.newObj == context.SymbolId)) 
+                        || (SlangParser.verbatimIdentifier == context.SymbolId)) 
+                        || (SlangParser.identifier2 == context.SymbolId)) 
+                        || (SlangParser.boolType == context.SymbolId)) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(SlangParser.ParseExpression(context));
+                children.AddRange(SlangParser.ParseNewObjectPartPart(context).Children);
+                return new ParseNode(SlangParser.NewObjectPartPart2, "NewObjectPartPart2", children.ToArray(), line, column, position);
+            }
+            context.Error(@"Expecting rparen, add, sub, lparen, verbatimStringLiteral, integerLiteral, floatLiteral, stringLiteral, typeOf, nameOf, newObj, verbatimIdentifier, identifier, boolType, charType, stringType, floatType, doubleType, decimalType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, or objectType at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseArrayInitializer(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // ArrayInitializer -> eq lbrace ArrayInitializerPart2
+            if ((SlangParser.eq == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (SlangParser.eq == context.SymbolId))) {
+                    context.Error("Expecting eq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.eq, "eq", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                if ((false 
+                            == (SlangParser.lbrace == context.SymbolId))) {
+                    context.Error("Expecting lbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(SlangParser.lbrace, "lbrace", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.AddRange(SlangParser.ParseArrayInitializerPart2(context).Children);
+                return new ParseNode(SlangParser.ArrayInitializer, "ArrayInitializer", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting eq at line {0}, column {1}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// ArrayInitializer= "=" "{" [ Expression { "," Expression } ] "}"
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// ArrayInitializer -> eq lbrace ArrayInitializerPart2
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseArrayInitializer(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return SlangParser.ParseArrayInitializer(context);
+        }
+        private static ParseNode ParseArrayInitializerPart2(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // ArrayInitializerPart2 -> rbrace
+            if ((SlangParser.rbrace == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (SlangParser.rbrace == context.SymbolId))) {
+                    context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(SlangParser.rbrace, "rbrace", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(SlangParser.ArrayInitializerPart2, "ArrayInitializerPart2", children, line, column, position);
+            }
+            // ArrayInitializerPart2 -> Expression ArrayInitializerPart
+            if ((((((((((((((((((((((((((((SlangParser.add == context.SymbolId) 
+                        || (SlangParser.sub == context.SymbolId)) 
+                        || (SlangParser.lparen == context.SymbolId)) 
+                        || (SlangParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (SlangParser.integerLiteral == context.SymbolId)) 
+                        || (SlangParser.floatLiteral == context.SymbolId)) 
+                        || (SlangParser.stringLiteral == context.SymbolId)) 
+                        || (SlangParser.typeOf == context.SymbolId)) 
+                        || (SlangParser.nameOf == context.SymbolId)) 
+                        || (SlangParser.newObj == context.SymbolId)) 
+                        || (SlangParser.verbatimIdentifier == context.SymbolId)) 
+                        || (SlangParser.identifier2 == context.SymbolId)) 
+                        || (SlangParser.boolType == context.SymbolId)) 
+                        || (SlangParser.charType == context.SymbolId)) 
+                        || (SlangParser.stringType == context.SymbolId)) 
+                        || (SlangParser.floatType == context.SymbolId)) 
+                        || (SlangParser.doubleType == context.SymbolId)) 
+                        || (SlangParser.decimalType == context.SymbolId)) 
+                        || (SlangParser.sbyteType == context.SymbolId)) 
+                        || (SlangParser.byteType == context.SymbolId)) 
+                        || (SlangParser.shortType == context.SymbolId)) 
+                        || (SlangParser.ushortType == context.SymbolId)) 
+                        || (SlangParser.intType == context.SymbolId)) 
+                        || (SlangParser.uintType == context.SymbolId)) 
+                        || (SlangParser.longType == context.SymbolId)) 
+                        || (SlangParser.ulongType == context.SymbolId)) 
+                        || (SlangParser.objectType == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(SlangParser.ParseExpression(context));
+                children.AddRange(SlangParser.ParseArrayInitializerPart(context).Children);
+                return new ParseNode(SlangParser.ArrayInitializerPart2, "ArrayInitializerPart2", children.ToArray(), line, column, position);
+            }
+            context.Error(@"Expecting rbrace, add, sub, lparen, verbatimStringLiteral, integerLiteral, floatLiteral, stringLiteral, typeOf, nameOf, newObj, verbatimIdentifier, identifier, boolType, charType, stringType, floatType, doubleType, decimalType, sbyteType, byteType, shortType, ushortType, intType, uintType, longType, ulongType, or objectType at line {0}, column {1}, position {2}", line, column, position);
             return null;
         }
     }
@@ -821,20 +3539,20 @@ namespace CD {
     /// </summary>
     /// <typeparam name="T">The type to enumerate</typeparam>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
-    internal class LookAheadEnumerator<T> : IEnumerator<T>
+    internal class LookAheadEnumerator<T> : object, IEnumerator<T>
      {
-        const int _Enumerating = 0;
-        const int _NotStarted = -2;
-        const int _Ended = -1;
-        const int _Disposed = -3;
-        IEnumerator<T> _inner;
-        int _state;
+        private const int _Enumerating = 0;
+        private const int _NotStarted = -2;
+        private const int _Ended = -1;
+        private const int _Disposed = -3;
+        private IEnumerator<T> _inner;
+        private int _state;
         // for the lookahead queue
-        const int _DefaultCapacity = 16;
-        const float _GrowthFactor = 0.9F;
-        T[] _queue;
-        int _queueHead;
-        int _queueCount;
+        private const int _DefaultCapacity = 16;
+        private const float _GrowthFactor = 0.9F;
+        private T[] _queue;
+        private int _queueHead;
+        private int _queueCount;
         /// <summary>
         /// Creates a new instance. Once this is created, the inner/wrapped enumerator must not be touched.
         /// </summary>
@@ -967,7 +3685,7 @@ namespace CD {
         /// Advances the cursor
         /// </summary>
         /// <returns>True if more input was read, otherwise false</returns>
-        public bool MoveNext() {
+        bool System.Collections.IEnumerator.MoveNext() {
             if ((0 > this._state)) {
                 if ((LookAheadEnumerator<T>._Disposed == this._state)) {
                     throw new ObjectDisposedException(typeof(LookAheadEnumerator<T>).Name);
@@ -1002,7 +3720,7 @@ namespace CD {
         /// <summary>
         /// Resets the cursor, and clears the queue.
         /// </summary>
-        public void Reset() {
+        void System.Collections.IEnumerator.Reset() {
             this._inner.Reset();
             if (((0 < this._queueCount) 
                         && (null == default(T)))) {
@@ -1021,7 +3739,7 @@ namespace CD {
         /// <summary>
         /// Disposes of this instance
         /// </summary>
-        public void Dispose() {
+        void System.IDisposable.Dispose() {
             if ((false 
                         == (LookAheadEnumerator<T>._Disposed == this._state))) {
                 this._inner.Dispose();
@@ -1069,28 +3787,30 @@ namespace CD {
         #endregion
     }
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
-    internal class LookAheadEnumeratorEnumerable<T> : IEnumerable<T>
+    internal class LookAheadEnumeratorEnumerable<T> : object, IEnumerable<T>
      {
-        LookAheadEnumerator<T> _outer;
+        private LookAheadEnumerator<T> _outer;
         public LookAheadEnumeratorEnumerable(LookAheadEnumerator<T> outer) {
             this._outer = outer;
         }
         public IEnumerator<T> GetEnumerator() {
-            return new LookAheadEnumeratorEnumerator<T>(this._outer);
+            // for some reason VB was resolving new as AddressOf, so use this.
+            LookAheadEnumeratorEnumerator<T> result = ((LookAheadEnumeratorEnumerator<T>)(System.Activator.CreateInstance(typeof(LookAheadEnumeratorEnumerator<T>), this._outer)));
+            return result;
         }
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
             return this.GetEnumerator();
         }
     }
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
-    internal class LookAheadEnumeratorEnumerator<T> : IEnumerator<T>
+    internal class LookAheadEnumeratorEnumerator<T> : object, IEnumerator<T>
      {
-        const int _NotStarted = -2;
-        const int _Ended = -1;
-        const int _Disposed = -3;
-        LookAheadEnumerator<T> _outer;
-        int _index;
-        T _current;
+        private const int _NotStarted = -2;
+        private const int _Ended = -1;
+        private const int _Disposed = -3;
+        private LookAheadEnumerator<T> _outer;
+        private int _index;
+        private T _current;
         public LookAheadEnumeratorEnumerator(LookAheadEnumerator<T> outer) {
             this._outer = outer;
             if (this._outer.IsEnumerating) {
@@ -1117,10 +3837,10 @@ namespace CD {
                 return this.Current;
             }
         }
-        public void Dispose() {
+        void System.IDisposable.Dispose() {
             this._index = LookAheadEnumeratorEnumerator<T>._Disposed;
         }
-        public bool MoveNext() {
+        bool System.Collections.IEnumerator.MoveNext() {
             T value;
             if ((0 > this._index)) {
                 if ((this._index == LookAheadEnumeratorEnumerator<T>._Disposed)) {
@@ -1139,7 +3859,7 @@ namespace CD {
             this._current = value;
             return true;
         }
-        public void Reset() {
+        void System.Collections.IEnumerator.Reset() {
             this._index = LookAheadEnumeratorEnumerator<T>._NotStarted;
         }
     }

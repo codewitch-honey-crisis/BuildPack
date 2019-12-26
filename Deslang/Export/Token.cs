@@ -1,7 +1,7 @@
-﻿namespace Parsley
+﻿namespace Rolex
 {
 	/// <summary>
-	/// Shim for slang. Not actually used
+	/// Reference implementation for generated shared code
 	/// </summary>
 	struct Token
 	{

@@ -24,10 +24,6 @@ namespace ParsleyDemo {
     /// (whitespace)= '\s+';
     /// </summary>
     /// <remarks>The rules for the factored grammar are as follows:
-    /// Term -> Factor TermList
-    /// Term -> Factor
-    /// Factor -> Unary FactorList
-    /// Factor -> Unary
     /// Unary -> add Unary
     /// Unary -> Implicit Unary
     /// Unary -> Leaf
@@ -42,6 +38,12 @@ namespace ParsleyDemo {
     /// TermListRightAssoc ->
     /// FactorListRightAssoc -> mul Unary FactorListRightAssoc
     /// FactorListRightAssoc ->
+    /// Term -> Factor TermPart
+    /// TermPart -> TermList
+    /// TermPart ->
+    /// Factor -> Unary FactorPart
+    /// FactorPart -> FactorList
+    /// FactorPart ->
     /// TermListRightAssoc2 -> Implicit Factor TermListRightAssoc2
     /// TermListRightAssoc2 ->
     /// FactorListRightAssoc2 -> Implicit2 Unary FactorListRightAssoc2
@@ -51,246 +53,53 @@ namespace ParsleyDemo {
     internal partial class ExpressionParser {
         internal const int ErrorSymbol = -1;
         internal const int EosSymbol = -2;
-        public const int Term = 0;
-        public const int Factor = 1;
-        public const int Unary = 2;
-        public const int Leaf = 3;
-        public const int TermList = 4;
-        public const int FactorList = 5;
-        public const int TermListRightAssoc = 6;
-        public const int FactorListRightAssoc = 7;
-        public const int TermListRightAssoc2 = 8;
-        public const int FactorListRightAssoc2 = 9;
-        public const int add = 10;
-        public const int Implicit = 11;
-        public const int integer = 12;
-        public const int identifier = 13;
-        public const int Implicit3 = 14;
-        public const int Implicit4 = 15;
-        public const int mul = 16;
-        public const int Implicit2 = 17;
-        public const int whitespace = 18;
-        private static ParseNode _ParseTerm(ParserContext context) {
-            int line = context.Line;
-            int column = context.Column;
-            long position = context.Position;
-            // Term -> Factor TermList
-            // Term -> Factor
-            if ((((((ExpressionParser.add == context.SymbolId) 
-                        || (ExpressionParser.Implicit == context.SymbolId)) 
-                        || (ExpressionParser.integer == context.SymbolId)) 
-                        || (ExpressionParser.identifier == context.SymbolId)) 
-                        || (ExpressionParser.Implicit3 == context.SymbolId))) {
-                ParserContext pc2;
-                System.Exception lastExcept = null;
-                pc2 = context.GetLookAhead();
-                pc2.EnsureStarted();
-                // Term -> Factor TermList
-                try {
-                    if ((((((ExpressionParser.add == pc2.SymbolId) 
-                                || (ExpressionParser.Implicit == pc2.SymbolId)) 
-                                || (ExpressionParser.integer == pc2.SymbolId)) 
-                                || (ExpressionParser.identifier == pc2.SymbolId)) 
-                                || (ExpressionParser.Implicit3 == pc2.SymbolId))) {
-                        System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                        children.Add(ExpressionParser._ParseFactor(pc2));
-                        children.AddRange(ExpressionParser._ParseTermList(pc2).Children);
-                        int adv = 0;
-                        for (
-                        ; (adv < pc2.AdvanceCount); 
-                        ) {
-                            context.Advance();
-                            adv = (adv + 1);
-                        }
-                        return new ParseNode(ExpressionParser.Term, "Term", children.ToArray(), line, column, position);
-                    }
-                    context.Error("Expecting add, Implicit, integer, identifier, or Implicit3");
-                }
-                catch (SyntaxException ex) {
-                    if ((lastExcept == null)) {
-                        lastExcept = ex;
-                    }
-                }
-                finally {
-
-                }
-                pc2 = context.GetLookAhead();
-                pc2.EnsureStarted();
-                // Term -> Factor
-                try {
-                    if ((((((ExpressionParser.add == pc2.SymbolId) 
-                                || (ExpressionParser.Implicit == pc2.SymbolId)) 
-                                || (ExpressionParser.integer == pc2.SymbolId)) 
-                                || (ExpressionParser.identifier == pc2.SymbolId)) 
-                                || (ExpressionParser.Implicit3 == pc2.SymbolId))) {
-                        ParseNode[] children = new ParseNode[1];
-                        children[0] = ExpressionParser._ParseFactor(pc2);
-                        int adv = 0;
-                        for (
-                        ; (adv < pc2.AdvanceCount); 
-                        ) {
-                            context.Advance();
-                            adv = (adv + 1);
-                        }
-                        return new ParseNode(ExpressionParser.Term, "Term", children, line, column, position);
-                    }
-                    context.Error("Expecting add, Implicit, integer, identifier, or Implicit3");
-                }
-                catch (SyntaxException ex) {
-                    if ((lastExcept == null)) {
-                        lastExcept = ex;
-                    }
-                }
-                finally {
-
-                }
-                throw lastExcept;
-            }
-            context.Error("Expecting add, Implicit, integer, identifier, or Implicit3");
-            return null;
-        }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Term= Factor { ( "+" | "-" ) Factor }
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Term -> Factor TermList
-        /// Term -> Factor
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode ParseTerm(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return ExpressionParser._ParseTerm(context);
-        }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Term= Factor { ( "+" | "-" ) Factor }
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Term -> Factor TermList
-        /// Term -> Factor
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return ExpressionParser._ParseTerm(context);
-        }
-        private static ParseNode _ParseFactor(ParserContext context) {
-            int line = context.Line;
-            int column = context.Column;
-            long position = context.Position;
-            // Factor -> Unary FactorList
-            // Factor -> Unary
-            if ((((((ExpressionParser.add == context.SymbolId) 
-                        || (ExpressionParser.Implicit == context.SymbolId)) 
-                        || (ExpressionParser.integer == context.SymbolId)) 
-                        || (ExpressionParser.identifier == context.SymbolId)) 
-                        || (ExpressionParser.Implicit3 == context.SymbolId))) {
-                ParserContext pc2;
-                System.Exception lastExcept = null;
-                pc2 = context.GetLookAhead();
-                pc2.EnsureStarted();
-                // Factor -> Unary FactorList
-                try {
-                    if ((((((ExpressionParser.add == pc2.SymbolId) 
-                                || (ExpressionParser.Implicit == pc2.SymbolId)) 
-                                || (ExpressionParser.integer == pc2.SymbolId)) 
-                                || (ExpressionParser.identifier == pc2.SymbolId)) 
-                                || (ExpressionParser.Implicit3 == pc2.SymbolId))) {
-                        System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                        children.Add(ExpressionParser._ParseUnary(pc2));
-                        children.AddRange(ExpressionParser._ParseFactorList(pc2).Children);
-                        int adv = 0;
-                        for (
-                        ; (adv < pc2.AdvanceCount); 
-                        ) {
-                            context.Advance();
-                            adv = (adv + 1);
-                        }
-                        return new ParseNode(ExpressionParser.Factor, "Factor", children.ToArray(), line, column, position);
-                    }
-                    context.Error("Expecting add, Implicit, integer, identifier, or Implicit3");
-                }
-                catch (SyntaxException ex) {
-                    if ((lastExcept == null)) {
-                        lastExcept = ex;
-                    }
-                }
-                finally {
-
-                }
-                pc2 = context.GetLookAhead();
-                pc2.EnsureStarted();
-                // Factor -> Unary
-                try {
-                    if ((((((ExpressionParser.add == pc2.SymbolId) 
-                                || (ExpressionParser.Implicit == pc2.SymbolId)) 
-                                || (ExpressionParser.integer == pc2.SymbolId)) 
-                                || (ExpressionParser.identifier == pc2.SymbolId)) 
-                                || (ExpressionParser.Implicit3 == pc2.SymbolId))) {
-                        ParseNode[] children = new ParseNode[1];
-                        children[0] = ExpressionParser._ParseUnary(pc2);
-                        int adv = 0;
-                        for (
-                        ; (adv < pc2.AdvanceCount); 
-                        ) {
-                            context.Advance();
-                            adv = (adv + 1);
-                        }
-                        return new ParseNode(ExpressionParser.Factor, "Factor", children, line, column, position);
-                    }
-                    context.Error("Expecting add, Implicit, integer, identifier, or Implicit3");
-                }
-                catch (SyntaxException ex) {
-                    if ((lastExcept == null)) {
-                        lastExcept = ex;
-                    }
-                }
-                finally {
-
-                }
-                throw lastExcept;
-            }
-            context.Error("Expecting add, Implicit, integer, identifier, or Implicit3");
-            return null;
-        }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Factor= Unary { ( "*" | "/" ) Unary }
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Factor -> Unary FactorList
-        /// Factor -> Unary
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode ParseFactor(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return ExpressionParser._ParseFactor(context);
-        }
-        private static ParseNode _ParseUnary(ParserContext context) {
+        public const int Unary = 0;
+        public const int Leaf = 1;
+        public const int TermList = 2;
+        public const int FactorList = 3;
+        public const int TermListRightAssoc = 4;
+        public const int FactorListRightAssoc = 5;
+        public const int Term = 6;
+        public const int TermPart = 7;
+        public const int Factor = 8;
+        public const int FactorPart = 9;
+        public const int TermListRightAssoc2 = 10;
+        public const int FactorListRightAssoc2 = 11;
+        public const int add = 12;
+        public const int Implicit = 13;
+        public const int integer = 14;
+        public const int identifier = 15;
+        public const int Implicit3 = 16;
+        public const int Implicit4 = 17;
+        public const int mul = 18;
+        public const int Implicit2 = 19;
+        public const int whitespace = 20;
+        private static ParseNode ParseUnary(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             // Unary -> add Unary
             if ((ExpressionParser.add == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[2];
-                children[0] = new ParseNode(ExpressionParser.add, "add", context.Value, line, column, position);
+                if ((false 
+                            == (ExpressionParser.add == context.SymbolId))) {
+                    context.Error("Expecting add at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(ExpressionParser.add, "add", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
-                children[1] = ExpressionParser._ParseUnary(context);
+                children[1] = ExpressionParser.ParseUnary(context);
                 return new ParseNode(ExpressionParser.Unary, "Unary", children, line, column, position);
             }
             // Unary -> Implicit Unary
             if ((ExpressionParser.Implicit == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[2];
-                children[0] = new ParseNode(ExpressionParser.Implicit, "Implicit", context.Value, line, column, position);
+                if ((false 
+                            == (ExpressionParser.Implicit == context.SymbolId))) {
+                    context.Error("Expecting Implicit at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(ExpressionParser.Implicit, "Implicit", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
-                children[1] = ExpressionParser._ParseUnary(context);
+                children[1] = ExpressionParser.ParseUnary(context);
                 return new ParseNode(ExpressionParser.Unary, "Unary", children, line, column, position);
             }
             // Unary -> Leaf
@@ -298,10 +107,11 @@ namespace ParsleyDemo {
                         || (ExpressionParser.identifier == context.SymbolId)) 
                         || (ExpressionParser.Implicit3 == context.SymbolId))) {
                 ParseNode[] children = new ParseNode[1];
-                children[0] = ExpressionParser._ParseLeaf(context);
+                children[0] = ExpressionParser.ParseLeaf(context);
                 return new ParseNode(ExpressionParser.Unary, "Unary", children, line, column, position);
             }
-            context.Error("Expecting add, Implicit, integer, identifier, or Implicit3");
+            context.Error("Expecting add, Implicit, integer, identifier, or Implicit3 at line {0}, column {1" +
+                    "}, position {2}", line, column, position);
             return null;
         }
         /// <summary>
@@ -318,39 +128,54 @@ namespace ParsleyDemo {
         public static ParseNode ParseUnary(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
-            return ExpressionParser._ParseUnary(context);
+            return ExpressionParser.ParseUnary(context);
         }
-        private static ParseNode _ParseLeaf(ParserContext context) {
+        private static ParseNode ParseLeaf(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             // Leaf -> integer
             if ((ExpressionParser.integer == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[1];
-                children[0] = new ParseNode(ExpressionParser.integer, "integer", context.Value, line, column, position);
+                if ((false 
+                            == (ExpressionParser.integer == context.SymbolId))) {
+                    context.Error("Expecting integer at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(ExpressionParser.integer, "integer", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);
             }
             // Leaf -> identifier
             if ((ExpressionParser.identifier == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[1];
-                children[0] = new ParseNode(ExpressionParser.identifier, "identifier", context.Value, line, column, position);
+                if ((false 
+                            == (ExpressionParser.identifier == context.SymbolId))) {
+                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(ExpressionParser.identifier, "identifier", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);
             }
             // Leaf -> Implicit3 Term Implicit4
             if ((ExpressionParser.Implicit3 == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[3];
-                children[0] = new ParseNode(ExpressionParser.Implicit3, "Implicit3", context.Value, line, column, position);
-                context.Advance();
-                children[1] = ExpressionParser._ParseTerm(context);
-                if ((ExpressionParser.Implicit4 == context.SymbolId)) {
-                    children[2] = new ParseNode(ExpressionParser.Implicit4, "Implicit4", context.Value, line, column, position);
-                    context.Advance();
+                if ((false 
+                            == (ExpressionParser.Implicit3 == context.SymbolId))) {
+                    context.Error("Expecting Implicit3 at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
                 }
+                children[0] = new ParseNode(ExpressionParser.Implicit3, "Implicit3", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                children[1] = ExpressionParser.ParseTerm(context);
+                if ((false 
+                            == (ExpressionParser.Implicit4 == context.SymbolId))) {
+                    context.Error("Expecting Implicit4 at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[2] = new ParseNode(ExpressionParser.Implicit4, "Implicit4", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
                 return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line, column, position);
             }
-            context.Error("Expecting integer, identifier, or Implicit3");
+            context.Error("Expecting integer, identifier, or Implicit3 at line {0}, column {1}, position {2}" +
+                    "", line, column, position);
             return null;
         }
         /// <summary>
@@ -367,73 +192,93 @@ namespace ParsleyDemo {
         public static ParseNode ParseLeaf(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
-            return ExpressionParser._ParseLeaf(context);
+            return ExpressionParser.ParseLeaf(context);
         }
-        private static ParseNode _ParseTermList(ParserContext context) {
+        private static ParseNode ParseTermList(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             // TermList -> add Factor TermListRightAssoc TermListRightAssoc2
             if ((ExpressionParser.add == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(ExpressionParser.add, "add", context.Value, line, column, position));
+                if ((false 
+                            == (ExpressionParser.add == context.SymbolId))) {
+                    context.Error("Expecting add at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.add, "add", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(ExpressionParser._ParseFactor(context));
-                children.AddRange(ExpressionParser._ParseTermListRightAssoc(context).Children);
-                children.AddRange(ExpressionParser._ParseTermListRightAssoc2(context).Children);
+                children.Add(ExpressionParser.ParseFactor(context));
+                children.AddRange(ExpressionParser.ParseTermListRightAssoc(context).Children);
+                children.AddRange(ExpressionParser.ParseTermListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.TermList, "TermList", children.ToArray(), line, column, position);
             }
             // TermList -> Implicit Factor TermListRightAssoc TermListRightAssoc2
             if ((ExpressionParser.Implicit == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(ExpressionParser.Implicit, "Implicit", context.Value, line, column, position));
+                if ((false 
+                            == (ExpressionParser.Implicit == context.SymbolId))) {
+                    context.Error("Expecting Implicit at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.Implicit, "Implicit", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(ExpressionParser._ParseFactor(context));
-                children.AddRange(ExpressionParser._ParseTermListRightAssoc(context).Children);
-                children.AddRange(ExpressionParser._ParseTermListRightAssoc2(context).Children);
+                children.Add(ExpressionParser.ParseFactor(context));
+                children.AddRange(ExpressionParser.ParseTermListRightAssoc(context).Children);
+                children.AddRange(ExpressionParser.ParseTermListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.TermList, "TermList", children.ToArray(), line, column, position);
             }
-            context.Error("Expecting add or Implicit");
+            context.Error("Expecting add or Implicit at line {0}, column {1}, position {2}", line, column, position);
             return null;
         }
-        private static ParseNode _ParseFactorList(ParserContext context) {
+        private static ParseNode ParseFactorList(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             // FactorList -> mul Unary FactorListRightAssoc FactorListRightAssoc2
             if ((ExpressionParser.mul == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(ExpressionParser.mul, "mul", context.Value, line, column, position));
+                if ((false 
+                            == (ExpressionParser.mul == context.SymbolId))) {
+                    context.Error("Expecting mul at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.mul, "mul", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(ExpressionParser._ParseUnary(context));
-                children.AddRange(ExpressionParser._ParseFactorListRightAssoc(context).Children);
-                children.AddRange(ExpressionParser._ParseFactorListRightAssoc2(context).Children);
+                children.Add(ExpressionParser.ParseUnary(context));
+                children.AddRange(ExpressionParser.ParseFactorListRightAssoc(context).Children);
+                children.AddRange(ExpressionParser.ParseFactorListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.FactorList, "FactorList", children.ToArray(), line, column, position);
             }
             // FactorList -> Implicit2 Unary FactorListRightAssoc FactorListRightAssoc2
             if ((ExpressionParser.Implicit2 == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(ExpressionParser.Implicit2, "Implicit2", context.Value, line, column, position));
+                if ((false 
+                            == (ExpressionParser.Implicit2 == context.SymbolId))) {
+                    context.Error("Expecting Implicit2 at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.Implicit2, "Implicit2", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(ExpressionParser._ParseUnary(context));
-                children.AddRange(ExpressionParser._ParseFactorListRightAssoc(context).Children);
-                children.AddRange(ExpressionParser._ParseFactorListRightAssoc2(context).Children);
+                children.Add(ExpressionParser.ParseUnary(context));
+                children.AddRange(ExpressionParser.ParseFactorListRightAssoc(context).Children);
+                children.AddRange(ExpressionParser.ParseFactorListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.FactorList, "FactorList", children.ToArray(), line, column, position);
             }
-            context.Error("Expecting mul or Implicit2");
+            context.Error("Expecting mul or Implicit2 at line {0}, column {1}, position {2}", line, column, position);
             return null;
         }
-        private static ParseNode _ParseTermListRightAssoc(ParserContext context) {
+        private static ParseNode ParseTermListRightAssoc(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             // TermListRightAssoc -> add Factor TermListRightAssoc
             if ((ExpressionParser.add == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(ExpressionParser.add, "add", context.Value, line, column, position));
+                if ((false 
+                            == (ExpressionParser.add == context.SymbolId))) {
+                    context.Error("Expecting add at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.add, "add", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(ExpressionParser._ParseFactor(context));
-                children.AddRange(ExpressionParser._ParseTermListRightAssoc(context).Children);
+                children.Add(ExpressionParser.ParseFactor(context));
+                children.AddRange(ExpressionParser.ParseTermListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TermListRightAssoc, "TermListRightAssoc", children.ToArray(), line, column, position);
             }
             // TermListRightAssoc ->
@@ -443,20 +288,25 @@ namespace ParsleyDemo {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TermListRightAssoc, "TermListRightAssoc", children, line, column, position);
             }
-            context.Error("Expecting add, Implicit, #EOS, or Implicit4");
+            context.Error("Expecting add, Implicit, #EOS, or Implicit4 at line {0}, column {1}, position {2}" +
+                    "", line, column, position);
             return null;
         }
-        private static ParseNode _ParseFactorListRightAssoc(ParserContext context) {
+        private static ParseNode ParseFactorListRightAssoc(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             // FactorListRightAssoc -> mul Unary FactorListRightAssoc
             if ((ExpressionParser.mul == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(ExpressionParser.mul, "mul", context.Value, line, column, position));
+                if ((false 
+                            == (ExpressionParser.mul == context.SymbolId))) {
+                    context.Error("Expecting mul at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.mul, "mul", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(ExpressionParser._ParseUnary(context));
-                children.AddRange(ExpressionParser._ParseFactorListRightAssoc(context).Children);
+                children.Add(ExpressionParser.ParseUnary(context));
+                children.AddRange(ExpressionParser.ParseFactorListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.FactorListRightAssoc, "FactorListRightAssoc", children.ToArray(), line, column, position);
             }
             // FactorListRightAssoc ->
@@ -468,20 +318,149 @@ namespace ParsleyDemo {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.FactorListRightAssoc, "FactorListRightAssoc", children, line, column, position);
             }
-            context.Error("Expecting mul, Implicit2, add, Implicit, #EOS, or Implicit4");
+            context.Error("Expecting mul, Implicit2, add, Implicit, #EOS, or Implicit4 at line {0}, column {" +
+                    "1}, position {2}", line, column, position);
             return null;
         }
-        private static ParseNode _ParseTermListRightAssoc2(ParserContext context) {
+        private static ParseNode ParseTerm(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // Term -> Factor TermPart
+            if ((((((ExpressionParser.add == context.SymbolId) 
+                        || (ExpressionParser.Implicit == context.SymbolId)) 
+                        || (ExpressionParser.integer == context.SymbolId)) 
+                        || (ExpressionParser.identifier == context.SymbolId)) 
+                        || (ExpressionParser.Implicit3 == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(ExpressionParser.ParseFactor(context));
+                children.AddRange(ExpressionParser.ParseTermPart(context).Children);
+                return new ParseNode(ExpressionParser.Term, "Term", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting add, Implicit, integer, identifier, or Implicit3 at line {0}, column {1" +
+                    "}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// Term= Factor { ( "+" | "-" ) Factor }
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Term -> Factor TermPart
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseTerm(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return ExpressionParser.ParseTerm(context);
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// Term= Factor { ( "+" | "-" ) Factor }
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Term -> Factor TermPart
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return ExpressionParser.ParseTerm(context);
+        }
+        private static ParseNode ParseTermPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // TermPart -> TermList
+            if (((ExpressionParser.add == context.SymbolId) 
+                        || (ExpressionParser.Implicit == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(ExpressionParser.ParseTermList(context).Children);
+                return new ParseNode(ExpressionParser.TermPart, "TermPart", children.ToArray(), line, column, position);
+            }
+            // TermPart ->
+            if (((ExpressionParser.EosSymbol == context.SymbolId) 
+                        || (ExpressionParser.Implicit4 == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(ExpressionParser.TermPart, "TermPart", children, line, column, position);
+            }
+            context.Error("Expecting add, Implicit, #EOS, or Implicit4 at line {0}, column {1}, position {2}" +
+                    "", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseFactor(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // Factor -> Unary FactorPart
+            if ((((((ExpressionParser.add == context.SymbolId) 
+                        || (ExpressionParser.Implicit == context.SymbolId)) 
+                        || (ExpressionParser.integer == context.SymbolId)) 
+                        || (ExpressionParser.identifier == context.SymbolId)) 
+                        || (ExpressionParser.Implicit3 == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(ExpressionParser.ParseUnary(context));
+                children.AddRange(ExpressionParser.ParseFactorPart(context).Children);
+                return new ParseNode(ExpressionParser.Factor, "Factor", children.ToArray(), line, column, position);
+            }
+            context.Error("Expecting add, Implicit, integer, identifier, or Implicit3 at line {0}, column {1" +
+                    "}, position {2}", line, column, position);
+            return null;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// Factor= Unary { ( "*" | "/" ) Unary }
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Factor -> Unary FactorPart
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseFactor(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            return ExpressionParser.ParseFactor(context);
+        }
+        private static ParseNode ParseFactorPart(ParserContext context) {
+            int line = context.Line;
+            int column = context.Column;
+            long position = context.Position;
+            // FactorPart -> FactorList
+            if (((ExpressionParser.mul == context.SymbolId) 
+                        || (ExpressionParser.Implicit2 == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(ExpressionParser.ParseFactorList(context).Children);
+                return new ParseNode(ExpressionParser.FactorPart, "FactorPart", children.ToArray(), line, column, position);
+            }
+            // FactorPart ->
+            if (((((ExpressionParser.add == context.SymbolId) 
+                        || (ExpressionParser.Implicit == context.SymbolId)) 
+                        || (ExpressionParser.EosSymbol == context.SymbolId)) 
+                        || (ExpressionParser.Implicit4 == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(ExpressionParser.FactorPart, "FactorPart", children, line, column, position);
+            }
+            context.Error("Expecting mul, Implicit2, add, Implicit, #EOS, or Implicit4 at line {0}, column {" +
+                    "1}, position {2}", line, column, position);
+            return null;
+        }
+        private static ParseNode ParseTermListRightAssoc2(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             // TermListRightAssoc2 -> Implicit Factor TermListRightAssoc2
             if ((ExpressionParser.Implicit == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(ExpressionParser.Implicit, "Implicit", context.Value, line, column, position));
+                if ((false 
+                            == (ExpressionParser.Implicit == context.SymbolId))) {
+                    context.Error("Expecting Implicit at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.Implicit, "Implicit", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(ExpressionParser._ParseFactor(context));
-                children.AddRange(ExpressionParser._ParseTermListRightAssoc2(context).Children);
+                children.Add(ExpressionParser.ParseFactor(context));
+                children.AddRange(ExpressionParser.ParseTermListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.TermListRightAssoc2, "TermListRightAssoc2", children.ToArray(), line, column, position);
             }
             // TermListRightAssoc2 ->
@@ -490,20 +469,24 @@ namespace ParsleyDemo {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TermListRightAssoc2, "TermListRightAssoc2", children, line, column, position);
             }
-            context.Error("Expecting Implicit, #EOS, or Implicit4");
+            context.Error("Expecting Implicit, #EOS, or Implicit4 at line {0}, column {1}, position {2}", line, column, position);
             return null;
         }
-        private static ParseNode _ParseFactorListRightAssoc2(ParserContext context) {
+        private static ParseNode ParseFactorListRightAssoc2(ParserContext context) {
             int line = context.Line;
             int column = context.Column;
             long position = context.Position;
             // FactorListRightAssoc2 -> Implicit2 Unary FactorListRightAssoc2
             if ((ExpressionParser.Implicit2 == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(new ParseNode(ExpressionParser.Implicit2, "Implicit2", context.Value, line, column, position));
+                if ((false 
+                            == (ExpressionParser.Implicit2 == context.SymbolId))) {
+                    context.Error("Expecting Implicit2 at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.Implicit2, "Implicit2", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
-                children.Add(ExpressionParser._ParseUnary(context));
-                children.AddRange(ExpressionParser._ParseFactorListRightAssoc2(context).Children);
+                children.Add(ExpressionParser.ParseUnary(context));
+                children.AddRange(ExpressionParser.ParseFactorListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.FactorListRightAssoc2, "FactorListRightAssoc2", children.ToArray(), line, column, position);
             }
             // FactorListRightAssoc2 ->
@@ -514,7 +497,8 @@ namespace ParsleyDemo {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.FactorListRightAssoc2, "FactorListRightAssoc2", children, line, column, position);
             }
-            context.Error("Expecting Implicit2, add, Implicit, #EOS, or Implicit4");
+            context.Error("Expecting Implicit2, add, Implicit, #EOS, or Implicit4 at line {0}, column {1}, p" +
+                    "osition {2}", line, column, position);
             return null;
         }
         /// <summary>
@@ -523,8 +507,7 @@ namespace ParsleyDemo {
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Term -> Factor TermList
-        /// Term -> Factor
+        /// Term -> Factor TermPart
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <returns>The result of the evaluation</returns>
@@ -537,8 +520,7 @@ namespace ParsleyDemo {
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Term -> Factor TermList
-        /// Term -> Factor
+        /// Term -> Factor TermPart
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
@@ -552,8 +534,7 @@ namespace ParsleyDemo {
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Term -> Factor TermList
-        /// Term -> Factor
+        /// Term -> Factor TermPart
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
@@ -583,8 +564,7 @@ namespace ParsleyDemo {
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Term -> Factor TermList
-        /// Term -> Factor
+        /// Term -> Factor TermPart
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <returns>The result of the evaluation</returns>
@@ -597,8 +577,7 @@ namespace ParsleyDemo {
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Factor -> Unary FactorList
-        /// Factor -> Unary
+        /// Factor -> Unary FactorPart
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <param name="state">A user supplied state object. What it should be depends on the production's associated code block</param>
@@ -630,8 +609,7 @@ namespace ParsleyDemo {
         /// </summary>
         /// <remarks>
         /// The production rules are:
-        /// Factor -> Unary FactorList
-        /// Factor -> Unary
+        /// Factor -> Unary FactorPart
         /// </remarks>
         /// <param name="node">The <see cref="ParseNode"/> to evaluate</param>
         /// <returns>The result of the evaluation</returns>
@@ -765,6 +743,563 @@ namespace ParsleyDemo {
                 return node.Value;
             }
             return null;
+        }
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
+    internal class SyntaxException : Exception {
+        private int _line;
+        private int _column;
+        private long _position;
+        /// <summary>
+        /// Creates a syntax exception with the specified arguments
+        /// </summary>
+        /// <param name="message">The error message</param>
+        /// <param name="line">The line where the error occurred</param>
+        /// <param name="column">The column where the error occured</param>
+        /// <param name="position">The position where the error occured</param>
+        public SyntaxException(string message, int line, int column, long position) : 
+                base(SyntaxException._GetMessage(message, line, column, position)) {
+            this._line = line;
+            this._column = column;
+            this._position = position;
+        }
+        /// <summary>
+        /// The line where the error occurred
+        /// </summary>
+        public int Line {
+            get {
+                return this._line;
+            }
+        }
+        /// <summary>
+        /// The column where the error occurred
+        /// </summary>
+        public int Column {
+            get {
+                return this._column;
+            }
+        }
+        /// <summary>
+        /// The position where the error occurred
+        /// </summary>
+        public long Position {
+            get {
+                return this._position;
+            }
+        }
+        static string _GetMessage(string message, int line, int column, long position) {
+            return string.Format("{0} at line {1}, column {2}, position {3}", message, line, column, position);
+        }
+    }
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
+    internal partial class ParseNode {
+        private int _symbolId;
+        private string _symbol;
+        private string _value;
+        private int _line;
+        private int _column;
+        private long _position;
+        private ParseNode[] _children;
+        public ParseNode(int symbolId, string symbol, ParseNode[] children, int line, int column, long position) {
+            this._symbolId = symbolId;
+            this._symbol = symbol;
+            this._value = null;
+            this._children = children;
+            this._line = line;
+            this._column = column;
+            this._position = position;
+        }
+        public ParseNode(int symbolId, string symbol, string value, int line, int column, long position) {
+            this._symbolId = symbolId;
+            this._symbol = symbol;
+            this._value = value;
+            this._children = null;
+            this._line = line;
+            this._column = column;
+            this._position = position;
+        }
+        public bool IsNonTerminal {
+            get {
+                return (null != this._children);
+            }
+        }
+        public ParseNode[] Children {
+            get {
+                return this._children;
+            }
+        }
+        public int SymbolId {
+            get {
+                return this._symbolId;
+            }
+        }
+        public string Symbol {
+            get {
+                return this._symbol;
+            }
+        }
+        public string Value {
+            get {
+                return this._value;
+            }
+        }
+        public int Line {
+            get {
+                return this._line;
+            }
+        }
+        public int Column {
+            get {
+                return this._column;
+            }
+        }
+        public long Position {
+            get {
+                return this._position;
+            }
+        }
+    }
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
+    internal partial class ParserContext : Object, IDisposable {
+        private int _state;
+        private IEnumerator<Token> _e;
+        private LookAheadEnumerator<Token> _el;
+        private Token _t;
+        private int _advanceCount;
+        public ParserContext(IEnumerable<Token> tokenizer) : 
+                this(tokenizer.GetEnumerator(), true) {
+        }
+        private ParserContext(IEnumerator<Token> enumerator, bool wrap) {
+            this._e = enumerator;
+            if (wrap) {
+                this._el = new LookAheadEnumerator<Token>(enumerator);
+                this._e = this._el;
+                // we need both pointers to point to the lookahead
+            }
+            this._state = -1;
+            this._t.SymbolId = -1;
+            this._advanceCount = 0;
+        }
+        public void EnsureStarted() {
+            if ((-1 == this._state)) {
+                this.Advance();
+            }
+        }
+        public ParserContext GetLookAhead() {
+            if ((null == this._el)) {
+                throw new NotSupportedException("This parser context does not support lookahead.");
+            }
+            return new ParserContext(this._el.LookAhead.GetEnumerator(), true);
+        }
+        public ParserContext GetLookAhead(bool start) {
+            ParserContext result = this.GetLookAhead();
+            if (start) {
+                result.EnsureStarted();
+            }
+            return result;
+        }
+        public int AdvanceCount {
+            get {
+                return this._advanceCount;
+            }
+        }
+        public void ResetAdvanceCount() {
+            this._advanceCount = 0;
+        }
+        public int SymbolId {
+            get {
+                return this._t.SymbolId;
+            }
+        }
+        public string Value {
+            get {
+                return this._t.Value;
+            }
+        }
+        public int Line {
+            get {
+                return this._t.Line;
+            }
+        }
+        public int Column {
+            get {
+                return this._t.Column;
+            }
+        }
+        public long Position {
+            get {
+                return this._t.Position;
+            }
+        }
+        public bool IsEnded {
+            get {
+                return (-2 == this._state);
+            }
+        }
+        public bool Advance() {
+            if ((false == this._e.MoveNext())) {
+                this._t.SymbolId = -2;
+                this._state = -2;
+            }
+            else {
+                // sanity check. should never happen
+                if ((int.MaxValue == this._advanceCount)) {
+                    this._advanceCount = -1;
+                }
+                this._advanceCount = (this._advanceCount + 1);
+                this._state = 0;
+                this._t = this._e.Current;
+                return true;
+            }
+            return false;
+        }
+        public void Error(string message, object arg1, object arg2, object arg3) {
+            throw new SyntaxException(string.Format(message, arg1, arg2, arg3), this.Line, this.Column, this.Position);
+        }
+        public void Error(string message, object arg1, object arg2) {
+            throw new SyntaxException(string.Format(message, arg1, arg2), this.Line, this.Column, this.Position);
+        }
+        public void Error(string message, object arg) {
+            throw new SyntaxException(string.Format(message, arg), this.Line, this.Column, this.Position);
+        }
+        public void Error(string message) {
+            throw new SyntaxException(message, this.Line, this.Column, this.Position);
+        }
+        public void Dispose() {
+            this._e.Dispose();
+            this._state = -3;
+        }
+    }
+    /// <summary>
+    /// An enumerator that provides lookahead without advancing the cursor
+    /// </summary>
+    /// <typeparam name="T">The type to enumerate</typeparam>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
+    internal class LookAheadEnumerator<T> : object, IEnumerator<T>
+     {
+        private const int _Enumerating = 0;
+        private const int _NotStarted = -2;
+        private const int _Ended = -1;
+        private const int _Disposed = -3;
+        private IEnumerator<T> _inner;
+        private int _state;
+        // for the lookahead queue
+        private const int _DefaultCapacity = 16;
+        private const float _GrowthFactor = 0.9F;
+        private T[] _queue;
+        private int _queueHead;
+        private int _queueCount;
+        /// <summary>
+        /// Creates a new instance. Once this is created, the inner/wrapped enumerator must not be touched.
+        /// </summary>
+        /// <param name="inner"></param>
+        public LookAheadEnumerator(IEnumerator<T> inner) {
+            this._inner = inner;
+            this._state = LookAheadEnumerator<T>._NotStarted;
+            this._queue = new T[LookAheadEnumerator<T>._DefaultCapacity];
+            this._queueHead = 0;
+            this._queueCount = 0;
+        }
+        /// <summary>
+        /// Discards the lookahead and advances the cursor to the physical position.
+        /// </summary>
+        public void DiscardLookAhead() {
+            for (
+            ; (1 < this._queueCount); 
+            ) {
+                this._Dequeue();
+            }
+        }
+        /// <summary>
+        /// Retrieves the value under the cursor
+        /// </summary>
+        public T Current {
+            get {
+                if ((0 > this._state)) {
+                    if ((LookAheadEnumerator<T>._NotStarted == this._state)) {
+                        throw new InvalidOperationException("The cursor is before the start of the enumeration.");
+                    }
+                    if ((LookAheadEnumerator<T>._Ended == this._state)) {
+                        throw new InvalidOperationException("The cursor is after the end of the enumeration.");
+                    }
+                    throw new ObjectDisposedException(typeof(LookAheadEnumerator<T>).Name);
+                }
+                return this._queue[this._queueHead];
+            }
+        }
+        // legacy enum support (required)
+        object System.Collections.IEnumerator.Current {
+            get {
+                return this.Current;
+            }
+        }
+        internal int QueueCount {
+            get {
+                return this._queueCount;
+            }
+        }
+        /// <summary>
+        /// Attempts to peek the specified number of positions from the current position without advancing
+        /// </summary>
+        /// <param name="lookahead">The offset from the current position to peek at</param>
+        /// <param name="value">The value returned</param>
+        /// <returns>True if the peek could be satisfied, otherwise false</returns>
+        public bool TryPeek(int lookahead, out T value) {
+            if ((LookAheadEnumerator<T>._Disposed == this._state)) {
+                throw new ObjectDisposedException(typeof(LookAheadEnumerator<T>).Name);
+            }
+            if ((0 > lookahead)) {
+                throw new ArgumentOutOfRangeException("lookahead");
+            }
+            if ((LookAheadEnumerator<T>._Ended == this._state)) {
+                value = default(T);
+                return false;
+            }
+            if ((LookAheadEnumerator<T>._NotStarted == this._state)) {
+                if ((0 == lookahead)) {
+                    value = default(T);
+                    return false;
+                }
+            }
+            if ((lookahead < this._queueCount)) {
+                value = this._queue[((lookahead + this._queueHead) 
+                            % this._queue.Length)];
+                return true;
+            }
+            lookahead = (lookahead - this._queueCount);
+            value = default(T);
+            for (
+            ; ((0 <= lookahead) 
+                        && this._inner.MoveNext()); 
+            ) {
+                value = this._inner.Current;
+                this._Enqueue(value);
+                lookahead = (lookahead - 1);
+            }
+            return (-1 == lookahead);
+        }
+        /// <summary>
+        /// Peek the specified number of positions from the current position without advancing
+        /// </summary>
+        /// <param name="lookahead">The offset from the current position to peek at</param>
+        /// <returns>The value at the specified position</returns>
+        public T Peek(int lookahead) {
+            T value;
+            if ((false == this.TryPeek(lookahead, out value))) {
+                throw new InvalidOperationException("There were not enough values in the enumeration to satisfy the request");
+            }
+            return value;
+        }
+        internal bool IsEnumerating {
+            get {
+                return (-1 < this._state);
+            }
+        }
+        internal bool IsEnded {
+            get {
+                return (LookAheadEnumerator<T>._Ended == this._state);
+            }
+        }
+        /// <summary>
+        /// Retrieves a lookahead cursor from the current cursor that can be navigated without moving the main cursor
+        /// </summary>
+        public IEnumerable<T> LookAhead {
+            get {
+                if ((0 > this._state)) {
+                    if ((this._state == LookAheadEnumerator<T>._NotStarted)) {
+                        throw new InvalidOperationException("The cursor is before the start of the enumeration.");
+                    }
+                    if ((this._state == LookAheadEnumerator<T>._Ended)) {
+                        throw new InvalidOperationException("The cursor is after the end of the enumeration.");
+                    }
+                    throw new ObjectDisposedException(typeof(LookAheadEnumerator<T>).Name);
+                }
+                return new LookAheadEnumeratorEnumerable<T>(this);
+            }
+        }
+        /// <summary>
+        /// Advances the cursor
+        /// </summary>
+        /// <returns>True if more input was read, otherwise false</returns>
+        bool System.Collections.IEnumerator.MoveNext() {
+            if ((0 > this._state)) {
+                if ((LookAheadEnumerator<T>._Disposed == this._state)) {
+                    throw new ObjectDisposedException(typeof(LookAheadEnumerator<T>).Name);
+                }
+                if ((LookAheadEnumerator<T>._Ended == this._state)) {
+                    return false;
+                }
+                if ((LookAheadEnumerator<T>._NotStarted == this._state)) {
+                    if ((0 < this._queueCount)) {
+                        this._state = LookAheadEnumerator<T>._Enumerating;
+                        return true;
+                    }
+                    if ((false == this._inner.MoveNext())) {
+                        this._state = LookAheadEnumerator<T>._Ended;
+                        return false;
+                    }
+                    this._Enqueue(this._inner.Current);
+                    this._state = LookAheadEnumerator<T>._Enumerating;
+                    return true;
+                }
+            }
+            this._Dequeue();
+            if ((0 == this._queueCount)) {
+                if ((false == this._inner.MoveNext())) {
+                    this._state = LookAheadEnumerator<T>._Ended;
+                    return false;
+                }
+                this._Enqueue(this._inner.Current);
+            }
+            return true;
+        }
+        /// <summary>
+        /// Resets the cursor, and clears the queue.
+        /// </summary>
+        void System.Collections.IEnumerator.Reset() {
+            this._inner.Reset();
+            if (((0 < this._queueCount) 
+                        && (null == default(T)))) {
+                System.Array.Clear(this._queue, this._queueHead, (this._queue.Length - this._queueHead));
+                if (((this._queueHead + this._queueCount) 
+                            >= this._queue.Length)) {
+                    System.Array.Clear(this._queue, 0, (this._queueHead 
+                                    + (this._queueCount % this._queue.Length)));
+                }
+            }
+            this._queueHead = 0;
+            this._queueCount = 0;
+            this._state = LookAheadEnumerator<T>._NotStarted;
+        }
+        #region IDisposable Support
+        /// <summary>
+        /// Disposes of this instance
+        /// </summary>
+        void System.IDisposable.Dispose() {
+            if ((false 
+                        == (LookAheadEnumerator<T>._Disposed == this._state))) {
+                this._inner.Dispose();
+                this._state = LookAheadEnumerator<T>._Disposed;
+            }
+        }
+        void _Enqueue(T item) {
+            if ((this._queueCount == this._queue.Length)) {
+                T[] arr = new T[((int)((this._queue.Length 
+                            * (1 + LookAheadEnumerator<T>._GrowthFactor))))];
+                if (((this._queueHead + this._queueCount) 
+                            <= this._queue.Length)) {
+                    System.Array.Copy(this._queue, arr, this._queueCount);
+                    this._queueHead = 0;
+                    arr[this._queueCount] = item;
+                    this._queueCount = (this._queueCount + 1);
+                    this._queue = arr;
+                }
+                else {
+                    System.Array.Copy(this._queue, this._queueHead, arr, 0, (this._queue.Length - this._queueHead));
+                    System.Array.Copy(this._queue, 0, arr, (this._queue.Length - this._queueHead), this._queueHead);
+                    this._queueHead = 0;
+                    arr[this._queueCount] = item;
+                    this._queueCount = (this._queueCount + 1);
+                    this._queue = arr;
+                }
+            }
+            else {
+                this._queue[((this._queueHead + this._queueCount) 
+                            % this._queue.Length)] = item;
+                this._queueCount = (this._queueCount + 1);
+            }
+        }
+        T _Dequeue() {
+            if ((0 == this._queueCount)) {
+                throw new InvalidOperationException("The queue is empty");
+            }
+            T result = this._queue[this._queueHead];
+            this._queue[this._queueHead] = default(T);
+            this._queueHead = (this._queueHead + 1);
+            this._queueHead = (this._queueHead % this._queue.Length);
+            this._queueCount = (this._queueCount - 1);
+            return result;
+        }
+        #endregion
+    }
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
+    internal class LookAheadEnumeratorEnumerable<T> : object, IEnumerable<T>
+     {
+        private LookAheadEnumerator<T> _outer;
+        public LookAheadEnumeratorEnumerable(LookAheadEnumerator<T> outer) {
+            this._outer = outer;
+        }
+        public IEnumerator<T> GetEnumerator() {
+            // for some reason VB was resolving new as AddressOf, so use this.
+            LookAheadEnumeratorEnumerator<T> result = ((LookAheadEnumeratorEnumerator<T>)(System.Activator.CreateInstance(typeof(LookAheadEnumeratorEnumerator<T>), this._outer)));
+            return result;
+        }
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
+            return this.GetEnumerator();
+        }
+    }
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")]
+    internal class LookAheadEnumeratorEnumerator<T> : object, IEnumerator<T>
+     {
+        private const int _NotStarted = -2;
+        private const int _Ended = -1;
+        private const int _Disposed = -3;
+        private LookAheadEnumerator<T> _outer;
+        private int _index;
+        private T _current;
+        public LookAheadEnumeratorEnumerator(LookAheadEnumerator<T> outer) {
+            this._outer = outer;
+            if (this._outer.IsEnumerating) {
+                this._current = this._outer.Current;
+            }
+            this._index = LookAheadEnumeratorEnumerator<T>._NotStarted;
+        }
+        public T Current {
+            get {
+                if ((0 > this._index)) {
+                    if ((this._index == LookAheadEnumeratorEnumerator<T>._NotStarted)) {
+                        throw new InvalidOperationException("The cursor is before the start of the enumeration.");
+                    }
+                    if ((this._index == LookAheadEnumeratorEnumerator<T>._Ended)) {
+                        throw new InvalidOperationException("The cursor is after the end of the enumeration.");
+                    }
+                    throw new ObjectDisposedException(typeof(LookAheadEnumeratorEnumerator<T>).Name);
+                }
+                return this._current;
+            }
+        }
+        object System.Collections.IEnumerator.Current {
+            get {
+                return this.Current;
+            }
+        }
+        void System.IDisposable.Dispose() {
+            this._index = LookAheadEnumeratorEnumerator<T>._Disposed;
+        }
+        bool System.Collections.IEnumerator.MoveNext() {
+            T value;
+            if ((0 > this._index)) {
+                if ((this._index == LookAheadEnumeratorEnumerator<T>._Disposed)) {
+                    throw new ObjectDisposedException(typeof(LookAheadEnumeratorEnumerator<T>).Name);
+                }
+                if ((this._index == LookAheadEnumeratorEnumerator<T>._Ended)) {
+                    return false;
+                }
+                this._index = -1;
+            }
+            this._index = (this._index + 1);
+            if ((false == this._outer.TryPeek(this._index, out value))) {
+                this._index = LookAheadEnumeratorEnumerator<T>._Ended;
+                return false;
+            }
+            this._current = value;
+            return true;
+        }
+        void System.Collections.IEnumerator.Reset() {
+            this._index = LookAheadEnumeratorEnumerator<T>._NotStarted;
         }
     }
 }

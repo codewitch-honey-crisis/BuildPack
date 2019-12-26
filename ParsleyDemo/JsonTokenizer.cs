@@ -200,7 +200,7 @@ namespace ParsleyDemo {
                                         'F',
                                         'a',
                                         'f'}, 9)}, -1),
-                new DfaEntry(new DfaTransitionEntry[0], 12),
+                new DfaEntry(new DfaTransitionEntry[0], 14),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
                                         'r',
@@ -244,11 +244,11 @@ namespace ParsleyDemo {
                                         'l',
                                         'l'}, 31)}, -1),
                 new DfaEntry(new DfaTransitionEntry[0], 17),
-                new DfaEntry(new DfaTransitionEntry[0], 14),
+                new DfaEntry(new DfaTransitionEntry[0], 24),
+                new DfaEntry(new DfaTransitionEntry[0], 22),
+                new DfaEntry(new DfaTransitionEntry[0], 23),
+                new DfaEntry(new DfaTransitionEntry[0], 21),
                 new DfaEntry(new DfaTransitionEntry[0], 15),
-                new DfaEntry(new DfaTransitionEntry[0], 10),
-                new DfaEntry(new DfaTransitionEntry[0], 11),
-                new DfaEntry(new DfaTransitionEntry[0], 13),
                 new DfaEntry(new DfaTransitionEntry[0], 20),
                 new DfaEntry(new DfaTransitionEntry[] {
                             new DfaTransitionEntry(new char[] {
@@ -257,8 +257,12 @@ namespace ParsleyDemo {
                                         '\r',
                                         '\r',
                                         ' ',
-                                        ' '}, 38)}, 21)};
+                                        ' '}, 38)}, 25)};
         internal static int[] NodeFlags = new int[] {
+                0,
+                0,
+                0,
+                0,
                 0,
                 0,
                 0,
@@ -303,21 +307,25 @@ namespace ParsleyDemo {
                 null,
                 null,
                 null,
+                null,
+                null,
+                null,
+                null,
                 null};
         public JsonTokenizer(IEnumerable<char> input) : 
                 base(JsonTokenizer.DfaTable, JsonTokenizer.BlockEnds, JsonTokenizer.NodeFlags, input) {
         }
-        public const int lbrace = 10;
-        public const int rbrace = 11;
-        public const int @string = 12;
-        public const int colon = 13;
-        public const int lbracket = 14;
-        public const int rbracket = 15;
+        public const int @string = 14;
+        public const int colon = 15;
         public const int number = 16;
         public const int @null = 17;
         public const int @true = 18;
         public const int @false = 19;
         public const int comma = 20;
-        public const int whitespace = 21;
+        public const int rbrace = 21;
+        public const int rbracket = 22;
+        public const int lbrace = 23;
+        public const int lbracket = 24;
+        public const int whitespace = 25;
     }
 }

@@ -542,16 +542,20 @@ namespace Parsley
 			{
 				if (IsNonTerminal(symbol))
 				{
-					foreach (var f in followsNT[symbol])
+					ICollection<string> col;
+					if (followsNT.TryGetValue(symbol, out col))
 					{
-						if (!IsNonTerminal(f))
+						foreach (var f in col)
 						{
-							if (!result.Contains(f))
-								result.Add(f);
-						}
-						else
-							_ResolveFollows(f, result, followsNT, seen);
+							if (!IsNonTerminal(f))
+							{
+								if (!result.Contains(f))
+									result.Add(f);
+							}
+							else
+								_ResolveFollows(f, result, followsNT, seen);
 
+						}
 					}
 				}
 			}

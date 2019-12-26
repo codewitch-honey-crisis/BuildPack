@@ -20,6 +20,7 @@ namespace CD
 		const int _ResolveCompileUnits = 1;
 		static readonly object _parentKey = new object();
 		static readonly object _rootKey = new object();
+		
 		IDictionary<CodeTypeReference, Type> _typeCache = new Dictionary<CodeTypeReference, Type>(CodeTypeReferenceEqualityComparer.Default);
 		/// <summary>
 		/// Retrieves the compile units list the resolver draws on

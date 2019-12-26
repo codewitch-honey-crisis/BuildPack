@@ -31,6 +31,7 @@ namespace Parsley
 			bool verbose = false;
 			bool noshared = false;
 			bool ifstale = false;
+			bool fast = false;
 
 			
 			try
@@ -75,6 +76,9 @@ namespace Parsley
 							break;
 						case "/ifstale":
 							ifstale = true;
+							break;
+						case "/fast":
+							fast = true;
 							break;
 						case "/noshared":
 							noshared = true;
@@ -172,6 +176,8 @@ namespace Parsley
 						Console.Error.WriteLine(gplexshared);
 					if (null != gplexcode)
 						Console.Error.WriteLine(gplexcode);
+					if (fast && null != codelanguage)
+						throw new ArgumentException("<codelanguage> and <fast> cannot both be specified. The <fast> option is C# only.");
 					if (string.IsNullOrEmpty(codelanguage))
 					{
 						if (!string.IsNullOrEmpty(outputfile))
@@ -218,7 +224,7 @@ namespace Parsley
 								Console.Error.WriteLine(msg);
 
 						}
-						CfgException.ThrowIfErrors(msgs);
+						
 #else // if NOPREPARELL1
 						CfgDocument ocfg = null;
 						var i = 20;
@@ -234,9 +240,14 @@ namespace Parsley
 						{
 							if (verbose || ErrorLevel.Message != msg.ErrorLevel)
 								Console.Error.WriteLine(msg);
-
 						}
 #endif // !NOPREPARELL1
+						if(verbose)
+						{
+							Console.Error.WriteLine("Final grammar:");
+							Console.Error.WriteLine(cfg.ToString());
+						}
+						CfgException.ThrowIfErrors(msgs);
 						var ccu = CodeGenerator.GenerateCompileUnit(doc, cfg, codeclass, codenamespace);
 						var ccuNS = ccu.Namespaces[ccu.Namespaces.Count - 1];
 						var ccuShared = CodeGenerator.GenerateSharedCompileUnit(codenamespace);
@@ -254,12 +265,25 @@ namespace Parsley
 						ccuNS.Types.Add(lookAheadEnumeratorEnumerable);
 						ccuNS.Types.Add(lookAheadEnumeratorEnumerator);
 						ccu.ReferencedAssemblies.Add(typeof(TypeConverter).Assembly.GetName().ToString());
-						CD.SlangPatcher.Patch(ccu, ccuShared);
-						var co = CD.SlangPatcher.GetNextUnresolvedElement(ccu);
-						if (null != co)
+
+						if (fast)
 						{
-							Console.Error.WriteLine("Warning: Not all of the elements could be resolved. The generated code may not be correct in all languages.");
-							Console.Error.WriteLine("  Next unresolved: {0}", C.ToString(co).Trim());
+							CD.CodeDomVisitor.Visit(ccu, (ctx) =>
+							{
+								var vd = ctx.Target as CodeVariableDeclarationStatement;
+								if (null != vd && CD.CodeDomResolver.IsNullOrVoidType(vd.Type))
+									vd.Type = C.Type("var");
+							});
+						}
+						else
+						{
+							CD.SlangPatcher.Patch(ccu, ccuShared);
+							var co = CD.SlangPatcher.GetNextUnresolvedElement(ccu);
+							if (null != co)
+							{
+								Console.Error.WriteLine("Warning: Not all of the elements could be resolved. The generated code may not be correct in all languages.");
+								Console.Error.WriteLine("  Next unresolved: {0}", C.ToString(co).Trim());
+							}
 						}
 						if (noshared)
 						{
@@ -407,7 +431,7 @@ namespace Parsley
 			t.WriteLine(" <inputfile> [/output <outputfile>] [/rolex <rolexfile>]");
 			t.WriteLine("	[/gplex <gplexfile>] [/gplexclass <gplexcodeclass>]");
 			t.WriteLine("	[/namespace <codenamespace>] [/class <codeclass>]");
-			t.WriteLine("	[/langage <codelanguage>] ");
+			t.WriteLine("	[/langage <codelanguage>] [/fast]");
 			t.WriteLine("	[/noshared] [/verbose] [/ifstale]");
 			t.WriteLine();
 			t.WriteLine("	<inputfile>		The XBNF input file to use.");
@@ -416,8 +440,9 @@ namespace Parsley
 			t.WriteLine("	<gplexfile>		Generate Gplex lexer specification to the specified file file. Will also generate supporting C# files (C# only)");
 			t.WriteLine("	<gplexcodeclass>	Generate Gplex lexer specification with the specified class name. - default takes the name from <gplexfile>");
 			t.WriteLine("	<codenamespace>		Generate code under the specified namespace - default none"); 
-			t.WriteLine("	<codelanguage>		Generate code in the specified language - default derived from <outputfile> or C#.");
 			t.WriteLine("	<codeclass>		Generate code with the specified class name - default derived from <outputfile> or the grammar.");
+			t.WriteLine("	<codelanguage>		Generate code in the specified language - default derived from <outputfile> or C#.");
+			t.WriteLine("	<fast>			Generate code quickly, without resolution using C# only - not valid with the <codelanguage> option.");
 			t.WriteLine("	<noshared>		Do not include shared library prerequisites");
 			t.WriteLine("	<verbose>		Output all messages from the generation process");
 			t.WriteLine("	<ifstale>		Do not generate unless <outputfile> or <rolexfile> is older than <inputfile>.");

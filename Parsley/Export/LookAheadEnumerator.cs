@@ -7,21 +7,21 @@ namespace Parsley
 	/// An enumerator that provides lookahead without advancing the cursor
 	/// </summary>
 	/// <typeparam name="T">The type to enumerate</typeparam>
-	class LookAheadEnumerator<T> : IEnumerator<T>
+	class LookAheadEnumerator<T> : object, IEnumerator<T>
 	{
-		const int _Enumerating = 0;
-		const int _NotStarted = -2;
-		const int _Ended = -1;
-		const int _Disposed = -3;
-		IEnumerator<T> _inner;
-		int _state;
+		private const int _Enumerating = 0;
+		private const int _NotStarted = -2;
+		private const int _Ended = -1;
+		private const int _Disposed = -3;
+		private IEnumerator<T> _inner;
+		private int _state;
 
 		// for the lookahead queue
-		const int _DefaultCapacity = 16;
-		const float _GrowthFactor = .9f;
-		T[] _queue;
-		int _queueHead;
-		int _queueCount;
+		private const int _DefaultCapacity = 16;
+		private const float _GrowthFactor = .9f;
+		private T[] _queue;
+		private int _queueHead;
+		private int _queueCount;
 		/// <summary>
 		/// Creates a new instance. Once this is created, the inner/wrapped enumerator must not be touched.
 		/// </summary>
@@ -147,7 +147,7 @@ namespace Parsley
 		/// Advances the cursor
 		/// </summary>
 		/// <returns>True if more input was read, otherwise false</returns>
-		public bool MoveNext()
+		bool System.Collections.IEnumerator.MoveNext()
 		{
 			if (0 > _state)
 			{
@@ -189,7 +189,7 @@ namespace Parsley
 		/// <summary>
 		/// Resets the cursor, and clears the queue.
 		/// </summary>
-		public void Reset()
+		void System.Collections.IEnumerator.Reset()
 		{
 			_inner.Reset();
 			if (0 < _queueCount && null == default(T))
@@ -208,7 +208,7 @@ namespace Parsley
 		/// <summary>
 		/// Disposes of this instance
 		/// </summary>
-		public void Dispose()
+		void System.IDisposable.Dispose()
 		{
 			if (_Disposed != _state)
 			{
@@ -260,27 +260,30 @@ namespace Parsley
 		
 		#endregion
 	}
-	class LookAheadEnumeratorEnumerable<T> : IEnumerable<T>
+	class LookAheadEnumeratorEnumerable<T> : object, IEnumerable<T>
 	{
-		LookAheadEnumerator<T> _outer;
+		private LookAheadEnumerator<T> _outer;
 		public LookAheadEnumeratorEnumerable(LookAheadEnumerator<T> outer)
 		{
 			_outer = outer;
 		}
 		public IEnumerator<T> GetEnumerator()
 		{
-			return new LookAheadEnumeratorEnumerator<T>(_outer);
+			// for some reason VB was resolving new as AddressOf, so use this.
+			LookAheadEnumeratorEnumerator<T> result = (LookAheadEnumeratorEnumerator<T>)
+				Activator.CreateInstance(typeof(LookAheadEnumeratorEnumerator<T>),_outer);
+			return result;
 		}
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return GetEnumerator(); }
 	}
-	class LookAheadEnumeratorEnumerator<T> : IEnumerator<T>
+	class LookAheadEnumeratorEnumerator<T> : object, IEnumerator<T>
 	{
-		const int _NotStarted = -2;
-		const int _Ended = -1;
-		const int _Disposed = -3;
-		LookAheadEnumerator<T> _outer;
-		int _index;
-		T _current;
+		private const int _NotStarted = -2;
+		private const int _Ended = -1;
+		private const int _Disposed = -3;
+		private LookAheadEnumerator<T> _outer;
+		private int _index;
+		private T _current;
 		public LookAheadEnumeratorEnumerator(LookAheadEnumerator<T> outer)
 		{
 			_outer = outer;
@@ -305,12 +308,12 @@ namespace Parsley
 
 		object System.Collections.IEnumerator.Current { get { return Current; } }
 
-		public void Dispose()
+		void System.IDisposable.Dispose()
 		{
 			_index = _Disposed;
 		}
 
-		public bool MoveNext()
+		bool System.Collections.IEnumerator.MoveNext()
 		{
 			T value;
 			if (0 > _index)
@@ -333,7 +336,7 @@ namespace Parsley
 			return true;
 		}
 
-		public void Reset()
+		void System.Collections.IEnumerator.Reset()
 		{
 			_index = _NotStarted;
 		}

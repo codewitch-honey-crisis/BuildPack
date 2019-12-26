@@ -114,22 +114,52 @@
 
 %%
 <<EOF>>		{ return -2; }
-@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])* 	{ return 21; }
-@\"([^\"|\"\"])*\" 	{ return 15; }
-(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])* 	{ return 22; }
-\"([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*\" 	{ return 18; }
+"out" 	{ return 77; }
+"ref" 	{ return 78; }
+@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])* 	{ return 106; }
+"typeof" 	{ return 104; }
+"nameOf" 	{ return 105; }
+"new" 	{ return 114; }
+"string" 	{ return 81; }
+"bool" 	{ return 79; }
+"char" 	{ return 80; }
+"float" 	{ return 82; }
+"double" 	{ return 83; }
+"decimal" 	{ return 84; }
+"sbyte" 	{ return 85; }
+"byte" 	{ return 86; }
+"short" 	{ return 87; }
+"ushort" 	{ return 88; }
+"int" 	{ return 89; }
+"uint" 	{ return 90; }
+"long" 	{ return 91; }
+"ulong" 	{ return 92; }
+"object" 	{ return 93; }
+@\"([^\"|\"\"])*\" 	{ return 100; }
+(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])* 	{ return 107; }
+\"([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*\" 	{ return 103; }
 \/\/[^\n]* 	 { return yylex(); }
 "/*" 	{ if(!_TryReadUntilBlockEnd("*/")) return -1; return yylex(); }
 [ \t\r\n\v\f]+ 	 { return yylex(); }
-"+" 	{ return 13; }
-"-" 	{ return 14; }
-"*" 	{ return 23; }
-"/" 	{ return 24; }
-"(" 	{ return 19; }
-")" 	{ return 20; }
-(0x[0-9A-Fa-f]{1,16}|(0|[1-9][0-9]*))([Uu][Ll]?|[Ll][Uu]?)? 	{ return 16; }
-((0|[1-9][0-9]*)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?) 	{ return 17; }
-#[ \t]*[a-z]+[ \t]* 	{ if(!_TryReadUntilBlockEnd("\n")) return -1;return 28; }
+"<" 	{ return 116; }
+">" 	{ return 113; }
+"=" 	{ return 117; }
+"+" 	{ return 98; }
+"-" 	{ return 99; }
+"*" 	{ return 108; }
+"/" 	{ return 109; }
+"%" 	{ return 110; }
+"[" 	{ return 96; }
+"]" 	{ return 112; }
+"(" 	{ return 95; }
+")" 	{ return 97; }
+"{" 	{ return 118; }
+"}" 	{ return 115; }
+"," 	{ return 94; }
+"." 	{ return 76; }
+(0x[0-9A-Fa-f]{1,16}|(0|[1-9][0-9]*))([Uu][Ll]?|[Ll][Uu]?)? 	{ return 101; }
+((0|[1-9][0-9]*)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?) 	{ return 102; }
+#[ \t]*[a-z]+[ \t]* 	{ if(!_TryReadUntilBlockEnd("\n")) return -1;return 122; }
 
 [\n]|[^\n]		{ return -1; }
 

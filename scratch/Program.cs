@@ -11,11 +11,11 @@ namespace scratch
 	{
 		static void Main()
 		{
-			var tokenizer = new SlangTokenizer("identifier + identifier2");
+			var tokenizer = new SlangTokenizer("new object[] = { new object() }");
 			var pt = SlangParser.Parse(tokenizer);
 			_WriteTree(pt, Console.Out);
 		}
-
+		
 		static void _Lex()
 		{
 			
@@ -61,7 +61,6 @@ namespace scratch
 				{
 					node = childStack[0];
 					childStack.RemoveAt(0);
-
 					string indent = "";
 					for (int i = 0; i < childListStack.Count - 1; i++)
 					{
@@ -72,6 +71,11 @@ namespace scratch
 					writer.WriteLine();// string.Concat(" at line ", node.Line, ", column ", node.Column, ", position ", node.Position, ", length of ", node.Length));
 					if (node.IsNonTerminal && 0 < node.Children.Length)
 					{
+						for(var i = 0;i<node.Children.Length;i++)
+						{
+							if (null == node.Children[i])
+								System.Diagnostics.Debugger.Break();
+						}
 						childListStack.Add(new List<ParseNode>(node.Children));
 					}
 				}

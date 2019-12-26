@@ -56,7 +56,7 @@ namespace Rolex
 	/// <summary>
 	/// Reference Implementation for generated shared code
 	/// </summary>
-	class TableTokenizer : object, IEnumerable<Parsley.Token>
+	class TableTokenizer : object, IEnumerable<Token>
 	{
 		public const int ErrorSymbol= -1;
 		// our state table
@@ -71,13 +71,12 @@ namespace Rolex
 		/// Retrieves an enumerator that can be used to iterate over the tokens
 		/// </summary>
 		/// <returns>An enumerator that can be used to iterate over the tokens</returns>
-		public IEnumerator<Parsley.Token> GetEnumerator()
+		public IEnumerator<Token> GetEnumerator()
 		{
 			// just create our table tokenizer's enumerator, passing all of the relevant stuff
 			// it's the real workhorse.
 			return new TableTokenizerEnumerator(_dfaTable, _blockEnds, _nodeFlags, _input.GetEnumerator());
 		}
-		
 		// legacy collection support (required)
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 		{
@@ -106,7 +105,7 @@ namespace Rolex
 			_input = input;
 		}
 	}
-	class TableTokenizerEnumerator : IEnumerator<Parsley.Token>
+	class TableTokenizerEnumerator : object, IEnumerator<Token>
 	{
 		// our error symbol. Always -1
 		public const int ErrorSymbol = -1;
@@ -135,7 +134,7 @@ namespace Rolex
 		// our state 
 		private int _state;
 		// the current token
-		private Parsley.Token _current;
+		private Token _current;
 		// a buffer used primarily by _Lex() to capture matched input
 		private StringBuilder _buffer;
 		// the one based line
@@ -157,7 +156,7 @@ namespace Rolex
 			_column = 1;
 			_position = 0;
 		}
-		Parsley.Token IEnumerator<Parsley.Token>.Current {
+		public Token Current {
 			get {
 				// if we're not enumerating, find out what's going on
 				if (_Enumerating > _state)
@@ -201,7 +200,7 @@ namespace Rolex
 					return false;
 				// we're okay if we got here
 			}
-			_current = default(Parsley.Token);
+			_current = default(Token);
 			_current.Line = _line;
 			_current.Column = _column;
 			_current.Position = _position;

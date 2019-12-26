@@ -247,7 +247,16 @@ namespace Parsley
 				var p = document.Productions[i];
 				if (p.IsTerminal)
 				{
-					tmap.Add(p.Expression, p.Name);
+					string name;
+					if (!tmap.TryGetValue(p.Expression, out name))
+					{
+						tmap.Add(p.Expression, p.Name);
+						
+					} else
+					{
+						if (name != p.Name)
+							throw new InvalidOperationException(string.Format("{0} attempts to redefine terminal {1}",name,p.Name));
+					}
 					done.Add(p.Expression);
 				}
 				else
@@ -266,10 +275,51 @@ namespace Parsley
 			for (int ic = document.Productions.Count, i = 0; i < ic; ++i)
 			{
 				var p = document.Productions[i];
+				if(p.IsAbstract)
+				{
+					// mark this symbol so the cfg "sees" it even
+					// though it's never referenced in the grammar
+					CfgAttributeList attrs;
+					if(!cfg.AttributeSets.TryGetValue(p.Name, out attrs))
+					{
+						attrs = new CfgAttributeList();
+						cfg.AttributeSets.Add(p.Name, attrs);
+					}
+					var ai = attrs.IndexOf("abstract");
+					if(0>ai)
+					{
+						attrs.Add(new CfgAttribute("abstract", true));
+					}
+				}
 				if (!p.IsTerminal)
 				{
-					var dys = _GetDysjunctions(document, syms, tmap, attrSets, rules, p, p.Expression);
-					ntd.Add(p.Name, dys);
+					if (!p.IsVirtual && !p.IsAbstract)
+					{
+						var dys = _GetDysjunctions(document, syms, tmap, attrSets, rules, p, p.Expression);
+						ntd.Add(p.Name, dys);
+					} else if(p.IsVirtual)
+					{
+						var ai = p.Attributes.IndexOf("firsts");
+						if (0 > ai)
+						{
+							var dys = new List<IList<string>>();
+							dys.Add(new List<string>());
+							ntd.Add(p.Name, dys);
+						} else
+						{
+							var dys = new List<IList<string>>();
+							var firsts = p.Attributes[ai].Value as string;
+							if(null!=firsts)
+							{
+								foreach (var sym in firsts.Split(' '))
+									dys.Add(new List<string>(new string[] { sym })); 
+							} else
+								dys.Add(new List<string>());
+							
+							ntd.Add(p.Name, dys);
+						}
+
+					}
 				}
 			}
 			// now that we've done that, build the rest of our attributes
@@ -291,6 +341,21 @@ namespace Parsley
 				//	delim = ", ";
 				}
 				//writer.WriteLine();
+			}
+			for(int ic = document.Productions.Count,i=0;i<ic;++i)
+			{
+				var prod = document.Productions[i];
+				if(prod.Where!=null&&null!=prod.Where.Value)
+				{
+					CfgAttributeList attrs;
+					if(!cfg.AttributeSets.TryGetValue(prod.Name,out attrs))
+					{
+						attrs = new CfgAttributeList();
+						cfg.AttributeSets.Add(prod.Name,attrs);
+					}
+					if (!attrs.Contains("constrained"))
+						attrs.Add(new CfgAttribute("constrained", true));
+				}
 			}
 			// now write our main rules
 			foreach (var nt in ntd)
