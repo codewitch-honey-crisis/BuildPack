@@ -62,7 +62,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(SolutionDir)Parsley\bin\Release\parsley.exe" "$(ProjectDir)Slang.xbnf" /output "SlangParser.cs" /gplex "$(ProjectDir)Slang.lex" /namespace CD /ifstale /fast
+    <PreBuildEvent>"$(SolutionDir)Parsley\bin\Release\parsley.exe" "$(ProjectDir)Slang.xbnf" /output "$(ProjectDir)SlangParser.cs" /gplex "$(ProjectDir)Slang.lex" /namespace CD /ifstale /fast
 "$(SolutionDir)Gplex\bin\Release\gplex.exe" "$(ProjectDir)Slang.lex"</PreBuildEvent>
   </PropertyGroup>
 </Project>
