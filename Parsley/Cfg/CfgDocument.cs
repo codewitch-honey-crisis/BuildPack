@@ -92,12 +92,43 @@ namespace Parsley
 		public IEnumerable<string> EnumNonTerminals()
 		{
 			var seen = new HashSet<string>();
-			var ic = Rules.Count;
+			int ic = Rules.Count;
 			for (var i = 0; i < ic; ++i)
 			{
 				var s = Rules[i].Left;
 				if (seen.Add(s))
 					yield return s;
+			}
+			foreach (var attrs in AttributeSets)
+			{
+				if (seen.Add(attrs.Key))
+				{
+					var o = GetAttribute(attrs.Key, "virtual", false);
+					if (o is bool && (bool)o)
+					{
+						yield return attrs.Key;
+					}
+					else
+					{
+						o = GetAttribute(attrs.Key, "abstract", false);
+						if (o is bool && (bool)o)
+						{
+							yield return attrs.Key;
+						}
+						else
+						{
+							o = GetAttribute(attrs.Key, "dependency", false);
+							if (o is bool && (bool)o)
+								yield return attrs.Key;
+							else
+							{
+								o = GetAttribute(attrs.Key, "terminal", null);
+								if (null != o && o is bool && !(bool)o)
+									yield return attrs.Key;
+							}
+						}
+					}
+				}
 			}
 		}
 		public IList<string> FillNonTerminals(IList<string> result = null)
@@ -105,82 +136,69 @@ namespace Parsley
 			if (null == result)
 				result = new List<string>();
 			var ic = Rules.Count;
+			
 			for (var i = 0; i < ic; ++i)
 			{
 				var s = Rules[i].Left;
 				if (!result.Contains(s))
 					result.Add(s);
 			}
+			foreach (var attrs in AttributeSets)
+			{
+				if (!result.Contains(attrs.Key))
+				{
+					var o = GetAttribute(attrs.Key, "virtual", false);
+					if (o is bool && (bool)o)
+					{
+						result.Add(attrs.Key);
+					} else
+					{
+						o = GetAttribute(attrs.Key, "abstract", false);
+						if (o is bool && (bool)o)
+						{
+							result.Add(attrs.Key);
+						}
+						else
+						{
+							o = GetAttribute(attrs.Key, "dependency", false);
+							if (o is bool && (bool)o)
+								result.Add(attrs.Key);
+							else
+							{
+								o = GetAttribute(attrs.Key, "terminal", null);
+								if (null != o && o is bool && !(bool)o)
+									result.Add(attrs.Key);
+							}
+						}
+					}
+				}
+			}
 			return result;
 		}
 		public IEnumerable<string> EnumSymbols()
 		{
-			var seen = new HashSet<string>();
-			var ic = Rules.Count;
-			for (var i = 0; i < ic; ++i)
-			{
-				var s = Rules[i].Left;
-				if (seen.Add(s))
-					yield return s;
-			}
-			for (var i = 0; i < ic; ++i)
-			{
-				var right = Rules[i].Right;
-				for (int jc = right.Count, j = 0; j < jc; ++j)
-				{
-					var s = right[j];
-					if (seen.Add(s))
-						yield return s;
-				}
-			}
-			foreach (var attrs in AttributeSets)
-				if (seen.Add(attrs.Key))
-					yield return attrs.Key;
-
-			yield return "#EOS";
-			yield return "#ERROR";
+			foreach (var nt in EnumNonTerminals())
+				yield return nt;
+			foreach (var t in EnumTerminals())
+				yield return t;
 		}
 		public IList<string> FillSymbols(IList<string> result = null)
 		{
 			if (null == result)
 				result = new List<string>();
-			var seen = new HashSet<string>();
-			var ic = Rules.Count;
-			for (var i = 0; i < ic; ++i)
-			{
-				var s = Rules[i].Left;
-				if (seen.Add(s))
-					if (!result.Contains(s))
-						result.Add(s);
-			}
-			for (var i = 0; i < ic; ++i)
-			{
-				var right = Rules[i].Right;
-				for (int jc = right.Count, j = 0; j < jc; ++j)
-				{
-					var s = right[j];
-					if (seen.Add(s))
-						if (!result.Contains(s))
-							result.Add(s);
-				}
-			}
-			foreach (var attrs in AttributeSets)
-				if (seen.Add(attrs.Key))
-					if (!result.Contains(attrs.Key))
-						result.Add(attrs.Key);
-
-			if (!result.Contains("#EOS"))
-				result.Add("#EOS");
-			if (!result.Contains("#ERROR"))
-				result.Add("#ERROR");
+			FillNonTerminals(result);
+			FillTerminals(result);
 			return result;
 		}
 		public IEnumerable<string> EnumTerminals()
 		{
 			var seen = new HashSet<string>();
+			seen.Add("#EOS");
+			seen.Add("#ERROR");
 			var ic = Rules.Count;
 			for (var i = 0; i < ic; ++i)
 				seen.Add(Rules[i].Left);
+			
 			for (var i = 0; i < ic; ++i)
 			{
 				var right = Rules[i].Right;
@@ -191,9 +209,30 @@ namespace Parsley
 						yield return s;
 				}
 			}
+			
 			foreach (var attrs in AttributeSets)
+			{
+				
 				if (seen.Add(attrs.Key))
+				{
+					var o = GetAttribute(attrs.Key, "virtual", false);
+					if (o is bool && (bool)o)
+						continue;
+					o = GetAttribute(attrs.Key, "abstract", false);
+					if (o is bool && (bool)o)
+						continue;
+					o = GetAttribute(attrs.Key, "abstract", false);
+					if (o is bool && (bool)o)
+						continue;
+					o = GetAttribute(attrs.Key, "dependency", false);
+					if (o is bool && (bool)o)
+						continue;
+					o = GetAttribute(attrs.Key, "terminal", null);
+					if (null != o && o is bool && !(bool)o)
+						continue;
 					yield return attrs.Key;
+				}
+			}
 			yield return "#EOS";
 			yield return "#ERROR";
 		}
@@ -217,10 +256,28 @@ namespace Parsley
 				}
 			}
 			foreach (var attrs in AttributeSets)
+			{
 				if (seen.Add(attrs.Key))
+				{
+					var o = GetAttribute(attrs.Key, "virtual", false);
+					if (o is bool && (bool)o)
+						continue;
+					o = GetAttribute(attrs.Key, "abstract", false);
+					if (o is bool && (bool)o)
+						continue;
+					o = GetAttribute(attrs.Key, "abstract", false);
+					if (o is bool && (bool)o)
+						continue;
+					o = GetAttribute(attrs.Key, "dependency", false);
+					if (o is bool && (bool)o)
+						continue;
+					o = GetAttribute(attrs.Key, "terminal", null);
+					if (null != o && o is bool && !(bool)o)
+						continue;
 					if (!result.Contains(attrs.Key))
 						result.Add(attrs.Key);
-
+				}
+			}
 			if (!result.Contains("#EOS"))
 				result.Add("#EOS");
 			if (!result.Contains("#ERROR"))
@@ -259,10 +316,35 @@ namespace Parsley
 			// first add the terminals to the result
 			foreach (var t in EnumTerminals())
 			{
-				var l = new List<string>();
+				var l = new HashSet<string>();
 				l.Add(t);
 				result.Add(t, l);
 			}
+			// foreach nonterm that has a firsts attribute
+			/*foreach (var sattrs in AttributeSets)
+			{
+				var attrs = sattrs.Value;
+				var ai = attrs.IndexOf("firsts");
+				if (-1 < ai)
+				{
+					var s = attrs[ai].Value as string;
+					if (!string.IsNullOrWhiteSpace(s))
+					{
+						var nt = sattrs.Key;
+						var ntr = FillNonTerminalRules(nt);
+						if (1 == ntr.Count)
+						{
+							var sa = s.Split(' ');
+							var col = new List<string>();
+							result.Add(nt, col);
+							for (var i = 0; i < sa.Length; i++)
+							{
+								col.Add(sa[i]);
+							}
+						}
+					}
+				}
+			}*/
 			// now for each rule, find every first right hand side and add it to the rule's left non-terminal result
 			for (int ic = Rules.Count, i = 0; i < ic; ++i)
 			{
@@ -333,6 +415,30 @@ namespace Parsley
 				l.Add((null, t));
 				result.Add(t, l);
 			}
+			// foreach nonterm that has a firsts attribute
+			/*foreach(var sattrs in AttributeSets)
+			{
+				var attrs = sattrs.Value;
+				var ai = attrs.IndexOf("firsts");
+				if(-1<ai)
+				{
+					var s = attrs[ai].Value as string;
+					if(!string.IsNullOrWhiteSpace(s))
+					{
+						var nt = sattrs.Key;
+						var ntr = FillNonTerminalRules(nt);
+						if (1 == ntr.Count) {
+							var sa = s.Split(' ');
+							var col = new List<(CfgRule Rule, string Symbol)>();
+							result.Add(nt, col);
+							for (var i = 0; i < sa.Length; i++)
+							{
+								col.Add((ntr[0], sa[i]));
+							}
+						}
+					}
+				}
+			}*/
 			// now for each rule, find every first right hand side and add it to the rule's left non-terminal result
 			for (int ic = Rules.Count, i = 0; i < ic; ++i)
 			{
@@ -429,7 +535,10 @@ namespace Parsley
 			{
 				if (null != symbol)
 				{
-					foreach (var p in predictNT[symbol])
+					ICollection<(CfgRule Rule, string Symbol)> col;
+					if (!predictNT.TryGetValue(symbol, out col))
+						throw new ArgumentException(string.Format("The symbol {0} was not found int the grammar.", symbol), "symbol");
+					foreach (var p in col)
 					{
 						if (!IsNonTerminal(p.Symbol))
 						{
@@ -452,7 +561,31 @@ namespace Parsley
 				result = new Dictionary<string, ICollection<string>>();
 
 			var followsNT = new Dictionary<string, ICollection<string>>();
-
+			// foreach nonterm that has a follows attribute
+			/*foreach (var sattrs in AttributeSets)
+			{
+				var attrs = sattrs.Value;
+				var ai = attrs.IndexOf("follows");
+				if (-1 < ai)
+				{
+					var s = attrs[ai].Value as string;
+					if (!string.IsNullOrWhiteSpace(s))
+					{
+						var nt = sattrs.Key;
+						var ntr = FillNonTerminalRules(nt);
+						if (1 == ntr.Count)
+						{
+							var sa = s.Split(' ');
+							var col = new HashSet<string>();
+							result.Add(nt, col);
+							for (var i = 0; i < sa.Length; i++)
+							{
+								col.Add(sa[i]);
+							}
+						}
+					}
+				}
+			}*/
 			// we'll need the predict table
 			//Console.Error.WriteLine("Computing predict...");
 			var predict = FillPredict();
@@ -524,13 +657,18 @@ namespace Parsley
 			// below we look for any non-terminals in the follows result and replace them
 			// with their follows, so for example if N appeared, N would be replaced with 
 			// the result of FOLLOW(N)
-
-			foreach (var nt in EnumNonTerminals())
+			var l = FillNonTerminals();
+			foreach (var nt in l)
 			{
-				var col = new HashSet<string>();
+				ICollection<string> col = new HashSet<string>();
 				var res = new List<string>();
 				_ResolveFollows(nt, col, followsNT, new HashSet<string>());
-				result.Add(nt, col);
+				ICollection<string> col2;
+				if (result.TryGetValue(nt, out col2))
+				{
+					col2.AddRange(col);
+				} else
+					result.Add(nt, col);
 			}
 			//Console.Error.WriteLine("Done!");
 			return result;
@@ -581,6 +719,17 @@ namespace Parsley
 				var rule = Rules[i];
 				if (rule.Left == symbol)
 					result.Add(rule);
+			}
+			return result;
+		}
+		public string GetUniqueSymbolName(string name)
+		{
+			var result = name;
+			var i = 2;
+			while(EnumSymbols().Contains(result))
+			{
+				result = string.Concat(name, i.ToString());
+				++i;
 			}
 			return result;
 		}
@@ -644,6 +793,8 @@ namespace Parsley
 		}
 		public bool IsSymbol(string symbol)
 		{
+			if (AttributeSets.ContainsKey(symbol))
+				return true;
 			if (null != _sCache) return _sCache.Contains(symbol);
 			for (int ic = Rules.Count, i = 0; i < ic; ++i)
 			{

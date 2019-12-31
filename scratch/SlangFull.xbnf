@@ -1,0 +1,341 @@
+﻿// Slang.xbnf
+// This is the XBNF spec for Slang (gplex version - unicode enabled)
+// Slang is a CodeDOM compliant subset of C#
+
+// Types
+// since it's only used in code, we need to give it follows
+TypeAttributes<follows="classKeyword enumKeyword structKeyword interfaceKeyword partialKeyword">= { publicKeyword | internalKeyword | privateKeyword };
+EnumPart<collapsed> = "{" EnumFields "}" | ":" Type "{" EnumFields "}";
+EnumFields<collapsed>= [ EnumField { "," EnumField } ];
+EnumField= Identifier "=" Expression ;
+Where<dependency,follows="lbrace">= "where" WhereClauses;
+WhereClauses<dependency,virtual,firsts="Identifier"> {
+	var line=context.Line;
+	var column=context.Column;
+	var position=context.Position;
+	if(SlangParser.identifier2!=context.SymbolId)
+		context.Error("Expecting identifier in where clause");
+	var children = new List<ParseNode>();
+	while(SlangParser.EosSymbol!=context.SymbolId && SlangParser.lbrace!=context.SymbolId) 
+	{
+		children.Add(ParseWhereClause(context));
+		if(SlangParser.comma==context.SymbolId)
+			context.Advance();
+	}
+	if(SlangParser.lbrace!=context.SymbolId)
+		throw new SyntaxException(string.Format("Unterminated where clause at line {0}, column {1}, position {2}",line,column,position),line,column,position);
+	return new ParseNode(SlangParser.WhereClauses,"WhereClauses",children.ToArray(),line,column,position);
+} : where { return !Keywords.Contains(context.Value); }
+WhereClause<follows="comma lbrace">= Identifier ":" (Type | newKeyword "(" ")" );
+BaseType<dependency,collapsed,follows="comma whereKeyword lbrace">= Type;
+BaseTypes<abstract>;
+TypeDeclPart<virtual,firsts="colon whereKeyword lbrace", follows="rbrace"> { return _ParseTypeDeclPart(context);}
+TypeParams= [ "<" Identifier { "," Identifier } ">" ];
+			
+// we narrow the attributes this accepts as a base in our parse routine for parse member
+// TODO: do it for non-nested types
+Enum<dependency>= MemberAttributes "enum" Identifier EnumPart;
+Struct<dependency>= MemberAttributes "struct" Identifier TypeParams TypeDeclPart;
+Class<dependency>= MemberAttributes "class" Identifier TypeParams TypeDeclPart;
+Interface<dependency>= MemberAttributes "interface" Identifier [ "<" TypeParams ">" ] TypeDeclPart;
+TypeDecl<virtual,firsts="TypeAttributes structKeyword classKeyword enumKeyword interfaceKeyword partialKeyword"> { return _ParseTypeDecl(context,false,context.Line,context.Column,context.Position,null); }
+Namespace<start>= TypeDecls;
+TypeDecls= {TypeDecls}+;
+
+// Members
+MemberAttribute<collapsed>= newKeyword | constKeyword | publicKeyword | protectedKeyword | internalKeyword | privateKeyword | staticKeyword | overrideKeyword;
+MemberAttributes<dependency> = { MemberAttribute };
+// private implementation types are really difficult to parse so we use a virtual
+// for it. The trouble is in the ambiguity because the type leads the identifier, so
+// it's hard to know where the type ends and the identifier begins.
+// note that we restrict the Identifier below, 
+// by copying it's where clause.
+PrivateImplementationType<virtual,firsts="Identifier"> 
+	{ return _ParsePrivateImplementationType(context); } 
+	: where { return !Keywords.Contains(context.Value); } 
+// need the follows because it's only referenced by code
+// the grammar can't trace it
+MethodParamList<dependency,follows="rparen">= [ MethodParam { "," MethodParam } ];
+MethodParam= [ outKeyword | refKeyword ] Type Identifier;
+ParamList<dependency>= [ Param { "," Param } ];
+Param= Type Identifier;
+// property accessors are weird for the parser because one
+// can be optional, but only one of each may be specifed
+// and in any order. This is easier with a virtual
+PropertyAccessors<virtual,firsts="PropertyGet PropertySet"> { return _ParsePropertyAccessors(context); }
+PropertyGet<dependency>= "get" ( StatementBlock | ";" );
+PropertySet<dependency>= "set" ( StatementBlock | ";" );
+ConstructorChain = ( "base" | "this" ) "(" ParamList ")";
+// below we add rbrace to the follows sets for each to 
+// production below to allow member decls to be inside a 
+// { } block (for type decls)
+Constructor<abstract>;
+Method<abstract>;
+Property<abstract>;
+Event<abstract>;
+Field<abstract>;
+// methods/properties and fields are also tough to disambiguate. 
+// we could have used automatic backtracking for below but the error reporting
+// is just bad with it right now. Better to write a bunch of code because the
+// errors in the code inside methods and such were bubbling up here and 
+// interfering with error reporting
+Member<follows="rbrace", firsts="MemberAttributes Type eventKeyword Identifier">
+{
+	return _ParseMember(context);
+} : where { return true; } // ignore conflicts here. handled by the routine
+
+Members<virtual,firsts="Member"> { return _ParseMembers(context); } 
+	: where { return true; } // method handles first-first conflicts
+
+
+// Statements
+// must reference a symbol here rather than ";" or XBNF thinks it's a terminal
+// TODO: test terminal=false attribute setting in Parsley
+EmptyStatement= semi;
+VariableDeclarationStatement= (varType | Type) Identifier [ "=" Expression ] ";";
+ExpressionStatement=Expression ";" : where { 
+	try 
+	{ 
+		ParseVariableDeclarationStatement(context);
+		return false;
+	}
+	catch(SyntaxException) 
+	{
+		return true;
+	}
+}
+// enable automatic backtracking here
+VariableDeclarationOrLabelOrExpressionStatement<collapsed>=
+	VariableDeclarationStatement| 
+	ExpressionStatement			| 
+	LabelStatement 
+	: where { return true; }
+// trailing else conflict requires a conflict
+// override via a where constraint
+ElsePart<collapsed> = "else" StatementOrBlock : where {return true; }
+IfStatement= "if" "(" Expression ")" StatementOrBlock;
+GotoStatement= "goto" identifier ";";
+// we already check to disambiguate in ExpressionStatement,
+// so all we do here is override the first first conflict
+LocalAssignStatement<dependency,collapsed>=ExpressionStatement | VariableDeclarationStatement : where { return true; }
+// for trailing part of for first line:
+ForIncPart<dependency,collapsed> = [ Expression ] ")";
+// "for" "(" (LocalAssignStatement | EmptyStatement) (Expression ";" | EmptyStatement) ForIncPart StatementOrBlock
+ForStatement<virtual,firsts="forKeyword"> { return _ParseForStatement(context); }
+	: where {return true;} // enable automatic backtracking
+WhileStatement= "while" "(" Expression ")" StatementOrBlock;
+ReturnStatement= "return" Expression ";";
+ThrowStatement= "throw" [ Expression ] ";";
+TryStatement= "try" StatementBlock ( { CatchClause }+ [ FinallyPart ] | FinallyPart );
+CatchClause= "catch" "(" Type [ Identifier ] ")" StatementBlock;
+FinallyPart<collapsed> = "finally" StatementBlock;
+// look for : to disambiguate between this and a primary expression
+LabelStatement= identifier ":" : where { 
+	context.Advance();
+	return SlangParser.colon==context.SymbolId;
+}
+StatementOrBlock = (Statement | StatementBlock);
+Statement=
+	EmptyStatement	|
+	VariableDeclarationOrLabelOrExpressionStatement | 
+	IfStatement		|
+	GotoStatement	|
+	ForStatement	|
+	WhileStatement	|
+	ReturnStatement |
+	GotoStatement	|
+	TryStatement	;
+
+StatementBlock= "{" {Statement} "}";
+
+// Expressions
+Expression=AssignExpression;
+RelationalExpression = TermExpression { ("<"|"<="|">"|">=") TermExpression };
+EqualityExpression = RelationalExpression { ("=="|"!=") RelationalExpression };
+BitwiseAndExpression = EqualityExpression { "&" EqualityExpression };
+BitwiseOrExpression = BitwiseAndExpression { "|" BitwiseAndExpression };
+AndExpression= BitwiseOrExpression { "&&" BitwiseOrExpression };
+OrExpression= AndExpression { "||" AndExpression };
+AssignExpression= OrExpression { ("="|"+="|"-="|"*="|"/="|"%="|"&="|"|=") OrExpression };
+TermExpression= FactorExpression { ("+"|"-") FactorExpression };
+FactorExpression= UnaryExpression { ("*"|"/"|"%") UnaryExpression };
+MemberFieldRef = "." Identifier;
+MemberInvokeRef = "(" [ MethodArg { "," MethodArg } ] ")";
+MemberIndexerRef = "[" Expression { "," Expression } "]";
+MemberAnyRef<collapsed> = MemberFieldRef | MemberInvokeRef | MemberIndexerRef;
+MethodArg = [ outKeyword | refKeyword ] Expression;
+TypeRef = Type;
+IntrinsicType=	boolType	|
+				charType	|
+				stringType	|
+				floatType	|
+				doubleType	|
+				decimalType	|
+				sbyteType	|
+				byteType	|
+				shortType	|
+				ushortType	|
+				intType		|
+				uintType	|
+				longType	|
+				ulongType	|
+				objectType	;
+TypeBase = (identifier { "."  identifier }) | IntrinsicType;
+Type=TypeElement { TypeArraySpec };
+TypeElement = TypeBase [ TypeGenericPart ];
+TypeGenericPart= "<" [ Type { "," Type } ] ">";
+TypeArraySpec= "[" { ArraySpecRank } "]";
+TypeArraySpecRank = comma; 
+// parse casts manually because they're weird. it's just easier
+CastExpression<virtual,firsts="lparen"> { 
+	return _ParseCastExpression(context);
+}
+// much easier to code this as a virtual and parse manually
+ArraySpec<virtual,firsts="lbracket"> {
+	return _ParseArraySpec(context);
+}
+NewExpression= newKeyword TypeElement ( NewObjectPart | NewArrayPart );
+NewObjectPart<collapsed>= "(" [ Expression { "," Expression } ] ")";
+NewArrayPart<collapsed>= ArraySpec;
+
+// this is necessary so we can get Parsley to generate a 
+// method called ParseTypeCastExpressionPart() which we use
+// when resolving casts
+TypeCastExpressionPart<dependency,collapsed>= Type ")"; 
+ArraySpecExpressionList<dependency,collapsed>= Expression { "," Expression } "]";
+ArrayInitializer<dependency>= "=" "{" [ Expression { "," Expression } ] "}";
+SubExpression<collapsed> = "(" Expression ")" : where { return !_IsCastExpression(context);}
+// use the where clause to override first first conflict:
+UnaryExpression= ("+"|"-"|"!") UnaryExpression | ("++"|"--") PrimaryExpression | SubExpression | PrimaryExpression : where { return true;}
+PrimaryExpression=	
+		( Identifier | IntrinsicType )	{ MemberAnyRef }	|
+		verbatimStringLiteral { MemberAnyRef}				|
+		characterLiteral { MemberAnyRef }					|
+		integerLiteral { MemberAnyRef}						| 
+		floatLiteral { MemberAnyRef}						|
+		stringLiteral  { MemberAnyRef}						|
+		boolLiteral { MemberAnyRef}							|
+		nullLiteral											|
+		CastExpression										|
+		typeOf "(" Type ")"	{ MemberAnyRef }				|
+		nameOf "(" Identifier ")" { MemberAnyRef }			|
+		defaultOf "(" Type ")" { MemberAnyRef }				|
+		NewExpression { MemberAnyRef }						|
+		thisRef { MemberAnyRef }							|
+		baseRef { MemberAnyRef }							;
+
+		
+// Identifier exists as a non-terminal solely to attach a semantic constraint to identifiers.
+// we collapse it because we don't need it in the final parse tree but in the grammar 
+// we have to refer to "Identifier" instead of identifier or verbatimIdentifer.
+Identifier<collapsed> = verbatimIdentifier | identifier : where { return !Keywords.Contains(context.Value); }
+
+// be careful about the order of the terminals.
+// remember they have priorities in the final lexer
+
+verbatimIdentifier='@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
+// begin keywords
+namespaceKeyword="namespace";
+usingKeyword="using";
+partialKeyword="partial";
+classKeyword="class";
+enumKeyword="enum";
+structKeyword="struct";
+interfaceKeyword="interface";
+getKeyword="get";
+setKeyword="set";
+eventKeyword="event";
+publicKeyword="public";
+privateKeyword="private";
+protectedKeyword="protected";
+internalKeyword="internal";
+staticKeyword="static";
+abstractKeyword="abstract";
+constKeyword="const";
+overrideKeyword="override";
+whereKeyword="where";
+outKeyword="out";
+refKeyword="ref";
+ifKeyword="if";
+gotoKeyword="goto";
+elseKeyword="else";
+forKeyword="for";
+throwKeyword="throw";
+whileKeyword="while";
+returnKeyword="return";
+tryKeyword="try";
+catchKeyword="catch";
+finallyKeyword="finally";
+typeOf="typeof";
+nameOf="nameOf";
+defaultOf="default";
+newKeyword="new";
+stringType="string";
+boolType="bool";
+charType="char";
+floatType="float";
+doubleType="double";
+decimalType="decimal";
+sbyteType="sbyte";
+byteType="byte";
+shortType="short";
+ushortType="ushort";
+intType="int";
+uintType="uint";
+longType="long";
+ulongType="ulong";
+objectType="object";
+varType="var"; // for variable declarations
+voidType="void"; // basically for methods
+boolLiteral = "true|false";
+nullLiteral = "null";
+thisRef = "this";
+baseRef = "base";
+verbatimStringLiteral='@"([^"|""])*"';
+identifier='(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
+stringLiteral='"([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*"';
+characterLiteral='[\u0027]([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})[\u0027]';
+lte="<=";
+lt="<";
+gte=">=";
+gt=">";
+eqEq="==";
+notEq="!=";
+eq="=";
+inc="++";
+addAssign="+=";
+add="+";
+dec="--";
+subAssign="-=";
+sub="-";
+mulAssign="*=";
+mul="*";
+divAssign="/=";
+div="/";
+modAssign="%=";
+mod="%";
+and="&&";
+bitwiseAndAssign="&=";
+bitwiseAnd="&";
+or="||";
+bitwiseOrAssign="|=";
+bitwiseOr="|";
+not="!";
+lbracket="[";
+rbracket="]";
+lparen="(";
+rparen=")";
+lbrace="{";
+rbrace="}";
+comma=",";
+colonColon="::";
+colon=":";
+semi=";";
+dot=".";
+directive<blockEnd="\n">='#[A-Za-z]+';
+integerLiteral = '(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)?';
+floatLiteral= '(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)';
+lineComment<hidden>='\/\/[^\n]*';
+blockComment<hidden,blockEnd="*/">="/*";
+whitespace<hidden>='[ \t\r\n\v\f]+';
+

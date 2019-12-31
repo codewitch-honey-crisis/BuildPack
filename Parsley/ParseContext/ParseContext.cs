@@ -46,6 +46,7 @@ namespace Parsley
 	/// </summary>
 	public partial class ParseContext : IDisposable , IEnumerable<char>
 	{
+		public string Source { get; set; }
 		/// <summary>
 		/// Attempts to read whitespace from the current input, capturing it
 		/// </summary>
@@ -739,7 +740,7 @@ namespace Parsley
 					}
 					break;
 			}
-			string at = string.Concat(" at line ", Line, ", column ", Column, ", position ", Position);
+			string at = string.Concat(" at line ", Line, ", column ", Column, ", position ", Position, ", file/uri ", string.IsNullOrEmpty(Source)?"<unknown>":Source);
 			if (-1 == Current)
 			{
 				if (0 == expecting.Length)
@@ -803,7 +804,7 @@ namespace Parsley
 		/// </summary>
 		/// <param name="filename">The filename to use</param>
 		/// <returns>A parse context over the specified file</returns>
-		public static ParseContext CreateFrom(string filename) { return new ParseContext(File.OpenText(filename)); }
+		public static ParseContext CreateFrom(string filename) { var result = new ParseContext(File.OpenText(filename));result.Source = filename;return result; }
 		/// <summary>
 		/// Creates a parse context over the specified url
 		/// </summary>
@@ -813,7 +814,10 @@ namespace Parsley
 		{
 			var wreq = WebRequest.Create(url);
 			var wresp = wreq.GetResponse();
-			return CreateFrom(new StreamReader(wresp.GetResponseStream()));
+			var result = ParseContext.CreateFrom(new StreamReader(wresp.GetResponseStream()));
+			result.Source = url;
+			return result;
+			
 		}
 		IEnumerator<char> IEnumerable<char>.GetEnumerator()
 		{

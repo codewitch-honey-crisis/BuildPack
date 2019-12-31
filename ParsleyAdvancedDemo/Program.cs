@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using CD;
-[assembly: scratch.Foo]
+[assembly: ParsleyAdvancedDemo.Foo]
 
 
-namespace scratch
-{ 
+namespace ParsleyAdvancedDemo
+{
 
 
-	
-	class Bar<[Foo] T> where T:IComparable<T>,new()
+
+	class Bar<[Foo] T> where T : IComparable<T>, new()
 	{
 
 	}
@@ -43,7 +43,7 @@ namespace scratch
 			Stream stm = null;
 			try
 			{
-				stm = File.Open(@"..\..\..\Program.cs", FileMode.Open);
+				stm = File.Open(@"..\..\Program.cs", FileMode.Open);
 				var tokenizer = new SlangTokenizer(stm);
 				var e = tokenizer.GetEnumerator();
 				while (e.MoveNext())
@@ -58,13 +58,11 @@ namespace scratch
 		[return: Foo]
 		static int Main()
 		{
-
-
-
 			Stream stm = null;
+			// Slang doesn't understand the using directive
 			try
 			{
-				stm = File.OpenRead(@"..\..\..\Program.cs");
+				stm = File.OpenRead(@"..\..\Program.cs");
 				var tokenizer = new SlangTokenizer(stm);
 				var pt = SlangParser.Parse(tokenizer);
 				_WriteTree(pt, Console.Out);
@@ -103,7 +101,7 @@ namespace scratch
 						if (0 < childListStack[i].Count)
 							indent += "|  ";
 						else
-							indent+= "   ";
+							indent += "   ";
 					}
 					var s = node.Symbol;
 					var ns = "";

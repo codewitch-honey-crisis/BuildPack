@@ -35,64 +35,69 @@ namespace Parsley
 			foreach (var nt in cfg.EnumNonTerminals())
 			{
 				var d = new Dictionary<string, CfgLL1ParseTableEntry>();
-				foreach (var f in predict[nt])
+				ICollection<(CfgRule Rule, string Symbol)> col;
+				if (predict.TryGetValue(nt, out col))
 				{
-					if (null != f.Symbol)
+					foreach (var f in col)
 					{
-						CfgLL1ParseTableEntry re = new CfgLL1ParseTableEntry(new CfgRule[] { f.Rule });
-						CfgLL1ParseTableEntry or;
-						if (d.TryGetValue(f.Symbol, out or))
+						if (null != f.Symbol)
 						{
-							or.Rules.Add(f.Rule);
-							result.Add(new CfgMessage(ErrorLevel.Error, 1,
-										string.Format(
-											"first first conflict between {0} and {1} on {2}",
-											or.Rules[0],
-											f.Rule,
-											f.Symbol), f.Rule.Line, f.Rule.Column, f.Rule.Position, cfg.Filename));
-						}
-						else
-							d.Add(f.Symbol, re);
-						if (null != progress)
-							progress.Report(new CfgLL1Progress(CfgLL1Status.CreatingParseTable, j));
-						++j;
-					}
-					else
-					{
-						var ff = follows[nt];
-						foreach (var fe in ff)
-						{
+							CfgLL1ParseTableEntry re = new CfgLL1ParseTableEntry(new CfgRule[] { f.Rule });
 							CfgLL1ParseTableEntry or;
-							if (d.TryGetValue(fe, out or))
+							if (d.TryGetValue(f.Symbol, out or))
 							{
 								or.Rules.Add(f.Rule);
-								// we can override conflict handling with the followsConflict
-								// attribute. If specified (first/last/error - error is default) it will choose
-								// the first or last rule respectively.
-								var fc = cfg.GetAttribute(nt, "followsConflict", "error") as string;
-								if ("error" == fc)
-									result.Add(new CfgMessage(ErrorLevel.Error, -1,
-										string.Format(
-											"first follows conflict between {0} and {1} on {2}",
-											or.Rules[0],
-											f.Rule,
-											fe), f.Rule.Line, f.Rule.Column, f.Rule.Position, cfg.Filename));
-								else if ("last" == fc)
-								{
-									d[fe] = new CfgLL1ParseTableEntry(new CfgRule[] { f.Rule });
-								}
+								result.Add(new CfgMessage(ErrorLevel.Error, 1,
+											string.Format(
+												"first first conflict between {0} and {1} on {2}",
+												or.Rules[0],
+												f.Rule,
+												f.Symbol), f.Rule.Line, f.Rule.Column, f.Rule.Position, cfg.Filename));
 							}
 							else
-							{
-								d.Add(fe, new CfgLL1ParseTableEntry(new CfgRule[] { f.Rule }));
-							}
+								d.Add(f.Symbol, re);
 							if (null != progress)
 								progress.Report(new CfgLL1Progress(CfgLL1Status.CreatingParseTable, j));
 							++j;
 						}
+						else
+						{
+							var ff = follows[nt];
+							foreach (var fe in ff)
+							{
+								CfgLL1ParseTableEntry or;
+								if (d.TryGetValue(fe, out or))
+								{
+									or.Rules.Add(f.Rule);
+									// we can override conflict handling with the followsConflict
+									// attribute. If specified (first/last/error - error is default) it will choose
+									// the first or last rule respectively.
+									var fc = cfg.GetAttribute(nt, "followsConflict", "error") as string;
+									if ("error" == fc)
+										result.Add(new CfgMessage(ErrorLevel.Error, -1,
+											string.Format(
+												"first follows conflict between {0} and {1} on {2}",
+												or.Rules[0],
+												f.Rule,
+												fe), f.Rule.Line, f.Rule.Column, f.Rule.Position, cfg.Filename));
+									else if ("last" == fc)
+									{
+										d[fe] = new CfgLL1ParseTableEntry(new CfgRule[] { f.Rule });
+									}
+								}
+								else
+								{
+									d.Add(fe, new CfgLL1ParseTableEntry(new CfgRule[] { f.Rule }));
+								}
+								if (null != progress)
+									progress.Report(new CfgLL1Progress(CfgLL1Status.CreatingParseTable, j));
+								++j;
+							}
+						}
 					}
 				}
-				parseTable.Add(nt, d);
+				if(0<d.Count)
+					parseTable.Add(nt, d);
 			}
 			return result;
 		}
@@ -186,9 +191,10 @@ namespace Parsley
 						//var o = cfg.GetAttribute(rule.Left, "collapsed", false);
 						//if (o is bool && (bool)o)
 							_SetAttribute(cfg, newId, "collapsed", true);
+							_SetAttribute(cfg, newId, "nowarn", true);
 						//else
 						//	_SetAttribute(cfg, newId, "substitute", rule.Left);
-						
+
 						var newRule = new CfgRule(newId);
 						for(int jc=col.Count,j=0;j<jc;++j)
 							newRule.Right.Add(col[j]);
@@ -285,39 +291,45 @@ namespace Parsley
 			foreach (var nt in cfg.EnumNonTerminals())
 			{
 				var d = new Dictionary<string, CfgRule>();
-				foreach (var f in predict[nt])
+				ICollection<(CfgRule Rule, string Symbol)> col;
+				if (predict.TryGetValue(nt, out col))
 				{
-					if (null != f.Symbol)
+
+
+					foreach (var f in col)
 					{
-						CfgRule r;
-						if (d.TryGetValue(f.Symbol, out r))
-						{
-							if (r != f.Rule)
-							{
-								var cf = new CfgLL1Conflict(CfgLL1ConflictKind.FirstFirst, r, f.Rule, f.Symbol);
-								if (!result.Contains(cf))
-									result.Add(cf);
-							}
-						}
-						else
-							d.Add(f.Symbol, f.Rule);
-					}
-					else
-					{
-						foreach (var ff in follows[nt])
+						if (null != f.Symbol)
 						{
 							CfgRule r;
-							if (d.TryGetValue(ff, out r))
+							if (d.TryGetValue(f.Symbol, out r))
 							{
 								if (r != f.Rule)
 								{
-									var cf = new CfgLL1Conflict(CfgLL1ConflictKind.FirstFollows, r, f.Rule, ff);
+									var cf = new CfgLL1Conflict(CfgLL1ConflictKind.FirstFirst, r, f.Rule, f.Symbol);
 									if (!result.Contains(cf))
 										result.Add(cf);
 								}
 							}
 							else
-								d.Add(ff, f.Rule);
+								d.Add(f.Symbol, f.Rule);
+						}
+						else
+						{
+							foreach (var ff in follows[nt])
+							{
+								CfgRule r;
+								if (d.TryGetValue(ff, out r))
+								{
+									if (r != f.Rule)
+									{
+										var cf = new CfgLL1Conflict(CfgLL1ConflictKind.FirstFollows, r, f.Rule, ff);
+										if (!result.Contains(cf))
+											result.Add(cf);
+									}
+								}
+								else
+									d.Add(ff, f.Rule);
+							}
 						}
 					}
 				}
@@ -379,8 +391,18 @@ namespace Parsley
 					{
 						if (cfg.IsNonTerminal(sym))
 						{
-							var r = cfg.FillNonTerminalRules(sym)[0];
-							result.Add(new CfgMessage(ErrorLevel.Warning, -1, string.Concat("Unreachable symbol \"", sym, "\""), r.Line, r.Column, r.Position, cfg.Filename));
+							object o = cfg.GetAttribute(sym, "dependency");
+							if (o is bool && (bool)o)
+								continue;
+							o = cfg.GetAttribute(sym, "nowarn");
+							if (o is bool && (bool)o)
+								continue;
+							var rules = cfg.FillNonTerminalRules(sym);
+							if (0 < rules.Count)
+							{
+								var r = rules[0];
+								result.Add(new CfgMessage(ErrorLevel.Warning, -1, string.Concat("Unreachable symbol \"", sym, "\""), r.Line, r.Column, r.Position, cfg.Filename));
+							}
 						}
 					}
 				}
@@ -392,45 +414,49 @@ namespace Parsley
 			foreach (var nt in cfg.EnumNonTerminals())
 			{
 				var d = new Dictionary<string, CfgRule>();
-				foreach (var f in predict[nt])
+				ICollection<(CfgRule Rule, string Symbol)> col;
+				if (predict.TryGetValue(nt, out col))
 				{
-					if (null != f.Symbol)
+					foreach (var f in col)
 					{
-						CfgRule r;
-						if (d.TryGetValue(f.Symbol, out r))
-						{
-							if (r != f.Rule)
-							{
-								result.Add(new CfgMessage(ErrorLevel.Message, -1,
-									string.Format(
-										"Rule {0} has a first first conflict with rule {1} on symbol {2} and will require additional lookahead",
-										f.Rule,
-										r,
-										f.Symbol), f.Rule.Line, f.Rule.Column, f.Rule.Position, cfg.Filename));
-							}
-						}
-						else
-							d.Add(f.Symbol, f.Rule);
-					}
-					else
-					{
-						foreach (var ff in follows[nt])
+						if (null != f.Symbol)
 						{
 							CfgRule r;
-							if (d.TryGetValue(ff, out r))
+							if (d.TryGetValue(f.Symbol, out r))
 							{
 								if (r != f.Rule)
 								{
 									result.Add(new CfgMessage(ErrorLevel.Message, -1,
-									string.Format(
-										"Rule {0} has a first follow conflict with rule {1} on symbol {2} and will require additional lookahead",
-										f.Rule,
-										r,
-										ff), f.Rule.Line, f.Rule.Column, f.Rule.Position, cfg.Filename));
+										string.Format(
+											"Rule {0} has a first first conflict with rule {1} on symbol {2} and will require additional lookahead",
+											f.Rule,
+											r,
+											f.Symbol), f.Rule.Line, f.Rule.Column, f.Rule.Position, cfg.Filename));
 								}
 							}
 							else
-								d.Add(ff, f.Rule);
+								d.Add(f.Symbol, f.Rule);
+						}
+						else
+						{
+							foreach (var ff in follows[nt])
+							{
+								CfgRule r;
+								if (d.TryGetValue(ff, out r))
+								{
+									if (r != f.Rule)
+									{
+										result.Add(new CfgMessage(ErrorLevel.Message, -1,
+										string.Format(
+											"Rule {0} has a first follow conflict with rule {1} on symbol {2} and will require additional lookahead",
+											f.Rule,
+											r,
+											ff), f.Rule.Line, f.Rule.Column, f.Rule.Position, cfg.Filename));
+									}
+								}
+								else
+									d.Add(ff, f.Rule);
+							}
 						}
 					}
 				}
@@ -450,6 +476,8 @@ namespace Parsley
 					// so warnings about them not being in the grammar
 					// are suppressed.
 					var i = attrs.Value.IndexOf("hidden");
+					if (0 > i)
+						i = attrs.Value.IndexOf("nowarn");
 					if (!(-1 < i && attrs.Value[i].Value is bool && ((bool)attrs.Value[i].Value)))
 						result.Add(new CfgMessage(ErrorLevel.Warning, -1, string.Concat("Attributes declared on a symbol \"", attrs.Key, "\" that is not in the grammar"), attrs.Value[0].Line, attrs.Value[0].Column, attrs.Value[0].Position, cfg.Filename));
 				}
@@ -527,6 +555,9 @@ namespace Parsley
 			var result = new List<CfgMessage>();
 			foreach (var nt in new List<string>(cfg.EnumNonTerminals()))
 			{
+				var o = cfg.GetAttribute(nt, "constrained", false);
+				if (o is bool && (bool)o)
+					continue;
 				var rules = cfg.FillNonTerminalRules(nt);
 				var rights = new List<IList<string>>();
 				foreach (var rule in rules)
@@ -570,6 +601,7 @@ namespace Parsley
 					}
 
 					_SetAttribute(cfg,nnt, "collapsed", true);
+					_SetAttribute(cfg, nnt, "nowarn", true);
 
 				}
 			}
@@ -579,6 +611,12 @@ namespace Parsley
 		{
 			var result = new List<CfgMessage>();
 			var conflicts = cfg.FillLL1Conflicts();
+			if (conflicts.Count > 100)
+			{
+				var c = conflicts[0];
+				throw new CfgException(string.Format("Too many conflicts in the grammar, first conflict is first-{0} between rule {1} and rule {2} on symbol {3}",CfgLL1ConflictKind.FirstFirst==c.Kind?"first":"follows", c.Rule1,c.Rule2,c.Symbol));
+			}
+				
 			for (int ic = conflicts.Count, i = 0; i < ic; ++i)
 			{
 				var conflict = conflicts[i];

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 
 namespace Parsley
@@ -12,7 +13,7 @@ namespace Parsley
 		}
 		public bool IsVirtual {
 			get {
-				return null == Expression && null != Body;
+				return null == Expression && null != Body ;
 			}
 		}
 		public bool IsAbstract {
@@ -22,17 +23,23 @@ namespace Parsley
 		}
 		public bool IsTerminal {
 			get {
+				var i = Attributes.IndexOf("terminal");
+				if (-1 < i && Attributes[i].Value is bool)
+				{
+					return (bool)Attributes[i].Value;
+				}
+
 				if (null != Expression)
 				{
+					
 					if (Expression.IsTerminal)
 						return true;
-					var i = Attributes.IndexOf("terminal");
-					if (-1 < i && Attributes[i].Value is bool && (bool)Attributes[i].Value)
-						return true;
+					
 				}
 				return false;
 			}
 		}
+		
 		public bool IsHidden {
 			get {
 				if (!IsTerminal)
@@ -107,6 +114,7 @@ namespace Parsley
 				sb.Append("= ");
 				sb.Append(Expression);
 			}
+		
 			if (null != Action && ("pc" == fmt || string.IsNullOrEmpty(fmt)))
 			{
 				sb.Append(" => {");
@@ -119,7 +127,7 @@ namespace Parsley
 				sb.Append(Where);
 				sb.Append("}");
 			}
-			else if ("p" != fmt)
+			else if ( "p" != fmt)
 				sb.Append(";");
 			return sb.ToString();
 		}
@@ -149,6 +157,7 @@ namespace Parsley
 			}
 			pc.TrySkipCCommentsAndWhiteSpace();
 			pc.Expecting('=',';', '{');
+			
 			if ('=' == pc.Current)
 			{
 				pc.Advance();
@@ -178,31 +187,9 @@ namespace Parsley
 					result.Action = new XbnfCode(s);
 					result.SetLocation(l, c, p);
 				}
-				pc.TrySkipCCommentsAndWhiteSpace();
-				if (pc.Current == ':')
-				{
-					pc.Advance();
-					pc.TrySkipCCommentsAndWhiteSpace();
-					l = pc.Line;
-					c = pc.Column;
-					p = pc.Position;
-					var ident = XbnfExpression.ParseIdentifier(pc);
-					if (0 != string.Compare("where", ident, StringComparison.InvariantCulture))
-						throw new ExpectingException(string.Format("Expecting \"where\" at line {0}, column {1}, position {2}", l, c, p));
-					pc.TrySkipCCommentsAndWhiteSpace();
-					pc.Expecting('{');
-					pc.Advance();
-					l = pc.Line;
-					c = pc.Column;
-					p = pc.Position;
-					var s = XbnfDocument.ReadCode(pc);
-					pc.Expecting('}');
-					pc.Advance();
-					result.Where = new XbnfCode(s);
-					result.Where.SetLocation(l, c, p);
-				}
+				_ParseWhereConstraint(pc, result, ref l, ref c, ref p);
 			}
-			else if (';' != pc.Current)
+			else if ('{' == pc.Current)
 			{
 				// '{' - virtual non-terminal definition
 				pc.Advance();
@@ -214,14 +201,42 @@ namespace Parsley
 				pc.Advance();
 				result.Body = new XbnfCode(s);
 				result.SetLocation(l, c, p);
+				_ParseWhereConstraint(pc, result, ref l, ref c, ref p);
 			}
-			else
+			 else
 			{
 				// abstract 
 				pc.Advance();
 				result.SetLocation(l, c, p);
 			}
 			return result;
+		}
+
+		private static void _ParseWhereConstraint(ParseContext pc, XbnfProduction result, ref int l, ref int c, ref long p)
+		{
+			pc.TrySkipCCommentsAndWhiteSpace();
+			if (pc.Current == ':')
+			{
+				pc.Advance();
+				pc.TrySkipCCommentsAndWhiteSpace();
+				l = pc.Line;
+				c = pc.Column;
+				p = pc.Position;
+				var ident = XbnfExpression.ParseIdentifier(pc);
+				if (0 != string.Compare("where", ident, StringComparison.InvariantCulture))
+					throw new ExpectingException(string.Format("Expecting \"where\" at line {0}, column {1}, position {2}", l, c, p));
+				pc.TrySkipCCommentsAndWhiteSpace();
+				pc.Expecting('{');
+				pc.Advance();
+				l = pc.Line;
+				c = pc.Column;
+				p = pc.Position;
+				var s = XbnfDocument.ReadCode(pc);
+				pc.Expecting('}');
+				pc.Advance();
+				result.Where = new XbnfCode(s);
+				result.Where.SetLocation(l, c, p);
+			}
 		}
 
 

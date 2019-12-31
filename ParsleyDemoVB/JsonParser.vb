@@ -64,7 +64,7 @@ Namespace ParsleyDemo
     '''ArrayPart2 -> rbracket
     '''ArrayPart2 -> Value ArrayPart
     '''</remarks>
-    <System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.0.0")>  _
+    <System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")>  _
     Partial Friend Class JsonParser
         Friend Const ErrorSymbol As Integer = -1
         Friend Const EosSymbol As Integer = -2
@@ -95,22 +95,22 @@ Namespace ParsleyDemo
         Public Const lbracket As Integer = 24
         Public Const whitespace As Integer = 25
         Private Overloads Shared Function ParseJson(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
+            Dim line__ As Integer = context.Line
+            Dim column__ As Integer = context.Column
+            Dim position__ As Long = context.Position
             'Json -> Object
             If (JsonParser.lbrace = context.SymbolId) Then
                 Dim children(0) As ParseNode
                 children(0) = JsonParser.ParseObject(context)
-                Return New ParseNode(JsonParser.Json, "Json", children, line, column, position)
+                Return New ParseNode(JsonParser.Json, "Json", children, line__, column__, position__)
             End If
             'Json -> Array
             If (JsonParser.lbracket = context.SymbolId) Then
                 Dim children(0) As ParseNode
                 children(0) = JsonParser.ParseArray(context)
-                Return New ParseNode(JsonParser.Json, "Json", children, line, column, position)
+                Return New ParseNode(JsonParser.Json, "Json", children, line__, column__, position__)
             End If
-            context.Error("Expecting lbrace or lbracket at line {0}, column {1}, position {2}", line, column, position)
+            context.Error("Expecting lbrace or lbracket at line {0}, column {1}, position {2}", line__, column__, position__)
             Return Nothing
         End Function
         '''<summary>
@@ -144,9 +144,9 @@ Namespace ParsleyDemo
             Return JsonParser.ParseJson(context)
         End Function
         Private Overloads Shared Function ParseField(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
+            Dim line__ As Integer = context.Line
+            Dim column__ As Integer = context.Column
+            Dim position__ As Long = context.Position
             'Field -> string colon Value
             If (JsonParser.[string] = context.SymbolId) Then
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -162,9 +162,9 @@ Namespace ParsleyDemo
                 End If
                 context.Advance
                 children.AddRange(JsonParser.ParseValue(context).Children)
-                Return New ParseNode(JsonParser.Field, "Field", children.ToArray, line, column, position)
+                Return New ParseNode(JsonParser.Field, "Field", children.ToArray, line__, column__, position__)
             End If
-            context.Error("Expecting string at line {0}, column {1}, position {2}", line, column, position)
+            context.Error("Expecting string at line {0}, column {1}, position {2}", line__, column__, position__)
             Return Nothing
         End Function
         '''<summary>
@@ -182,9 +182,9 @@ Namespace ParsleyDemo
             Return JsonParser.ParseField(context)
         End Function
         Private Shared Function ParseValue(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
+            Dim line__ As Integer = context.Line
+            Dim column__ As Integer = context.Column
+            Dim position__ As Long = context.Position
             'Value -> string
             If (JsonParser.[string] = context.SymbolId) Then
                 Dim children(0) As ParseNode
@@ -194,7 +194,7 @@ Namespace ParsleyDemo
                 End If
                 children(0) = New ParseNode(JsonParser.[string], "string", context.Value, context.Line, context.Column, context.Position)
                 context.Advance
-                Return New ParseNode(JsonParser.Value, "Value", children, line, column, position)
+                Return New ParseNode(JsonParser.Value, "Value", children, line__, column__, position__)
             End If
             'Value -> number
             If (JsonParser.number = context.SymbolId) Then
@@ -205,26 +205,26 @@ Namespace ParsleyDemo
                 End If
                 children(0) = New ParseNode(JsonParser.number, "number", context.Value, context.Line, context.Column, context.Position)
                 context.Advance
-                Return New ParseNode(JsonParser.Value, "Value", children, line, column, position)
+                Return New ParseNode(JsonParser.Value, "Value", children, line__, column__, position__)
             End If
             'Value -> Object
             If (JsonParser.lbrace = context.SymbolId) Then
                 Dim children(0) As ParseNode
                 children(0) = JsonParser.ParseObject(context)
-                Return New ParseNode(JsonParser.Value, "Value", children, line, column, position)
+                Return New ParseNode(JsonParser.Value, "Value", children, line__, column__, position__)
             End If
             'Value -> Array
             If (JsonParser.lbracket = context.SymbolId) Then
                 Dim children(0) As ParseNode
                 children(0) = JsonParser.ParseArray(context)
-                Return New ParseNode(JsonParser.Value, "Value", children, line, column, position)
+                Return New ParseNode(JsonParser.Value, "Value", children, line__, column__, position__)
             End If
             'Value -> Boolean
             If ((JsonParser.[true] = context.SymbolId)  _
                         OrElse (JsonParser.[false] = context.SymbolId)) Then
                 Dim children(0) As ParseNode
                 children(0) = JsonParser.ParseBoolean(context)
-                Return New ParseNode(JsonParser.Value, "Value", children, line, column, position)
+                Return New ParseNode(JsonParser.Value, "Value", children, line__, column__, position__)
             End If
             'Value -> null
             If (JsonParser.null = context.SymbolId) Then
@@ -235,16 +235,16 @@ Namespace ParsleyDemo
                 End If
                 children(0) = New ParseNode(JsonParser.null, "null", context.Value, context.Line, context.Column, context.Position)
                 context.Advance
-                Return New ParseNode(JsonParser.Value, "Value", children, line, column, position)
+                Return New ParseNode(JsonParser.Value, "Value", children, line__, column__, position__)
             End If
             context.Error("Expecting string, number, lbrace, lbracket, true, false, or null at line {0}, col"& _ 
-                    "umn {1}, position {2}", line, column, position)
+                    "umn {1}, position {2}", line__, column__, position__)
             Return Nothing
         End Function
         Private Overloads Shared Function ParseBoolean(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
+            Dim line__ As Integer = context.Line
+            Dim column__ As Integer = context.Column
+            Dim position__ As Long = context.Position
             'Boolean -> true
             If (JsonParser.[true] = context.SymbolId) Then
                 Dim children(0) As ParseNode
@@ -254,7 +254,7 @@ Namespace ParsleyDemo
                 End If
                 children(0) = New ParseNode(JsonParser.[true], "true", context.Value, context.Line, context.Column, context.Position)
                 context.Advance
-                Return New ParseNode(JsonParser.[Boolean], "Boolean", children, line, column, position)
+                Return New ParseNode(JsonParser.[Boolean], "Boolean", children, line__, column__, position__)
             End If
             'Boolean -> false
             If (JsonParser.[false] = context.SymbolId) Then
@@ -265,9 +265,9 @@ Namespace ParsleyDemo
                 End If
                 children(0) = New ParseNode(JsonParser.[false], "false", context.Value, context.Line, context.Column, context.Position)
                 context.Advance
-                Return New ParseNode(JsonParser.[Boolean], "Boolean", children, line, column, position)
+                Return New ParseNode(JsonParser.[Boolean], "Boolean", children, line__, column__, position__)
             End If
-            context.Error("Expecting true or false at line {0}, column {1}, position {2}", line, column, position)
+            context.Error("Expecting true or false at line {0}, column {1}, position {2}", line__, column__, position__)
             Return Nothing
         End Function
         '''<summary>
@@ -286,9 +286,9 @@ Namespace ParsleyDemo
             Return JsonParser.ParseBoolean(context)
         End Function
         Private Shared Function ParseObjectList(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
+            Dim line__ As Integer = context.Line
+            Dim column__ As Integer = context.Column
+            Dim position__ As Long = context.Position
             'ObjectList -> comma Field ObjectListRightAssoc
             If (JsonParser.comma = context.SymbolId) Then
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -299,15 +299,15 @@ Namespace ParsleyDemo
                 context.Advance
                 children.Add(JsonParser.ParseField(context))
                 children.AddRange(JsonParser.ParseObjectListRightAssoc(context).Children)
-                Return New ParseNode(JsonParser.ObjectList, "ObjectList", children.ToArray, line, column, position)
+                Return New ParseNode(JsonParser.ObjectList, "ObjectList", children.ToArray, line__, column__, position__)
             End If
-            context.Error("Expecting comma at line {0}, column {1}, position {2}", line, column, position)
+            context.Error("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__)
             Return Nothing
         End Function
         Private Shared Function ParseArrayList(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
+            Dim line__ As Integer = context.Line
+            Dim column__ As Integer = context.Column
+            Dim position__ As Long = context.Position
             'ArrayList -> comma Value ArrayListRightAssoc
             If (JsonParser.comma = context.SymbolId) Then
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -318,15 +318,15 @@ Namespace ParsleyDemo
                 context.Advance
                 children.AddRange(JsonParser.ParseValue(context).Children)
                 children.AddRange(JsonParser.ParseArrayListRightAssoc(context).Children)
-                Return New ParseNode(JsonParser.ArrayList, "ArrayList", children.ToArray, line, column, position)
+                Return New ParseNode(JsonParser.ArrayList, "ArrayList", children.ToArray, line__, column__, position__)
             End If
-            context.Error("Expecting comma at line {0}, column {1}, position {2}", line, column, position)
+            context.Error("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__)
             Return Nothing
         End Function
         Private Shared Function ParseObjectListRightAssoc(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
+            Dim line__ As Integer = context.Line
+            Dim column__ As Integer = context.Column
+            Dim position__ As Long = context.Position
             'ObjectListRightAssoc -> comma Field ObjectListRightAssoc
             If (JsonParser.comma = context.SymbolId) Then
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -337,20 +337,20 @@ Namespace ParsleyDemo
                 context.Advance
                 children.Add(JsonParser.ParseField(context))
                 children.AddRange(JsonParser.ParseObjectListRightAssoc(context).Children)
-                Return New ParseNode(JsonParser.ObjectListRightAssoc, "ObjectListRightAssoc", children.ToArray, line, column, position)
+                Return New ParseNode(JsonParser.ObjectListRightAssoc, "ObjectListRightAssoc", children.ToArray, line__, column__, position__)
             End If
             'ObjectListRightAssoc ->
             If (JsonParser.rbrace = context.SymbolId) Then
                 Dim children(-1) As ParseNode
-                Return New ParseNode(JsonParser.ObjectListRightAssoc, "ObjectListRightAssoc", children, line, column, position)
+                Return New ParseNode(JsonParser.ObjectListRightAssoc, "ObjectListRightAssoc", children, line__, column__, position__)
             End If
-            context.Error("Expecting comma or rbrace at line {0}, column {1}, position {2}", line, column, position)
+            context.Error("Expecting comma or rbrace at line {0}, column {1}, position {2}", line__, column__, position__)
             Return Nothing
         End Function
         Private Shared Function ParseArrayListRightAssoc(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
+            Dim line__ As Integer = context.Line
+            Dim column__ As Integer = context.Column
+            Dim position__ As Long = context.Position
             'ArrayListRightAssoc -> comma Value ArrayListRightAssoc
             If (JsonParser.comma = context.SymbolId) Then
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -361,20 +361,20 @@ Namespace ParsleyDemo
                 context.Advance
                 children.AddRange(JsonParser.ParseValue(context).Children)
                 children.AddRange(JsonParser.ParseArrayListRightAssoc(context).Children)
-                Return New ParseNode(JsonParser.ArrayListRightAssoc, "ArrayListRightAssoc", children.ToArray, line, column, position)
+                Return New ParseNode(JsonParser.ArrayListRightAssoc, "ArrayListRightAssoc", children.ToArray, line__, column__, position__)
             End If
             'ArrayListRightAssoc ->
             If (JsonParser.rbracket = context.SymbolId) Then
                 Dim children(-1) As ParseNode
-                Return New ParseNode(JsonParser.ArrayListRightAssoc, "ArrayListRightAssoc", children, line, column, position)
+                Return New ParseNode(JsonParser.ArrayListRightAssoc, "ArrayListRightAssoc", children, line__, column__, position__)
             End If
-            context.Error("Expecting comma or rbracket at line {0}, column {1}, position {2}", line, column, position)
+            context.Error("Expecting comma or rbracket at line {0}, column {1}, position {2}", line__, column__, position__)
             Return Nothing
         End Function
         Private Shared Function ParseObjectPart(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
+            Dim line__ As Integer = context.Line
+            Dim column__ As Integer = context.Column
+            Dim position__ As Long = context.Position
             'ObjectPart -> ObjectList rbrace
             If (JsonParser.comma = context.SymbolId) Then
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -384,7 +384,7 @@ Namespace ParsleyDemo
                     context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position)
                 End If
                 context.Advance
-                Return New ParseNode(JsonParser.ObjectPart, "ObjectPart", children.ToArray, line, column, position)
+                Return New ParseNode(JsonParser.ObjectPart, "ObjectPart", children.ToArray, line__, column__, position__)
             End If
             'ObjectPart -> rbrace
             If (JsonParser.rbrace = context.SymbolId) Then
@@ -394,15 +394,15 @@ Namespace ParsleyDemo
                     context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position)
                 End If
                 context.Advance
-                Return New ParseNode(JsonParser.ObjectPart, "ObjectPart", children.ToArray, line, column, position)
+                Return New ParseNode(JsonParser.ObjectPart, "ObjectPart", children.ToArray, line__, column__, position__)
             End If
-            context.Error("Expecting comma or rbrace at line {0}, column {1}, position {2}", line, column, position)
+            context.Error("Expecting comma or rbrace at line {0}, column {1}, position {2}", line__, column__, position__)
             Return Nothing
         End Function
         Private Shared Function ParseArrayPart(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
+            Dim line__ As Integer = context.Line
+            Dim column__ As Integer = context.Column
+            Dim position__ As Long = context.Position
             'ArrayPart -> ArrayList rbracket
             If (JsonParser.comma = context.SymbolId) Then
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -412,7 +412,7 @@ Namespace ParsleyDemo
                     context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position)
                 End If
                 context.Advance
-                Return New ParseNode(JsonParser.ArrayPart, "ArrayPart", children.ToArray, line, column, position)
+                Return New ParseNode(JsonParser.ArrayPart, "ArrayPart", children.ToArray, line__, column__, position__)
             End If
             'ArrayPart -> rbracket
             If (JsonParser.rbracket = context.SymbolId) Then
@@ -422,15 +422,15 @@ Namespace ParsleyDemo
                     context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position)
                 End If
                 context.Advance
-                Return New ParseNode(JsonParser.ArrayPart, "ArrayPart", children.ToArray, line, column, position)
+                Return New ParseNode(JsonParser.ArrayPart, "ArrayPart", children.ToArray, line__, column__, position__)
             End If
-            context.Error("Expecting comma or rbracket at line {0}, column {1}, position {2}", line, column, position)
+            context.Error("Expecting comma or rbracket at line {0}, column {1}, position {2}", line__, column__, position__)
             Return Nothing
         End Function
         Private Overloads Shared Function ParseObject(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
+            Dim line__ As Integer = context.Line
+            Dim column__ As Integer = context.Column
+            Dim position__ As Long = context.Position
             'Object -> lbrace ObjectPart2
             If (JsonParser.lbrace = context.SymbolId) Then
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -440,9 +440,9 @@ Namespace ParsleyDemo
                 End If
                 context.Advance
                 children.AddRange(JsonParser.ParseObjectPart2(context).Children)
-                Return New ParseNode(JsonParser.[Object], "Object", children.ToArray, line, column, position)
+                Return New ParseNode(JsonParser.[Object], "Object", children.ToArray, line__, column__, position__)
             End If
-            context.Error("Expecting lbrace at line {0}, column {1}, position {2}", line, column, position)
+            context.Error("Expecting lbrace at line {0}, column {1}, position {2}", line__, column__, position__)
             Return Nothing
         End Function
         '''<summary>
@@ -460,9 +460,9 @@ Namespace ParsleyDemo
             Return JsonParser.ParseObject(context)
         End Function
         Private Shared Function ParseObjectPart2(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
+            Dim line__ As Integer = context.Line
+            Dim column__ As Integer = context.Column
+            Dim position__ As Long = context.Position
             'ObjectPart2 -> rbrace
             If (JsonParser.rbrace = context.SymbolId) Then
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -471,22 +471,22 @@ Namespace ParsleyDemo
                     context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position)
                 End If
                 context.Advance
-                Return New ParseNode(JsonParser.ObjectPart2, "ObjectPart2", children.ToArray, line, column, position)
+                Return New ParseNode(JsonParser.ObjectPart2, "ObjectPart2", children.ToArray, line__, column__, position__)
             End If
             'ObjectPart2 -> Field ObjectPart
             If (JsonParser.[string] = context.SymbolId) Then
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
                 children.Add(JsonParser.ParseField(context))
                 children.AddRange(JsonParser.ParseObjectPart(context).Children)
-                Return New ParseNode(JsonParser.ObjectPart2, "ObjectPart2", children.ToArray, line, column, position)
+                Return New ParseNode(JsonParser.ObjectPart2, "ObjectPart2", children.ToArray, line__, column__, position__)
             End If
-            context.Error("Expecting rbrace or string at line {0}, column {1}, position {2}", line, column, position)
+            context.Error("Expecting rbrace or string at line {0}, column {1}, position {2}", line__, column__, position__)
             Return Nothing
         End Function
         Private Overloads Shared Function ParseArray(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
+            Dim line__ As Integer = context.Line
+            Dim column__ As Integer = context.Column
+            Dim position__ As Long = context.Position
             'Array -> lbracket ArrayPart2
             If (JsonParser.lbracket = context.SymbolId) Then
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -496,9 +496,9 @@ Namespace ParsleyDemo
                 End If
                 context.Advance
                 children.AddRange(JsonParser.ParseArrayPart2(context).Children)
-                Return New ParseNode(JsonParser.Array, "Array", children.ToArray, line, column, position)
+                Return New ParseNode(JsonParser.Array, "Array", children.ToArray, line__, column__, position__)
             End If
-            context.Error("Expecting lbracket at line {0}, column {1}, position {2}", line, column, position)
+            context.Error("Expecting lbracket at line {0}, column {1}, position {2}", line__, column__, position__)
             Return Nothing
         End Function
         '''<summary>
@@ -516,9 +516,9 @@ Namespace ParsleyDemo
             Return JsonParser.ParseArray(context)
         End Function
         Private Shared Function ParseArrayPart2(ByVal context As ParserContext) As ParseNode
-            Dim line As Integer = context.Line
-            Dim column As Integer = context.Column
-            Dim position As Long = context.Position
+            Dim line__ As Integer = context.Line
+            Dim column__ As Integer = context.Column
+            Dim position__ As Long = context.Position
             'ArrayPart2 -> rbracket
             If (JsonParser.rbracket = context.SymbolId) Then
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
@@ -527,7 +527,7 @@ Namespace ParsleyDemo
                     context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position)
                 End If
                 context.Advance
-                Return New ParseNode(JsonParser.ArrayPart2, "ArrayPart2", children.ToArray, line, column, position)
+                Return New ParseNode(JsonParser.ArrayPart2, "ArrayPart2", children.ToArray, line__, column__, position__)
             End If
             'ArrayPart2 -> Value ArrayPart
             If (((((((JsonParser.[string] = context.SymbolId)  _
@@ -540,10 +540,10 @@ Namespace ParsleyDemo
                 Dim children As System.Collections.Generic.List(Of ParseNode) = New System.Collections.Generic.List(Of ParseNode)()
                 children.AddRange(JsonParser.ParseValue(context).Children)
                 children.AddRange(JsonParser.ParseArrayPart(context).Children)
-                Return New ParseNode(JsonParser.ArrayPart2, "ArrayPart2", children.ToArray, line, column, position)
+                Return New ParseNode(JsonParser.ArrayPart2, "ArrayPart2", children.ToArray, line__, column__, position__)
             End If
             context.Error("Expecting rbracket, string, number, lbrace, lbracket, true, false, or null at lin"& _ 
-                    "e {0}, column {1}, position {2}", line, column, position)
+                    "e {0}, column {1}, position {2}", line__, column__, position__)
             Return Nothing
         End Function
     End Class

@@ -2,6 +2,7 @@
 using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
@@ -33,7 +34,7 @@ namespace Parsley
 			bool ifstale = false;
 			bool fast = false;
 
-			
+
 			try
 			{
 				if (0 == args.Length)
@@ -54,7 +55,7 @@ namespace Parsley
 							if (args.Length - 1 == i) // check if we're at the end
 								throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i].Substring(1)));
 							++i; // advance 
-							codenamespace= args[i];
+							codenamespace = args[i];
 							break;
 						case "/class":
 							if (args.Length - 1 == i) // check if we're at the end
@@ -84,7 +85,7 @@ namespace Parsley
 							noshared = true;
 							break;
 						case "/verbose":
-							verbose= true;
+							verbose = true;
 							break;
 						case "/rolex":
 							if (args.Length - 1 == i) // check if we're at the end
@@ -116,21 +117,21 @@ namespace Parsley
 					else
 						codeclass = Path.GetFileNameWithoutExtension(inputfile);
 				}
-				
+
 				string gplexshared = null;
 				string gplexcode = null;
-				if(null!=gplexfile)
+				if (null != gplexfile)
 				{
 					if (null == gplexcodeclass)
 					{
 						gplexcodeclass = Path.GetFileNameWithoutExtension(gplexfile);
 					}
 					var dir = Path.GetDirectoryName(gplexfile);
-					if(!noshared)
+					if (!noshared)
 					{
 						gplexshared = Path.Combine(dir, "GplexShared.cs");
 					}
-					gplexcode = Path.Combine(dir, string.Concat(gplexcodeclass,"Tokenizer.cs"));
+					gplexcode = Path.Combine(dir, string.Concat(gplexcodeclass, "Tokenizer.cs"));
 				}
 				var stale = true;
 				if (ifstale && null != outputfile)
@@ -156,7 +157,7 @@ namespace Parsley
 						Console.Error.WriteLine(outputfile);
 					if (null != rolexfile)
 						Console.Error.WriteLine(rolexfile);
-					if(null!=gplexfile)
+					if (null != gplexfile)
 						Console.Error.WriteLine(gplexfile);
 					if (null != gplexshared)
 						Console.Error.WriteLine(gplexshared);
@@ -165,11 +166,11 @@ namespace Parsley
 				}
 				else
 				{
-					Console.Error.WriteLine("{0} is building the following:",Name);
+					Console.Error.WriteLine("{0} is building the following:", Name);
 					if (null != outputfile)
 						Console.Error.WriteLine(outputfile);
 					if (null != rolexfile)
-						Console.Error.WriteLine(rolexfile);	
+						Console.Error.WriteLine(rolexfile);
 					if (null != gplexfile)
 						Console.Error.WriteLine(gplexfile);
 					if (null != gplexshared)
@@ -188,67 +189,66 @@ namespace Parsley
 						}
 						if (string.IsNullOrEmpty(codelanguage))
 							codelanguage = "cs";
-						
+
 					}
 					var s = codelanguage.ToUpperInvariant();
 					if (null != gplexfile && s != "CS" && s != "C#" && s != "CSHARP")
 						Console.Error.WriteLine("Warning: Gplex only targets C# but the langauge specified was {0}. This will require the C# code to be compiled separately and referenced from the main project.", codelanguage);
 
 					var doc = XbnfDocument.ReadFrom(inputfile);
-					var isLexerOnly = false; 
-					if (!doc.HasNonTerminalProductions)
-					{
-						// this is purely a lexer file
-						isLexerOnly = true;
-						// we need to prepare it by marking every terminal
-						// with an attribute if it isn't already. we use 
-						// "terminal" because it doesn't impact terminals
-						// in any way, but this way the CfgDocument can
-						// "see" them.
-						for(int ic = doc.Productions.Count,i=0;i<ic;++i)
+					var isLexerOnly = true;
+					if (doc.HasNonTerminalProductions)
+						isLexerOnly = false;
+					else {
+						foreach(var import in doc.Imports)
 						{
-							var p = doc.Productions[i];
-							if(0==p.Attributes.Count)
-								p.Attributes.Add(new XbnfAttribute("terminal", true));
-							
-						}
-					}
-					var cfg = XbnfConvert.ToCfg(doc);
-					if (!isLexerOnly)
-					{
-#if !NOPREPARELL1
-						var msgs = cfg.TryPrepareLL1();
-						foreach (var msg in msgs)
-						{
-							if (verbose || ErrorLevel.Message != msg.ErrorLevel)
-								Console.Error.WriteLine(msg);
-
+							if(import.Document.HasNonTerminalProductions)
+							{
+								isLexerOnly = false;
+								break;
+							}
 						}
 						
-#else // if NOPREPARELL1
-						CfgDocument ocfg = null;
-						var i = 20;
-						while (0<i && ocfg != cfg)
+					}
+					// we need to prepare it by marking every terminal
+					// with an attribute if it isn't already. we use 
+					// "terminal" because it doesn't impact terminals
+					// in any way, but this way the CfgDocument can
+					// "see" them.
+					for (int ic = doc.Productions.Count, i = 0; i < ic; ++i)
+					{
+						var p = doc.Productions[i];
+						if (p.IsTerminal && 0 == p.Attributes.Count)
+							p.Attributes.Add(new XbnfAttribute("terminal", true));
+
+					}
+
+					XbnfGenerationInfo genInfo;
+					var msgs = XbnfConvert.TryCreateXbnfImportData(doc, out genInfo);
+
+					foreach (var msg in msgs)
+					{
+						if (verbose || ErrorLevel.Message != msg.ErrorLevel)
+							Console.Error.WriteLine(msg);
+
+					}
+					CfgException.ThrowIfErrors(msgs);
+					CfgDocument primaryCfg = genInfo.CfgMap[doc];
+					
+					if (!isLexerOnly)
+					{
+
+						if (verbose)
 						{
-							ocfg = cfg.Clone();
-							cfg.EliminateLeftRecursion();
-							--i;
-						}
-						Console.Error.WriteLine(cfg.ToString());
-						var msgs = cfg.TryValidateLL1();
-						foreach (var msg in msgs)
-						{
-							if (verbose || ErrorLevel.Message != msg.ErrorLevel)
-								Console.Error.WriteLine(msg);
-						}
-#endif // !NOPREPARELL1
-						if(verbose)
-						{
-							Console.Error.WriteLine("Final grammar:");
-							Console.Error.WriteLine(cfg.ToString());
+							Console.Error.WriteLine("Final grammars:");
+							foreach (var cfg in genInfo.CfgMap)
+							{
+								Console.Error.WriteLine(cfg.ToString());
+								Console.WriteLine();
+							}
 						}
 						CfgException.ThrowIfErrors(msgs);
-						var ccu = CodeGenerator.GenerateCompileUnit(doc, cfg, codeclass, codenamespace,fast);
+						var ccu = CodeGenerator.GenerateCompileUnit(doc, genInfo, codeclass, codenamespace, fast);
 						var ccuNS = ccu.Namespaces[ccu.Namespaces.Count - 1];
 						var ccuShared = CodeGenerator.GenerateSharedCompileUnit(codenamespace);
 						var sNS = ccuShared.Namespaces[ccuShared.Namespaces.Count - 1];
@@ -273,7 +273,7 @@ namespace Parsley
 								var vd = ctx.Target as CodeVariableDeclarationStatement;
 								if (null != vd && CD.CodeDomResolver.IsNullOrVoidType(vd.Type))
 									vd.Type = C.Type("var");
-							},CD.CodeDomVisitTargets.All & ~(CD.CodeDomVisitTargets.Expressions | CD.CodeDomVisitTargets.Comments | CD.CodeDomVisitTargets.Attributes | CD.CodeDomVisitTargets.Directives | CD.CodeDomVisitTargets.Types|CD.CodeDomVisitTargets.TypeRefs));
+							}, CD.CodeDomVisitTargets.All & ~(CD.CodeDomVisitTargets.Expressions | CD.CodeDomVisitTargets.Comments | CD.CodeDomVisitTargets.Attributes | CD.CodeDomVisitTargets.Directives | CD.CodeDomVisitTargets.Types | CD.CodeDomVisitTargets.TypeRefs));
 						}
 						else
 						{
@@ -328,21 +328,21 @@ namespace Parsley
 						output = null;
 					}
 					else
-						Console.Error.WriteLine("{0} skipped parser generation because there are no non-terminals defined.", Name);
+						Console.Error.WriteLine("{0} skipped parser generation because there are no non-terminals and no imports defined.", Name);
 
-					if(null!=rolexfile)
+					if (null != rolexfile)
 					{
 						var sw = new StreamWriter(rolexfile);
 						sw.BaseStream.SetLength(0);
 						output = sw;
-						output.WriteLine(XbnfConvert.ToRolexSpec(doc, cfg));
+						output.WriteLine(XbnfConvert.ToRolexSpec(doc, primaryCfg));
 						output.Flush();
 						output.Close();
 						output = null;
 					}
-					if(null!=gplexfile)
+					if (null != gplexfile)
 					{
-						if(!noshared)
+						if (!noshared)
 						{
 							using (var sr = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Parsley.Export.GplexShared.Prototype.cs")))
 								s = sr.ReadToEnd();
@@ -354,7 +354,8 @@ namespace Parsley
 								sw.Flush();
 							}
 						}
-						s= XbnfConvert.ToGplexSpec(doc, cfg, codenamespace, gplexcodeclass);
+
+						s = XbnfConvert.ToGplexSpec(genInfo, codenamespace, gplexcodeclass);
 						using (var sw = new StreamWriter(System.IO.File.Open(gplexfile, FileMode.OpenOrCreate, FileAccess.ReadWrite)))
 						{
 							sw.BaseStream.SetLength(0);
@@ -370,7 +371,7 @@ namespace Parsley
 								s = string.Concat("namespace ", codenamespace, Environment.NewLine, "{", Environment.NewLine, s, "}", Environment.NewLine);
 							}
 							s = s.Replace("Parsley_codeclass", gplexcodeclass);
-							s = s.Replace("Parsley_constants", XbnfConvert.ToGplexSymbolConstants(doc, cfg));
+							s = s.Replace("Parsley_constants", XbnfConvert.ToGplexSymbolConstants(genInfo.CfgMap));
 							using (var sw = new StreamWriter(System.IO.File.Open(gplexcode, FileMode.OpenOrCreate, FileAccess.ReadWrite)))
 							{
 								sw.BaseStream.SetLength(0);
@@ -379,7 +380,6 @@ namespace Parsley
 							}
 						}
 					}
-					
 
 				}
 			}
@@ -398,8 +398,8 @@ namespace Parsley
 
 			}
 			return result;
-			
-			
+
+
 		}
 		static string _GetName()
 		{
@@ -439,13 +439,13 @@ namespace Parsley
 			t.WriteLine("	<rolexfile>		Output a Rolex lexer specification to the specified file");
 			t.WriteLine("	<gplexfile>		Generate Gplex lexer specification to the specified file file. Will also generate supporting C# files (C# only)");
 			t.WriteLine("	<gplexcodeclass>	Generate Gplex lexer specification with the specified class name. - default takes the name from <gplexfile>");
-			t.WriteLine("	<codenamespace>		Generate code under the specified namespace - default none"); 
+			t.WriteLine("	<codenamespace>		Generate code under the specified namespace - default none");
 			t.WriteLine("	<codeclass>		Generate code with the specified class name - default derived from <outputfile> or the grammar.");
 			t.WriteLine("	<codelanguage>		Generate code in the specified language - default derived from <outputfile> or C#.");
 			t.WriteLine("	<fast>			Generate code quickly, without resolution using C# only - not valid with the <codelanguage> option.");
 			t.WriteLine("	<noshared>		Do not include shared library prerequisites");
 			t.WriteLine("	<verbose>		Output all messages from the generation process");
-			t.WriteLine("	<ifstale>		Do not generate unless <outputfile> or <rolexfile> is older than <inputfile>.");
+			t.WriteLine("	<ifstale>		Do not generate unless output files are older than the input files.");
 			t.WriteLine();
 			t.WriteLine("Any other switch displays this screen and exits.");
 			t.WriteLine();

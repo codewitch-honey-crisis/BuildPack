@@ -361,7 +361,10 @@ namespace CD
 						_AddStartDirs(ls, dirs);
 						dirs.AddRange(_ParseDirectives(pc, true));
 						_AddEndDirs(ls, dirs);
+						
 						return ls;
+						
+
 					}
 					
 					throw new NotImplementedException("Not finished");

@@ -12,7 +12,11 @@
 
 
 %{
-
+		public const int TabWidth = 4;
+		// yyline and yycol are useless
+		int _line=1;
+		int _column=1;
+		long _position=0;
 		// required to shut gplex up
 		enum Tokens {
 		EOF = -1
@@ -23,15 +27,44 @@
 		{
 			var result = default(Token);
 			result.SymbolId = -4;
+			result.Line = 1;
+			result.Column = 1;
+			result.Position = 0;
 			return result;
+		}
+		public void UpdatePosition(string text) 
+		{
+			if(string.IsNullOrEmpty(text)) return;
+			for(var i = 0;i<text.Length;++i) 
+			{
+				var ch = text[i];
+				switch(ch) 
+				{
+					case '\n':
+						++_line;
+						_column=1;
+						break;
+					case '\r':
+						_column=1;
+						break;
+					case '\t':
+						_column+=TabWidth;
+						break;
+					default:
+						++_column;
+						break;
+				}
+				++_position;
+			}
 		}
 		public void Advance()
 		{
-			Current.Line = yyline;
-			Current.Column = yycol;
-			Current.Position = yypos;
 			Current.SymbolId = yylex();
 			Current.Value = yytext;
+			Current.Line = _line;
+			Current.Column = _column;
+			Current.Position = _position;
+			
 		}
 		public void Close()
 		{
@@ -61,6 +94,7 @@
 					tokTxt = sb.ToString();
 				else
 					tokTxt += sb.ToString();
+				UpdatePosition(tokTxt);
 				return code == character;
 			}
 			return false;
@@ -104,10 +138,12 @@
 					// TODO: verify this
 					GetCode();
 					tokTxt = s+ sb.ToString();
+					UpdatePosition(tokTxt);
 					return true;
 				}
 			}
 			tokTxt = s+sb.ToString();
+			UpdatePosition(tokTxt);
 			return false;
 		}
 %}
@@ -115,7 +151,7 @@
 %%
 <<EOF>>		{ return -2; }
 Parsley_declarations
-[\n]|[^\n]		{ return -1; }
+[\n]|[^\n]		{ UpdatePosition(yytext); return -1; }
 
 
 	

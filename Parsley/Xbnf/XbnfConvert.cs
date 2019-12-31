@@ -9,93 +9,198 @@ namespace Parsley
 	// port of PCK's XbnkToPckTransform for use with Rolex and Parsley
 	// the rolex spec is written to rolexOutput
 	// the CfgDocument is the return value
+	using TermPriEntry = KeyValuePair<KeyValuePair<string, XbnfDocument>, int>;
 	static class XbnfConvert
 	{
-		public static string ToGplexSymbolConstants(XbnfDocument doc,CfgDocument cfg)
+	
+		public static string ToGplexSymbolConstants(IDictionary<XbnfDocument,CfgDocument> cfgMap)
 		{
 			var sb = new StringBuilder();
+			int termStart;
+			var symtbl=GetMasterSymbolTable(cfgMap, out termStart);
 			sb.AppendLine("symbol constants follow");
 			sb.AppendLine("public const int ErrorSymbol = -1;");
 			sb.AppendLine("public const int EosSymbol = -2;");
 			var seen = new HashSet<string>();
 			seen.Add("ErrorSymbol");
 			seen.Add("EosSymbol");
-			for(int ic=doc.Productions.Count,i=0;i<ic;++i)
+			for(int ic=symtbl.Count,i=termStart;i<ic;++i)
 			{
-				var p = doc.Productions[i];
-				if(p.IsTerminal)
-				{
-					var id = cfg.GetIdOfSymbol(p.Name);
-					// some terminals declared in the grammar might have never been used
-
-					var name = _EscapeKeyword(_MakeUniqueName(seen, _MakeSafeName(p.Name)));
-					sb.Append("public const int ");
-					sb.Append(name);
-					sb.Append(" = ");
-					sb.Append(id.ToString());
-					sb.AppendLine(";");
-				}
+				var se = symtbl[i];
+				var name = _EscapeKeyword(_MakeUniqueName(seen, _MakeSafeName(se.Key)));
+				sb.Append("public const int ");
+				sb.Append(name);
+				sb.Append(" = ");
+				sb.Append(i.ToString());
+				sb.AppendLine(";");
+				
 			}
 			return sb.ToString();
 		}
-		public static string ToGplexSpec(XbnfDocument document,CfgDocument cfg,string codenamespace,string codeclass)
+		internal static ListDictionary<string,XbnfDocument> GetMasterSymbolTable(IDictionary<XbnfDocument,CfgDocument> cfgMap, out int termStart)
 		{
+			var result = new ListDictionary<string, XbnfDocument>();
+			var seen = new HashSet<string>();
+			XbnfDocument first = null;
+			foreach (var ce in cfgMap)
+			{
+				if (null == first)
+					first = ce.Key;
+
+				foreach (var s in ce.Value.FillNonTerminals())
+				{
+					// this sucks. we have to make sure that 
+					// our foreign symbols in the document
+					// which we added to augment the FIRSTS
+					// do not get counted toward this document's 
+					// non terminals. To that end we look to see
+					// if any other document contains it.
+					// only if no other does does it allow 
+					// to add.
+					var foreign = false;
+					foreach (var d in cfgMap.Keys)
+					{
+						if (d == ce.Key) continue;
+						if(d.Productions.Contains(s))
+						{
+							foreign = true;
+							break;
+						}
+					}
+					if (!foreign)
+					{
+						if (seen.Add(s))
+							result.Add(s, ce.Key);
+					}
+
+				}
+			}
+			termStart = result.Count;
+			foreach (var ce in cfgMap)
+			{
+				var ts = new List<string>();
+				foreach (var prod in ce.Key.Productions)
+				{
+					if (prod.IsTerminal)
+					{
+						var foreign = false;
+						foreach (var d in cfgMap.Keys)
+						{
+							if (d == ce.Key) continue;
+							if (d.Productions.Contains(prod.Name))
+							{
+								foreign = true;
+								break;
+							}
+						}
+						if(!foreign)
+							ts.Add(prod.Name);
+					}
+				}
+				foreach (var s in ts)
+				{
+					//if (0 != string.Compare("#ERROR", s, StringComparison.InvariantCulture) && 0 != string.Compare("#EOS", s, StringComparison.InvariantCulture))
+					//{
+					if (seen.Add(s))
+						result.Add(s, ce.Key);
+					//}
+				}
+			}
+			result.Add("#EOS",first);
+			result.Add("#ERROR",first);
+			return result;
+		}
+		
+		private class _TermPriorityComparer : IComparer<TermPriEntry>
+		{
+			ICollection<CfgDocument> _cfgs;
+			public _TermPriorityComparer(ICollection<CfgDocument> cfgs) { _cfgs = cfgs; }
+			public int Compare(TermPriEntry x, TermPriEntry y)
+			{
+				// aloha
+				return _Compare(x.Key.Key, y.Key.Key);
+			}
+			int _Compare(string x, string y)
+			{
+				if (x == y) return 0;
+				var p1 = -_FindPriority(x);
+				var p2 = -_FindPriority(y);
+				return p1 - p2;
+			}
+			int _FindPriority(string x)
+			{
+				// not working?!
+				if ("#ERROR" == x || "#EOS" == x)
+					return int.MinValue;
+				foreach (var cfg in _cfgs)
+				{
+					var o = cfg.GetAttribute(x, "priority");
+					if(o is double)
+					{
+						return (int)(double)o;
+					}
+				}
+				
+				return 0;
+			}
+		}
+		public static string ToGplexSpec(XbnfGenerationInfo genInfo,string codenamespace,string codeclass)
+		{
+			var cfgMap = genInfo.CfgMap;
 			var syms = new HashSet<string>();
-			//writer.WriteLine();
 			// use a list dictionary to keep these in order
-			var tmap = new ListDictionary<XbnfExpression, string>();
 			var attrSets = new Dictionary<string, XbnfAttributeList>();
 			var rules = new List<KeyValuePair<string, IList<string>>>();
-			// below are scratch
-			var working = new HashSet<XbnfExpression>();
-			var done = new HashSet<XbnfExpression>();
-
-			// now get the terminals and their ids, declaring if necessary
-			for (int ic = document.Productions.Count, i = 0; i < ic; ++i)
+			var termStart = 0;
+			var stbl = GetMasterSymbolTable(cfgMap,out termStart);
+			var stbli = new List<KeyValuePair<KeyValuePair<string, XbnfDocument>, int>>();
+			var id = 0;
+			// assign ids
+			foreach (var se in stbl)
 			{
-				var p = document.Productions[i];
-				if (p.IsTerminal)
-				{
-					tmap.Add(p.Expression, p.Name);
-					done.Add(p.Expression);
-				}
-				else
-					_VisitFetchTerminals(p.Expression, working);
+				if(id>=termStart)
+					stbli.Add(new KeyValuePair<KeyValuePair<string, XbnfDocument>, int>(se, id));
+				++id;
 			}
-			foreach (var term in working)
-			{
-				if (!done.Contains(term))
-				{
-					var newId = _GetImplicitTermId(syms);
-					tmap.Add(term, newId);
-				}
-			}
-			var sb = new StringBuilder();
-			sb.AppendLine("// Generated by Parsley " + Assembly.GetExecutingAssembly().GetName().Version.ToString());
-			sb.AppendLine();
+			stbli.Sort( new _TermPriorityComparer(cfgMap.Values));
 			string lexSpec;
 			using (var sr = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("Parsley.Export.GplexTokenizer.lex")))
 				lexSpec=sr.ReadToEnd();
 			lexSpec=lexSpec.Replace("Parsley_codenamespace", codenamespace);
 			lexSpec = lexSpec.Replace("Parsley_codeclass", codeclass);
 			var decls = new StringBuilder();
-			for (int ic = tmap.Count, i = 0; i < ic; ++i)
+			for (int ic = stbli.Count, i = 0; i < ic; ++i)
 			{
-				var te = tmap[i];
-				var sym = te.Value;
-				var id = cfg.GetIdOfSymbol(sym);
-				
+				var se = stbli[i].Key;
+				if ("#EOS" == se.Key || "#ERROR" == se.Key)
+					continue;
+				XbnfExpression e = null;
+				foreach(var k in genInfo.TerminalMap)
+				{
+					if(k.Value ==se.Key)
+					{
+						e = k.Key;
+						break;
+					}
+				}
+				if (char.IsLower(se.Key[0]))
+					System.Diagnostics.Debugger.Break();
+				//var te = genInfo.TerminalMap[i];
+				//var sym = te.Value;
+				//var id = stbli.IndexOf(new KeyValuePair<string, XbnfDocument>(sym, d));
+				id = stbli[i].Value;
 				if (-1 < id) // some terminals might never be used.
 				{
 					// implicit terminals do not have productions and therefore attributes
-					decls.Append(_ToRegex(document, te.Key, true,true).Replace(@"\'",""));
+					var s = _ToRegex(se.Value, e, true, true).Replace(@"\'", "");
+					decls.Append(s);
 					decls.Append(" ");
-					var pi = document.Productions.IndexOf(te.Value);
+					var pi = se.Value.Productions.IndexOf(se.Key);
 					var isHidden = false;
 					string blockEnd = null;
 					if (-1 < pi)
 					{
-						var p = document.Productions[pi];
+						var p = se.Value.Productions[pi];
 						isHidden = p.IsHidden;
 						var ai = p.Attributes.IndexOf("blockEnd");
 						if (-1 < ai)
@@ -109,18 +214,17 @@ namespace Parsley
 						if (null != blockEnd)
 						{
 							decls.Append("if(!_TryReadUntilBlockEnd(");
-							decls.Append(string.Concat("\"",_EscapeLiteral(blockEnd,false),"\")"));
+							decls.Append(string.Concat("\"", _EscapeLiteral(blockEnd, false), "\")"));
 							decls.Append(") return -1;");
 							if (isHidden)
 							{
 								// skip it
-								// TODO: hopefully this works
-								decls.Append(" return yylex();");
+								decls.Append("UpdatePosition(yytext); return yylex();");
 							}
 						}
 						if (!isHidden)
 						{
-							decls.Append("return ");
+							decls.Append("UpdatePosition(yytext); return ");
 							decls.Append(id.ToString());
 							decls.Append(";");
 						}
@@ -128,16 +232,20 @@ namespace Parsley
 					}
 					else
 					{
-						decls.Append("\t { return yylex(); }");
+						decls.Append("\t { UpdatePosition(yytext); return yylex(); }");
 						decls.AppendLine();
 					}
 				}
+				else System.Diagnostics.Debugger.Break();
 			}
+			
+			
 			lexSpec = lexSpec.Replace("Parsley_declarations", decls.ToString());
 			return lexSpec;
 		}
 		public static string ToRolexSpec(XbnfDocument document,CfgDocument cfg)
 		{
+			
 			var syms = new HashSet<string>();
 			//writer.WriteLine();
 			// use a list dictionary to keep these in order
@@ -202,209 +310,594 @@ namespace Parsley
 			}
 			return sb.ToString();
 		}
-		public static CfgDocument ToCfg(XbnfDocument document)
+		
+		public static IList<CfgMessage> TryCreateXbnfImportData(XbnfDocument document,out XbnfGenerationInfo genInfo)
 		{
-			var syms = new HashSet<string>();
-			var cfg = new CfgDocument();
-			// gather the attributes and production names
-			for (int ic = document.Productions.Count, i = 0; i < ic; ++i)
+			var imports = new XbnfImportList();
+			imports.AddRange(document.Imports);
+			_GatherImports(document, imports);
+			var cfgMap = new ListDictionary<XbnfDocument,CfgDocument>();
+			cfgMap.Add(document, new CfgDocument());
+			for (int ic=imports.Count,i=0;i<ic;++i)
 			{
-				var p = document.Productions[i];
-				syms.Add(p.Name);
-				if (0 < p.Attributes.Count)
+				var cfg = new CfgDocument();
+				cfgMap.Add(imports[i].Document, new CfgDocument());
+			}
+
+			return _TryToCfg(document,cfgMap,out genInfo);
+		}
+		static void _GatherImports(XbnfDocument doc,XbnfImportList result)
+		{
+			for(int ic=doc.Imports.Count,i=0;i<ic;++i)
+			{
+				var imp = doc.Imports[i];
+				var found = false;
+				for (int jc=result.Count,j=0;j<jc;++j)
 				{
-					CfgAttributeList attrs;
-					if (!cfg.AttributeSets.TryGetValue(p.Name, out attrs))
+					var fn = result[i].Document.Filename;
+					if (!string.IsNullOrEmpty(fn) && 0==string.Compare(fn,imp.Document.Filename))
 					{
-						attrs = new CfgAttributeList();
-						cfg.AttributeSets.Add(p.Name, attrs);
+						found = true;
+						break;
 					}
-					//writer.Write(string.Concat(p.Name, ": "));
-					//var delim = "";
-					for (int jc = p.Attributes.Count, j = 0; j < jc; ++j)
-					{
-						//writer.Write(string.Concat(delim, p.Attributes[j].ToString()));
-						//delim = ", ";
-						var attr = p.Attributes[j];
-						attrs.Add(new CfgAttribute(attr.Name, attr.Value));
-					}
-					//writer.WriteLine();
-					
+				}
+				if (!found)
+				{
+					result.Add(imp);
+					_GatherImports(imp.Document, result);
 				}
 			}
-			//writer.WriteLine();
+		}
+		
+		static IList<CfgMessage> _TryToCfg(XbnfDocument document,IDictionary<XbnfDocument, CfgDocument> cfgMap,out XbnfGenerationInfo genInfo)
+		{
+			genInfo = default(XbnfGenerationInfo);
+			var hasErrors = false;
+			var result = new List<CfgMessage>();
+			var syms = new HashSet<string>();
+			// gather the attributes and production names
+			foreach (var ce in cfgMap)
+			{
+				for (int ic = ce.Key.Productions.Count, i = 0; i < ic; ++i)
+				{
+					var p = ce.Key.Productions[i];
+					if(!syms.Add(p.Name))
+					{
+						result.Add(new CfgMessage(ErrorLevel.Error, -1, string.Format("Duplicate symbol {0} defined.", p.Name), p.Line, p.Column, p.Position, ce.Value.Filename));
+						hasErrors = true;
+					}
+					if (0 < p.Attributes.Count)
+					{
+						CfgAttributeList attrs;
+						if (!ce.Value.AttributeSets.TryGetValue(p.Name, out attrs))
+						{
+							attrs = new CfgAttributeList();
+							ce.Value.AttributeSets.Add(p.Name, attrs);
+						}
+						for (int jc = p.Attributes.Count, j = 0; j < jc; ++j)
+						{
+							var attr = p.Attributes[j];
+							attrs.Add(new CfgAttribute(attr.Name, attr.Value));
+						}
+					}
+				}
+			}
 			// use a list dictionary to keep these in order
 			var tmap = new ListDictionary<XbnfExpression, string>();
 			var attrSets = new Dictionary<string, XbnfAttributeList>();
 			var rules = new List<KeyValuePair<string, IList<string>>>();
+			IDictionary<string, ICollection<(CfgRule Rule, string Symbol)>> predict = null;
 			// below are scratch
 			var working = new HashSet<XbnfExpression>();
 			var done = new HashSet<XbnfExpression>();
-
+			var firstsLookup = new Dictionary<string, string>();
+			var followsLookup = new Dictionary<string, string>();
+			var refMap = new Dictionary<string, KeyValuePair<XbnfDocument, XbnfProduction>>();
+			var docRefMap = new Dictionary<XbnfDocument, HashSet<string>>();
 			// now get the terminals and their ids, declaring if necessary
-			for (int ic = document.Productions.Count, i = 0; i < ic; ++i)
+			foreach (var doc in cfgMap.Keys)
 			{
-				var p = document.Productions[i];
-				if (p.IsTerminal)
+
+				for (int ic = doc.Productions.Count, i = 0; i < ic; ++i)
 				{
-					string name;
-					if (!tmap.TryGetValue(p.Expression, out name))
+					
+					var p = doc.Productions[i];
+					if (p.IsTerminal)
 					{
-						tmap.Add(p.Expression, p.Name);
-						
-					} else
-					{
-						if (name != p.Name)
-							throw new InvalidOperationException(string.Format("{0} attempts to redefine terminal {1}",name,p.Name));
+						string name;
+						if (!tmap.TryGetValue(p.Expression, out name))
+						{
+							tmap.Add(p.Expression, p.Name);
+
+						}
+						else
+						{
+							if (name != p.Name)
+							{
+								result.Add(new CfgMessage(ErrorLevel.Error, -1, string.Format("{0} attempts to redefine terminal {1}", name, p.Name), p.Line, p.Column, p.Position, doc.Filename));
+								hasErrors = true;
+							}
+						}
+						done.Add(p.Expression);
 					}
-					done.Add(p.Expression);
+					else
+						_VisitFetchTerminals(p.Expression, working);
 				}
-				else
-					_VisitFetchTerminals(p.Expression, working);
 			}
+			if (hasErrors)
+				return result ;
 			foreach (var term in working)
 			{
 				if (!done.Contains(term))
 				{
 					var newId = _GetImplicitTermId(syms);
+					foreach (var d in cfgMap.Keys)
+					{
+						var prod = d.GetProductionForExpression(term);
+						if (null != prod)
+						{
+							// recycle this symbol
+							newId = prod.Name;
+							break;
+						}
+						
+					}
 					tmap.Add(term, newId);
 				}
 			}
-			var ntd = new Dictionary<string, IList<IList<string>>>();
+			// tmap now contains ALL of our terminal definitions from all of our imports
 			// now we can use tmap and syms to help solve the rest of our productions
-			for (int ic = document.Productions.Count, i = 0; i < ic; ++i)
+			foreach (var ce in cfgMap)
 			{
-				var p = document.Productions[i];
-				if(p.IsAbstract)
+				var ntd = new Dictionary<string, IList<IList<string>>>();
+				var doc = ce.Key;
+				var cfg = ce.Value;
+				var unref = new HashSet<string>();
+				// get all the symbols in the doc which are referred to but 
+				// which we can't find 
+				for (int ic = doc.Productions.Count, i = 0; i < ic; ++i)
+					if (null != doc.Productions[i].Expression)
+						_VisitUnreferenced(doc, doc.Productions[i].Expression, unref);
+				// now build a map of that data for later
+				foreach (var s in unref)
 				{
-					// mark this symbol so the cfg "sees" it even
-					// though it's never referenced in the grammar
-					CfgAttributeList attrs;
-					if(!cfg.AttributeSets.TryGetValue(p.Name, out attrs))
+					if(!refMap.ContainsKey(s))
 					{
-						attrs = new CfgAttributeList();
-						cfg.AttributeSets.Add(p.Name, attrs);
-					}
-					var ai = attrs.IndexOf("abstract");
-					if(0>ai)
-					{
-						attrs.Add(new CfgAttribute("abstract", true));
+						foreach (var d in cfgMap.Keys)
+						{
+							var pi = d.Productions.IndexOf(s);
+							if (-1 < pi)
+							{
+								refMap.Add(s, new KeyValuePair<XbnfDocument, XbnfProduction>(d, d.Productions[pi]));
+							}
+						}
 					}
 				}
-				if (!p.IsTerminal)
+				docRefMap.Add(doc, unref);
+				for (int ic = doc.Productions.Count, i = 0; i < ic; ++i)
 				{
-					if (!p.IsVirtual && !p.IsAbstract)
+					var p = doc.Productions[i];
+					if (p.IsAbstract)
 					{
-						var dys = _GetDysjunctions(document, syms, tmap, attrSets, rules, p, p.Expression);
-						ntd.Add(p.Name, dys);
-					} else if(p.IsVirtual)
-					{
-						var ai = p.Attributes.IndexOf("firsts");
+						// mark this symbol so the cfg "sees" it even
+						// though it's never referenced in the grammar
+						CfgAttributeList attrs;
+						if (!cfg.AttributeSets.TryGetValue(p.Name, out attrs))
+						{
+							attrs = new CfgAttributeList();
+							cfg.AttributeSets.Add(p.Name, attrs);
+						}
+						var ai = attrs.IndexOf("abstract");
 						if (0 > ai)
 						{
-							var dys = new List<IList<string>>();
-							dys.Add(new List<string>());
-							ntd.Add(p.Name, dys);
-						} else
+							attrs.Add(new CfgAttribute("abstract", true));
+						}
+					}
+
+					if (!p.IsTerminal)
+					{
+						if (!p.IsVirtual && !p.IsAbstract)
 						{
-							var dys = new List<IList<string>>();
-							var firsts = p.Attributes[ai].Value as string;
-							if(null!=firsts)
+
+							var dys = _GetDysjunctions(doc, syms, tmap, attrSets, rules, p, p.Expression);
+							IList<IList<string>> odys;
+							if (ntd.TryGetValue(p.Name, out odys))
 							{
-								foreach (var sym in firsts.Split(' '))
-									dys.Add(new List<string>(new string[] { sym })); 
-							} else
-								dys.Add(new List<string>());
-							
+								result.Add(new CfgMessage(ErrorLevel.Error, -1, string.Format("The {0} production was specified more than once", p.Name), p.Line, p.Column, p.Position, doc.Filename));
+								hasErrors = true;
+								throw new InvalidOperationException(string.Format("The {0} production was specified more than once at line {1}, column {2}, position {2}", p.Name, p.Line, p.Column, p.Position));
+							}
+							var ai = p.Attributes.IndexOf("follows");
+							if (-1 < ai)
+							{
+								var follows = p.Attributes[ai].Value as string;
+								if (null != follows)
+								{
+									followsLookup.Add(p.Name, follows);
+								}
+							}
+							ai = p.Attributes.IndexOf("firsts");
+							if (-1 < ai)
+							{
+								var firsts = p.Attributes[ai].Value as string;
+								if (null != firsts)
+								{
+									firstsLookup.Add(p.Name, firsts);
+								}
+							}
+
 							ntd.Add(p.Name, dys);
+							if (hasErrors)
+								return result;
+						}
+						else if (!p.IsAbstract) // is virtual or grammar
+						{
+
+							var ai = p.Attributes.IndexOf("follows");
+							if (-1 < ai)
+							{
+								var dys = new List<IList<string>>();
+								var follows = p.Attributes[ai].Value as string;
+								if (null != follows)
+								{
+									if (p.Name == "Type")
+										System.Diagnostics.Debugger.Break();
+									followsLookup.Add(p.Name, follows);
+
+								}
+								else
+									dys.Add(new List<string>());
+
+								ntd.Add(p.Name, dys);
+							}
+
+							ai = p.Attributes.IndexOf("firsts");
+							if (0 > ai)
+							{
+								var dys = new List<IList<string>>();
+								dys.Add(new List<string>());
+								ntd.Add(p.Name, dys);
+							}
+							else
+							{
+								var dys = new List<IList<string>>();
+								var firsts = p.Attributes[ai].Value as string;
+								if (null != firsts)
+								{
+									firstsLookup.Add(p.Name, firsts);
+								}
+								else
+									dys.Add(new List<string>());
+								if (!ntd.ContainsKey(p.Name))
+									ntd.Add(p.Name, dys);
+							}
+						}
+					}
+				}
+				// now that we've done that, build the rest of our attributes
+				foreach (var sattrs in attrSets)
+				{
+					CfgAttributeList attrs;
+					if (!cfg.AttributeSets.TryGetValue(sattrs.Key, out attrs))
+					{
+						attrs = new CfgAttributeList();
+						cfg.AttributeSets.Add(sattrs.Key, attrs);
+					}
+					for (int jc = sattrs.Value.Count, j = 0; j < jc; ++j)
+					{
+						var attr = sattrs.Value[j];
+						attrs.Add(new CfgAttribute(attr.Name, attr.Value));
+					}
+
+				}
+				for (int ic = doc.Productions.Count, i = 0; i < ic; ++i)
+				{
+					var prod = doc.Productions[i];
+					if (prod.Where != null && null != prod.Where.Value)
+					{
+						CfgAttributeList attrs;
+						if (!cfg.AttributeSets.TryGetValue(prod.Name, out attrs))
+						{
+							attrs = new CfgAttributeList();
+							cfg.AttributeSets.Add(prod.Name, attrs);
+						}
+						if (!attrs.Contains("constrained"))
+							attrs.Add(new CfgAttribute("constrained", true));
+					}
+				}
+				// now write our main rules
+				foreach (var nt in ntd)
+				{
+					foreach (var l in nt.Value)
+					{
+						cfg.Rules.Add(new CfgRule(nt.Key, l));
+
+					}
+				}
+				// build our secondary rules
+				foreach (var rule in rules)
+				{
+
+					cfg.Rules.Add(new CfgRule(rule.Key, rule.Value));
+
+				}
+				// finally resolve our extra firsts and follows.
+				var f = cfg.FillTerminals();
+				if (0 < firstsLookup.Count)
+				{
+					predict = cfg.FillPredict();
+					foreach (var fl in firstsLookup)
+					{
+						
+						if (!cfg.IsSymbol(fl.Key))
+							continue;
+						var sa = fl.Value.Split(' ');
+						var seen = new HashSet<string>();
+						for (var i = 0; i < sa.Length; i++)
+						{
+							if (cfg.IsNonTerminal(sa[i]))
+							{
+								ICollection<(CfgRule Rule, string Symbol)> col;
+								if (!predict.TryGetValue(sa[i], out col))
+								{
+									// it could be stale.
+									cfg.ClearCache();
+									cfg.RebuildCache();
+									predict = cfg.FillPredict();
+									if (!predict.TryGetValue(sa[i], out col))
+									{
+										// last ditch hunt through all cfgs
+										var found = false;
+										foreach (var ccfg in cfgMap.Values)
+										{
+											if (!ReferenceEquals(cfg, ccfg) && ccfg.IsSymbol(sa[i]))
+											{
+												found = true;
+												predict = ccfg.FillPredict();
+												break;
+											}
+										}
+										if (!found)
+										{
+											// see if tmap has it so we know it's a terminal
+
+											if (tmap.Values.Contains(sa[i]))
+											{
+												XbnfExpression expr = null;
+												foreach (var t in tmap)
+												{
+													if (t.Value == sa[i])
+													{
+														expr = t.Key;
+														break;
+													}
+												}
+												XbnfDocument dd = null;
+												foreach (var d in cfgMap.Keys)
+												{
+													var p = d.GetProductionForExpression(expr);
+													if (null != p)
+													{
+														dd = d;
+														break;
+													}
+												}
+												if (null != dd)
+												{
+													// get the associated cfg
+													var ccfg = cfgMap[dd];
+													CfgAttributeList attrs;
+													if (!ccfg.AttributeSets.TryGetValue(sa[i], out attrs))
+													{
+														attrs = new CfgAttributeList();
+														ccfg.AttributeSets.Add(sa[i], attrs);
+													}
+													var ai = attrs.IndexOf("terminal");
+													if (-1 < ai)
+														attrs[ai].Value = true;
+													else
+														attrs.Add(new CfgAttribute("terminal", true));
+													predict = ccfg.FillPredict();
+
+												}
+
+											}
+										}
+										if (!found || !predict.TryGetValue(sa[i], out col)) // error
+										{
+											var pi = doc.Productions.IndexOf(fl.Key);
+											var l = 0;
+											var c = 0;
+											var p = 0L;
+											string fn = null;
+											if (-1 < pi)
+											{
+												var prod = doc.Productions[pi];
+												l = prod.Line;
+												c = prod.Column;
+												p = prod.Position;
+												fn = doc.Filename;
+											}
+
+											result.Add(new CfgMessage(ErrorLevel.Error, -1, string.Format("Firsts symbol from production {0}, {1} not found in the grammar", fl.Key, sa[i]), l, c, p, fn));
+											hasErrors = true;
+										}
+									}
+								}
+								if (hasErrors)
+									return result;
+								foreach (var p in col)
+								{
+									if (null != p.Symbol && seen.Add(p.Symbol))
+									{
+										cfg.Rules.Add(new CfgRule(fl.Key, p.Symbol));
+									}
+								}
+							} else
+							{
+								// it's a terminal, we can simply add it.
+								cfg.Rules.Add(new CfgRule(fl.Key, sa[i]));
+							}
+							
+						}
+					}
+				}
+				
+				if (hasErrors)
+					return result;
+				if (0 < followsLookup.Count)
+				{
+
+					var firsts = cfg.FillFirsts();
+					foreach (var fl in followsLookup)
+					{
+						if (!cfg.IsSymbol(fl.Key))
+							continue;
+						var sa = fl.Value.Split(' ');
+						var seen = new HashSet<string>();
+						for (var i = 0; i < sa.Length; i++)
+						{
+							if (cfg.IsNonTerminal(sa[i]))
+							{
+								var fol = firsts[sa[i]];
+
+								foreach (var sym in fol)
+								{
+									if (null != sym)
+									{
+										var s = string.Concat(fl.Key, "Follows");
+										s = cfg.GetUniqueSymbolName(s);
+										cfg.Rules.Add(new CfgRule(s, fl.Key, sym));
+										CfgAttributeList attrs;
+										if (!cfg.AttributeSets.TryGetValue(s, out attrs))
+										{
+											attrs = new CfgAttributeList();
+											cfg.AttributeSets.Add(s, attrs);
+											attrs.Add(new CfgAttribute("terminal", false));
+											attrs.Add(new CfgAttribute("nowarn", true));
+										}
+
+									}
+								}
+							}
+							else
+							{
+								var s = string.Concat(fl.Key, "Follows");
+								s = cfg.GetUniqueSymbolName(s);
+								cfg.Rules.Add(new CfgRule(s, fl.Key, sa[i]));
+								CfgAttributeList attrs;
+								if (!cfg.AttributeSets.TryGetValue(s, out attrs))
+								{
+									attrs = new CfgAttributeList();
+									cfg.AttributeSets.Add(s, attrs);
+									attrs.Add(new CfgAttribute("nowarn", true));
+								}
+							}
+						}
+					}
+					// below was doing above (but badly) twice?
+					// seemes like dead code 12/30/2019
+					// commented out
+					/*foreach (var fl in firstsLookup)
+					{
+						if (!cfg.IsSymbol(fl.Key))
+							continue;
+						var sa = fl.Value.Split(' ');
+						var seen = new HashSet<string>();
+						for (var i = 0; i < sa.Length; i++)
+						{
+							var pred = predict[sa[i]];
+
+							foreach (var p in pred)
+							{
+								if (null != p.Symbol && seen.Add(p.Symbol))
+								{
+									cfg.Rules.Add(new CfgRule(fl.Key, p.Symbol));
+								}
+							}
+						}
+					}*/
+				}
+				if(0<cfg.FillNonTerminals().Count)
+				{
+					var msgs = cfg.TryPrepareLL1();
+					for(int ic=msgs.Count,i=0;i<ic;++i)
+					{
+						result.Add(msgs[i]);
+						if (ErrorLevel.Error== msgs[i].ErrorLevel)
+							hasErrors = true;
+					}
+				}
+			}
+			// now resolve all of our unreferenced symbols
+			// we must creates rules for them in the referencing grammar
+			var firstMap = new Dictionary<XbnfDocument, IDictionary<string,ICollection<string>>>();
+			foreach (var drme in docRefMap)
+			{
+				var cfg = cfgMap[drme.Key];
+				foreach(var s in drme.Value)
+				{
+					var refTarget = refMap[s];
+					var cfgTarget = cfgMap[refTarget.Key];
+					if(!refTarget.Value.IsTerminal)
+					{
+						IDictionary<string,ICollection<string>> firsts;
+						if(!firstMap.TryGetValue(refTarget.Key, out firsts))
+						{
+							firsts = cfgTarget.FillFirsts();
+							firstMap.Add(refTarget.Key, firsts);
+						}
+						// manufacure some firsts
+						foreach(var term in firsts[s])
+						{
+							cfg.Rules.Add(new CfgRule(s, term));
 						}
 
 					}
 				}
 			}
-			// now that we've done that, build the rest of our attributes
-			foreach (var sattrs in attrSets)
+			// finally, factor the grammars
+			foreach(var ce in cfgMap)
 			{
-				CfgAttributeList attrs;
-				if(!cfg.AttributeSets.TryGetValue(sattrs.Key, out attrs))
+				// but only for documents that have non-term productions
+				if (ce.Key.HasNonTerminalProductions)
 				{
-					attrs = new CfgAttributeList();
-					cfg.AttributeSets.Add(sattrs.Key, attrs);
-				}
-				//writer.Write(string.Concat(sattrs.Key, ":"));
-				//var delim = "";
-				for (int jc = sattrs.Value.Count, j = 0; j < jc; ++j)
-				{
-					var attr = sattrs.Value[j];
-					attrs.Add(new CfgAttribute(attr.Name, attr.Value));
-				//	writer.Write(string.Concat(delim, sattrs.Value[j].ToString()));
-				//	delim = ", ";
-				}
-				//writer.WriteLine();
-			}
-			for(int ic = document.Productions.Count,i=0;i<ic;++i)
-			{
-				var prod = document.Productions[i];
-				if(prod.Where!=null&&null!=prod.Where.Value)
-				{
-					CfgAttributeList attrs;
-					if(!cfg.AttributeSets.TryGetValue(prod.Name,out attrs))
+					var res = ce.Value.TryPrepareLL1();
+					for (int ic = res.Count, i = 0; i < ic; ++i)
 					{
-						attrs = new CfgAttributeList();
-						cfg.AttributeSets.Add(prod.Name,attrs);
+						if (ErrorLevel.Error == res[i].ErrorLevel)
+							hasErrors = true;
+						result.Add(res[i]);
 					}
-					if (!attrs.Contains("constrained"))
-						attrs.Add(new CfgAttribute("constrained", true));
 				}
-			}
-			// now write our main rules
-			foreach (var nt in ntd)
-			{
-				foreach (var l in nt.Value)
-				{
-					cfg.Rules.Add(new CfgRule(nt.Key, l));
-					//writer.Write(string.Concat(nt.Key, "->"));
-					//foreach (var s in l)
-					//	writer.Write(string.Concat(" ", s));
-					//writer.WriteLine();
-				}
-			}
-			// build our secondary rules
-			foreach (var rule in rules)
-			{
 				
-				cfg.Rules.Add(new CfgRule(rule.Key, rule.Value));
-				//writer.Write(string.Concat(rule.Key, "->"));
-				//foreach (var s in rule.Value)
-				//	writer.Write(string.Concat(" ", s));
-				//writer.WriteLine();
 			}
-			//writer.WriteLine();
-			// write our terminals
-			/*
-			for (int ic = tmap.Count, i = 0; i < ic; ++i)
+			if (hasErrors)
+				return result;
+			genInfo.Document = document;
+			genInfo.TerminalMap = tmap;
+			genInfo.AllExternals = refMap;
+			genInfo.ExternalsMap = docRefMap;
+			genInfo.CfgMap = cfgMap;		
+			return result;
+
+		}
+		static string _MergeFirstsFollows(string lhs, ICollection<string> rhs)
+		{
+			var result = new List<string>();
+			if (null != lhs)
 			{
-				var te = tmap[i];
-				var prod = document.Productions[te.Value];
-				rolexOutput.Write(te.Value);
-				if (0 < prod.Attributes.Count)
-				{
-					rolexOutput.Write("<");
-					var delim = "";
-					foreach (var attr in prod.Attributes)
-					{
-						rolexOutput.Write(delim);
-						rolexOutput.Write(attr.ToString());
-					}
-					rolexOutput.Write(">");
-				}
-				rolexOutput.WriteLine(string.Concat("= \'", _ToRegex(document, te.Key,true), "\'"));
-
+				var sa = lhs.Trim().Split(' ');
+				foreach (var s in sa)
+					if (!result.Contains(s))
+						result.Add(s);
 			}
-			rolexOutput.Flush();
-			*/
-			return cfg;
-
+			foreach (var s in rhs)
+			{
+				if (!result.Contains(s))
+					result.Add(s);
+			}
+			return string.Join(" ", result.ToArray());
 		}
 		static string _MakeSafeName(string name)
 		{
@@ -850,7 +1343,9 @@ namespace Parsley
 			syms.Add(ss);
 			listId = ss;
 			var attr = new XbnfAttribute("collapsed", true);
+			var attr2 = new XbnfAttribute("nowarn", true);
 			var attrlist = new XbnfAttributeList();
+			attrlist.Add(attr);
 			attrlist.Add(attr);
 			attrs.Add(listId, attrlist);
 			var expr =
@@ -948,13 +1443,15 @@ namespace Parsley
 			var l = expr as XbnfLiteralExpression;
 			if (null != l)
 			{
-				terms.Add(l);
+				if (!terms.Contains(l))
+					terms.Add(l);
 				return;
 			}
 			var r = expr as XbnfRegexExpression;
 			if (null != r)
 			{
-				terms.Add(r);
+				if(!terms.Contains(r))
+					terms.Add(r);
 				return;
 			}
 			var u = expr as XbnfUnaryExpression;
@@ -968,6 +1465,30 @@ namespace Parsley
 			{
 				_VisitFetchTerminals(b.Left, terms);
 				_VisitFetchTerminals(b.Right, terms);
+				return;
+			}
+
+		}
+		static void _VisitUnreferenced(XbnfDocument doc,XbnfExpression expr, HashSet<string> result)
+		{
+			var r = expr as XbnfRefExpression;
+			if (null != r)
+			{
+				if (!doc.Productions.Contains(r.Symbol))
+					result.Add(r.Symbol);
+				return;
+			}
+			var u = expr as XbnfUnaryExpression;
+			if (null != u)
+			{
+				_VisitUnreferenced(doc,u.Expression, result);
+				return;
+			}
+			var b = expr as XbnfBinaryExpression;
+			if (null != b)
+			{
+				_VisitUnreferenced(doc,b.Left, result);
+				_VisitUnreferenced(doc,b.Right, result);
 				return;
 			}
 

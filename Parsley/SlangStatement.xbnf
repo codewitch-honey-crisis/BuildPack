@@ -1,0 +1,80 @@
+﻿// Slang.xbnf
+// This is the XBNF spec for Slang Statements (gplex version - unicode enabled)
+// Slang is a CodeDOM compliant subset of C#
+@import "SlangExpression.xbnf";
+// Statements
+// must reference a symbol here rather than ";" or XBNF thinks it's a terminal
+// TODO: test terminal=false attribute setting in Parsley
+EmptyStatement= semi;
+VariableDeclarationStatement= (varType | Type) Identifier [ "=" Expression ] ";";
+ExpressionStatement=Expression ";" : where { 
+	try 
+	{
+		ParseVariableDeclarationStatement(context);
+		return false;
+	}
+	catch(SyntaxException) 
+	{
+		return true;
+	}
+}
+// enable automatic backtracking here
+VariableDeclarationOrLabelOrExpressionStatement<collapsed>=
+	VariableDeclarationStatement| 
+	ExpressionStatement			| 
+	LabelStatement 
+	: where { return true; }
+// trailing else conflict requires a conflict
+// override via a where constraint
+ElsePart<collapsed> = "else" StatementOrBlock;
+IfStatementPart<collapsed>= "if" "(" Expression ")" StatementOrBlock ;
+IfStatement=IfStatementPart ElsePart | IfStatementPart : where { return true; }
+GotoStatement= "goto" identifier ";";
+// we already check to disambiguate in ExpressionStatement,
+// so all we do here is override the first first conflict
+LocalAssignStatement<dependency,collapsed>=ExpressionStatement | VariableDeclarationStatement : where { return true; }
+// for trailing part of for first line:
+ForIncPart<dependency,collapsed> = [ Expression ] ")";
+// "for" "(" (LocalAssignStatement | EmptyStatement) (Expression ";" | EmptyStatement) ForIncPart StatementOrBlock
+ForStatement<virtual,firsts="forKeyword"> { return _ParseForStatement(context); }
+	: where {return true;} // enable automatic backtracking
+WhileStatement= "while" "(" Expression ")" StatementOrBlock;
+ReturnStatement= "return" Expression ";";
+ThrowStatement= "throw" [ Expression ] ";";
+TryStatement= "try" StatementBlock ( { CatchClause }+ [ FinallyPart ] | FinallyPart );
+CatchClause= "catch" "(" Type [ Identifier ] ")" StatementBlock;
+FinallyPart<collapsed> = "finally" StatementBlock;
+// look for : to disambiguate between this and a primary expression
+LabelStatement= identifier ":" : where { 
+	context.Advance();
+	return colon==context.SymbolId;
+}
+StatementOrBlock = (Statement | StatementBlock);
+Statement<start>=
+	EmptyStatement	|
+	VariableDeclarationOrLabelOrExpressionStatement | 
+	IfStatement		|
+	GotoStatement	|
+	ForStatement	|
+	WhileStatement	|
+	ReturnStatement |
+	GotoStatement	|
+	TryStatement	;
+
+StatementBlock= "{" {Statement} "}";
+
+ifKeyword="if";
+gotoKeyword="goto";
+elseKeyword="else";
+// have to hint forKeyword as terminal because it never appears except
+// in code or attributes
+forKeyword<terminal>="for";
+throwKeyword="throw";
+whileKeyword="while";
+returnKeyword="return";
+tryKeyword="try";
+catchKeyword="catch";
+finallyKeyword="finally";
+semi=";";
+varType="var";
+colon=":";

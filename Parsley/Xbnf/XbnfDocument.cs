@@ -10,6 +10,7 @@ namespace Parsley
 		string _filename;
 		public string Filename { get { return _filename; } }
 		public void SetFilename(string filename) { _filename = filename; }
+		public XbnfImportList Imports { get; } = new XbnfImportList();
 		public XbnfProduction StartProduction {
 			get {
 				var ic = Productions.Count;
@@ -153,9 +154,17 @@ namespace Parsley
 		internal static XbnfDocument Parse(ParseContext pc)
 		{
 			var result = new XbnfDocument();
-			while (-1 != pc.Current)
+			if(!string.IsNullOrEmpty(pc.Source))
+				result.SetFilename(pc.Source);
+			while (-1 != pc.Current && '}'!=pc.Current)
 			{
 				pc.TrySkipCCommentsAndWhiteSpace();
+				while ('@' == pc.Current) // imports
+				{
+					result.Imports.Add(_ParseImport(result, pc));
+
+					pc.TrySkipCCommentsAndWhiteSpace();
+				}
 				if (pc.Current == '{')
 				{
 					pc.Advance();
@@ -168,12 +177,26 @@ namespace Parsley
 					var code = new XbnfCode(s);
 					code.SetLocation(l, c, p);
 					result.Code.Add(code);
-				} else
+				}
+				else if (-1 != pc.Current)
+				{
+					if ('@' == pc.Current)
+					{
+						var ee = new ExpectingException(string.Format("Expecting productions. Imports must be specified before any productions at line {0}, column {1}, position {2} in {3}.", pc.Line, pc.Column, pc.Position, !string.IsNullOrEmpty(pc.Source) ? pc.Source : "in-memory document"));
+						ee.Line = pc.Line;
+						ee.Column = pc.Column;
+						ee.Position = pc.Position;
+						ee.Expecting = new string[] { "Production" };
+						throw ee;
+					}
 					result.Productions.Add(XbnfProduction.Parse(pc));
+				}
+				else // end of input
+					return result;
 				// have to do this so trailing whitespace
 				// doesn't get read as a production
 				pc.TryReadCCommentsAndWhitespace();
-			}
+			} 
 			return result;
 		}
 		public static XbnfDocument Parse(IEnumerable<char> @string)
@@ -198,7 +221,7 @@ namespace Parsley
 		{
 			var sb = new StringBuilder();
 			var i = 1;
-			var skipRead = false;
+			var skipRead = true;
 			while (skipRead || -1 != pc.Advance())
 			{
 				skipRead = false;
@@ -355,10 +378,73 @@ namespace Parsley
 			for (int ic = Productions.Count, i = 0; i < ic; ++i)
 			{
 				var prod = Productions[i];
-				if (expr == prod.Expression)
+				if (Equals(expr , prod.Expression))
 					return prod;
 			}
 			return null;
+		}
+		static XbnfImport _ParseImport(XbnfDocument doc, ParseContext pc)
+		{
+			pc.TrySkipCCommentsAndWhiteSpace();
+			pc.Expecting('@');
+			pc.Advance();
+			var l = pc.Line;
+			var c = pc.Column;
+			var p = pc.Position;
+			var str = XbnfNode.ParseIdentifier(pc);
+			if (0 != string.Compare("import", str, StringComparison.InvariantCulture))
+			{
+				var ee = new ExpectingException(string.Format("Expecting \"import\" at line {0}, column {1}, position {2}", l, c, p));
+				ee.Expecting = new string[] { "import" };
+				ee.Line = l;
+				ee.Column = c;
+				ee.Position = p;
+			}
+			pc.TrySkipCCommentsAndWhiteSpace();
+			l = pc.Line;
+			c = pc.Column;
+			p = pc.Position;
+			pc.Expecting('\"');
+			// borrow the parsing from XbnfExpression for this.
+			var le = XbnfExpression.Parse(pc) as XbnfLiteralExpression;
+			if (null == le)
+			{
+				var ee = new ExpectingException(string.Format("Expecting string literal import argument at line {0}, column {1}, position {2}", l, c, p));
+				ee.Expecting = new string[] { "string literal" };
+				ee.Line = l;
+				ee.Column = c;
+				ee.Position = p;
+			}
+			var res = le.Value;
+			pc.TrySkipCCommentsAndWhiteSpace();
+			pc.Expecting(';');
+			pc.Advance();
+			var cmp = res.ToLowerInvariant();
+			var result = new XbnfImport();
+			if (-1 < cmp.IndexOf("://"))
+				result.Document = XbnfDocument.ReadFromUrl(cmp);
+			else
+			{
+				string mdir = null;
+				if (null != doc && !string.IsNullOrEmpty(doc.Filename))
+				{
+					mdir = doc.Filename;
+					if (!Path.IsPathRooted(mdir))
+						mdir = Path.GetFullPath(mdir);
+					mdir = Path.GetDirectoryName(mdir);
+				}
+				var path = res;
+				if (!Path.IsPathRooted(path))
+				{
+					if (null != mdir)
+						path = Path.Combine(mdir, path);
+					else
+						path = Path.GetFullPath(path);
+				}
+				result.Document = XbnfDocument.ReadFrom(path);
+			}
+			result.SetLocation(l, c, p);
+			return result;
 		}
 	}
 }

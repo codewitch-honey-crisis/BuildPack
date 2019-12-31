@@ -84,6 +84,9 @@
     <Compile Include="Xbnf\XbnfDocument.cs" />
     <Compile Include="Xbnf\XbnfException.cs" />
     <Compile Include="Xbnf\XbnfExpression.cs" />
+    <Compile Include="Xbnf\XbnfGenerationInfo.cs" />
+    <Compile Include="Xbnf\XbnfImport.cs" />
+    <Compile Include="Xbnf\XbnfImportList.cs" />
     <Compile Include="Xbnf\XbnfLiteralExpression.cs" />
     <Compile Include="Xbnf\XbnfMessage.cs" />
     <Compile Include="Xbnf\XbnfNode.cs" />
@@ -97,6 +100,10 @@
     <Compile Include="Xbnf\XbnfConvert.cs" />
     <Compile Include="Xbnf\XbnfUnaryExpression.cs" />
     <None Include="Slang.xbnf" />
+    <None Include="SlangAttribute.xbnf" />
+    <None Include="SlangExpression.xbnf" />
+    <Content Include="SlangStatement.xbnf" />
+    <None Include="SlangType.xbnf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

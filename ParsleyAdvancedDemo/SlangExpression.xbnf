@@ -1,0 +1,167 @@
+﻿// Slang.xbnf
+// This is the XBNF spec for Slang Expressions (gplex version - unicode enabled)
+// Slang is a CodeDOM compliant subset of C#
+// Expressions
+
+Expression<start,follows="semi rparen rbracket comma">=AssignExpression;
+RelationalExpression = TermExpression { ("<"|"<="|">"|">=") TermExpression };
+EqualityExpression = RelationalExpression { ("=="|"!=") RelationalExpression };
+BitwiseAndExpression = EqualityExpression { "&" EqualityExpression };
+BitwiseOrExpression = BitwiseAndExpression { "|" BitwiseAndExpression };
+AndExpression= BitwiseOrExpression { "&&" BitwiseOrExpression };
+OrExpression= AndExpression { "||" AndExpression };
+AssignExpression= OrExpression { ("="|"+="|"-="|"*="|"/="|"%="|"&="|"|=") OrExpression };
+TermExpression= FactorExpression { ("+"|"-") FactorExpression };
+FactorExpression= UnaryExpression { ("*"|"/"|"%") UnaryExpression };
+MemberFieldRef = "." Identifier;
+MemberInvokeRef = "(" [ MethodArg { "," MethodArg } ] ")";
+MemberIndexerRef = "[" Expression { "," Expression } "]";
+MemberAnyRef<collapsed> = MemberFieldRef | MemberInvokeRef | MemberIndexerRef ;
+MethodArg = [ outKeyword | refKeyword ] Expression;
+TypeRef = Type;
+IntrinsicType=	boolType	|
+				charType	|
+				stringType	|
+				floatType	|
+				doubleType	|
+				decimalType	|
+				sbyteType	|
+				byteType	|
+				shortType	|
+				ushortType	|
+				intType		|
+				uintType	|
+				longType	|
+				ulongType	|
+				objectType	;
+TypeBase = (identifier { "."  identifier }) | IntrinsicType;
+// the first follows is for fields and methods, second two 
+// are for base types and custom attributes, respectively
+Type<follows="Identifier lbrace rbracket">=TypeElement { TypeArraySpec };
+TypeElement = TypeBase [ TypeGenericPart ];
+TypeGenericPart= "<" [ Type { "," Type } ] ">";
+TypeArraySpec= "[" { TypeArraySpecRank } "]";
+TypeArraySpecRank = comma; 
+// parse casts manually because they're weird. it's just easier
+CastExpression<virtual,firsts="lparen"> { 
+	return _ParseCastExpression(context);
+}
+// much easier to code this as a virtual and parse manually
+ArraySpec<virtual,firsts="lbracket"> {
+	return _ParseArraySpec(context);
+}
+NewExpression= newKeyword TypeElement ( NewObjectPart | NewArrayPart );
+NewObjectPart<collapsed>= "(" [ Expression { "," Expression } ] ")";
+NewArrayPart<collapsed>= ArraySpec;
+
+// this is necessary so we can get Parsley to generate a 
+// method called ParseTypeCastExpressionPart() which we use
+// when resolving casts
+TypeCastExpressionPart<dependency,collapsed>= Type ")"; 
+ArraySpecExpressionList<dependency,collapsed>= Expression { "," Expression } "]";
+ArrayInitializer<dependency>= "=" "{" [ Expression { "," Expression } ] "}";
+SubExpression<collapsed> = "(" Expression ")" : where { return !_IsCastExpression(context);}
+// use the where clause to override first first conflict.
+UnaryExpression= ("+"|"-"|"!") UnaryExpression | ("++"|"--") PrimaryExpression | SubExpression | PrimaryExpression : where { return true;}
+FieldRef<dependency>= Identifier { MemberAnyRef };
+// This is a virtual but here's the basic description
+//TypeOrFieldRef = ( Identifier | IntrinsicType )	{ MemberAnyRef } | (TypeRef) {MemberAnyRef}+ : where {return true;}
+TypeOrFieldRef<virtual,firsts="Identifier IntrinsicType"> { return _ParseTypeOrFieldRef(context); }
+
+PrimaryExpression=	
+		TypeOrFieldRef { MemberAnyRef } 					|
+		verbatimStringLiteral { MemberAnyRef }				|
+		characterLiteral { MemberAnyRef }					|
+		integerLiteral { MemberAnyRef }						| 
+		floatLiteral { MemberAnyRef }						|
+		stringLiteral  { MemberAnyRef }						|
+		boolLiteral { MemberAnyRef }						|
+		nullLiteral											|
+		CastExpression										|
+		typeOf "(" Type ")"	{ MemberAnyRef }				|
+		nameOf "(" Identifier ")" { MemberAnyRef }			|
+		defaultOf "(" Type ")" { MemberAnyRef }				|
+		NewExpression { MemberAnyRef }						|
+		thisRef { MemberAnyRef }							|
+		baseRef { MemberAnyRef }							;
+		
+// Identifier exists as a non-terminal solely to attach a semantic constraint to identifiers.
+// we collapse it because we don't need it in the final parse tree but in the grammar 
+// we have to refer to "Identifier" instead of identifier or verbatimIdentifer.
+Identifier<collapsed> = verbatimIdentifier | identifier : where { return !Keywords.Contains(context.Value); }
+
+// be careful about the order of the terminals.
+// remember they have priorities in the final lexer
+
+verbatimIdentifier='@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
+// begin keywords
+outKeyword="out";
+refKeyword="ref";
+typeOf="typeof";
+nameOf="nameOf";
+defaultOf="default";
+newKeyword="new";
+stringType="string";
+boolType="bool";
+charType="char";
+floatType="float";
+doubleType="double";
+decimalType="decimal";
+sbyteType="sbyte";
+byteType="byte";
+shortType="short";
+ushortType="ushort";
+intType="int";
+uintType="uint";
+longType="long";
+ulongType="ulong";
+objectType="object";
+boolLiteral = "true|false";
+nullLiteral = "null";
+thisRef = "this";
+baseRef = "base";
+verbatimStringLiteral='@"([^"|""])*"';
+// bury this
+identifier<priority=-100>='(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
+stringLiteral='"([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*"';
+characterLiteral='[\u0027]([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})[\u0027]';
+lte="<=";
+lt="<";
+gte=">=";
+gt=">";
+eqEq="==";
+notEq="!=";
+eq="=";
+inc="++";
+addAssign="+=";
+add="+";
+dec="--";
+subAssign="-=";
+sub="-";
+mulAssign="*=";
+mul="*";
+divAssign="/=";
+div="/";
+modAssign="%=";
+mod="%";
+and="&&";
+bitwiseAndAssign="&=";
+bitwiseAnd="&";
+or="||";
+bitwiseOrAssign="|=";
+bitwiseOr="|";
+not="!";
+lbracket="[";
+rbracket="]";
+lparen="(";
+rparen=")";
+lbrace="{";
+rbrace="}";
+comma=",";
+colonColon="::";
+dot=".";
+integerLiteral = '(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)?';
+floatLiteral= '(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)';
+lineComment<hidden>='\/\/[^\n]*';
+blockComment<hidden,blockEnd="*/">="/*";
+whitespace<hidden>='[ \t\r\n\v\f]+';

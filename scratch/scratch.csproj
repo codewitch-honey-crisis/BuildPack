@@ -16,11 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Slang.xbnf" />
+    <None Remove="SlangStatement.xbnf" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Slang.xbnf" />
+    <Content Include="SlangStatement.xbnf" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
