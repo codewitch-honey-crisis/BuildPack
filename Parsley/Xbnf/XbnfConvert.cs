@@ -225,15 +225,12 @@ namespace Parsley
 						decls.Append(") { UpdatePosition(yytext); return -1; } ");
 					}
 					decls.Append("UpdatePosition(yytext); ");
-					if(isHidden)
+					if(isSkipped)
 					{
-						decls.Append("return yylex();");
-					} else if(isSkipped)
-					{
-						decls.Append("return Skip(");
+						decls.Append("Skip(");
 						decls.Append(id.ToString());
 						decls.Append(");");
-					} else
+					} else if(!isHidden)
 					{
 						decls.Append("return ");
 						decls.Append(id.ToString());

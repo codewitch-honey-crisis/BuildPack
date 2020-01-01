@@ -59,7 +59,7 @@
 				++_position;
 			}
 		}
-		public int Skip(int sym) {
+		public void Skip(int sym) {
 			Token t = _InitToken();
 			t.SymbolId=sym;
 			t.Line = Current.Line;
@@ -68,8 +68,6 @@
 			t.Value = yytext;
 			t.Skipped = null;
 			_skipped.Add(t);
-			int result = yylex();
-			return result;
 		}
 		public void Advance()
 		{

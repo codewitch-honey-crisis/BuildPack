@@ -29,7 +29,6 @@ namespace scratch
 	/// </summary>
 	partial class Program
 	{
-		
 		static void _Lex()
 		{
 			#region Fetch constants
@@ -64,11 +63,16 @@ namespace scratch
 		}
 		[return: Foo]
 		static int Main()
-		{			
-			Stream stm = null;
+		{
+			var i = 0;
+			var node = new ParseNode(0, "", new ParseNode[0], 0, 0, 0);
+			for (
+			   ; (i < node.Children.Length);
+			   ) ;
+				Stream stm = null;
 			try
 			{
-				stm = File.OpenRead(@"..\..\..\JsonParser.cs");
+				stm = File.OpenRead(@"..\..\..\Program.cs");
 				var tokenizer = new SlangTokenizer(stm);
 				var pt = SlangParser.Parse(tokenizer);
 				_WriteTree(pt, Console.Out);

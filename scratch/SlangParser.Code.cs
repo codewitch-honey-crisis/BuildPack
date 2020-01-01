@@ -91,6 +91,8 @@ namespace CD
 			if (skipDot)
 				context.Advance();
 			var pc2 = context.GetLookAhead(true);
+			if (70 == line)
+				System.Diagnostics.Debugger.Break();
 			SyntaxException sx , sx2= null;
 			var fieldAdvCount = 0;
 			try
@@ -126,7 +128,10 @@ namespace CD
 					try
 					{
 						ParseType(pc2);
-						isTypeArg = true;
+						if (gt == pc2.SymbolId || comma == pc2.SymbolId)
+						{
+							isTypeArg = true;
+						}
 					}
 					catch(SyntaxException)
 					{
@@ -903,6 +908,5 @@ namespace CD
 
 			return new ParseNode(Namespace, "Namespace", children.ToArray(), line, column, position);
 		}
-
 	}
 }

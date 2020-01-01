@@ -59,7 +59,7 @@
 				++_position;
 			}
 		}
-		public int Skip(int sym) {
+		public void Skip(int sym) {
 			Token t = _InitToken();
 			t.SymbolId=sym;
 			t.Line = Current.Line;
@@ -68,8 +68,6 @@
 			t.Value = yytext;
 			t.Skipped = null;
 			_skipped.Add(t);
-			int result = yylex();
-			return result;
 		}
 		public void Advance()
 		{
@@ -176,7 +174,7 @@
 "else" 	{ UpdatePosition(yytext); return 473; }
 "goto" 	{ UpdatePosition(yytext); return 472; }
 "if" 	{ UpdatePosition(yytext); return 471; }
-[ \t\r\n\v\f]+ 	{ UpdatePosition(yytext); return yylex(); }
+[ \t\r\n\v\f]+ 	{ UpdatePosition(yytext);  }
 (([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?) 	{ UpdatePosition(yytext); return 469; }
 "catch" 	{ UpdatePosition(yytext); return 479; }
 (0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)? 	{ UpdatePosition(yytext); return 468; }
@@ -213,9 +211,9 @@
 "partial" 	{ UpdatePosition(yytext); return 489; }
 "void" 	{ UpdatePosition(yytext); return 488; }
 "assembly" 	{ UpdatePosition(yytext); return 487; }
-"/*" 	{ if(!_TryReadUntilBlockEnd("*/")) { UpdatePosition(yytext); return -1; } UpdatePosition(yytext); return Skip(486); }
-(\/\/[^\n]*[\n])+ 	{ UpdatePosition(yytext); return Skip(485); }
-#[A-Za-z]+[\t ]*[^\n]* 	{ UpdatePosition(yytext); return Skip(484); }
+"/*" 	{ if(!_TryReadUntilBlockEnd("*/")) { UpdatePosition(yytext); return -1; } UpdatePosition(yytext); Skip(486); }
+(\/\/[^\n]*[\n])+ 	{ UpdatePosition(yytext); Skip(485); }
+#[A-Za-z]+[\t ]*[^\n]* 	{ UpdatePosition(yytext); Skip(484); }
 ":" 	{ UpdatePosition(yytext); return 483; }
 "|=" 	{ UpdatePosition(yytext); return 456; }
 "||" 	{ UpdatePosition(yytext); return 455; }

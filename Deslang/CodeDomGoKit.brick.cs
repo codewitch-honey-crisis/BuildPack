@@ -3941,7 +3941,10 @@ public long Position;/// <summary>
 public int SymbolId;/// <summary>
 /// Indicates the value of the token
 /// </summary>
-public string Value;}/// <summary>
+public string Value;/// <summary>
+/// Always null in Rolex
+/// </summary>
+public Token[]Skipped;}/// <summary>
 /// Reference implementation for a DfaEntry
 /// </summary>
 [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex","0.2.0.0")]internal struct DfaEntry{/// <summary>

@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  DESKTOP-U8QJ4Q2
-//  DateTime: 1/1/2020 9:08:35 AM
+//  DateTime: 1/1/2020 3:01:35 PM
 //  UserName: gazto
-//  GPLEX input file <C:\dev\BuildPack\scratch\Slang.lex - 1/1/2020 9:06:45 AM>
+//  GPLEX input file <C:\dev\BuildPack\scratch\Slang.lex - 1/1/2020 2:11:43 PM>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: unicode, verbose, noParser, stack, minimize
@@ -185,7 +185,7 @@ public const int TabWidth = 4;
 				++_position;
 			}
 		}
-		public int Skip(int sym) {
+		public void Skip(int sym) {
 			Token t = _InitToken();
 			t.SymbolId=sym;
 			t.Line = Current.Line;
@@ -194,8 +194,6 @@ public const int TabWidth = 4;
 			t.Value = yytext;
 			t.Skipped = null;
 			_skipped.Add(t);
-			int result = yylex();
-			return result;
 		}
 		public void Advance()
 		{
@@ -3597,7 +3595,7 @@ UpdatePosition(yytext); return -1;
 UpdatePosition(yytext); return 430;
             break;
         case 18: // Recognized '[ \t\r\n\v\f]+',	Shortest string "\n"
-UpdatePosition(yytext); return yylex();
+UpdatePosition(yytext);
             break;
         case 19: // Recognized '(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)',	Shortest string "8"
         case 22: // Recognized '(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)',	Shortest string "0"
@@ -3706,19 +3704,19 @@ UpdatePosition(yytext); return 452;
 UpdatePosition(yytext); return 437;
             break;
         case 61: // Recognized '#[A-Za-z]+[\t ]*[^\n]*',	Shortest string "#n"
-UpdatePosition(yytext); return Skip(484);
+UpdatePosition(yytext); Skip(484);
             break;
         case 62: // Recognized '"*="',	Shortest string "*="
 UpdatePosition(yytext); return 446;
             break;
         case 63: // Recognized '"/*"',	Shortest string "/*"
-if(!_TryReadUntilBlockEnd("*/")) { UpdatePosition(yytext); return -1; } UpdatePosition(yytext); return Skip(486);
+if(!_TryReadUntilBlockEnd("*/")) { UpdatePosition(yytext); return -1; } UpdatePosition(yytext); Skip(486);
             break;
         case 64: // Recognized '"/="',	Shortest string "/="
 UpdatePosition(yytext); return 448;
             break;
         case 65: // Recognized '(\/\/[^\n]*[\n])+',	Shortest string "//\n"
-UpdatePosition(yytext); return Skip(485);
+UpdatePosition(yytext); Skip(485);
             break;
         case 70: // Recognized '"bool"',	Shortest string "bool"
 UpdatePosition(yytext); return 411;
