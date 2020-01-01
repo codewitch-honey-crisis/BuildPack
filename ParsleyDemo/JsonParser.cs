@@ -12,55 +12,7 @@ namespace ParsleyDemo {
     using System;
     using System.Collections.Generic;
     
-    /// <summary>Parses the following grammar:
-    /// Json= Object | Array;
-    /// Object= "{" [ Field { "," Field } ] "}";
-    /// Field= string ":" Value;
-    /// Array= "[" [ Value { "," Value } ] "]";
-    /// {Value}= string | number | Object | Array | Boolean | null;
-    /// Boolean= true | false;
-    /// number= '\-?(0|[1-9][0-9]*)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?';
-    /// string= '"([^\n"\\]|\\([btrnf"\\/]|(u[A-Fa-f]{4})))*"';
-    /// true= "true";
-    /// false= "false";
-    /// null= "null";
-    /// {lbracket}= "[";
-    /// {rbracket}= "]";
-    /// {lbrace}= "{";
-    /// {rbrace}= "}";
-    /// {colon}= ":";
-    /// {comma}= ",";
-    /// (whitespace)= '[\n\r\t ]+';
-    /// </summary>
-    /// <remarks>The rules for the factored grammar are as follows:
-    /// Json -> Object
-    /// Json -> Array
-    /// Field -> string colon Value
-    /// Value -> string
-    /// Value -> number
-    /// Value -> Object
-    /// Value -> Array
-    /// Value -> Boolean
-    /// Value -> null
-    /// Boolean -> true
-    /// Boolean -> false
-    /// ObjectList -> comma Field ObjectListRightAssoc
-    /// ArrayList -> comma Value ArrayListRightAssoc
-    /// ObjectListRightAssoc -> comma Field ObjectListRightAssoc
-    /// ObjectListRightAssoc ->
-    /// ArrayListRightAssoc -> comma Value ArrayListRightAssoc
-    /// ArrayListRightAssoc ->
-    /// ObjectPart -> ObjectList rbrace
-    /// ObjectPart -> rbrace
-    /// ArrayPart -> ArrayList rbracket
-    /// ArrayPart -> rbracket
-    /// Object -> lbrace ObjectPart2
-    /// ObjectPart2 -> rbrace
-    /// ObjectPart2 -> Field ObjectPart
-    /// Array -> lbracket ArrayPart2
-    /// ArrayPart2 -> rbracket
-    /// ArrayPart2 -> Value ArrayPart
-    /// </remarks>
+    /// <summary>Parses the indicated grammar. Refer to C:\dev\BuildPack\ParsleyDemo\json.xbnf</summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal partial class JsonParser {
         internal const int ErrorSymbol = -1;

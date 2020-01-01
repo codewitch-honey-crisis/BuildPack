@@ -56,7 +56,7 @@ Param= Type Identifier;
 PropertyAccessors<virtual,firsts="PropertyGet PropertySet"> { return _ParsePropertyAccessors(context); }
 PropertyGet<dependency>= "get" ( StatementBlock | ";" );
 PropertySet<dependency>= "set" ( StatementBlock | ";" );
-ConstructorChain = ( "base" | "this" ) "(" ParamList ")";
+ConstructorChain = ( "base" | "this" ) "(" [ Expression { "," Expression } ] ")";
 // below we add rbrace to the follows sets for each to 
 // production below to allow member decls to be inside a 
 // { } block (for type decls)

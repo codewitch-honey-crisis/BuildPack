@@ -38,6 +38,10 @@ namespace RolexDemo {
         /// Indicates the value of the token
         /// </summary>
         public string Value;
+        /// <summary>
+        /// Always null in Rolex
+        /// </summary>
+        public Token[] Skipped;
     }
     /// <summary>
     /// Reference Implementation for generated shared code

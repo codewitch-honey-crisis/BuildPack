@@ -23,7 +23,7 @@ Namespace ParsleyDemo
                 End If
             End Try
             Dim jsonTokenizer As JsonTokenizer = New JsonTokenizer(text)
-            pt = JsonParser.ParseJson(jsonTokenizer)
+            pt = JsonParser.Parse(jsonTokenizer)
             _WriteTree(pt, Console.Out)
             Console.WriteLine("Press any key...")
             Console.ReadKey()

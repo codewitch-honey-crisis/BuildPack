@@ -68,7 +68,7 @@ namespace scratch
 			Stream stm = null;
 			try
 			{
-				stm = File.OpenRead(@"..\..\..\SlangParser.cs");
+				stm = File.OpenRead(@"..\..\..\JsonParser.cs");
 				var tokenizer = new SlangTokenizer(stm);
 				var pt = SlangParser.Parse(tokenizer);
 				_WriteTree(pt, Console.Out);

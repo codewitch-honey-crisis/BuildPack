@@ -41,6 +41,10 @@ Namespace ParsleyDemo
         '''Indicates the value of the token
         '''</summary>
         Public Value As String
+        '''<summary>
+        '''Always null in Rolex
+        '''</summary>
+        Public Skipped() As Token
     End Structure
     '''<summary>
     '''Reference implementation for a DfaEntry

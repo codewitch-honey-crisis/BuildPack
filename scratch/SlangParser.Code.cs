@@ -347,18 +347,19 @@ namespace CD
 					context.Error("Types cannot be static in Slang.");
 				return _ParseTypeDecl(context, true,cpn,customAttributes, line, column, position, attrs);
 			}
-			if (373 == context.Line)
-				System.Diagnostics.Debugger.Break();
 			// backtrack a little to see if it's a constructor
 			// not doing so makes this much more difficult
 			var pc2 = context.GetLookAhead(true);
 			var isCtor = false;
 			if (context.SymbolId == verbatimIdentifier || context.SymbolId == identifier2)
 			{
-				if (lparen == pc2.SymbolId)
+				var pc3 = pc2.GetLookAhead(true);
+				ExpressionParser.ParseIdentifier(pc3);
+				if (lparen == pc3.SymbolId)
 				{
 					isCtor = true;
 				}
+				pc3 = null;
 			}
 			if (!isCtor)
 			{

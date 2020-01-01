@@ -27,14 +27,14 @@ namespace CD {
         public const int NamespaceName = 7;
         public const int NamespaceNamePart = 8;
         public const int Identifier = 22;
-        public const int namespaceKeyword = 393;
-        public const int usingKeyword = 394;
-        public const int verbatimIdentifier = 395;
-        public const int identifier2 = 422;
-        public const int lbrace = 455;
-        public const int rbrace = 456;
-        public const int dot = 459;
-        public const int semi = 473;
+        public const int namespaceKeyword = 401;
+        public const int usingKeyword = 402;
+        public const int verbatimIdentifier = 403;
+        public const int identifier2 = 430;
+        public const int lbrace = 463;
+        public const int rbrace = 464;
+        public const int dot = 467;
+        public const int semi = 481;
         internal static ParseNode ParseUsingDirective(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
@@ -366,74 +366,74 @@ namespace CD {
         public const int NewObjectPartPart2 = 166;
         public const int ArrayInitializer = 167;
         public const int ArrayInitializerPart2 = 168;
-        public const int verbatimIdentifier = 395;
-        public const int outKeyword = 396;
-        public const int refKeyword = 397;
-        public const int typeOf = 398;
-        public const int nameOf = 399;
-        public const int defaultOf = 400;
-        public const int newKeyword = 401;
-        public const int stringType = 402;
-        public const int boolType = 403;
-        public const int charType = 404;
-        public const int floatType = 405;
-        public const int doubleType = 406;
-        public const int decimalType = 407;
-        public const int sbyteType = 408;
-        public const int byteType = 409;
-        public const int shortType = 410;
-        public const int ushortType = 411;
-        public const int intType = 412;
-        public const int uintType = 413;
-        public const int longType = 414;
-        public const int ulongType = 415;
-        public const int objectType = 416;
-        public const int boolLiteral = 417;
-        public const int nullLiteral = 418;
-        public const int thisRef = 419;
-        public const int baseRef = 420;
-        public const int verbatimStringLiteral = 421;
-        public const int identifier2 = 422;
-        public const int stringLiteral = 423;
-        public const int characterLiteral = 424;
-        public const int lte = 425;
-        public const int lt = 426;
-        public const int gte = 427;
-        public const int gt = 428;
-        public const int eqEq = 429;
-        public const int notEq = 430;
-        public const int eq = 431;
-        public const int inc = 432;
-        public const int addAssign = 433;
-        public const int add = 434;
-        public const int dec = 435;
-        public const int subAssign = 436;
-        public const int sub = 437;
-        public const int mulAssign = 438;
-        public const int mul = 439;
-        public const int divAssign = 440;
-        public const int div = 441;
-        public const int modAssign = 442;
-        public const int mod = 443;
-        public const int and = 444;
-        public const int bitwiseAndAssign = 445;
-        public const int bitwiseAnd = 446;
-        public const int or = 447;
-        public const int bitwiseOrAssign = 448;
-        public const int bitwiseOr = 449;
-        public const int not = 450;
-        public const int lbracket = 451;
-        public const int rbracket = 452;
-        public const int lparen = 453;
-        public const int rparen = 454;
-        public const int lbrace = 455;
-        public const int rbrace = 456;
-        public const int comma = 457;
-        public const int dot = 459;
-        public const int integerLiteral = 460;
-        public const int floatLiteral = 461;
-        public const int whitespace = 462;
-        public const int semi = 473;
+        public const int verbatimIdentifier = 403;
+        public const int outKeyword = 404;
+        public const int refKeyword = 405;
+        public const int typeOf = 406;
+        public const int nameOf = 407;
+        public const int defaultOf = 408;
+        public const int newKeyword = 409;
+        public const int stringType = 410;
+        public const int boolType = 411;
+        public const int charType = 412;
+        public const int floatType = 413;
+        public const int doubleType = 414;
+        public const int decimalType = 415;
+        public const int sbyteType = 416;
+        public const int byteType = 417;
+        public const int shortType = 418;
+        public const int ushortType = 419;
+        public const int intType = 420;
+        public const int uintType = 421;
+        public const int longType = 422;
+        public const int ulongType = 423;
+        public const int objectType = 424;
+        public const int boolLiteral = 425;
+        public const int nullLiteral = 426;
+        public const int thisRef = 427;
+        public const int baseRef = 428;
+        public const int verbatimStringLiteral = 429;
+        public const int identifier2 = 430;
+        public const int stringLiteral = 431;
+        public const int characterLiteral = 432;
+        public const int lte = 433;
+        public const int lt = 434;
+        public const int gte = 435;
+        public const int gt = 436;
+        public const int eqEq = 437;
+        public const int notEq = 438;
+        public const int eq = 439;
+        public const int inc = 440;
+        public const int addAssign = 441;
+        public const int add = 442;
+        public const int dec = 443;
+        public const int subAssign = 444;
+        public const int sub = 445;
+        public const int mulAssign = 446;
+        public const int mul = 447;
+        public const int divAssign = 448;
+        public const int div = 449;
+        public const int modAssign = 450;
+        public const int mod = 451;
+        public const int and = 452;
+        public const int bitwiseAndAssign = 453;
+        public const int bitwiseAnd = 454;
+        public const int or = 455;
+        public const int bitwiseOrAssign = 456;
+        public const int bitwiseOr = 457;
+        public const int not = 458;
+        public const int lbracket = 459;
+        public const int rbracket = 460;
+        public const int lparen = 461;
+        public const int rparen = 462;
+        public const int lbrace = 463;
+        public const int rbrace = 464;
+        public const int comma = 465;
+        public const int dot = 467;
+        public const int integerLiteral = 468;
+        public const int floatLiteral = 469;
+        public const int whitespace = 470;
+        public const int semi = 481;
         internal static ParseNode ParseExpression(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
@@ -6647,85 +6647,85 @@ namespace CD {
         public const int TryStatement = 232;
         public const int TryStatementPart2 = 233;
         public const int Comments = 234;
-        public const int verbatimIdentifier = 395;
-        public const int typeOf = 398;
-        public const int nameOf = 399;
-        public const int defaultOf = 400;
-        public const int newKeyword = 401;
-        public const int stringType = 402;
-        public const int boolType = 403;
-        public const int charType = 404;
-        public const int floatType = 405;
-        public const int doubleType = 406;
-        public const int decimalType = 407;
-        public const int sbyteType = 408;
-        public const int byteType = 409;
-        public const int shortType = 410;
-        public const int ushortType = 411;
-        public const int intType = 412;
-        public const int uintType = 413;
-        public const int longType = 414;
-        public const int ulongType = 415;
-        public const int objectType = 416;
-        public const int boolLiteral = 417;
-        public const int nullLiteral = 418;
-        public const int thisRef = 419;
-        public const int baseRef = 420;
-        public const int verbatimStringLiteral = 421;
-        public const int identifier2 = 422;
-        public const int stringLiteral = 423;
-        public const int characterLiteral = 424;
-        public const int lte = 425;
-        public const int lt = 426;
-        public const int gte = 427;
-        public const int gt = 428;
-        public const int eqEq = 429;
-        public const int notEq = 430;
-        public const int eq = 431;
-        public const int inc = 432;
-        public const int addAssign = 433;
-        public const int add = 434;
-        public const int dec = 435;
-        public const int subAssign = 436;
-        public const int sub = 437;
-        public const int mulAssign = 438;
-        public const int mul = 439;
-        public const int divAssign = 440;
-        public const int div = 441;
-        public const int modAssign = 442;
-        public const int mod = 443;
-        public const int and = 444;
-        public const int bitwiseAndAssign = 445;
-        public const int bitwiseAnd = 446;
-        public const int or = 447;
-        public const int bitwiseOrAssign = 448;
-        public const int bitwiseOr = 449;
-        public const int not = 450;
-        public const int rbracket = 452;
-        public const int lparen = 453;
-        public const int rparen = 454;
-        public const int lbrace = 455;
-        public const int rbrace = 456;
-        public const int comma = 457;
-        public const int dot = 459;
-        public const int integerLiteral = 460;
-        public const int floatLiteral = 461;
-        public const int ifKeyword = 463;
-        public const int gotoKeyword = 464;
-        public const int elseKeyword = 465;
-        public const int forKeyword = 466;
-        public const int throwKeyword = 467;
-        public const int whileKeyword = 468;
-        public const int returnKeyword = 469;
-        public const int tryKeyword = 470;
-        public const int catchKeyword = 471;
-        public const int finallyKeyword = 472;
-        public const int semi = 473;
-        public const int varType = 474;
-        public const int colon = 475;
-        public const int directive = 476;
-        public const int lineComment = 477;
-        public const int blockComment = 478;
+        public const int verbatimIdentifier = 403;
+        public const int typeOf = 406;
+        public const int nameOf = 407;
+        public const int defaultOf = 408;
+        public const int newKeyword = 409;
+        public const int stringType = 410;
+        public const int boolType = 411;
+        public const int charType = 412;
+        public const int floatType = 413;
+        public const int doubleType = 414;
+        public const int decimalType = 415;
+        public const int sbyteType = 416;
+        public const int byteType = 417;
+        public const int shortType = 418;
+        public const int ushortType = 419;
+        public const int intType = 420;
+        public const int uintType = 421;
+        public const int longType = 422;
+        public const int ulongType = 423;
+        public const int objectType = 424;
+        public const int boolLiteral = 425;
+        public const int nullLiteral = 426;
+        public const int thisRef = 427;
+        public const int baseRef = 428;
+        public const int verbatimStringLiteral = 429;
+        public const int identifier2 = 430;
+        public const int stringLiteral = 431;
+        public const int characterLiteral = 432;
+        public const int lte = 433;
+        public const int lt = 434;
+        public const int gte = 435;
+        public const int gt = 436;
+        public const int eqEq = 437;
+        public const int notEq = 438;
+        public const int eq = 439;
+        public const int inc = 440;
+        public const int addAssign = 441;
+        public const int add = 442;
+        public const int dec = 443;
+        public const int subAssign = 444;
+        public const int sub = 445;
+        public const int mulAssign = 446;
+        public const int mul = 447;
+        public const int divAssign = 448;
+        public const int div = 449;
+        public const int modAssign = 450;
+        public const int mod = 451;
+        public const int and = 452;
+        public const int bitwiseAndAssign = 453;
+        public const int bitwiseAnd = 454;
+        public const int or = 455;
+        public const int bitwiseOrAssign = 456;
+        public const int bitwiseOr = 457;
+        public const int not = 458;
+        public const int rbracket = 460;
+        public const int lparen = 461;
+        public const int rparen = 462;
+        public const int lbrace = 463;
+        public const int rbrace = 464;
+        public const int comma = 465;
+        public const int dot = 467;
+        public const int integerLiteral = 468;
+        public const int floatLiteral = 469;
+        public const int ifKeyword = 471;
+        public const int gotoKeyword = 472;
+        public const int elseKeyword = 473;
+        public const int forKeyword = 474;
+        public const int throwKeyword = 475;
+        public const int whileKeyword = 476;
+        public const int returnKeyword = 477;
+        public const int tryKeyword = 478;
+        public const int catchKeyword = 479;
+        public const int finallyKeyword = 480;
+        public const int semi = 481;
+        public const int varType = 482;
+        public const int colon = 483;
+        public const int directive = 484;
+        public const int lineComment = 485;
+        public const int blockComment = 486;
         internal static ParseNode ParseEmptyStatement(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
@@ -12730,234 +12730,242 @@ namespace CD {
         public const int MethodParam = 252;
         public const int ParamList = 253;
         public const int Param = 254;
-        public const int ConstructorChain = 255;
-        public const int CustomAttributeArgListList = 256;
-        public const int CustomAttributeGroupList = 257;
-        public const int CustomAttributeGroupList2 = 258;
-        public const int CustomAttributeGroupList3 = 259;
-        public const int TypeAttributesList = 260;
-        public const int EnumFieldsList = 261;
-        public const int WhereClauseList = 262;
-        public const int TypeParamsList = 263;
-        public const int TypeParamsList2 = 264;
-        public const int MemberAttributeList = 265;
-        public const int MethodParamListList = 266;
-        public const int ParamListList = 267;
-        public const int WhereClauses = 268;
-        public const int TypeDeclPart = 269;
-        public const int TypeDecl = 270;
-        public const int PrivateImplementationType = 271;
-        public const int PropertyAccessors = 272;
-        public const int Member = 273;
-        public const int Members = 274;
-        public const int CustomAttributeGroupFollows = 275;
-        public const int CustomAttributeGroupFollows2 = 276;
-        public const int CustomAttributeGroupFollows3 = 277;
-        public const int CustomAttributeGroupFollows4 = 278;
-        public const int CustomAttributeGroupFollows5 = 279;
-        public const int CustomAttributeGroupFollows6 = 280;
-        public const int CustomAttributeGroupFollows7 = 281;
-        public const int CustomAttributeGroupFollows8 = 282;
-        public const int CustomAttributeGroupFollows9 = 283;
-        public const int CustomAttributeGroupFollows10 = 284;
-        public const int CustomAttributeGroupFollows11 = 285;
-        public const int CustomAttributeGroupFollows12 = 286;
-        public const int CustomAttributeGroupFollows13 = 287;
-        public const int CustomAttributeGroupFollows14 = 288;
-        public const int CustomAttributeGroupFollows15 = 289;
-        public const int CustomAttributeGroupFollows16 = 290;
-        public const int CustomAttributeGroupFollows17 = 291;
-        public const int CustomAttributeGroupFollows18 = 292;
-        public const int CustomAttributeGroupFollows19 = 293;
-        public const int CustomAttributeGroupFollows20 = 294;
-        public const int CustomAttributeGroupFollows21 = 295;
-        public const int CustomAttributeGroupsFollows = 296;
-        public const int CustomAttributeGroupsFollows2 = 297;
-        public const int CustomAttributeGroupsFollows3 = 298;
-        public const int CustomAttributeGroupsFollows4 = 299;
-        public const int CustomAttributeGroupsFollows5 = 300;
-        public const int CustomAttributeGroupsFollows6 = 301;
-        public const int CustomAttributeGroupsFollows7 = 302;
-        public const int CustomAttributeGroupsFollows8 = 303;
-        public const int CustomAttributeGroupsFollows9 = 304;
-        public const int CustomAttributeGroupsFollows10 = 305;
-        public const int CustomAttributeGroupsFollows11 = 306;
-        public const int CustomAttributeGroupsFollows12 = 307;
-        public const int CustomAttributeGroupsFollows13 = 308;
-        public const int CustomAttributeGroupsFollows14 = 309;
-        public const int CustomAttributeGroupsFollows15 = 310;
-        public const int CustomAttributeGroupsFollows16 = 311;
-        public const int CustomAttributeGroupsFollows17 = 312;
-        public const int CustomAttributeGroupsFollows18 = 313;
-        public const int CustomAttributeGroupsFollows19 = 314;
-        public const int CustomAttributeGroupsFollows20 = 315;
-        public const int CustomAttributeGroupsFollows21 = 316;
-        public const int CustomAttributeGroupsFollows22 = 317;
-        public const int CustomAttributeGroupsFollows23 = 318;
-        public const int TypeAttributesFollows = 319;
-        public const int TypeAttributesFollows2 = 320;
-        public const int TypeAttributesFollows3 = 321;
-        public const int TypeAttributesFollows4 = 322;
-        public const int TypeAttributesFollows5 = 323;
-        public const int WhereFollows = 324;
-        public const int WhereClauseFollows = 325;
-        public const int BaseTypeFollows = 326;
-        public const int BaseTypeFollows2 = 327;
-        public const int BaseTypeFollows3 = 328;
-        public const int TypeDeclPartFollows = 329;
-        public const int TypeParamsFollows = 330;
-        public const int TypeParamsFollows2 = 331;
-        public const int TypeParamsFollows3 = 332;
-        public const int TypeDeclFollows = 333;
-        public const int TypeDeclFollows2 = 334;
-        public const int TypeDeclFollows3 = 335;
-        public const int TypeDeclFollows4 = 336;
-        public const int TypeDeclFollows5 = 337;
-        public const int TypeDeclFollows6 = 338;
-        public const int TypeDeclFollows7 = 339;
-        public const int TypeDeclFollows8 = 340;
-        public const int TypeDeclFollows9 = 341;
-        public const int TypeDeclFollows10 = 342;
-        public const int TypeDeclFollows11 = 343;
-        public const int TypeDeclFollows12 = 344;
-        public const int TypeDeclFollows13 = 345;
-        public const int MethodParamListFollows = 346;
-        public const int ParamListFollows = 347;
-        public const int ParamListFollows2 = 348;
-        public const int MemberFollows = 349;
-        public const int CustomAttributeArgListListRightAssoc = 350;
-        public const int CustomAttributeGroupListRightAssoc = 351;
-        public const int CustomAttributeGroupList2RightAssoc = 352;
-        public const int CustomAttributeGroupList3RightAssoc = 353;
-        public const int TypeAttributesListRightAssoc = 354;
-        public const int TypeAttributesListRightAssoc2 = 355;
-        public const int EnumFieldsListRightAssoc = 356;
-        public const int WhereClauseListRightAssoc = 357;
-        public const int TypeParamsListRightAssoc = 358;
-        public const int TypeParamsList2RightAssoc = 359;
-        public const int MemberAttributeListRightAssoc = 360;
-        public const int MethodParamListListRightAssoc = 361;
-        public const int ParamListListRightAssoc = 362;
-        public const int CustomAttributePart = 363;
-        public const int CustomAttributeArgList = 364;
-        public const int CustomAttributeArgListPart = 365;
-        public const int CustomAttributeGroupPart = 366;
-        public const int CustomAttributeGroupPart2 = 367;
-        public const int EnumFieldsPart = 368;
-        public const int WhereClause = 369;
-        public const int WhereClausePart2 = 370;
-        public const int TypeParamsPart = 371;
-        public const int TypeParamsPart2 = 372;
-        public const int Interface = 373;
-        public const int InterfacePart = 374;
-        public const int MethodParamListPart = 375;
-        public const int ParamListPart = 376;
-        public const int PropertyGet = 377;
-        public const int PropertyGetPart = 378;
-        public const int PropertySet = 379;
-        public const int PropertySetPart = 380;
-        public const int TypeAttributesListRightAssoc3 = 381;
-        public const int CustomAttribute = 382;
-        public const int CustomAttributePart2 = 383;
-        public const int TypeParamsPart3 = 384;
-        public const int CustomAttributeGroup = 385;
-        public const int CustomAttributeGroupPart3 = 386;
-        public const int BaseTypes = 387;
-        public const int Constructor = 388;
-        public const int Method = 389;
-        public const int Property = 390;
-        public const int Event = 391;
-        public const int Field = 392;
-        public const int namespaceKeyword = 393;
-        public const int usingKeyword = 394;
-        public const int verbatimIdentifier = 395;
-        public const int outKeyword = 396;
-        public const int refKeyword = 397;
-        public const int typeOf = 398;
-        public const int nameOf = 399;
-        public const int defaultOf = 400;
-        public const int newKeyword = 401;
-        public const int stringType = 402;
-        public const int boolType = 403;
-        public const int charType = 404;
-        public const int floatType = 405;
-        public const int doubleType = 406;
-        public const int decimalType = 407;
-        public const int sbyteType = 408;
-        public const int byteType = 409;
-        public const int shortType = 410;
-        public const int ushortType = 411;
-        public const int intType = 412;
-        public const int uintType = 413;
-        public const int longType = 414;
-        public const int ulongType = 415;
-        public const int objectType = 416;
-        public const int boolLiteral = 417;
-        public const int nullLiteral = 418;
-        public const int thisRef = 419;
-        public const int baseRef = 420;
-        public const int verbatimStringLiteral = 421;
-        public const int identifier2 = 422;
-        public const int stringLiteral = 423;
-        public const int characterLiteral = 424;
-        public const int lte = 425;
-        public const int lt = 426;
-        public const int gte = 427;
-        public const int gt = 428;
-        public const int eqEq = 429;
-        public const int notEq = 430;
-        public const int eq = 431;
-        public const int inc = 432;
-        public const int addAssign = 433;
-        public const int add = 434;
-        public const int dec = 435;
-        public const int subAssign = 436;
-        public const int sub = 437;
-        public const int mulAssign = 438;
-        public const int mul = 439;
-        public const int divAssign = 440;
-        public const int div = 441;
-        public const int modAssign = 442;
-        public const int mod = 443;
-        public const int and = 444;
-        public const int bitwiseAndAssign = 445;
-        public const int bitwiseAnd = 446;
-        public const int or = 447;
-        public const int bitwiseOrAssign = 448;
-        public const int bitwiseOr = 449;
-        public const int not = 450;
-        public const int lbracket = 451;
-        public const int rbracket = 452;
-        public const int lparen = 453;
-        public const int rparen = 454;
-        public const int lbrace = 455;
-        public const int rbrace = 456;
-        public const int comma = 457;
-        public const int dot = 459;
-        public const int integerLiteral = 460;
-        public const int floatLiteral = 461;
-        public const int returnKeyword = 469;
-        public const int semi = 473;
-        public const int colon = 475;
-        public const int assemblyKeyword = 479;
-        public const int voidType = 480;
-        public const int partialKeyword = 481;
-        public const int classKeyword = 482;
-        public const int enumKeyword = 483;
-        public const int structKeyword = 484;
-        public const int interfaceKeyword = 485;
-        public const int getKeyword = 486;
-        public const int setKeyword = 487;
-        public const int eventKeyword = 488;
-        public const int publicKeyword = 489;
-        public const int privateKeyword = 490;
-        public const int protectedKeyword = 491;
-        public const int internalKeyword = 492;
-        public const int staticKeyword = 493;
-        public const int abstractKeyword = 494;
-        public const int constKeyword = 495;
-        public const int overrideKeyword = 496;
-        public const int whereKeyword = 497;
+        public const int CustomAttributeArgListList = 255;
+        public const int CustomAttributeGroupList = 256;
+        public const int CustomAttributeGroupList2 = 257;
+        public const int CustomAttributeGroupList3 = 258;
+        public const int TypeAttributesList = 259;
+        public const int EnumFieldsList = 260;
+        public const int WhereClauseList = 261;
+        public const int TypeParamsList = 262;
+        public const int TypeParamsList2 = 263;
+        public const int MemberAttributeList = 264;
+        public const int MethodParamListList = 265;
+        public const int ParamListList = 266;
+        public const int ConstructorChainList = 267;
+        public const int ConstructorChainList2 = 268;
+        public const int WhereClauses = 269;
+        public const int TypeDeclPart = 270;
+        public const int TypeDecl = 271;
+        public const int PrivateImplementationType = 272;
+        public const int PropertyAccessors = 273;
+        public const int Member = 274;
+        public const int Members = 275;
+        public const int CustomAttributeGroupFollows = 276;
+        public const int CustomAttributeGroupFollows2 = 277;
+        public const int CustomAttributeGroupFollows3 = 278;
+        public const int CustomAttributeGroupFollows4 = 279;
+        public const int CustomAttributeGroupFollows5 = 280;
+        public const int CustomAttributeGroupFollows6 = 281;
+        public const int CustomAttributeGroupFollows7 = 282;
+        public const int CustomAttributeGroupFollows8 = 283;
+        public const int CustomAttributeGroupFollows9 = 284;
+        public const int CustomAttributeGroupFollows10 = 285;
+        public const int CustomAttributeGroupFollows11 = 286;
+        public const int CustomAttributeGroupFollows12 = 287;
+        public const int CustomAttributeGroupFollows13 = 288;
+        public const int CustomAttributeGroupFollows14 = 289;
+        public const int CustomAttributeGroupFollows15 = 290;
+        public const int CustomAttributeGroupFollows16 = 291;
+        public const int CustomAttributeGroupFollows17 = 292;
+        public const int CustomAttributeGroupFollows18 = 293;
+        public const int CustomAttributeGroupFollows19 = 294;
+        public const int CustomAttributeGroupFollows20 = 295;
+        public const int CustomAttributeGroupFollows21 = 296;
+        public const int CustomAttributeGroupsFollows = 297;
+        public const int CustomAttributeGroupsFollows2 = 298;
+        public const int CustomAttributeGroupsFollows3 = 299;
+        public const int CustomAttributeGroupsFollows4 = 300;
+        public const int CustomAttributeGroupsFollows5 = 301;
+        public const int CustomAttributeGroupsFollows6 = 302;
+        public const int CustomAttributeGroupsFollows7 = 303;
+        public const int CustomAttributeGroupsFollows8 = 304;
+        public const int CustomAttributeGroupsFollows9 = 305;
+        public const int CustomAttributeGroupsFollows10 = 306;
+        public const int CustomAttributeGroupsFollows11 = 307;
+        public const int CustomAttributeGroupsFollows12 = 308;
+        public const int CustomAttributeGroupsFollows13 = 309;
+        public const int CustomAttributeGroupsFollows14 = 310;
+        public const int CustomAttributeGroupsFollows15 = 311;
+        public const int CustomAttributeGroupsFollows16 = 312;
+        public const int CustomAttributeGroupsFollows17 = 313;
+        public const int CustomAttributeGroupsFollows18 = 314;
+        public const int CustomAttributeGroupsFollows19 = 315;
+        public const int CustomAttributeGroupsFollows20 = 316;
+        public const int CustomAttributeGroupsFollows21 = 317;
+        public const int CustomAttributeGroupsFollows22 = 318;
+        public const int CustomAttributeGroupsFollows23 = 319;
+        public const int TypeAttributesFollows = 320;
+        public const int TypeAttributesFollows2 = 321;
+        public const int TypeAttributesFollows3 = 322;
+        public const int TypeAttributesFollows4 = 323;
+        public const int TypeAttributesFollows5 = 324;
+        public const int WhereFollows = 325;
+        public const int WhereClauseFollows = 326;
+        public const int BaseTypeFollows = 327;
+        public const int BaseTypeFollows2 = 328;
+        public const int BaseTypeFollows3 = 329;
+        public const int TypeDeclPartFollows = 330;
+        public const int TypeParamsFollows = 331;
+        public const int TypeParamsFollows2 = 332;
+        public const int TypeParamsFollows3 = 333;
+        public const int TypeDeclFollows = 334;
+        public const int TypeDeclFollows2 = 335;
+        public const int TypeDeclFollows3 = 336;
+        public const int TypeDeclFollows4 = 337;
+        public const int TypeDeclFollows5 = 338;
+        public const int TypeDeclFollows6 = 339;
+        public const int TypeDeclFollows7 = 340;
+        public const int TypeDeclFollows8 = 341;
+        public const int TypeDeclFollows9 = 342;
+        public const int TypeDeclFollows10 = 343;
+        public const int TypeDeclFollows11 = 344;
+        public const int TypeDeclFollows12 = 345;
+        public const int TypeDeclFollows13 = 346;
+        public const int MethodParamListFollows = 347;
+        public const int ParamListFollows = 348;
+        public const int ParamListFollows2 = 349;
+        public const int MemberFollows = 350;
+        public const int CustomAttributeArgListListRightAssoc = 351;
+        public const int CustomAttributeGroupListRightAssoc = 352;
+        public const int CustomAttributeGroupList2RightAssoc = 353;
+        public const int CustomAttributeGroupList3RightAssoc = 354;
+        public const int TypeAttributesListRightAssoc = 355;
+        public const int TypeAttributesListRightAssoc2 = 356;
+        public const int EnumFieldsListRightAssoc = 357;
+        public const int WhereClauseListRightAssoc = 358;
+        public const int TypeParamsListRightAssoc = 359;
+        public const int TypeParamsList2RightAssoc = 360;
+        public const int MemberAttributeListRightAssoc = 361;
+        public const int MethodParamListListRightAssoc = 362;
+        public const int ParamListListRightAssoc = 363;
+        public const int ConstructorChainListRightAssoc = 364;
+        public const int ConstructorChainList2RightAssoc = 365;
+        public const int CustomAttributePart = 366;
+        public const int CustomAttributeArgList = 367;
+        public const int CustomAttributeArgListPart = 368;
+        public const int CustomAttributeGroupPart = 369;
+        public const int CustomAttributeGroupPart2 = 370;
+        public const int EnumFieldsPart = 371;
+        public const int WhereClause = 372;
+        public const int WhereClausePart2 = 373;
+        public const int TypeParamsPart = 374;
+        public const int TypeParamsPart2 = 375;
+        public const int Interface = 376;
+        public const int InterfacePart = 377;
+        public const int MethodParamListPart = 378;
+        public const int ParamListPart = 379;
+        public const int PropertyGet = 380;
+        public const int PropertyGetPart = 381;
+        public const int PropertySet = 382;
+        public const int PropertySetPart = 383;
+        public const int ConstructorChainPart = 384;
+        public const int ConstructorChainPart2 = 385;
+        public const int TypeAttributesListRightAssoc3 = 386;
+        public const int CustomAttribute = 387;
+        public const int CustomAttributePart2 = 388;
+        public const int TypeParamsPart3 = 389;
+        public const int ConstructorChain = 390;
+        public const int ConstructorChainPart3 = 391;
+        public const int ConstructorChainPart4 = 392;
+        public const int CustomAttributeGroup = 393;
+        public const int CustomAttributeGroupPart3 = 394;
+        public const int BaseTypes = 395;
+        public const int Constructor = 396;
+        public const int Method = 397;
+        public const int Property = 398;
+        public const int Event = 399;
+        public const int Field = 400;
+        public const int namespaceKeyword = 401;
+        public const int usingKeyword = 402;
+        public const int verbatimIdentifier = 403;
+        public const int outKeyword = 404;
+        public const int refKeyword = 405;
+        public const int typeOf = 406;
+        public const int nameOf = 407;
+        public const int defaultOf = 408;
+        public const int newKeyword = 409;
+        public const int stringType = 410;
+        public const int boolType = 411;
+        public const int charType = 412;
+        public const int floatType = 413;
+        public const int doubleType = 414;
+        public const int decimalType = 415;
+        public const int sbyteType = 416;
+        public const int byteType = 417;
+        public const int shortType = 418;
+        public const int ushortType = 419;
+        public const int intType = 420;
+        public const int uintType = 421;
+        public const int longType = 422;
+        public const int ulongType = 423;
+        public const int objectType = 424;
+        public const int boolLiteral = 425;
+        public const int nullLiteral = 426;
+        public const int thisRef = 427;
+        public const int baseRef = 428;
+        public const int verbatimStringLiteral = 429;
+        public const int identifier2 = 430;
+        public const int stringLiteral = 431;
+        public const int characterLiteral = 432;
+        public const int lte = 433;
+        public const int lt = 434;
+        public const int gte = 435;
+        public const int gt = 436;
+        public const int eqEq = 437;
+        public const int notEq = 438;
+        public const int eq = 439;
+        public const int inc = 440;
+        public const int addAssign = 441;
+        public const int add = 442;
+        public const int dec = 443;
+        public const int subAssign = 444;
+        public const int sub = 445;
+        public const int mulAssign = 446;
+        public const int mul = 447;
+        public const int divAssign = 448;
+        public const int div = 449;
+        public const int modAssign = 450;
+        public const int mod = 451;
+        public const int and = 452;
+        public const int bitwiseAndAssign = 453;
+        public const int bitwiseAnd = 454;
+        public const int or = 455;
+        public const int bitwiseOrAssign = 456;
+        public const int bitwiseOr = 457;
+        public const int not = 458;
+        public const int lbracket = 459;
+        public const int rbracket = 460;
+        public const int lparen = 461;
+        public const int rparen = 462;
+        public const int lbrace = 463;
+        public const int rbrace = 464;
+        public const int comma = 465;
+        public const int dot = 467;
+        public const int integerLiteral = 468;
+        public const int floatLiteral = 469;
+        public const int returnKeyword = 477;
+        public const int semi = 481;
+        public const int colon = 483;
+        public const int assemblyKeyword = 487;
+        public const int voidType = 488;
+        public const int partialKeyword = 489;
+        public const int classKeyword = 490;
+        public const int enumKeyword = 491;
+        public const int structKeyword = 492;
+        public const int interfaceKeyword = 493;
+        public const int getKeyword = 494;
+        public const int setKeyword = 495;
+        public const int eventKeyword = 496;
+        public const int publicKeyword = 497;
+        public const int privateKeyword = 498;
+        public const int protectedKeyword = 499;
+        public const int internalKeyword = 500;
+        public const int staticKeyword = 501;
+        public const int abstractKeyword = 502;
+        public const int constKeyword = 503;
+        public const int overrideKeyword = 504;
+        public const int whereKeyword = 505;
         internal static ParseNode ParseCustomAttributeArg(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
@@ -13712,60 +13720,6 @@ namespace CD {
                 return new ParseNode(TypeDeclParser.Param, "Param", children.ToArray(), line__, column__, position__);
             }
             throw new SyntaxException(string.Format("Expecting Type at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
-        }
-        internal static ParseNode ParseConstructorChain(ParserContext context) {
-            int line__ = context.Line;
-            int column__ = context.Column;
-            long position__ = context.Position;
-            // ConstructorChain -> baseRef lparen ParamList rparen
-            if ((ExpressionParser.baseRef == context.SymbolId)) {
-                ParseNode[] children = new ParseNode[4];
-                if ((false 
-                            == (ExpressionParser.baseRef == context.SymbolId))) {
-                    context.Error("Expecting baseRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
-                }
-                children[0] = new ParseNode(ExpressionParser.baseRef, "baseRef", context.Value, context.Line, context.Column, context.Position);
-                context.Advance();
-                if ((false 
-                            == (ExpressionParser.lparen == context.SymbolId))) {
-                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
-                }
-                children[1] = new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position);
-                context.Advance();
-                children[2] = TypeDeclParser.ParseParamList(context);
-                if ((false 
-                            == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
-                }
-                children[3] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
-                context.Advance();
-                return new ParseNode(TypeDeclParser.ConstructorChain, "ConstructorChain", children, line__, column__, position__);
-            }
-            // ConstructorChain -> thisRef lparen ParamList rparen
-            if ((ExpressionParser.thisRef == context.SymbolId)) {
-                ParseNode[] children = new ParseNode[4];
-                if ((false 
-                            == (ExpressionParser.thisRef == context.SymbolId))) {
-                    context.Error("Expecting thisRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
-                }
-                children[0] = new ParseNode(ExpressionParser.thisRef, "thisRef", context.Value, context.Line, context.Column, context.Position);
-                context.Advance();
-                if ((false 
-                            == (ExpressionParser.lparen == context.SymbolId))) {
-                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
-                }
-                children[1] = new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position);
-                context.Advance();
-                children[2] = TypeDeclParser.ParseParamList(context);
-                if ((false 
-                            == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
-                }
-                children[3] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
-                context.Advance();
-                return new ParseNode(TypeDeclParser.ConstructorChain, "ConstructorChain", children, line__, column__, position__);
-            }
-            throw new SyntaxException(string.Format("Expecting baseRef or thisRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
         internal static ParseNode ParseNamespaceNameList(ParserContext context) {
             int line__ = context.Line;
@@ -15016,6 +14970,44 @@ namespace CD {
                 children.Add(TypeDeclParser.ParseParam(context));
                 children.AddRange(TypeDeclParser.ParseParamListListRightAssoc(context).Children);
                 return new ParseNode(TypeDeclParser.ParamListList, "ParamListList", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseConstructorChainList(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // ConstructorChainList -> comma Expression ConstructorChainListRightAssoc
+            if ((ExpressionParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (ExpressionParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(ExpressionParser.ParseExpression(context));
+                children.AddRange(TypeDeclParser.ParseConstructorChainListRightAssoc(context).Children);
+                return new ParseNode(TypeDeclParser.ConstructorChainList, "ConstructorChainList", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseConstructorChainList2(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // ConstructorChainList2 -> comma Expression ConstructorChainList2RightAssoc
+            if ((ExpressionParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (ExpressionParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(ExpressionParser.ParseExpression(context));
+                children.AddRange(TypeDeclParser.ParseConstructorChainList2RightAssoc(context).Children);
+                return new ParseNode(TypeDeclParser.ConstructorChainList2, "ConstructorChainList2", children.ToArray(), line__, column__, position__);
             }
             throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
@@ -18411,6 +18403,54 @@ namespace CD {
             }
             throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
+        internal static ParseNode ParseConstructorChainListRightAssoc(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // ConstructorChainListRightAssoc -> comma Expression ConstructorChainListRightAssoc
+            if ((ExpressionParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (ExpressionParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(ExpressionParser.ParseExpression(context));
+                children.AddRange(TypeDeclParser.ParseConstructorChainListRightAssoc(context).Children);
+                return new ParseNode(TypeDeclParser.ConstructorChainListRightAssoc, "ConstructorChainListRightAssoc", children.ToArray(), line__, column__, position__);
+            }
+            // ConstructorChainListRightAssoc ->
+            if ((ExpressionParser.rparen == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(TypeDeclParser.ConstructorChainListRightAssoc, "ConstructorChainListRightAssoc", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseConstructorChainList2RightAssoc(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // ConstructorChainList2RightAssoc -> comma Expression ConstructorChainList2RightAssoc
+            if ((ExpressionParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (ExpressionParser.comma == context.SymbolId))) {
+                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.Add(ExpressionParser.ParseExpression(context));
+                children.AddRange(TypeDeclParser.ParseConstructorChainList2RightAssoc(context).Children);
+                return new ParseNode(TypeDeclParser.ConstructorChainList2RightAssoc, "ConstructorChainList2RightAssoc", children.ToArray(), line__, column__, position__);
+            }
+            // ConstructorChainList2RightAssoc ->
+            if ((ExpressionParser.rparen == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(TypeDeclParser.ConstructorChainList2RightAssoc, "ConstructorChainList2RightAssoc", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
         internal static ParseNode ParseCustomAttributePart(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
@@ -18890,6 +18930,64 @@ namespace CD {
             }
             throw new SyntaxException(string.Format("Expecting StatementBlock or semi at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
+        internal static ParseNode ParseConstructorChainPart(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // ConstructorChainPart -> ConstructorChainList rparen
+            if ((ExpressionParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(TypeDeclParser.ParseConstructorChainList(context).Children);
+                if ((false 
+                            == (ExpressionParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(TypeDeclParser.ConstructorChainPart, "ConstructorChainPart", children.ToArray(), line__, column__, position__);
+            }
+            // ConstructorChainPart -> rparen
+            if ((ExpressionParser.rparen == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (ExpressionParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(TypeDeclParser.ConstructorChainPart, "ConstructorChainPart", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting ConstructorChainList or rparen at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseConstructorChainPart2(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // ConstructorChainPart2 -> ConstructorChainList2 rparen
+            if ((ExpressionParser.comma == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(TypeDeclParser.ParseConstructorChainList2(context).Children);
+                if ((false 
+                            == (ExpressionParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(TypeDeclParser.ConstructorChainPart2, "ConstructorChainPart2", children.ToArray(), line__, column__, position__);
+            }
+            // ConstructorChainPart2 -> rparen
+            if ((ExpressionParser.rparen == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (ExpressionParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(TypeDeclParser.ConstructorChainPart2, "ConstructorChainPart2", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting ConstructorChainList2 or rparen at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
         internal static ParseNode ParseRelationalExpressionListPart(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
@@ -19208,6 +19306,166 @@ namespace CD {
             }
             throw new SyntaxException(string.Format("Expecting CustomAttributeGroup or Identifier at line {0}, column {1}, position {2" +
                         "}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseConstructorChain(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // ConstructorChain -> baseRef lparen ConstructorChainPart3
+            if ((ExpressionParser.baseRef == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (ExpressionParser.baseRef == context.SymbolId))) {
+                    context.Error("Expecting baseRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.baseRef, "baseRef", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                if ((false 
+                            == (ExpressionParser.lparen == context.SymbolId))) {
+                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.AddRange(TypeDeclParser.ParseConstructorChainPart3(context).Children);
+                return new ParseNode(TypeDeclParser.ConstructorChain, "ConstructorChain", children.ToArray(), line__, column__, position__);
+            }
+            // ConstructorChain -> thisRef lparen ConstructorChainPart4
+            if ((ExpressionParser.thisRef == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (ExpressionParser.thisRef == context.SymbolId))) {
+                    context.Error("Expecting thisRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.thisRef, "thisRef", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                if ((false 
+                            == (ExpressionParser.lparen == context.SymbolId))) {
+                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                children.AddRange(TypeDeclParser.ParseConstructorChainPart4(context).Children);
+                return new ParseNode(TypeDeclParser.ConstructorChain, "ConstructorChain", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting baseRef or thisRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseConstructorChainPart3(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // ConstructorChainPart3 -> rparen
+            if ((ExpressionParser.rparen == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (ExpressionParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(TypeDeclParser.ConstructorChainPart3, "ConstructorChainPart3", children, line__, column__, position__);
+            }
+            // ConstructorChainPart3 -> Expression ConstructorChainPart
+            if (((((((((((((((((((((((((((((((((((((ExpressionParser.add == context.SymbolId) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(ExpressionParser.ParseExpression(context));
+                children.AddRange(TypeDeclParser.ParseConstructorChainPart(context).Children);
+                return new ParseNode(TypeDeclParser.ConstructorChainPart3, "ConstructorChainPart3", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting rparen or Expression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseConstructorChainPart4(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // ConstructorChainPart4 -> rparen
+            if ((ExpressionParser.rparen == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                if ((false 
+                            == (ExpressionParser.rparen == context.SymbolId))) {
+                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[0] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(TypeDeclParser.ConstructorChainPart4, "ConstructorChainPart4", children, line__, column__, position__);
+            }
+            // ConstructorChainPart4 -> Expression ConstructorChainPart2
+            if (((((((((((((((((((((((((((((((((((((ExpressionParser.add == context.SymbolId) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(ExpressionParser.ParseExpression(context));
+                children.AddRange(TypeDeclParser.ParseConstructorChainPart2(context).Children);
+                return new ParseNode(TypeDeclParser.ConstructorChainPart4, "ConstructorChainPart4", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting rparen or Expression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeGroup(ParserContext context) {
             int line__ = context.Line;

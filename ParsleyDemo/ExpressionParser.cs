@@ -12,47 +12,7 @@ namespace ParsleyDemo {
     using System;
     using System.Collections.Generic;
     
-    /// <summary>Parses the following grammar:
-    /// Term= Factor { ( "+" | "-" ) Factor };
-    /// Factor= Unary { ( "*" | "/" ) Unary };
-    /// Unary= ( "+" | "-" ) Unary | Leaf;
-    /// Leaf= integer | identifier | "(" Term ")";
-    /// add= "+";
-    /// mul= "*";
-    /// integer= '[0-9]+';
-    /// identifier= '[A-Z_a-z][0-9A-Z_a-z]*';
-    /// (whitespace)= '\s+';
-    /// Implicit= "-";
-    /// Implicit2= "/";
-    /// Implicit3= "(";
-    /// Implicit4= ")";
-    /// </summary>
-    /// <remarks>The rules for the factored grammar are as follows:
-    /// Unary -> add Unary
-    /// Unary -> Implicit Unary
-    /// Unary -> Leaf
-    /// Leaf -> integer
-    /// Leaf -> identifier
-    /// Leaf -> Implicit3 Term Implicit4
-    /// TermList -> add Factor TermListRightAssoc TermListRightAssoc2
-    /// TermList -> Implicit Factor TermListRightAssoc TermListRightAssoc2
-    /// FactorList -> mul Unary FactorListRightAssoc FactorListRightAssoc2
-    /// FactorList -> Implicit2 Unary FactorListRightAssoc FactorListRightAssoc2
-    /// TermListRightAssoc -> add Factor TermListRightAssoc
-    /// TermListRightAssoc ->
-    /// FactorListRightAssoc -> mul Unary FactorListRightAssoc
-    /// FactorListRightAssoc ->
-    /// Term -> Factor TermPart
-    /// TermPart -> TermList
-    /// TermPart ->
-    /// Factor -> Unary FactorPart
-    /// FactorPart -> FactorList
-    /// FactorPart ->
-    /// TermListRightAssoc2 -> Implicit Factor TermListRightAssoc2
-    /// TermListRightAssoc2 ->
-    /// FactorListRightAssoc2 -> Implicit2 Unary FactorListRightAssoc2
-    /// FactorListRightAssoc2 ->
-    /// </remarks>
+    /// <summary>Parses the indicated grammar. Refer to C:\dev\BuildPack\ParsleyDemo\Expression.xbnf</summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal partial class ExpressionParser {
         internal const int ErrorSymbol = -1;

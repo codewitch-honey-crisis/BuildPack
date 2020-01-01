@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  DESKTOP-U8QJ4Q2
-//  DateTime: 1/1/2020 8:07:06 AM
+//  DateTime: 1/1/2020 9:08:35 AM
 //  UserName: gazto
-//  GPLEX input file <C:\dev\BuildPack\scratch\Slang.lex - 1/1/2020 8:07:06 AM>
+//  GPLEX input file <C:\dev\BuildPack\scratch\Slang.lex - 1/1/2020 9:06:45 AM>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: unicode, verbose, noParser, stack, minimize
@@ -3594,7 +3594,7 @@ UpdatePosition(yytext); return -1;
         case 310: // Recognized '(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*',	Shortest string "namesp"
         case 311: // Recognized '(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*',	Shortest string "namespa"
         case 312: // Recognized '(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*',	Shortest string "namespac"
-UpdatePosition(yytext); return 422;
+UpdatePosition(yytext); return 430;
             break;
         case 18: // Recognized '[ \t\r\n\v\f]+',	Shortest string "\n"
 UpdatePosition(yytext); return yylex();
@@ -3604,157 +3604,157 @@ UpdatePosition(yytext); return yylex();
         case 100: // Recognized '(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)',	Shortest string "8m"
         case 119: // Recognized '(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)',	Shortest string ".8"
         case 121: // Recognized '(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)',	Shortest string "8e8"
-UpdatePosition(yytext); return 461;
+UpdatePosition(yytext); return 469;
             break;
         case 20: // Recognized '"."',	Shortest string "."
-UpdatePosition(yytext); return 459;
+UpdatePosition(yytext); return 467;
             break;
         case 21: // Recognized '"+"',	Shortest string "+"
-UpdatePosition(yytext); return 434;
-            break;
-        case 23: // Recognized '":"',	Shortest string ":"
-UpdatePosition(yytext); return 475;
-            break;
-        case 24: // Recognized '","',	Shortest string ","
-UpdatePosition(yytext); return 457;
-            break;
-        case 25: // Recognized '"}"',	Shortest string "}"
-UpdatePosition(yytext); return 456;
-            break;
-        case 26: // Recognized '"{"',	Shortest string "{"
-UpdatePosition(yytext); return 455;
-            break;
-        case 27: // Recognized '")"',	Shortest string ")"
-UpdatePosition(yytext); return 454;
-            break;
-        case 28: // Recognized '"("',	Shortest string "("
-UpdatePosition(yytext); return 453;
-            break;
-        case 29: // Recognized '"]"',	Shortest string "]"
-UpdatePosition(yytext); return 452;
-            break;
-        case 30: // Recognized '"["',	Shortest string "["
-UpdatePosition(yytext); return 451;
-            break;
-        case 31: // Recognized '"!"',	Shortest string "!"
-UpdatePosition(yytext); return 450;
-            break;
-        case 32: // Recognized '"|"',	Shortest string "|"
-UpdatePosition(yytext); return 449;
-            break;
-        case 33: // Recognized '";"',	Shortest string ";"
-UpdatePosition(yytext); return 473;
-            break;
-        case 37: // Recognized '"/"',	Shortest string "/"
-UpdatePosition(yytext); return 441;
-            break;
-        case 38: // Recognized '"*"',	Shortest string "*"
-UpdatePosition(yytext); return 439;
-            break;
-        case 40: // Recognized '"="',	Shortest string "="
-UpdatePosition(yytext); return 431;
-            break;
-        case 41: // Recognized '"&"',	Shortest string "&"
-UpdatePosition(yytext); return 446;
-            break;
-        case 43: // Recognized '"%"',	Shortest string "%"
-UpdatePosition(yytext); return 443;
-            break;
-        case 44: // Recognized '"-"',	Shortest string "-"
-UpdatePosition(yytext); return 437;
-            break;
-        case 45: // Recognized '">"',	Shortest string ">"
-UpdatePosition(yytext); return 428;
-            break;
-        case 46: // Recognized '"<"',	Shortest string "<"
-UpdatePosition(yytext); return 426;
-            break;
-        case 49: // Recognized '\"([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*\"',	Shortest string "\"\""
-UpdatePosition(yytext); return 423;
-            break;
-        case 50: // Recognized '[\u0027]([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})[\u0027]',	Shortest string "'n'"
-UpdatePosition(yytext); return 424;
-            break;
-        case 51: // Recognized '"<="',	Shortest string "<="
-UpdatePosition(yytext); return 425;
-            break;
-        case 52: // Recognized '">="',	Shortest string ">="
-UpdatePosition(yytext); return 427;
-            break;
-        case 53: // Recognized '"-="',	Shortest string "-="
-UpdatePosition(yytext); return 436;
-            break;
-        case 54: // Recognized '"--"',	Shortest string "--"
-UpdatePosition(yytext); return 435;
-            break;
-        case 55: // Recognized '"%="',	Shortest string "%="
 UpdatePosition(yytext); return 442;
             break;
-        case 56: // Recognized '@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*',	Shortest string "@n"
-UpdatePosition(yytext); return 395;
+        case 23: // Recognized '":"',	Shortest string ":"
+UpdatePosition(yytext); return 483;
             break;
-        case 57: // Recognized '@\"([^\"|\"\"])*\"',	Shortest string "@\"\""
-UpdatePosition(yytext); return 421;
+        case 24: // Recognized '","',	Shortest string ","
+UpdatePosition(yytext); return 465;
             break;
-        case 58: // Recognized '"&="',	Shortest string "&="
-UpdatePosition(yytext); return 445;
+        case 25: // Recognized '"}"',	Shortest string "}"
+UpdatePosition(yytext); return 464;
             break;
-        case 59: // Recognized '"&&"',	Shortest string "&&"
-UpdatePosition(yytext); return 444;
+        case 26: // Recognized '"{"',	Shortest string "{"
+UpdatePosition(yytext); return 463;
             break;
-        case 60: // Recognized '"=="',	Shortest string "=="
-UpdatePosition(yytext); return 429;
+        case 27: // Recognized '")"',	Shortest string ")"
+UpdatePosition(yytext); return 462;
             break;
-        case 61: // Recognized '#[A-Za-z]+[\t ]*[^\n]*',	Shortest string "#n"
-UpdatePosition(yytext); return Skip(476);
+        case 28: // Recognized '"("',	Shortest string "("
+UpdatePosition(yytext); return 461;
             break;
-        case 62: // Recognized '"*="',	Shortest string "*="
-UpdatePosition(yytext); return 438;
+        case 29: // Recognized '"]"',	Shortest string "]"
+UpdatePosition(yytext); return 460;
             break;
-        case 63: // Recognized '"/*"',	Shortest string "/*"
-if(!_TryReadUntilBlockEnd("*/")) { UpdatePosition(yytext); return -1; } UpdatePosition(yytext); return Skip(478);
+        case 30: // Recognized '"["',	Shortest string "["
+UpdatePosition(yytext); return 459;
             break;
-        case 64: // Recognized '"/="',	Shortest string "/="
-UpdatePosition(yytext); return 440;
+        case 31: // Recognized '"!"',	Shortest string "!"
+UpdatePosition(yytext); return 458;
             break;
-        case 65: // Recognized '(\/\/[^\n]*[\n])+',	Shortest string "//\n"
-UpdatePosition(yytext); return Skip(477);
+        case 32: // Recognized '"|"',	Shortest string "|"
+UpdatePosition(yytext); return 457;
             break;
-        case 70: // Recognized '"bool"',	Shortest string "bool"
-UpdatePosition(yytext); return 403;
+        case 33: // Recognized '";"',	Shortest string ";"
+UpdatePosition(yytext); return 481;
             break;
-        case 72: // Recognized '"byte"',	Shortest string "byte"
-UpdatePosition(yytext); return 409;
+        case 37: // Recognized '"/"',	Shortest string "/"
+UpdatePosition(yytext); return 449;
             break;
-        case 74: // Recognized '"base"',	Shortest string "base"
-UpdatePosition(yytext); return 420;
-            break;
-        case 80: // Recognized '"double"',	Shortest string "double"
-UpdatePosition(yytext); return 406;
-            break;
-        case 86: // Recognized '"default"',	Shortest string "default"
-UpdatePosition(yytext); return 400;
-            break;
-        case 90: // Recognized '"decimal"',	Shortest string "decimal"
-UpdatePosition(yytext); return 407;
-            break;
-        case 94: // Recognized '"void"',	Shortest string "void"
-UpdatePosition(yytext); return 480;
-            break;
-        case 95: // Recognized '"var"',	Shortest string "var"
-UpdatePosition(yytext); return 474;
-            break;
-        case 96: // Recognized '"||"',	Shortest string "||"
+        case 38: // Recognized '"*"',	Shortest string "*"
 UpdatePosition(yytext); return 447;
             break;
-        case 97: // Recognized '"|="',	Shortest string "|="
+        case 40: // Recognized '"="',	Shortest string "="
+UpdatePosition(yytext); return 439;
+            break;
+        case 41: // Recognized '"&"',	Shortest string "&"
+UpdatePosition(yytext); return 454;
+            break;
+        case 43: // Recognized '"%"',	Shortest string "%"
+UpdatePosition(yytext); return 451;
+            break;
+        case 44: // Recognized '"-"',	Shortest string "-"
+UpdatePosition(yytext); return 445;
+            break;
+        case 45: // Recognized '">"',	Shortest string ">"
+UpdatePosition(yytext); return 436;
+            break;
+        case 46: // Recognized '"<"',	Shortest string "<"
+UpdatePosition(yytext); return 434;
+            break;
+        case 49: // Recognized '\"([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*\"',	Shortest string "\"\""
+UpdatePosition(yytext); return 431;
+            break;
+        case 50: // Recognized '[\u0027]([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})[\u0027]',	Shortest string "'n'"
+UpdatePosition(yytext); return 432;
+            break;
+        case 51: // Recognized '"<="',	Shortest string "<="
+UpdatePosition(yytext); return 433;
+            break;
+        case 52: // Recognized '">="',	Shortest string ">="
+UpdatePosition(yytext); return 435;
+            break;
+        case 53: // Recognized '"-="',	Shortest string "-="
+UpdatePosition(yytext); return 444;
+            break;
+        case 54: // Recognized '"--"',	Shortest string "--"
+UpdatePosition(yytext); return 443;
+            break;
+        case 55: // Recognized '"%="',	Shortest string "%="
+UpdatePosition(yytext); return 450;
+            break;
+        case 56: // Recognized '@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*',	Shortest string "@n"
+UpdatePosition(yytext); return 403;
+            break;
+        case 57: // Recognized '@\"([^\"|\"\"])*\"',	Shortest string "@\"\""
+UpdatePosition(yytext); return 429;
+            break;
+        case 58: // Recognized '"&="',	Shortest string "&="
+UpdatePosition(yytext); return 453;
+            break;
+        case 59: // Recognized '"&&"',	Shortest string "&&"
+UpdatePosition(yytext); return 452;
+            break;
+        case 60: // Recognized '"=="',	Shortest string "=="
+UpdatePosition(yytext); return 437;
+            break;
+        case 61: // Recognized '#[A-Za-z]+[\t ]*[^\n]*',	Shortest string "#n"
+UpdatePosition(yytext); return Skip(484);
+            break;
+        case 62: // Recognized '"*="',	Shortest string "*="
+UpdatePosition(yytext); return 446;
+            break;
+        case 63: // Recognized '"/*"',	Shortest string "/*"
+if(!_TryReadUntilBlockEnd("*/")) { UpdatePosition(yytext); return -1; } UpdatePosition(yytext); return Skip(486);
+            break;
+        case 64: // Recognized '"/="',	Shortest string "/="
 UpdatePosition(yytext); return 448;
             break;
+        case 65: // Recognized '(\/\/[^\n]*[\n])+',	Shortest string "//\n"
+UpdatePosition(yytext); return Skip(485);
+            break;
+        case 70: // Recognized '"bool"',	Shortest string "bool"
+UpdatePosition(yytext); return 411;
+            break;
+        case 72: // Recognized '"byte"',	Shortest string "byte"
+UpdatePosition(yytext); return 417;
+            break;
+        case 74: // Recognized '"base"',	Shortest string "base"
+UpdatePosition(yytext); return 428;
+            break;
+        case 80: // Recognized '"double"',	Shortest string "double"
+UpdatePosition(yytext); return 414;
+            break;
+        case 86: // Recognized '"default"',	Shortest string "default"
+UpdatePosition(yytext); return 408;
+            break;
+        case 90: // Recognized '"decimal"',	Shortest string "decimal"
+UpdatePosition(yytext); return 415;
+            break;
+        case 94: // Recognized '"void"',	Shortest string "void"
+UpdatePosition(yytext); return 488;
+            break;
+        case 95: // Recognized '"var"',	Shortest string "var"
+UpdatePosition(yytext); return 482;
+            break;
+        case 96: // Recognized '"||"',	Shortest string "||"
+UpdatePosition(yytext); return 455;
+            break;
+        case 97: // Recognized '"|="',	Shortest string "|="
+UpdatePosition(yytext); return 456;
+            break;
         case 98: // Recognized '"!="',	Shortest string "!="
-UpdatePosition(yytext); return 430;
+UpdatePosition(yytext); return 438;
             break;
         case 99: // Recognized '"::"',	Shortest string "::"
-UpdatePosition(yytext); return 458;
+UpdatePosition(yytext); return 466;
             break;
         case 101: // Recognized '(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)?',	Shortest string "8u"
         case 102: // Recognized '(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)?',	Shortest string "8l"
@@ -3775,160 +3775,160 @@ UpdatePosition(yytext); return 458;
         case 117: // Recognized '(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)?',	Shortest string "0xaaaaaaaaaaaaaaa"
         case 118: // Recognized '(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)?',	Shortest string "0xaaaaaaaaaaaaaaaa"
         case 120: // Recognized '(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)?',	Shortest string "8ul"
-UpdatePosition(yytext); return 460;
-            break;
-        case 122: // Recognized '"++"',	Shortest string "++"
-UpdatePosition(yytext); return 432;
-            break;
-        case 123: // Recognized '"+="',	Shortest string "+="
-UpdatePosition(yytext); return 433;
-            break;
-        case 127: // Recognized '"goto"',	Shortest string "goto"
-UpdatePosition(yytext); return 464;
-            break;
-        case 128: // Recognized '"get"',	Shortest string "get"
-UpdatePosition(yytext); return 486;
-            break;
-        case 132: // Recognized '"for"',	Shortest string "for"
-UpdatePosition(yytext); return 466;
-            break;
-        case 135: // Recognized '"float"',	Shortest string "float"
-UpdatePosition(yytext); return 405;
-            break;
-        case 140: // Recognized '"finally"',	Shortest string "finally"
-UpdatePosition(yytext); return 472;
-            break;
-        case 147: // Recognized '"object"',	Shortest string "object"
-UpdatePosition(yytext); return 416;
-            break;
-        case 153: // Recognized '"override"',	Shortest string "override"
-UpdatePosition(yytext); return 496;
-            break;
-        case 154: // Recognized '"out"',	Shortest string "out"
-UpdatePosition(yytext); return 396;
-            break;
-        case 157: // Recognized '"long"',	Shortest string "long"
-UpdatePosition(yytext); return 414;
-            break;
-        case 159: // Recognized '"if"',	Shortest string "if"
-UpdatePosition(yytext); return 463;
-            break;
-        case 160: // Recognized '"int"',	Shortest string "int"
-UpdatePosition(yytext); return 412;
-            break;
-        case 167: // Recognized '"interface"',	Shortest string "interface"
-UpdatePosition(yytext); return 485;
-            break;
-        case 169: // Recognized '"internal"',	Shortest string "internal"
-UpdatePosition(yytext); return 492;
-            break;
-        case 174: // Recognized '"while"',	Shortest string "while"
 UpdatePosition(yytext); return 468;
             break;
-        case 176: // Recognized '"where"',	Shortest string "where"
-UpdatePosition(yytext); return 497;
+        case 122: // Recognized '"++"',	Shortest string "++"
+UpdatePosition(yytext); return 440;
             break;
-        case 182: // Recognized '"ulong"',	Shortest string "ulong"
-UpdatePosition(yytext); return 415;
+        case 123: // Recognized '"+="',	Shortest string "+="
+UpdatePosition(yytext); return 441;
             break;
-        case 184: // Recognized '"uint"',	Shortest string "uint"
-UpdatePosition(yytext); return 413;
+        case 127: // Recognized '"goto"',	Shortest string "goto"
+UpdatePosition(yytext); return 472;
             break;
-        case 188: // Recognized '"using"',	Shortest string "using"
-UpdatePosition(yytext); return 394;
-            break;
-        case 191: // Recognized '"ushort"',	Shortest string "ushort"
-UpdatePosition(yytext); return 411;
-            break;
-        case 194: // Recognized '"ref"',	Shortest string "ref"
-UpdatePosition(yytext); return 397;
-            break;
-        case 197: // Recognized '"return"',	Shortest string "return"
-UpdatePosition(yytext); return 469;
-            break;
-        case 203: // Recognized '"this"',	Shortest string "this"
-UpdatePosition(yytext); return 419;
-            break;
-        case 205: // Recognized '"throw"',	Shortest string "throw"
-UpdatePosition(yytext); return 467;
-            break;
-        case 209: // Recognized '"typeof"',	Shortest string "typeof"
-UpdatePosition(yytext); return 398;
-            break;
-        case 210: // Recognized '"try"',	Shortest string "try"
-UpdatePosition(yytext); return 470;
-            break;
-        case 213: // Recognized '"true|false"',	Shortest string "true|false"
-UpdatePosition(yytext); return 417;
-            break;
-        case 220: // Recognized '"const"',	Shortest string "const"
-UpdatePosition(yytext); return 495;
-            break;
-        case 223: // Recognized '"class"',	Shortest string "class"
-UpdatePosition(yytext); return 482;
-            break;
-        case 225: // Recognized '"char"',	Shortest string "char"
-UpdatePosition(yytext); return 404;
-            break;
-        case 228: // Recognized '"catch"',	Shortest string "catch"
-UpdatePosition(yytext); return 471;
-            break;
-        case 235: // Recognized '"public"',	Shortest string "public"
-UpdatePosition(yytext); return 489;
-            break;
-        case 243: // Recognized '"protected"',	Shortest string "protected"
-UpdatePosition(yytext); return 491;
-            break;
-        case 247: // Recognized '"private"',	Shortest string "private"
-UpdatePosition(yytext); return 490;
-            break;
-        case 252: // Recognized '"partial"',	Shortest string "partial"
-UpdatePosition(yytext); return 481;
-            break;
-        case 259: // Recognized '"sbyte"',	Shortest string "sbyte"
-UpdatePosition(yytext); return 408;
-            break;
-        case 262: // Recognized '"short"',	Shortest string "short"
-UpdatePosition(yytext); return 410;
-            break;
-        case 268: // Recognized '"string"',	Shortest string "string"
-UpdatePosition(yytext); return 402;
-            break;
-        case 270: // Recognized '"struct"',	Shortest string "struct"
-UpdatePosition(yytext); return 484;
-            break;
-        case 273: // Recognized '"static"',	Shortest string "static"
-UpdatePosition(yytext); return 493;
-            break;
-        case 274: // Recognized '"set"',	Shortest string "set"
-UpdatePosition(yytext); return 487;
-            break;
-        case 280: // Recognized '"event"',	Shortest string "event"
-UpdatePosition(yytext); return 488;
-            break;
-        case 282: // Recognized '"else"',	Shortest string "else"
-UpdatePosition(yytext); return 465;
-            break;
-        case 284: // Recognized '"enum"',	Shortest string "enum"
-UpdatePosition(yytext); return 483;
-            break;
-        case 292: // Recognized '"abstract"',	Shortest string "abstract"
+        case 128: // Recognized '"get"',	Shortest string "get"
 UpdatePosition(yytext); return 494;
             break;
-        case 298: // Recognized '"assembly"',	Shortest string "assembly"
+        case 132: // Recognized '"for"',	Shortest string "for"
+UpdatePosition(yytext); return 474;
+            break;
+        case 135: // Recognized '"float"',	Shortest string "float"
+UpdatePosition(yytext); return 413;
+            break;
+        case 140: // Recognized '"finally"',	Shortest string "finally"
+UpdatePosition(yytext); return 480;
+            break;
+        case 147: // Recognized '"object"',	Shortest string "object"
+UpdatePosition(yytext); return 424;
+            break;
+        case 153: // Recognized '"override"',	Shortest string "override"
+UpdatePosition(yytext); return 504;
+            break;
+        case 154: // Recognized '"out"',	Shortest string "out"
+UpdatePosition(yytext); return 404;
+            break;
+        case 157: // Recognized '"long"',	Shortest string "long"
+UpdatePosition(yytext); return 422;
+            break;
+        case 159: // Recognized '"if"',	Shortest string "if"
+UpdatePosition(yytext); return 471;
+            break;
+        case 160: // Recognized '"int"',	Shortest string "int"
+UpdatePosition(yytext); return 420;
+            break;
+        case 167: // Recognized '"interface"',	Shortest string "interface"
+UpdatePosition(yytext); return 493;
+            break;
+        case 169: // Recognized '"internal"',	Shortest string "internal"
+UpdatePosition(yytext); return 500;
+            break;
+        case 174: // Recognized '"while"',	Shortest string "while"
+UpdatePosition(yytext); return 476;
+            break;
+        case 176: // Recognized '"where"',	Shortest string "where"
+UpdatePosition(yytext); return 505;
+            break;
+        case 182: // Recognized '"ulong"',	Shortest string "ulong"
+UpdatePosition(yytext); return 423;
+            break;
+        case 184: // Recognized '"uint"',	Shortest string "uint"
+UpdatePosition(yytext); return 421;
+            break;
+        case 188: // Recognized '"using"',	Shortest string "using"
+UpdatePosition(yytext); return 402;
+            break;
+        case 191: // Recognized '"ushort"',	Shortest string "ushort"
+UpdatePosition(yytext); return 419;
+            break;
+        case 194: // Recognized '"ref"',	Shortest string "ref"
+UpdatePosition(yytext); return 405;
+            break;
+        case 197: // Recognized '"return"',	Shortest string "return"
+UpdatePosition(yytext); return 477;
+            break;
+        case 203: // Recognized '"this"',	Shortest string "this"
+UpdatePosition(yytext); return 427;
+            break;
+        case 205: // Recognized '"throw"',	Shortest string "throw"
+UpdatePosition(yytext); return 475;
+            break;
+        case 209: // Recognized '"typeof"',	Shortest string "typeof"
+UpdatePosition(yytext); return 406;
+            break;
+        case 210: // Recognized '"try"',	Shortest string "try"
+UpdatePosition(yytext); return 478;
+            break;
+        case 213: // Recognized '"true|false"',	Shortest string "true|false"
+UpdatePosition(yytext); return 425;
+            break;
+        case 220: // Recognized '"const"',	Shortest string "const"
+UpdatePosition(yytext); return 503;
+            break;
+        case 223: // Recognized '"class"',	Shortest string "class"
+UpdatePosition(yytext); return 490;
+            break;
+        case 225: // Recognized '"char"',	Shortest string "char"
+UpdatePosition(yytext); return 412;
+            break;
+        case 228: // Recognized '"catch"',	Shortest string "catch"
 UpdatePosition(yytext); return 479;
             break;
-        case 303: // Recognized '"null"',	Shortest string "null"
+        case 235: // Recognized '"public"',	Shortest string "public"
+UpdatePosition(yytext); return 497;
+            break;
+        case 243: // Recognized '"protected"',	Shortest string "protected"
+UpdatePosition(yytext); return 499;
+            break;
+        case 247: // Recognized '"private"',	Shortest string "private"
+UpdatePosition(yytext); return 498;
+            break;
+        case 252: // Recognized '"partial"',	Shortest string "partial"
+UpdatePosition(yytext); return 489;
+            break;
+        case 259: // Recognized '"sbyte"',	Shortest string "sbyte"
+UpdatePosition(yytext); return 416;
+            break;
+        case 262: // Recognized '"short"',	Shortest string "short"
 UpdatePosition(yytext); return 418;
             break;
+        case 268: // Recognized '"string"',	Shortest string "string"
+UpdatePosition(yytext); return 410;
+            break;
+        case 270: // Recognized '"struct"',	Shortest string "struct"
+UpdatePosition(yytext); return 492;
+            break;
+        case 273: // Recognized '"static"',	Shortest string "static"
+UpdatePosition(yytext); return 501;
+            break;
+        case 274: // Recognized '"set"',	Shortest string "set"
+UpdatePosition(yytext); return 495;
+            break;
+        case 280: // Recognized '"event"',	Shortest string "event"
+UpdatePosition(yytext); return 496;
+            break;
+        case 282: // Recognized '"else"',	Shortest string "else"
+UpdatePosition(yytext); return 473;
+            break;
+        case 284: // Recognized '"enum"',	Shortest string "enum"
+UpdatePosition(yytext); return 491;
+            break;
+        case 292: // Recognized '"abstract"',	Shortest string "abstract"
+UpdatePosition(yytext); return 502;
+            break;
+        case 298: // Recognized '"assembly"',	Shortest string "assembly"
+UpdatePosition(yytext); return 487;
+            break;
+        case 303: // Recognized '"null"',	Shortest string "null"
+UpdatePosition(yytext); return 426;
+            break;
         case 304: // Recognized '"new"',	Shortest string "new"
-UpdatePosition(yytext); return 401;
+UpdatePosition(yytext); return 409;
             break;
         case 309: // Recognized '"nameof"',	Shortest string "nameof"
-UpdatePosition(yytext); return 399;
+UpdatePosition(yytext); return 407;
             break;
         case 313: // Recognized '"namespace"',	Shortest string "namespace"
-UpdatePosition(yytext); return 393;
+UpdatePosition(yytext); return 401;
             break;
         default:
             break;
