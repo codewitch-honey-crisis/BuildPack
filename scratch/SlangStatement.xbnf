@@ -48,7 +48,11 @@ LabelStatement= identifier ":" : where {
 	return colon==context.SymbolId;
 }
 StatementOrBlock = (Statement | StatementBlock);
-Statement<start,shared>=
+// use a virtual here. Primarily delegating to InnerStatement
+// but we need to grab comments
+Statement<start,virtual, firsts="InnerStatement",follows="InnerStatement rbrace #EOS"> { return _ParseStatement(context); } 
+	: where {return true;}
+InnerStatement<dependency,collapsed,follows="InnerStatement rbrace #EOS">=
 	EmptyStatement	|
 	VariableDeclarationOrLabelOrExpressionStatement | 
 	IfStatement		|
@@ -57,7 +61,8 @@ Statement<start,shared>=
 	WhileStatement	|
 	ReturnStatement |
 	GotoStatement	|
-	TryStatement	;
+	TryStatement	|
+	ThrowStatement	;
 	
 Statements<shared,follows="#EOS"> = {Statement};
 StatementBlock= "{" {Statement} "}";
@@ -78,5 +83,5 @@ semi=";";
 varType="var";
 colon=":";
 directive<skipped>='#[A-Za-z]+[\t ]*[^\n]*';
-lineComment<skipped>='\/\/[^\n]*';
+lineComment<skipped>='(\/\/[^\n]*[\n])+';
 blockComment<skipped,blockEnd="*/">="/*";

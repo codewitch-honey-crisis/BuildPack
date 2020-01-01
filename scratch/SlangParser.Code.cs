@@ -239,6 +239,39 @@ namespace CD
 			var line = context.Line;
 			var column = context.Column;
 			var position = context.Position;
+			var cc = new List<ParseNode>();
+			var l = line;
+			var c = column;
+			var p = position;
+			
+			if (null != context.Skipped)
+			{
+				for (var i = 0; i < context.Skipped.Length; i++)
+				{
+					var t = context.Skipped[i];
+					if (StatementParser.lineComment == t.SymbolId)
+					{
+						cc.Add(new ParseNode(t.SymbolId, "lineComment", t.Value, t.Line, t.Column, t.Position));
+					}
+					else if (StatementParser.blockComment == t.SymbolId)
+						cc.Add(new ParseNode(t.SymbolId, "blockComment", t.Value, t.Line, t.Column, t.Position));
+				}
+				if (0 < context.Skipped.Length)
+				{
+					var tt = context.Skipped[0];
+					l = tt.Line;
+					c = tt.Column;
+					p = tt.Position;
+				}
+			}
+			if (context.Value == "ParseNode")
+				System.Diagnostics.Debugger.Break();
+
+			var cpn = new ParseNode(StatementParser.Comments, "Comments", cc.ToArray(), l, c, p);
+			line = context.Line;
+			column = context.Column;
+			position = context.Position;
+
 			var attrs = new List<ParseNode>();
 			var seen = new HashSet<string>();
 			ParseNode customAttributes;
@@ -258,7 +291,7 @@ namespace CD
 				constKeyword == context.SymbolId)
 			{
 				if (!seen.Add(context.Value))
-					context.Error("Duplicate attribute {0} specified in member", context.Value);
+					context.Error(string.Format("Duplicate attribute {0} specified in member", context.Value));
 				attrs.Add(new ParseNode(context.SymbolId, string.Concat(context.Value, "Keyword"), context.Value, context.Line, context.Column, context.Position));
 				context.Advance();
 			}
@@ -289,16 +322,17 @@ namespace CD
 				// event
 				if (seen.Contains("const"))
 					context.Error("Events cannot be const.");
-				var children = new ParseNode[5];
-				children[0] = new ParseNode(MemberAttributes, "MemberAttributes", attrs.ToArray(), line, column, position);
-				children[1] = new ParseNode(eventKeyword, "eventKeyword", context.Value, context.Line, context.Column, context.Position);
+				var children = new List<ParseNode>(6);
+				children.Add(cpn);
+				children.Add(new ParseNode(MemberAttributes, "MemberAttributes", attrs.ToArray(), line, column, position));
+				children.Add(new ParseNode(eventKeyword, "eventKeyword", context.Value, context.Line, context.Column, context.Position));
 				context.Advance();
-				children[2] = ExpressionParser.ParseType(context);
-				children[3] = ExpressionParser.ParseIdentifier(context);
+				children.Add(ExpressionParser.ParseType(context));
+				children.Add(ExpressionParser.ParseIdentifier(context));
 				if (semi != context.SymbolId)
 					context.Error("Expecting ; in event declaration");
-				children[4] = new ParseNode(semi, "semi", ";", context.Line, context.Column, context.Position);
-				return new ParseNode(Event, "Event", children, line, column, position);
+				children.Add(new ParseNode(semi, "semi", ";", context.Line, context.Column, context.Position));
+				return new ParseNode(Event, "Event", children.ToArray(), line, column, position);
 			}
 			if (classKeyword == context.SymbolId ||
 					structKeyword == context.SymbolId ||
@@ -311,15 +345,16 @@ namespace CD
 					context.Error("Nested types cannot be const.");
 				if (seen.Contains("static"))
 					context.Error("Types cannot be static in Slang.");
-				return _ParseTypeDecl(context, true,customAttributes, line, column, position, attrs);
+				return _ParseTypeDecl(context, true,cpn,customAttributes, line, column, position, attrs);
 			}
+			if (373 == context.Line)
+				System.Diagnostics.Debugger.Break();
 			// backtrack a little to see if it's a constructor
 			// not doing so makes this much more difficult
 			var pc2 = context.GetLookAhead(true);
 			var isCtor = false;
 			if (context.SymbolId == verbatimIdentifier || context.SymbolId == identifier2)
 			{
-				ExpressionParser.ParseIdentifier(pc2);
 				if (lparen == pc2.SymbolId)
 				{
 					isCtor = true;
@@ -329,10 +364,13 @@ namespace CD
 			{
 				if (pc2.SymbolId != voidType)
 				{
+
 					ExpressionParser.ParseType(pc2);
 				}
+				if (lparen != pc2.SymbolId)
+					pc2.Advance();
 			}
-			pc2.Advance();
+			
 			bool hasAssign = false;
 			if (!isCtor && (semi == pc2.SymbolId || (hasAssign = (eq == pc2.SymbolId))))
 			{
@@ -377,10 +415,10 @@ namespace CD
 				{
 					children.Add(new ParseNode(colon, "colon", ":", context.Line, context.Column, context.Position));
 					context.Advance();
-					var cc = ParseConstructorChain(context);
-					if ("base" == cc.Children[0].Value && seen.Contains("static"))
+					var ccc = ParseConstructorChain(context);
+					if ("base" == ccc.Children[0].Value && seen.Contains("static"))
 						context.Error("Static constructors cannot have \"base\" constructor chains.");
-					children.Add(cc);
+					children.Add(ccc);
 				}
 				if (lbrace != context.SymbolId)
 					context.Error("Expecting body in constructor");
@@ -521,7 +559,7 @@ namespace CD
 				children.Add(ParseMember(context));
 			return new ParseNode(Members, "Members", children.ToArray(), line, column, position);
 		}
-		static ParseNode _ParseTypeDecl(ParserContext context, bool isNested, ParseNode customAttributes, int line, int column, long position, List<ParseNode> attrs)
+		static ParseNode _ParseTypeDecl(ParserContext context, bool isNested, ParseNode comments,ParseNode customAttributes, int line, int column, long position, List<ParseNode> attrs)
 		{
 			
 			var children = new List<ParseNode>();
@@ -569,6 +607,10 @@ namespace CD
 			}
 			else
 			{
+				if(null!=comments)
+				{
+					children.Add(comments);
+				}
 				if (null != customAttributes)
 					children.Add(customAttributes);
 				else
@@ -707,6 +749,40 @@ namespace CD
 	}
 	partial class StatementParser
 	{
+		static ParseNode _ParseStatement(ParserContext context)
+		{
+			var line = context.Line;
+			var column = context.Column;
+			var position = context.Position;
+			var cc = new List<ParseNode>();
+			var l = line;
+			var c = column;
+			var p = position;
+			if (null != context.Skipped)
+			{
+				for (var i = 0; i < context.Skipped.Length; i++)
+				{
+					var t = context.Skipped[i];
+					if (StatementParser.lineComment == t.SymbolId)
+					{
+						cc.Add(new ParseNode(t.SymbolId, "lineComment", t.Value, t.Line, t.Column, t.Position));
+					}
+					else if (StatementParser.blockComment == t.SymbolId)
+						cc.Add(new ParseNode(t.SymbolId, "blockComment", t.Value, t.Line, t.Column, t.Position));
+				}
+				if (0 < context.Skipped.Length)
+				{
+					var tt = context.Skipped[0];
+					l = tt.Line;
+					c = tt.Column;
+					p = tt.Position;
+				}
+			}
+			var children = new List<ParseNode>();
+			children.Add(new ParseNode(StatementParser.Comments, "Comments", cc.ToArray(), l, c, p));
+			children.AddRange(ParseInnerStatement(context).Children);
+			return new ParseNode(Statement, "Statement", children.ToArray(), line, column, position);
+		}
 		static ParseNode _ParseIfStatement(ParserContext context)
 		{
 			var line = context.Line;

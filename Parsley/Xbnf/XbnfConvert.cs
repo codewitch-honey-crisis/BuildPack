@@ -217,52 +217,30 @@ namespace Parsley
 							}
 						}
 					}
-					if (!isHidden || null != blockEnd)
+					decls.Append("\t{ ");
+					if (null!=blockEnd)
 					{
-						decls.Append("\t{ ");
-						if (null != blockEnd)
-						{
-							decls.Append("if(!_TryReadUntilBlockEnd(");
-							decls.Append(string.Concat("\"", _EscapeLiteral(blockEnd, false), "\")"));
-							decls.Append(") return -1;");
-							if (isHidden)
-							{
-								// hide it
-								decls.Append("UpdatePosition(yytext); return yylex();");
-							} else if(isSkipped)
-							{
-								decls.Append("UpdatePosition(yytext); return Skip("+id.ToString()+");");
-							}
-						}
-						if (!isHidden)
-						{
-							if (!isSkipped)
-							{
-								decls.Append("UpdatePosition(yytext); return ");
-								decls.Append(id.ToString());
-								decls.Append(";");
-							} else
-							{
-								decls.Append("UpdatePosition(yytext); return Skip(");
-								decls.Append(id.ToString());
-								decls.Append(");");
-							}
-						}
-						decls.AppendLine(" }");
+						decls.Append("if(!_TryReadUntilBlockEnd(");
+						decls.Append(string.Concat("\"", _EscapeLiteral(blockEnd, false), "\")"));
+						decls.Append(") { UpdatePosition(yytext); return -1; } ");
 					}
-					else
+					decls.Append("UpdatePosition(yytext); ");
+					if(isHidden)
 					{
-						if (isSkipped)
-						{
-							decls.Append("\t { UpdatePosition(yytext); return Skip("+id.ToString()+"); }");
-							decls.AppendLine();
-						}
-						else
-						{
-							decls.Append("\t { UpdatePosition(yytext); return yylex(); }");
-							decls.AppendLine();
-						}
+						decls.Append("return yylex();");
+					} else if(isSkipped)
+					{
+						decls.Append("return Skip(");
+						decls.Append(id.ToString());
+						decls.Append(");");
+					} else
+					{
+						decls.Append("return ");
+						decls.Append(id.ToString());
+						decls.Append(";");
 					}
+					decls.AppendLine(" }");
+					
 				}
 				else System.Diagnostics.Debugger.Break();
 			}

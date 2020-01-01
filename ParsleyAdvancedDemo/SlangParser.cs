@@ -18327,17 +18327,11 @@ namespace CD {
             }
             return false;
         }
-        public void Error(string message, object arg1, object arg2, object arg3) {
-            throw new SyntaxException(string.Format(message, arg1, arg2, arg3), this.Line, this.Column, this.Position);
-        }
-        public void Error(string message, object arg1, object arg2) {
-            throw new SyntaxException(string.Format(message, arg1, arg2), this.Line, this.Column, this.Position);
-        }
-        public void Error(string message, object arg) {
-            throw new SyntaxException(string.Format(message, arg), this.Line, this.Column, this.Position);
+        public void Error(string message, int line, int column, long position) {
+            throw new SyntaxException(string.Format((message + " at line {0}, column {1}, position"), line, column, position), line, column, position);
         }
         public void Error(string message) {
-            throw new SyntaxException(message, this.Line, this.Column, this.Position);
+            this.Error(message, this.Line, this.Column, this.Position);
         }
         public void Dispose() {
             this._e.Dispose();

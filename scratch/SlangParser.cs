@@ -12,29 +12,7 @@ namespace CD {
     using System;
     using System.Collections.Generic;
     
-    /// <summary>Parses the following grammar:
-    /// NamespaceName= Identifier { "." Identifier };
-    /// UsingDirective= "using" NamespaceName ";";
-    /// CompileUnit;
-    /// Namespace;
-    /// namespaceKeyword= "namespace";
-    /// usingKeyword= "using";
-    /// </summary>
-    /// <remarks>The rules for the factored grammar are as follows:
-    /// UsingDirective -> usingKeyword NamespaceName semi
-    /// CompileUnit ->
-    /// NamespaceNameList -> dot Identifier NamespaceNameListRightAssoc
-    /// Namespace -> namespaceKeyword
-    /// NamespaceNameFollows -> NamespaceName lbrace
-    /// NamespaceFollows -> Namespace rbrace
-    /// NamespaceNameListRightAssoc -> dot Identifier NamespaceNameListRightAssoc
-    /// NamespaceNameListRightAssoc ->
-    /// NamespaceName -> Identifier NamespaceNamePart
-    /// NamespaceNamePart -> NamespaceNameList
-    /// NamespaceNamePart ->
-    /// Identifier -> verbatimIdentifier
-    /// Identifier -> identifier
-    /// </remarks>
+    /// <summary>Parses the indicated grammar. Refer to C:\dev\BuildPack\scratch\Slang.xbnf</summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal partial class SlangParser {
         internal const int ErrorSymbol = -1;
@@ -49,14 +27,14 @@ namespace CD {
         public const int NamespaceName = 7;
         public const int NamespaceNamePart = 8;
         public const int Identifier = 22;
-        public const int namespaceKeyword = 364;
-        public const int usingKeyword = 365;
-        public const int verbatimIdentifier = 366;
-        public const int identifier2 = 393;
-        public const int lbrace = 426;
-        public const int rbrace = 427;
-        public const int dot = 430;
-        public const int semi = 444;
+        public const int namespaceKeyword = 393;
+        public const int usingKeyword = 394;
+        public const int verbatimIdentifier = 395;
+        public const int identifier2 = 422;
+        public const int lbrace = 455;
+        public const int rbrace = 456;
+        public const int dot = 459;
+        public const int semi = 473;
         internal static ParseNode ParseUsingDirective(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
@@ -221,432 +199,7 @@ namespace CD {
             throw new SyntaxException(string.Format("Expecting NamespaceNameList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
     }
-    /// <summary>Parses the following grammar:
-    /// Expression= AssignExpression;
-    /// RelationalExpression= TermExpression { ( "<" | "<=" | ">" | ">=" ) TermExpression };
-    /// EqualityExpression= RelationalExpression { ( "==" | "!=" ) RelationalExpression };
-    /// BitwiseAndExpression= EqualityExpression { "&" EqualityExpression };
-    /// BitwiseOrExpression= BitwiseAndExpression { "|" BitwiseAndExpression };
-    /// AndExpression= BitwiseOrExpression { "&&" BitwiseOrExpression };
-    /// OrExpression= AndExpression { "||" AndExpression };
-    /// AssignExpression= OrExpression { ( "=" | "+=" | "-=" | "*=" | "/=" | "%=" | "&=" | "|=" ) OrExpression };
-    /// TermExpression= FactorExpression { ( "+" | "-" ) FactorExpression };
-    /// FactorExpression= UnaryExpression { ( "*" | "/" | "%" ) UnaryExpression };
-    /// MemberFieldRef= "." Identifier;
-    /// MemberInvokeRef= "(" [ MethodArg { "," MethodArg } ] ")";
-    /// MemberIndexerRef= "[" Expression { "," Expression } "]";
-    /// {MemberAnyRef}= MemberFieldRef | MemberInvokeRef | MemberIndexerRef;
-    /// MethodArg= [ outKeyword | refKeyword ] Expression;
-    /// TypeRef= Type;
-    /// IntrinsicType= boolType | charType | stringType | floatType | doubleType | decimalType | sbyteType | byteType | shortType | ushortType | intType | uintType | longType | ulongType | objectType;
-    /// TypeBase= identifier { "." identifier } | IntrinsicType;
-    /// Type= TypeElement { TypeArraySpec };
-    /// TypeElement= TypeBase [ TypeGenericPart ];
-    /// TypeGenericPart= "<" [ Type { "," Type } ] ">";
-    /// TypeArraySpec= "[" { TypeArraySpecRank } "]";
-    /// TypeArraySpecRank= comma;
-    /// CastExpression;
-    /// ArraySpec;
-    /// NewExpression= newKeyword TypeElement ( NewObjectPart | NewArrayPart );
-    /// {NewObjectPart}= "(" [ Expression { "," Expression } ] ")";
-    /// {NewArrayPart}= ArraySpec;
-    /// {TypeCastExpressionPart}= Type ")";
-    /// {ArraySpecExpressionList}= Expression { "," Expression } "]";
-    /// ArrayInitializer= "=" "{" [ Expression { "," Expression } ] "}";
-    /// {SubExpression}= "(" Expression ")";
-    /// UnaryExpression= ( "+" | "-" | "!" ) UnaryExpression | ( "++" | "--" ) PrimaryExpression | SubExpression | PrimaryExpression;
-    /// FieldRef= Identifier { MemberAnyRef };
-    /// TypeOrFieldRef;
-    /// PrimaryExpression= TypeOrFieldRef { MemberAnyRef } | verbatimStringLiteral { MemberAnyRef } | characterLiteral { MemberAnyRef } | integerLiteral { MemberAnyRef } | floatLiteral { MemberAnyRef } | stringLiteral { MemberAnyRef } | boolLiteral { MemberAnyRef } | nullLiteral | CastExpression | typeOf "(" Type ")" { MemberAnyRef } | nameOf "(" Identifier ")" { MemberAnyRef } | defaultOf "(" Type ")" { MemberAnyRef } | NewExpression { MemberAnyRef } | thisRef { MemberAnyRef } | baseRef { MemberAnyRef };
-    /// {Identifier}= verbatimIdentifier | identifier;
-    /// verbatimIdentifier= '@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
-    /// outKeyword= "out";
-    /// refKeyword= "ref";
-    /// typeOf= "typeof";
-    /// nameOf= "nameOf";
-    /// defaultOf= "default";
-    /// newKeyword= "new";
-    /// stringType= "string";
-    /// boolType= "bool";
-    /// charType= "char";
-    /// floatType= "float";
-    /// doubleType= "double";
-    /// decimalType= "decimal";
-    /// sbyteType= "sbyte";
-    /// byteType= "byte";
-    /// shortType= "short";
-    /// ushortType= "ushort";
-    /// intType= "int";
-    /// uintType= "uint";
-    /// longType= "long";
-    /// ulongType= "ulong";
-    /// objectType= "object";
-    /// boolLiteral= "true|false";
-    /// nullLiteral= "null";
-    /// thisRef= "this";
-    /// baseRef= "base";
-    /// verbatimStringLiteral= '@"([^"|""])*"';
-    /// identifier= '(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
-    /// stringLiteral= '"([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*"';
-    /// characterLiteral= '[\u0027]([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})[\u0027]';
-    /// lte= "<=";
-    /// lt= "<";
-    /// gte= ">=";
-    /// gt= ">";
-    /// eqEq= "==";
-    /// notEq= "!=";
-    /// eq= "=";
-    /// inc= "++";
-    /// addAssign= "+=";
-    /// add= "+";
-    /// dec= "--";
-    /// subAssign= "-=";
-    /// sub= "-";
-    /// mulAssign= "*=";
-    /// mul= "*";
-    /// divAssign= "/=";
-    /// div= "/";
-    /// modAssign= "%=";
-    /// mod= "%";
-    /// and= "&&";
-    /// bitwiseAndAssign= "&=";
-    /// bitwiseAnd= "&";
-    /// or= "||";
-    /// bitwiseOrAssign= "|=";
-    /// bitwiseOr= "|";
-    /// not= "!";
-    /// lbracket= "[";
-    /// rbracket= "]";
-    /// lparen= "(";
-    /// rparen= ")";
-    /// lbrace= "{";
-    /// rbrace= "}";
-    /// comma= ",";
-    /// colonColon= "::";
-    /// dot= ".";
-    /// integerLiteral= '(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)?';
-    /// floatLiteral= '(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)';
-    /// (whitespace)= '[ \t\r\n\v\f]+';
-    /// </summary>
-    /// <remarks>The rules for the factored grammar are as follows:
-    /// Expression -> AssignExpression
-    /// MemberFieldRef -> dot Identifier
-    /// MemberAnyRef -> MemberFieldRef
-    /// MemberAnyRef -> MemberInvokeRef
-    /// MemberAnyRef -> MemberIndexerRef
-    /// MethodArg -> outKeyword Expression
-    /// MethodArg -> refKeyword Expression
-    /// MethodArg -> Expression
-    /// TypeRef -> Type
-    /// IntrinsicType -> boolType
-    /// IntrinsicType -> charType
-    /// IntrinsicType -> stringType
-    /// IntrinsicType -> floatType
-    /// IntrinsicType -> doubleType
-    /// IntrinsicType -> decimalType
-    /// IntrinsicType -> sbyteType
-    /// IntrinsicType -> byteType
-    /// IntrinsicType -> shortType
-    /// IntrinsicType -> ushortType
-    /// IntrinsicType -> intType
-    /// IntrinsicType -> uintType
-    /// IntrinsicType -> longType
-    /// IntrinsicType -> ulongType
-    /// IntrinsicType -> objectType
-    /// TypeBase -> IntrinsicType
-    /// TypeArraySpecRank -> comma
-    /// NewArrayPart -> ArraySpec
-    /// TypeCastExpressionPart -> Type rparen
-    /// SubExpression -> lparen Expression rparen
-    /// UnaryExpression -> add UnaryExpression
-    /// UnaryExpression -> sub UnaryExpression
-    /// UnaryExpression -> not UnaryExpression
-    /// UnaryExpression -> inc PrimaryExpression
-    /// UnaryExpression -> dec PrimaryExpression
-    /// UnaryExpression -> SubExpression
-    /// UnaryExpression -> PrimaryExpression
-    /// PrimaryExpression -> nullLiteral
-    /// PrimaryExpression -> CastExpression
-    /// Identifier -> verbatimIdentifier
-    /// Identifier -> identifier
-    /// NamespaceNameList -> dot Identifier NamespaceNameListRightAssoc
-    /// RelationalExpressionList -> lt TermExpression RelationalExpressionListRightAssoc RelationalExpressionListRightAssoc2 RelationalExpressionListRightAssoc3
-    /// RelationalExpressionList -> lte TermExpression RelationalExpressionListRightAssoc RelationalExpressionListRightAssoc2 RelationalExpressionListRightAssoc3
-    /// RelationalExpressionList -> gt TermExpression RelationalExpressionListRightAssoc RelationalExpressionListRightAssoc2 RelationalExpressionListRightAssoc3
-    /// RelationalExpressionList -> gte TermExpression RelationalExpressionListRightAssoc RelationalExpressionListRightAssoc2 RelationalExpressionListRightAssoc3
-    /// EqualityExpressionList -> eqEq RelationalExpression EqualityExpressionListRightAssoc EqualityExpressionListRightAssoc2
-    /// EqualityExpressionList -> notEq RelationalExpression EqualityExpressionListRightAssoc EqualityExpressionListRightAssoc2
-    /// BitwiseAndExpressionList -> bitwiseAnd EqualityExpression BitwiseAndExpressionListRightAssoc
-    /// BitwiseOrExpressionList -> bitwiseOr BitwiseAndExpression BitwiseOrExpressionListRightAssoc
-    /// AndExpressionList -> and BitwiseOrExpression AndExpressionListRightAssoc
-    /// OrExpressionList -> or AndExpression OrExpressionListRightAssoc
-    /// AssignExpressionList -> eq OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> addAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> subAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> mulAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> divAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> modAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> bitwiseAndAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> bitwiseOrAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// TermExpressionList -> add FactorExpression TermExpressionListRightAssoc TermExpressionListRightAssoc2
-    /// TermExpressionList -> sub FactorExpression TermExpressionListRightAssoc TermExpressionListRightAssoc2
-    /// FactorExpressionList -> mul UnaryExpression FactorExpressionListRightAssoc FactorExpressionListRightAssoc2 FactorExpressionListRightAssoc3
-    /// FactorExpressionList -> div UnaryExpression FactorExpressionListRightAssoc FactorExpressionListRightAssoc2 FactorExpressionListRightAssoc3
-    /// FactorExpressionList -> mod UnaryExpression FactorExpressionListRightAssoc FactorExpressionListRightAssoc2 FactorExpressionListRightAssoc3
-    /// MemberInvokeRefList -> comma MethodArg MemberInvokeRefListRightAssoc
-    /// MemberIndexerRefList -> comma Expression MemberIndexerRefListRightAssoc
-    /// TypeBaseList -> dot identifier TypeBaseListRightAssoc
-    /// TypeArraySpecList -> TypeArraySpec TypeArraySpecListRightAssoc
-    /// TypeGenericPartList -> comma Type TypeGenericPartListRightAssoc
-    /// TypeArraySpecRankList -> TypeArraySpecRank TypeArraySpecRankListRightAssoc
-    /// NewObjectPartList -> comma Expression NewObjectPartListRightAssoc
-    /// ArraySpecExpressionListList -> comma Expression ArraySpecExpressionListListRightAssoc
-    /// ArrayInitializerList -> comma Expression ArrayInitializerListRightAssoc
-    /// MemberAnyRefList -> MemberAnyRef MemberAnyRefListRightAssoc
-    /// MemberAnyRefList2 -> MemberAnyRef MemberAnyRefList2RightAssoc
-    /// MemberAnyRefList3 -> MemberAnyRef MemberAnyRefList3RightAssoc
-    /// MemberAnyRefList4 -> MemberAnyRef MemberAnyRefList4RightAssoc
-    /// MemberAnyRefList5 -> MemberAnyRef MemberAnyRefList5RightAssoc
-    /// MemberAnyRefList6 -> MemberAnyRef MemberAnyRefList6RightAssoc
-    /// MemberAnyRefList7 -> MemberAnyRef MemberAnyRefList7RightAssoc
-    /// MemberAnyRefList8 -> MemberAnyRef MemberAnyRefList8RightAssoc
-    /// MemberAnyRefList9 -> MemberAnyRef MemberAnyRefList9RightAssoc
-    /// MemberAnyRefList10 -> MemberAnyRef MemberAnyRefList10RightAssoc
-    /// MemberAnyRefList11 -> MemberAnyRef MemberAnyRefList11RightAssoc
-    /// MemberAnyRefList12 -> MemberAnyRef MemberAnyRefList12RightAssoc
-    /// MemberAnyRefList13 -> MemberAnyRef MemberAnyRefList13RightAssoc
-    /// MemberAnyRefList14 -> MemberAnyRef MemberAnyRefList14RightAssoc
-    /// CastExpression -> lparen
-    /// ArraySpec -> lbracket
-    /// TypeOrFieldRef -> verbatimIdentifier
-    /// TypeOrFieldRef -> identifier
-    /// TypeOrFieldRef -> boolType
-    /// TypeOrFieldRef -> charType
-    /// TypeOrFieldRef -> stringType
-    /// TypeOrFieldRef -> floatType
-    /// TypeOrFieldRef -> doubleType
-    /// TypeOrFieldRef -> decimalType
-    /// TypeOrFieldRef -> sbyteType
-    /// TypeOrFieldRef -> byteType
-    /// TypeOrFieldRef -> shortType
-    /// TypeOrFieldRef -> ushortType
-    /// TypeOrFieldRef -> intType
-    /// TypeOrFieldRef -> uintType
-    /// TypeOrFieldRef -> longType
-    /// TypeOrFieldRef -> ulongType
-    /// TypeOrFieldRef -> objectType
-    /// ExpressionFollows -> Expression semi
-    /// ExpressionFollows2 -> Expression rparen
-    /// ExpressionFollows3 -> Expression rbracket
-    /// ExpressionFollows4 -> Expression comma
-    /// TypeFollows -> Type verbatimIdentifier
-    /// TypeFollows2 -> Type identifier
-    /// TypeFollows3 -> Type lbrace
-    /// TypeFollows4 -> Type rbracket
-    /// TypeFollows5 -> Type #EOS
-    /// NamespaceNameListRightAssoc -> dot Identifier NamespaceNameListRightAssoc
-    /// NamespaceNameListRightAssoc ->
-    /// RelationalExpressionListRightAssoc -> lt TermExpression RelationalExpressionListRightAssoc
-    /// RelationalExpressionListRightAssoc ->
-    /// RelationalExpressionListRightAssoc2 -> gt TermExpression RelationalExpressionListRightAssoc2
-    /// RelationalExpressionListRightAssoc2 ->
-    /// EqualityExpressionListRightAssoc -> eqEq RelationalExpression EqualityExpressionListRightAssoc
-    /// EqualityExpressionListRightAssoc ->
-    /// BitwiseAndExpressionListRightAssoc -> bitwiseAnd EqualityExpression BitwiseAndExpressionListRightAssoc
-    /// BitwiseAndExpressionListRightAssoc ->
-    /// BitwiseOrExpressionListRightAssoc -> bitwiseOr BitwiseAndExpression BitwiseOrExpressionListRightAssoc
-    /// BitwiseOrExpressionListRightAssoc ->
-    /// AndExpressionListRightAssoc -> and BitwiseOrExpression AndExpressionListRightAssoc
-    /// AndExpressionListRightAssoc ->
-    /// OrExpressionListRightAssoc -> or AndExpression OrExpressionListRightAssoc
-    /// OrExpressionListRightAssoc ->
-    /// AssignExpressionListRightAssoc -> eq OrExpression AssignExpressionListRightAssoc
-    /// AssignExpressionListRightAssoc ->
-    /// AssignExpressionListRightAssoc2 -> subAssign OrExpression AssignExpressionListRightAssoc2
-    /// AssignExpressionListRightAssoc2 ->
-    /// AssignExpressionListRightAssoc3 -> divAssign OrExpression AssignExpressionListRightAssoc3
-    /// AssignExpressionListRightAssoc3 ->
-    /// AssignExpressionListRightAssoc4 -> bitwiseAndAssign OrExpression AssignExpressionListRightAssoc4
-    /// AssignExpressionListRightAssoc4 ->
-    /// TermExpressionListRightAssoc -> add FactorExpression TermExpressionListRightAssoc
-    /// TermExpressionListRightAssoc ->
-    /// FactorExpressionListRightAssoc -> mul UnaryExpression FactorExpressionListRightAssoc
-    /// FactorExpressionListRightAssoc ->
-    /// FactorExpressionListRightAssoc2 -> mod UnaryExpression FactorExpressionListRightAssoc2
-    /// FactorExpressionListRightAssoc2 ->
-    /// MemberInvokeRefListRightAssoc -> comma MethodArg MemberInvokeRefListRightAssoc
-    /// MemberInvokeRefListRightAssoc ->
-    /// MemberIndexerRefListRightAssoc -> comma Expression MemberIndexerRefListRightAssoc
-    /// MemberIndexerRefListRightAssoc ->
-    /// TypeBaseListRightAssoc -> dot identifier TypeBaseListRightAssoc
-    /// TypeBaseListRightAssoc ->
-    /// TypeArraySpecListRightAssoc -> TypeArraySpec TypeArraySpecListRightAssoc
-    /// TypeArraySpecListRightAssoc ->
-    /// TypeGenericPartListRightAssoc -> comma Type TypeGenericPartListRightAssoc
-    /// TypeGenericPartListRightAssoc ->
-    /// TypeArraySpecRankListRightAssoc -> TypeArraySpecRank TypeArraySpecRankListRightAssoc
-    /// TypeArraySpecRankListRightAssoc ->
-    /// NewObjectPartListRightAssoc -> comma Expression NewObjectPartListRightAssoc
-    /// NewObjectPartListRightAssoc ->
-    /// ArraySpecExpressionListListRightAssoc -> comma Expression ArraySpecExpressionListListRightAssoc
-    /// ArraySpecExpressionListListRightAssoc ->
-    /// ArrayInitializerListRightAssoc -> comma Expression ArrayInitializerListRightAssoc
-    /// ArrayInitializerListRightAssoc ->
-    /// MemberAnyRefListRightAssoc -> MemberAnyRef MemberAnyRefListRightAssoc
-    /// MemberAnyRefListRightAssoc ->
-    /// MemberAnyRefList2RightAssoc -> MemberAnyRef MemberAnyRefList2RightAssoc
-    /// MemberAnyRefList2RightAssoc ->
-    /// MemberAnyRefList3RightAssoc -> MemberAnyRef MemberAnyRefList3RightAssoc
-    /// MemberAnyRefList3RightAssoc ->
-    /// MemberAnyRefList4RightAssoc -> MemberAnyRef MemberAnyRefList4RightAssoc
-    /// MemberAnyRefList4RightAssoc ->
-    /// MemberAnyRefList5RightAssoc -> MemberAnyRef MemberAnyRefList5RightAssoc
-    /// MemberAnyRefList5RightAssoc ->
-    /// MemberAnyRefList6RightAssoc -> MemberAnyRef MemberAnyRefList6RightAssoc
-    /// MemberAnyRefList6RightAssoc ->
-    /// MemberAnyRefList7RightAssoc -> MemberAnyRef MemberAnyRefList7RightAssoc
-    /// MemberAnyRefList7RightAssoc ->
-    /// MemberAnyRefList8RightAssoc -> MemberAnyRef MemberAnyRefList8RightAssoc
-    /// MemberAnyRefList8RightAssoc ->
-    /// MemberAnyRefList9RightAssoc -> MemberAnyRef MemberAnyRefList9RightAssoc
-    /// MemberAnyRefList9RightAssoc ->
-    /// MemberAnyRefList10RightAssoc -> MemberAnyRef MemberAnyRefList10RightAssoc
-    /// MemberAnyRefList10RightAssoc ->
-    /// MemberAnyRefList11RightAssoc -> MemberAnyRef MemberAnyRefList11RightAssoc
-    /// MemberAnyRefList11RightAssoc ->
-    /// MemberAnyRefList12RightAssoc -> MemberAnyRef MemberAnyRefList12RightAssoc
-    /// MemberAnyRefList12RightAssoc ->
-    /// MemberAnyRefList13RightAssoc -> MemberAnyRef MemberAnyRefList13RightAssoc
-    /// MemberAnyRefList13RightAssoc ->
-    /// MemberAnyRefList14RightAssoc -> MemberAnyRef MemberAnyRefList14RightAssoc
-    /// MemberAnyRefList14RightAssoc ->
-    /// RelationalExpression -> TermExpression RelationalExpressionPart
-    /// RelationalExpressionPart -> RelationalExpressionList
-    /// RelationalExpressionPart ->
-    /// EqualityExpression -> RelationalExpression EqualityExpressionPart
-    /// EqualityExpressionPart -> EqualityExpressionList
-    /// EqualityExpressionPart ->
-    /// BitwiseAndExpression -> EqualityExpression BitwiseAndExpressionPart
-    /// BitwiseAndExpressionPart -> BitwiseAndExpressionList
-    /// BitwiseAndExpressionPart ->
-    /// BitwiseOrExpression -> BitwiseAndExpression BitwiseOrExpressionPart
-    /// BitwiseOrExpressionPart -> BitwiseOrExpressionList
-    /// BitwiseOrExpressionPart ->
-    /// AndExpression -> BitwiseOrExpression AndExpressionPart
-    /// AndExpressionPart -> AndExpressionList
-    /// AndExpressionPart ->
-    /// OrExpression -> AndExpression OrExpressionPart
-    /// OrExpressionPart -> OrExpressionList
-    /// OrExpressionPart ->
-    /// AssignExpression -> OrExpression AssignExpressionPart
-    /// AssignExpressionPart -> AssignExpressionList
-    /// AssignExpressionPart ->
-    /// TermExpression -> FactorExpression TermExpressionPart
-    /// TermExpressionPart -> TermExpressionList
-    /// TermExpressionPart ->
-    /// FactorExpression -> UnaryExpression FactorExpressionPart
-    /// FactorExpressionPart -> FactorExpressionList
-    /// FactorExpressionPart ->
-    /// MemberInvokeRefPart -> MemberInvokeRefList rparen
-    /// MemberInvokeRefPart -> rparen
-    /// MemberIndexerRef -> lbracket Expression MemberIndexerRefPart
-    /// MemberIndexerRefPart -> MemberIndexerRefList rbracket
-    /// MemberIndexerRefPart -> rbracket
-    /// TypeBase -> identifier TypeBasePart
-    /// TypeBasePart -> TypeBaseList
-    /// TypeBasePart ->
-    /// Type -> TypeElement TypePart
-    /// TypePart -> TypeArraySpecList
-    /// TypePart ->
-    /// TypeElement -> TypeBase TypeElementPart
-    /// TypeElementPart -> TypeGenericPart
-    /// TypeElementPart ->
-    /// TypeGenericPartPart -> TypeGenericPartList gt
-    /// TypeGenericPartPart -> gt
-    /// TypeArraySpec -> lbracket TypeArraySpecPart
-    /// TypeArraySpecPart -> TypeArraySpecRankList rbracket
-    /// TypeArraySpecPart -> rbracket
-    /// NewExpression -> newKeyword TypeElement NewExpressionPart
-    /// NewExpressionPart -> NewObjectPart
-    /// NewExpressionPart -> NewArrayPart
-    /// NewObjectPartPart -> NewObjectPartList rparen
-    /// NewObjectPartPart -> rparen
-    /// ArraySpecExpressionList -> Expression ArraySpecExpressionListPart
-    /// ArraySpecExpressionListPart -> ArraySpecExpressionListList rbracket
-    /// ArraySpecExpressionListPart -> rbracket
-    /// ArrayInitializerPart -> ArrayInitializerList rbrace
-    /// ArrayInitializerPart -> rbrace
-    /// FieldRef -> Identifier FieldRefPart
-    /// FieldRefPart -> MemberAnyRefList
-    /// FieldRefPart ->
-    /// PrimaryExpression -> typeOf lparen Type rparen PrimaryExpressionPart
-    /// PrimaryExpressionPart -> MemberAnyRefList9
-    /// PrimaryExpressionPart ->
-    /// PrimaryExpression -> nameOf lparen Identifier rparen PrimaryExpressionPart2
-    /// PrimaryExpressionPart2 -> MemberAnyRefList10
-    /// PrimaryExpressionPart2 ->
-    /// PrimaryExpression -> defaultOf lparen Type rparen PrimaryExpressionPart3
-    /// PrimaryExpressionPart3 -> MemberAnyRefList11
-    /// PrimaryExpressionPart3 ->
-    /// PrimaryExpression -> TypeOrFieldRef PrimaryExpressionPart4
-    /// PrimaryExpressionPart4 -> MemberAnyRefList2
-    /// PrimaryExpressionPart4 ->
-    /// PrimaryExpression -> verbatimStringLiteral PrimaryExpressionPart5
-    /// PrimaryExpressionPart5 -> MemberAnyRefList3
-    /// PrimaryExpressionPart5 ->
-    /// PrimaryExpression -> characterLiteral PrimaryExpressionPart6
-    /// PrimaryExpressionPart6 -> MemberAnyRefList4
-    /// PrimaryExpressionPart6 ->
-    /// PrimaryExpression -> integerLiteral PrimaryExpressionPart7
-    /// PrimaryExpressionPart7 -> MemberAnyRefList5
-    /// PrimaryExpressionPart7 ->
-    /// PrimaryExpression -> floatLiteral PrimaryExpressionPart8
-    /// PrimaryExpressionPart8 -> MemberAnyRefList6
-    /// PrimaryExpressionPart8 ->
-    /// PrimaryExpression -> stringLiteral PrimaryExpressionPart9
-    /// PrimaryExpressionPart9 -> MemberAnyRefList7
-    /// PrimaryExpressionPart9 ->
-    /// PrimaryExpression -> boolLiteral PrimaryExpressionPart10
-    /// PrimaryExpressionPart10 -> MemberAnyRefList8
-    /// PrimaryExpressionPart10 ->
-    /// PrimaryExpression -> NewExpression PrimaryExpressionPart11
-    /// PrimaryExpressionPart11 -> MemberAnyRefList12
-    /// PrimaryExpressionPart11 ->
-    /// PrimaryExpression -> thisRef PrimaryExpressionPart12
-    /// PrimaryExpressionPart12 -> MemberAnyRefList13
-    /// PrimaryExpressionPart12 ->
-    /// PrimaryExpression -> baseRef PrimaryExpressionPart13
-    /// PrimaryExpressionPart13 -> MemberAnyRefList14
-    /// PrimaryExpressionPart13 ->
-    /// RelationalExpressionListPart -> lte TermExpression
-    /// RelationalExpressionListPart -> gte TermExpression
-    /// AssignExpressionListPart -> addAssign OrExpression
-    /// AssignExpressionListPart -> mulAssign OrExpression
-    /// AssignExpressionListPart -> modAssign OrExpression
-    /// AssignExpressionListPart -> bitwiseOrAssign OrExpression
-    /// EqualityExpressionListRightAssoc2 -> notEq RelationalExpression EqualityExpressionListRightAssoc2
-    /// EqualityExpressionListRightAssoc2 ->
-    /// TermExpressionListRightAssoc2 -> sub FactorExpression TermExpressionListRightAssoc2
-    /// TermExpressionListRightAssoc2 ->
-    /// FactorExpressionListRightAssoc3 -> div UnaryExpression FactorExpressionListRightAssoc3
-    /// FactorExpressionListRightAssoc3 ->
-    /// RelationalExpressionListRightAssoc3 -> RelationalExpressionListPart RelationalExpressionListRightAssoc3
-    /// RelationalExpressionListRightAssoc3 ->
-    /// AssignExpressionListRightAssoc5 -> AssignExpressionListPart AssignExpressionListRightAssoc5
-    /// AssignExpressionListRightAssoc5 ->
-    /// MemberInvokeRef -> lparen MemberInvokeRefPart2
-    /// MemberInvokeRefPart2 -> rparen
-    /// MemberInvokeRefPart2 -> MethodArg MemberInvokeRefPart
-    /// TypeGenericPart -> lt TypeGenericPartPart2
-    /// TypeGenericPartPart2 -> gt
-    /// TypeGenericPartPart2 -> Type TypeGenericPartPart
-    /// NewObjectPart -> lparen NewObjectPartPart2
-    /// NewObjectPartPart2 -> rparen
-    /// NewObjectPartPart2 -> Expression NewObjectPartPart
-    /// ArrayInitializer -> eq lbrace ArrayInitializerPart2
-    /// ArrayInitializerPart2 -> rbrace
-    /// ArrayInitializerPart2 -> Expression ArrayInitializerPart
-    /// </remarks>
+    /// <summary>Parses the indicated grammar. Refer to C:\dev\BuildPack\scratch\SlangExpression.xbnf</summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal partial class ExpressionParser {
         internal const int ErrorSymbol = -1;
@@ -813,74 +366,74 @@ namespace CD {
         public const int NewObjectPartPart2 = 166;
         public const int ArrayInitializer = 167;
         public const int ArrayInitializerPart2 = 168;
-        public const int verbatimIdentifier = 366;
-        public const int outKeyword = 367;
-        public const int refKeyword = 368;
-        public const int typeOf = 369;
-        public const int nameOf = 370;
-        public const int defaultOf = 371;
-        public const int newKeyword = 372;
-        public const int stringType = 373;
-        public const int boolType = 374;
-        public const int charType = 375;
-        public const int floatType = 376;
-        public const int doubleType = 377;
-        public const int decimalType = 378;
-        public const int sbyteType = 379;
-        public const int byteType = 380;
-        public const int shortType = 381;
-        public const int ushortType = 382;
-        public const int intType = 383;
-        public const int uintType = 384;
-        public const int longType = 385;
-        public const int ulongType = 386;
-        public const int objectType = 387;
-        public const int boolLiteral = 388;
-        public const int nullLiteral = 389;
-        public const int thisRef = 390;
-        public const int baseRef = 391;
-        public const int verbatimStringLiteral = 392;
-        public const int identifier2 = 393;
-        public const int stringLiteral = 394;
-        public const int characterLiteral = 395;
-        public const int lte = 396;
-        public const int lt = 397;
-        public const int gte = 398;
-        public const int gt = 399;
-        public const int eqEq = 400;
-        public const int notEq = 401;
-        public const int eq = 402;
-        public const int inc = 403;
-        public const int addAssign = 404;
-        public const int add = 405;
-        public const int dec = 406;
-        public const int subAssign = 407;
-        public const int sub = 408;
-        public const int mulAssign = 409;
-        public const int mul = 410;
-        public const int divAssign = 411;
-        public const int div = 412;
-        public const int modAssign = 413;
-        public const int mod = 414;
-        public const int and = 415;
-        public const int bitwiseAndAssign = 416;
-        public const int bitwiseAnd = 417;
-        public const int or = 418;
-        public const int bitwiseOrAssign = 419;
-        public const int bitwiseOr = 420;
-        public const int not = 421;
-        public const int lbracket = 422;
-        public const int rbracket = 423;
-        public const int lparen = 424;
-        public const int rparen = 425;
-        public const int lbrace = 426;
-        public const int rbrace = 427;
-        public const int comma = 428;
-        public const int dot = 430;
-        public const int integerLiteral = 431;
-        public const int floatLiteral = 432;
-        public const int whitespace = 433;
-        public const int semi = 444;
+        public const int verbatimIdentifier = 395;
+        public const int outKeyword = 396;
+        public const int refKeyword = 397;
+        public const int typeOf = 398;
+        public const int nameOf = 399;
+        public const int defaultOf = 400;
+        public const int newKeyword = 401;
+        public const int stringType = 402;
+        public const int boolType = 403;
+        public const int charType = 404;
+        public const int floatType = 405;
+        public const int doubleType = 406;
+        public const int decimalType = 407;
+        public const int sbyteType = 408;
+        public const int byteType = 409;
+        public const int shortType = 410;
+        public const int ushortType = 411;
+        public const int intType = 412;
+        public const int uintType = 413;
+        public const int longType = 414;
+        public const int ulongType = 415;
+        public const int objectType = 416;
+        public const int boolLiteral = 417;
+        public const int nullLiteral = 418;
+        public const int thisRef = 419;
+        public const int baseRef = 420;
+        public const int verbatimStringLiteral = 421;
+        public const int identifier2 = 422;
+        public const int stringLiteral = 423;
+        public const int characterLiteral = 424;
+        public const int lte = 425;
+        public const int lt = 426;
+        public const int gte = 427;
+        public const int gt = 428;
+        public const int eqEq = 429;
+        public const int notEq = 430;
+        public const int eq = 431;
+        public const int inc = 432;
+        public const int addAssign = 433;
+        public const int add = 434;
+        public const int dec = 435;
+        public const int subAssign = 436;
+        public const int sub = 437;
+        public const int mulAssign = 438;
+        public const int mul = 439;
+        public const int divAssign = 440;
+        public const int div = 441;
+        public const int modAssign = 442;
+        public const int mod = 443;
+        public const int and = 444;
+        public const int bitwiseAndAssign = 445;
+        public const int bitwiseAnd = 446;
+        public const int or = 447;
+        public const int bitwiseOrAssign = 448;
+        public const int bitwiseOr = 449;
+        public const int not = 450;
+        public const int lbracket = 451;
+        public const int rbracket = 452;
+        public const int lparen = 453;
+        public const int rparen = 454;
+        public const int lbrace = 455;
+        public const int rbrace = 456;
+        public const int comma = 457;
+        public const int dot = 459;
+        public const int integerLiteral = 460;
+        public const int floatLiteral = 461;
+        public const int whitespace = 462;
+        public const int semi = 473;
         internal static ParseNode ParseExpression(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
@@ -6921,310 +6474,7 @@ namespace CD {
             throw new SyntaxException(string.Format("Expecting rbrace or Expression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
     }
-    /// <summary>Parses the following grammar:
-    /// Comments;
-    /// EmptyStatement= semi;
-    /// VariableDeclarationStatement= ( varType | Type ) Identifier [ "=" Expression ] ";";
-    /// ExpressionStatement= Expression ";";
-    /// {VariableDeclarationOrLabelOrExpressionStatement}= VariableDeclarationStatement | ExpressionStatement | LabelStatement;
-    /// {ElsePart}= "else" StatementOrBlock;
-    /// {IfStatementPart}= "if" "(" Expression ")" StatementOrBlock;
-    /// IfStatement;
-    /// GotoStatement= "goto" identifier ";";
-    /// {LocalAssignStatement}= ExpressionStatement | VariableDeclarationStatement;
-    /// {ForIncPart}= [ Expression ] ")";
-    /// ForStatement;
-    /// WhileStatement= "while" "(" Expression ")" StatementOrBlock;
-    /// ReturnStatement= "return" Expression ";";
-    /// ThrowStatement= "throw" [ Expression ] ";";
-    /// TryStatement= "try" StatementBlock ( { CatchClause }+ [ FinallyPart ] | FinallyPart );
-    /// CatchClause= "catch" "(" Type [ Identifier ] ")" StatementBlock;
-    /// {FinallyPart}= "finally" StatementBlock;
-    /// LabelStatement= identifier ":";
-    /// StatementOrBlock= Statement | StatementBlock;
-    /// Statement= EmptyStatement | VariableDeclarationOrLabelOrExpressionStatement | IfStatement | GotoStatement | ForStatement | WhileStatement | ReturnStatement | GotoStatement | TryStatement;
-    /// Statements= { Statement };
-    /// StatementBlock= "{" { Statement } "}";
-    /// ifKeyword= "if";
-    /// gotoKeyword= "goto";
-    /// elseKeyword= "else";
-    /// forKeyword= "for";
-    /// throwKeyword= "throw";
-    /// whileKeyword= "while";
-    /// returnKeyword= "return";
-    /// tryKeyword= "try";
-    /// catchKeyword= "catch";
-    /// finallyKeyword= "finally";
-    /// semi= ";";
-    /// varType= "var";
-    /// colon= ":";
-    /// directive= '#[A-Za-z]+[\t ]*[^\n]*';
-    /// lineComment= '\/\/[^\n]*';
-    /// blockComment= "/*";
-    /// </summary>
-    /// <remarks>The rules for the factored grammar are as follows:
-    /// EmptyStatement -> semi
-    /// ExpressionStatement -> Expression semi
-    /// VariableDeclarationOrLabelOrExpressionStatement -> VariableDeclarationStatement
-    /// VariableDeclarationOrLabelOrExpressionStatement -> ExpressionStatement
-    /// VariableDeclarationOrLabelOrExpressionStatement -> LabelStatement
-    /// ElsePart -> elseKeyword StatementOrBlock
-    /// IfStatementPart -> ifKeyword lparen Expression rparen StatementOrBlock
-    /// GotoStatement -> gotoKeyword identifier semi
-    /// LocalAssignStatement -> ExpressionStatement
-    /// LocalAssignStatement -> VariableDeclarationStatement
-    /// ForIncPart -> Expression rparen
-    /// ForIncPart -> rparen
-    /// WhileStatement -> whileKeyword lparen Expression rparen StatementOrBlock
-    /// ReturnStatement -> returnKeyword Expression semi
-    /// FinallyPart -> finallyKeyword StatementBlock
-    /// LabelStatement -> identifier colon
-    /// StatementOrBlock -> Statement
-    /// StatementOrBlock -> StatementBlock
-    /// Statement -> EmptyStatement
-    /// Statement -> VariableDeclarationOrLabelOrExpressionStatement
-    /// Statement -> IfStatement
-    /// Statement -> GotoStatement
-    /// Statement -> ForStatement
-    /// Statement -> WhileStatement
-    /// Statement -> ReturnStatement
-    /// Statement -> TryStatement
-    /// Statements -> StatementList
-    /// Statements ->
-    /// NamespaceNameList -> dot Identifier NamespaceNameListRightAssoc
-    /// RelationalExpressionList -> lt TermExpression RelationalExpressionListRightAssoc RelationalExpressionListRightAssoc2 RelationalExpressionListRightAssoc3
-    /// RelationalExpressionList -> lte TermExpression RelationalExpressionListRightAssoc RelationalExpressionListRightAssoc2 RelationalExpressionListRightAssoc3
-    /// RelationalExpressionList -> gt TermExpression RelationalExpressionListRightAssoc RelationalExpressionListRightAssoc2 RelationalExpressionListRightAssoc3
-    /// RelationalExpressionList -> gte TermExpression RelationalExpressionListRightAssoc RelationalExpressionListRightAssoc2 RelationalExpressionListRightAssoc3
-    /// EqualityExpressionList -> eqEq RelationalExpression EqualityExpressionListRightAssoc EqualityExpressionListRightAssoc2
-    /// EqualityExpressionList -> notEq RelationalExpression EqualityExpressionListRightAssoc EqualityExpressionListRightAssoc2
-    /// BitwiseAndExpressionList -> bitwiseAnd EqualityExpression BitwiseAndExpressionListRightAssoc
-    /// BitwiseOrExpressionList -> bitwiseOr BitwiseAndExpression BitwiseOrExpressionListRightAssoc
-    /// AndExpressionList -> and BitwiseOrExpression AndExpressionListRightAssoc
-    /// OrExpressionList -> or AndExpression OrExpressionListRightAssoc
-    /// AssignExpressionList -> eq OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> addAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> subAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> mulAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> divAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> modAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> bitwiseAndAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> bitwiseOrAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// TermExpressionList -> add FactorExpression TermExpressionListRightAssoc TermExpressionListRightAssoc2
-    /// TermExpressionList -> sub FactorExpression TermExpressionListRightAssoc TermExpressionListRightAssoc2
-    /// FactorExpressionList -> mul UnaryExpression FactorExpressionListRightAssoc FactorExpressionListRightAssoc2 FactorExpressionListRightAssoc3
-    /// FactorExpressionList -> div UnaryExpression FactorExpressionListRightAssoc FactorExpressionListRightAssoc2 FactorExpressionListRightAssoc3
-    /// FactorExpressionList -> mod UnaryExpression FactorExpressionListRightAssoc FactorExpressionListRightAssoc2 FactorExpressionListRightAssoc3
-    /// MemberInvokeRefList -> comma MethodArg MemberInvokeRefListRightAssoc
-    /// MemberIndexerRefList -> comma Expression MemberIndexerRefListRightAssoc
-    /// TypeBaseList -> dot identifier TypeBaseListRightAssoc
-    /// TypeArraySpecList -> TypeArraySpec TypeArraySpecListRightAssoc
-    /// TypeGenericPartList -> comma Type TypeGenericPartListRightAssoc
-    /// TypeArraySpecRankList -> TypeArraySpecRank TypeArraySpecRankListRightAssoc
-    /// NewObjectPartList -> comma Expression NewObjectPartListRightAssoc
-    /// ArraySpecExpressionListList -> comma Expression ArraySpecExpressionListListRightAssoc
-    /// ArrayInitializerList -> comma Expression ArrayInitializerListRightAssoc
-    /// MemberAnyRefList -> MemberAnyRef MemberAnyRefListRightAssoc
-    /// MemberAnyRefList2 -> MemberAnyRef MemberAnyRefList2RightAssoc
-    /// MemberAnyRefList3 -> MemberAnyRef MemberAnyRefList3RightAssoc
-    /// MemberAnyRefList4 -> MemberAnyRef MemberAnyRefList4RightAssoc
-    /// MemberAnyRefList5 -> MemberAnyRef MemberAnyRefList5RightAssoc
-    /// MemberAnyRefList6 -> MemberAnyRef MemberAnyRefList6RightAssoc
-    /// MemberAnyRefList7 -> MemberAnyRef MemberAnyRefList7RightAssoc
-    /// MemberAnyRefList8 -> MemberAnyRef MemberAnyRefList8RightAssoc
-    /// MemberAnyRefList9 -> MemberAnyRef MemberAnyRefList9RightAssoc
-    /// MemberAnyRefList10 -> MemberAnyRef MemberAnyRefList10RightAssoc
-    /// MemberAnyRefList11 -> MemberAnyRef MemberAnyRefList11RightAssoc
-    /// MemberAnyRefList12 -> MemberAnyRef MemberAnyRefList12RightAssoc
-    /// MemberAnyRefList13 -> MemberAnyRef MemberAnyRefList13RightAssoc
-    /// MemberAnyRefList14 -> MemberAnyRef MemberAnyRefList14RightAssoc
-    /// CatchClauseList -> CatchClause CatchClauseListRightAssoc
-    /// StatementList -> Statement StatementListRightAssoc
-    /// StatementList2 -> Statement StatementList2RightAssoc
-    /// IfStatement -> ifKeyword
-    /// ForStatement -> forKeyword
-    /// ExpressionFollows -> Expression semi
-    /// ExpressionFollows2 -> Expression rparen
-    /// ExpressionFollows3 -> Expression rbracket
-    /// ExpressionFollows4 -> Expression comma
-    /// TypeFollows -> Type Identifier
-    /// TypeFollows2 -> Type lbrace
-    /// TypeFollows3 -> Type rbracket
-    /// TypeFollows4 -> Type #EOS
-    /// StatementsFollows -> Statements #EOS
-    /// NamespaceNameListRightAssoc -> dot Identifier NamespaceNameListRightAssoc
-    /// NamespaceNameListRightAssoc ->
-    /// RelationalExpressionListRightAssoc -> lt TermExpression RelationalExpressionListRightAssoc
-    /// RelationalExpressionListRightAssoc ->
-    /// RelationalExpressionListRightAssoc2 -> gt TermExpression RelationalExpressionListRightAssoc2
-    /// RelationalExpressionListRightAssoc2 ->
-    /// EqualityExpressionListRightAssoc -> eqEq RelationalExpression EqualityExpressionListRightAssoc
-    /// EqualityExpressionListRightAssoc ->
-    /// BitwiseAndExpressionListRightAssoc -> bitwiseAnd EqualityExpression BitwiseAndExpressionListRightAssoc
-    /// BitwiseAndExpressionListRightAssoc ->
-    /// BitwiseOrExpressionListRightAssoc -> bitwiseOr BitwiseAndExpression BitwiseOrExpressionListRightAssoc
-    /// BitwiseOrExpressionListRightAssoc ->
-    /// AndExpressionListRightAssoc -> and BitwiseOrExpression AndExpressionListRightAssoc
-    /// AndExpressionListRightAssoc ->
-    /// OrExpressionListRightAssoc -> or AndExpression OrExpressionListRightAssoc
-    /// OrExpressionListRightAssoc ->
-    /// AssignExpressionListRightAssoc -> eq OrExpression AssignExpressionListRightAssoc
-    /// AssignExpressionListRightAssoc ->
-    /// AssignExpressionListRightAssoc2 -> subAssign OrExpression AssignExpressionListRightAssoc2
-    /// AssignExpressionListRightAssoc2 ->
-    /// AssignExpressionListRightAssoc3 -> divAssign OrExpression AssignExpressionListRightAssoc3
-    /// AssignExpressionListRightAssoc3 ->
-    /// AssignExpressionListRightAssoc4 -> bitwiseAndAssign OrExpression AssignExpressionListRightAssoc4
-    /// AssignExpressionListRightAssoc4 ->
-    /// TermExpressionListRightAssoc -> add FactorExpression TermExpressionListRightAssoc
-    /// TermExpressionListRightAssoc ->
-    /// FactorExpressionListRightAssoc -> mul UnaryExpression FactorExpressionListRightAssoc
-    /// FactorExpressionListRightAssoc ->
-    /// FactorExpressionListRightAssoc2 -> mod UnaryExpression FactorExpressionListRightAssoc2
-    /// FactorExpressionListRightAssoc2 ->
-    /// MemberInvokeRefListRightAssoc -> comma MethodArg MemberInvokeRefListRightAssoc
-    /// MemberInvokeRefListRightAssoc ->
-    /// MemberIndexerRefListRightAssoc -> comma Expression MemberIndexerRefListRightAssoc
-    /// MemberIndexerRefListRightAssoc ->
-    /// TypeBaseListRightAssoc -> dot identifier TypeBaseListRightAssoc
-    /// TypeBaseListRightAssoc ->
-    /// TypeArraySpecListRightAssoc -> TypeArraySpec TypeArraySpecListRightAssoc
-    /// TypeArraySpecListRightAssoc ->
-    /// TypeGenericPartListRightAssoc -> comma Type TypeGenericPartListRightAssoc
-    /// TypeGenericPartListRightAssoc ->
-    /// TypeArraySpecRankListRightAssoc -> TypeArraySpecRank TypeArraySpecRankListRightAssoc
-    /// TypeArraySpecRankListRightAssoc ->
-    /// NewObjectPartListRightAssoc -> comma Expression NewObjectPartListRightAssoc
-    /// NewObjectPartListRightAssoc ->
-    /// ArraySpecExpressionListListRightAssoc -> comma Expression ArraySpecExpressionListListRightAssoc
-    /// ArraySpecExpressionListListRightAssoc ->
-    /// ArrayInitializerListRightAssoc -> comma Expression ArrayInitializerListRightAssoc
-    /// ArrayInitializerListRightAssoc ->
-    /// MemberAnyRefListRightAssoc -> MemberAnyRef MemberAnyRefListRightAssoc
-    /// MemberAnyRefListRightAssoc ->
-    /// MemberAnyRefList2RightAssoc -> MemberAnyRef MemberAnyRefList2RightAssoc
-    /// MemberAnyRefList2RightAssoc ->
-    /// MemberAnyRefList3RightAssoc -> MemberAnyRef MemberAnyRefList3RightAssoc
-    /// MemberAnyRefList3RightAssoc ->
-    /// MemberAnyRefList4RightAssoc -> MemberAnyRef MemberAnyRefList4RightAssoc
-    /// MemberAnyRefList4RightAssoc ->
-    /// MemberAnyRefList5RightAssoc -> MemberAnyRef MemberAnyRefList5RightAssoc
-    /// MemberAnyRefList5RightAssoc ->
-    /// MemberAnyRefList6RightAssoc -> MemberAnyRef MemberAnyRefList6RightAssoc
-    /// MemberAnyRefList6RightAssoc ->
-    /// MemberAnyRefList7RightAssoc -> MemberAnyRef MemberAnyRefList7RightAssoc
-    /// MemberAnyRefList7RightAssoc ->
-    /// MemberAnyRefList8RightAssoc -> MemberAnyRef MemberAnyRefList8RightAssoc
-    /// MemberAnyRefList8RightAssoc ->
-    /// MemberAnyRefList9RightAssoc -> MemberAnyRef MemberAnyRefList9RightAssoc
-    /// MemberAnyRefList9RightAssoc ->
-    /// MemberAnyRefList10RightAssoc -> MemberAnyRef MemberAnyRefList10RightAssoc
-    /// MemberAnyRefList10RightAssoc ->
-    /// MemberAnyRefList11RightAssoc -> MemberAnyRef MemberAnyRefList11RightAssoc
-    /// MemberAnyRefList11RightAssoc ->
-    /// MemberAnyRefList12RightAssoc -> MemberAnyRef MemberAnyRefList12RightAssoc
-    /// MemberAnyRefList12RightAssoc ->
-    /// MemberAnyRefList13RightAssoc -> MemberAnyRef MemberAnyRefList13RightAssoc
-    /// MemberAnyRefList13RightAssoc ->
-    /// MemberAnyRefList14RightAssoc -> MemberAnyRef MemberAnyRefList14RightAssoc
-    /// MemberAnyRefList14RightAssoc ->
-    /// CatchClauseListRightAssoc -> CatchClause CatchClauseListRightAssoc
-    /// CatchClauseListRightAssoc ->
-    /// StatementListRightAssoc -> Statement StatementListRightAssoc
-    /// StatementListRightAssoc ->
-    /// StatementList2RightAssoc -> Statement StatementList2RightAssoc
-    /// StatementList2RightAssoc ->
-    /// VariableDeclarationStatement -> varType Identifier VariableDeclarationStatementPart
-    /// VariableDeclarationStatementPart -> eq Expression semi
-    /// VariableDeclarationStatementPart -> semi
-    /// VariableDeclarationStatement -> Type Identifier VariableDeclarationStatementPart2
-    /// VariableDeclarationStatementPart2 -> eq Expression semi
-    /// VariableDeclarationStatementPart2 -> semi
-    /// ThrowStatement -> throwKeyword ThrowStatementPart
-    /// ThrowStatementPart -> Expression semi
-    /// ThrowStatementPart -> semi
-    /// TryStatementPart -> FinallyPart
-    /// TryStatementPart ->
-    /// CatchClause -> catchKeyword lparen Type CatchClausePart
-    /// CatchClausePart -> Identifier rparen StatementBlock
-    /// CatchClausePart -> rparen StatementBlock
-    /// StatementBlock -> lbrace StatementBlockPart
-    /// StatementBlockPart -> StatementList2 rbrace
-    /// StatementBlockPart -> rbrace
-    /// RelationalExpressionListPart -> lte TermExpression
-    /// RelationalExpressionListPart -> gte TermExpression
-    /// AssignExpressionListPart -> addAssign OrExpression
-    /// AssignExpressionListPart -> mulAssign OrExpression
-    /// AssignExpressionListPart -> modAssign OrExpression
-    /// AssignExpressionListPart -> bitwiseOrAssign OrExpression
-    /// EqualityExpressionListRightAssoc2 -> notEq RelationalExpression EqualityExpressionListRightAssoc2
-    /// EqualityExpressionListRightAssoc2 ->
-    /// TermExpressionListRightAssoc2 -> sub FactorExpression TermExpressionListRightAssoc2
-    /// TermExpressionListRightAssoc2 ->
-    /// FactorExpressionListRightAssoc3 -> div UnaryExpression FactorExpressionListRightAssoc3
-    /// FactorExpressionListRightAssoc3 ->
-    /// RelationalExpressionListRightAssoc3 -> RelationalExpressionListPart RelationalExpressionListRightAssoc3
-    /// RelationalExpressionListRightAssoc3 ->
-    /// AssignExpressionListRightAssoc5 -> AssignExpressionListPart AssignExpressionListRightAssoc5
-    /// AssignExpressionListRightAssoc5 ->
-    /// TryStatement -> tryKeyword StatementBlock TryStatementPart2
-    /// TryStatementPart2 -> FinallyPart
-    /// TryStatementPart2 -> CatchClauseList TryStatementPart
-    /// Type -> boolType
-    /// Type -> identifier
-    /// Type -> charType
-    /// Type -> stringType
-    /// Type -> floatType
-    /// Type -> doubleType
-    /// Type -> decimalType
-    /// Type -> sbyteType
-    /// Type -> byteType
-    /// Type -> shortType
-    /// Type -> ushortType
-    /// Type -> intType
-    /// Type -> uintType
-    /// Type -> longType
-    /// Type -> ulongType
-    /// Type -> objectType
-    /// Identifier -> verbatimIdentifier
-    /// Identifier -> identifier
-    /// Expression -> add
-    /// Expression -> sub
-    /// Expression -> not
-    /// Expression -> inc
-    /// Expression -> dec
-    /// Expression -> lparen
-    /// Expression -> nullLiteral
-    /// Expression -> identifier
-    /// Expression -> typeOf
-    /// Expression -> nameOf
-    /// Expression -> defaultOf
-    /// Expression -> verbatimIdentifier
-    /// Expression -> verbatimStringLiteral
-    /// Expression -> characterLiteral
-    /// Expression -> integerLiteral
-    /// Expression -> floatLiteral
-    /// Expression -> stringLiteral
-    /// Expression -> boolLiteral
-    /// Expression -> newKeyword
-    /// Expression -> thisRef
-    /// Expression -> baseRef
-    /// Expression -> boolType
-    /// Expression -> charType
-    /// Expression -> stringType
-    /// Expression -> floatType
-    /// Expression -> doubleType
-    /// Expression -> decimalType
-    /// Expression -> sbyteType
-    /// Expression -> byteType
-    /// Expression -> shortType
-    /// Expression -> ushortType
-    /// Expression -> intType
-    /// Expression -> uintType
-    /// Expression -> longType
-    /// Expression -> ulongType
-    /// Expression -> objectType
-    /// </remarks>
+    /// <summary>Parses the indicated grammar. Refer to C:\dev\BuildPack\scratch\SlangStatement.xbnf</summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal partial class StatementParser {
         internal const int ErrorSymbol = -1;
@@ -7344,109 +6594,138 @@ namespace CD {
         public const int FinallyPart = 179;
         public const int LabelStatement = 180;
         public const int StatementOrBlock = 181;
-        public const int Statement = 182;
+        public const int InnerStatement = 182;
         public const int Statements = 183;
         public const int CatchClauseList = 184;
         public const int StatementList = 185;
         public const int StatementList2 = 186;
         public const int IfStatement = 187;
         public const int ForStatement = 188;
-        public const int StatementsFollows = 189;
-        public const int CatchClauseListRightAssoc = 190;
-        public const int StatementListRightAssoc = 191;
-        public const int StatementList2RightAssoc = 192;
-        public const int VariableDeclarationStatement = 193;
-        public const int VariableDeclarationStatementPart = 194;
-        public const int VariableDeclarationStatementPart2 = 195;
-        public const int ThrowStatement = 196;
-        public const int ThrowStatementPart = 197;
-        public const int TryStatementPart = 198;
-        public const int CatchClause = 199;
-        public const int CatchClausePart = 200;
-        public const int StatementBlock = 201;
-        public const int StatementBlockPart = 202;
-        public const int TryStatement = 203;
-        public const int TryStatementPart2 = 204;
-        public const int Comments = 205;
-        public const int verbatimIdentifier = 366;
-        public const int typeOf = 369;
-        public const int nameOf = 370;
-        public const int defaultOf = 371;
-        public const int newKeyword = 372;
-        public const int stringType = 373;
-        public const int boolType = 374;
-        public const int charType = 375;
-        public const int floatType = 376;
-        public const int doubleType = 377;
-        public const int decimalType = 378;
-        public const int sbyteType = 379;
-        public const int byteType = 380;
-        public const int shortType = 381;
-        public const int ushortType = 382;
-        public const int intType = 383;
-        public const int uintType = 384;
-        public const int longType = 385;
-        public const int ulongType = 386;
-        public const int objectType = 387;
-        public const int boolLiteral = 388;
-        public const int nullLiteral = 389;
-        public const int thisRef = 390;
-        public const int baseRef = 391;
-        public const int verbatimStringLiteral = 392;
-        public const int identifier2 = 393;
-        public const int stringLiteral = 394;
-        public const int characterLiteral = 395;
-        public const int lte = 396;
-        public const int lt = 397;
-        public const int gte = 398;
-        public const int gt = 399;
-        public const int eqEq = 400;
-        public const int notEq = 401;
-        public const int eq = 402;
-        public const int inc = 403;
-        public const int addAssign = 404;
-        public const int add = 405;
-        public const int dec = 406;
-        public const int subAssign = 407;
-        public const int sub = 408;
-        public const int mulAssign = 409;
-        public const int mul = 410;
-        public const int divAssign = 411;
-        public const int div = 412;
-        public const int modAssign = 413;
-        public const int mod = 414;
-        public const int and = 415;
-        public const int bitwiseAndAssign = 416;
-        public const int bitwiseAnd = 417;
-        public const int or = 418;
-        public const int bitwiseOrAssign = 419;
-        public const int bitwiseOr = 420;
-        public const int not = 421;
-        public const int rbracket = 423;
-        public const int lparen = 424;
-        public const int rparen = 425;
-        public const int lbrace = 426;
-        public const int rbrace = 427;
-        public const int comma = 428;
-        public const int dot = 430;
-        public const int integerLiteral = 431;
-        public const int floatLiteral = 432;
-        public const int ifKeyword = 434;
-        public const int gotoKeyword = 435;
-        public const int elseKeyword = 436;
-        public const int forKeyword = 437;
-        public const int throwKeyword = 438;
-        public const int whileKeyword = 439;
-        public const int returnKeyword = 440;
-        public const int tryKeyword = 441;
-        public const int catchKeyword = 442;
-        public const int finallyKeyword = 443;
-        public const int semi = 444;
-        public const int varType = 445;
-        public const int colon = 446;
-        public const int directive = 447;
-        public const int lineComment = 448;
-        public const int blockComment = 449;
+        public const int Statement = 189;
+        public const int StatementFollows = 190;
+        public const int StatementFollows2 = 191;
+        public const int StatementFollows3 = 192;
+        public const int StatementFollows4 = 193;
+        public const int StatementFollows5 = 194;
+        public const int StatementFollows6 = 195;
+        public const int StatementFollows7 = 196;
+        public const int StatementFollows8 = 197;
+        public const int StatementFollows9 = 198;
+        public const int StatementFollows10 = 199;
+        public const int StatementFollows11 = 200;
+        public const int StatementFollows12 = 201;
+        public const int StatementFollows13 = 202;
+        public const int StatementFollows14 = 203;
+        public const int InnerStatementFollows = 204;
+        public const int InnerStatementFollows2 = 205;
+        public const int InnerStatementFollows3 = 206;
+        public const int InnerStatementFollows4 = 207;
+        public const int InnerStatementFollows5 = 208;
+        public const int InnerStatementFollows6 = 209;
+        public const int InnerStatementFollows7 = 210;
+        public const int InnerStatementFollows8 = 211;
+        public const int InnerStatementFollows9 = 212;
+        public const int InnerStatementFollows10 = 213;
+        public const int InnerStatementFollows11 = 214;
+        public const int InnerStatementFollows12 = 215;
+        public const int InnerStatementFollows13 = 216;
+        public const int InnerStatementFollows14 = 217;
+        public const int StatementsFollows = 218;
+        public const int CatchClauseListRightAssoc = 219;
+        public const int StatementListRightAssoc = 220;
+        public const int StatementList2RightAssoc = 221;
+        public const int VariableDeclarationStatement = 222;
+        public const int VariableDeclarationStatementPart = 223;
+        public const int VariableDeclarationStatementPart2 = 224;
+        public const int ThrowStatement = 225;
+        public const int ThrowStatementPart = 226;
+        public const int TryStatementPart = 227;
+        public const int CatchClause = 228;
+        public const int CatchClausePart = 229;
+        public const int StatementBlock = 230;
+        public const int StatementBlockPart = 231;
+        public const int TryStatement = 232;
+        public const int TryStatementPart2 = 233;
+        public const int Comments = 234;
+        public const int verbatimIdentifier = 395;
+        public const int typeOf = 398;
+        public const int nameOf = 399;
+        public const int defaultOf = 400;
+        public const int newKeyword = 401;
+        public const int stringType = 402;
+        public const int boolType = 403;
+        public const int charType = 404;
+        public const int floatType = 405;
+        public const int doubleType = 406;
+        public const int decimalType = 407;
+        public const int sbyteType = 408;
+        public const int byteType = 409;
+        public const int shortType = 410;
+        public const int ushortType = 411;
+        public const int intType = 412;
+        public const int uintType = 413;
+        public const int longType = 414;
+        public const int ulongType = 415;
+        public const int objectType = 416;
+        public const int boolLiteral = 417;
+        public const int nullLiteral = 418;
+        public const int thisRef = 419;
+        public const int baseRef = 420;
+        public const int verbatimStringLiteral = 421;
+        public const int identifier2 = 422;
+        public const int stringLiteral = 423;
+        public const int characterLiteral = 424;
+        public const int lte = 425;
+        public const int lt = 426;
+        public const int gte = 427;
+        public const int gt = 428;
+        public const int eqEq = 429;
+        public const int notEq = 430;
+        public const int eq = 431;
+        public const int inc = 432;
+        public const int addAssign = 433;
+        public const int add = 434;
+        public const int dec = 435;
+        public const int subAssign = 436;
+        public const int sub = 437;
+        public const int mulAssign = 438;
+        public const int mul = 439;
+        public const int divAssign = 440;
+        public const int div = 441;
+        public const int modAssign = 442;
+        public const int mod = 443;
+        public const int and = 444;
+        public const int bitwiseAndAssign = 445;
+        public const int bitwiseAnd = 446;
+        public const int or = 447;
+        public const int bitwiseOrAssign = 448;
+        public const int bitwiseOr = 449;
+        public const int not = 450;
+        public const int rbracket = 452;
+        public const int lparen = 453;
+        public const int rparen = 454;
+        public const int lbrace = 455;
+        public const int rbrace = 456;
+        public const int comma = 457;
+        public const int dot = 459;
+        public const int integerLiteral = 460;
+        public const int floatLiteral = 461;
+        public const int ifKeyword = 463;
+        public const int gotoKeyword = 464;
+        public const int elseKeyword = 465;
+        public const int forKeyword = 466;
+        public const int throwKeyword = 467;
+        public const int whileKeyword = 468;
+        public const int returnKeyword = 469;
+        public const int tryKeyword = 470;
+        public const int catchKeyword = 471;
+        public const int finallyKeyword = 472;
+        public const int semi = 473;
+        public const int varType = 474;
+        public const int colon = 475;
+        public const int directive = 476;
+        public const int lineComment = 477;
+        public const int blockComment = 478;
         internal static ParseNode ParseEmptyStatement(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
@@ -8132,7 +7411,7 @@ namespace CD {
             int column__ = context.Column;
             long position__ = context.Position;
             // StatementOrBlock -> Statement
-            if (((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
                         || (StatementParser.varType == context.SymbolId)) 
                         || (ExpressionParser.boolType == context.SymbolId)) 
                         || (ExpressionParser.identifier2 == context.SymbolId)) 
@@ -8175,7 +7454,8 @@ namespace CD {
                         || (StatementParser.forKeyword == context.SymbolId)) 
                         || (StatementParser.whileKeyword == context.SymbolId)) 
                         || (StatementParser.returnKeyword == context.SymbolId)) 
-                        || (StatementParser.tryKeyword == context.SymbolId))) {
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
                 ParseNode[] children = new ParseNode[1];
                 children[0] = StatementParser.ParseStatement(context);
                 return new ParseNode(StatementParser.StatementOrBlock, "StatementOrBlock", children, line__, column__, position__);
@@ -8188,17 +7468,17 @@ namespace CD {
             }
             throw new SyntaxException(string.Format("Expecting Statement or StatementBlock at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        internal static ParseNode ParseStatement(ParserContext context) {
+        internal static ParseNode ParseInnerStatement(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
-            // Statement -> EmptyStatement
+            // InnerStatement -> EmptyStatement
             if ((StatementParser.semi == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[1];
                 children[0] = StatementParser.ParseEmptyStatement(context);
-                return new ParseNode(StatementParser.Statement, "Statement", children, line__, column__, position__);
+                return new ParseNode(StatementParser.InnerStatement, "InnerStatement", children, line__, column__, position__);
             }
-            // Statement -> VariableDeclarationOrLabelOrExpressionStatement
+            // InnerStatement -> VariableDeclarationOrLabelOrExpressionStatement
             if ((((((((((((((((((((((((((((((((((((((StatementParser.varType == context.SymbolId) 
                         || (ExpressionParser.boolType == context.SymbolId)) 
                         || (ExpressionParser.identifier2 == context.SymbolId)) 
@@ -8238,104 +7518,60 @@ namespace CD {
                         || (ExpressionParser.baseRef == context.SymbolId))) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 children.AddRange(StatementParser.ParseVariableDeclarationOrLabelOrExpressionStatement(context).Children);
-                return new ParseNode(StatementParser.Statement, "Statement", children.ToArray(), line__, column__, position__);
+                return new ParseNode(StatementParser.InnerStatement, "InnerStatement", children.ToArray(), line__, column__, position__);
             }
-            // Statement -> IfStatement
+            // InnerStatement -> IfStatement
             if ((StatementParser.ifKeyword == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[1];
                 children[0] = StatementParser.ParseIfStatement(context);
-                return new ParseNode(StatementParser.Statement, "Statement", children, line__, column__, position__);
+                return new ParseNode(StatementParser.InnerStatement, "InnerStatement", children, line__, column__, position__);
             }
-            // Statement -> GotoStatement
+            // InnerStatement -> GotoStatement
             if ((StatementParser.gotoKeyword == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[1];
                 children[0] = StatementParser.ParseGotoStatement(context);
-                return new ParseNode(StatementParser.Statement, "Statement", children, line__, column__, position__);
+                return new ParseNode(StatementParser.InnerStatement, "InnerStatement", children, line__, column__, position__);
             }
-            // Statement -> ForStatement
+            // InnerStatement -> ForStatement
             if ((StatementParser.forKeyword == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[1];
                 children[0] = StatementParser.ParseForStatement(context);
-                return new ParseNode(StatementParser.Statement, "Statement", children, line__, column__, position__);
+                return new ParseNode(StatementParser.InnerStatement, "InnerStatement", children, line__, column__, position__);
             }
-            // Statement -> WhileStatement
+            // InnerStatement -> WhileStatement
             if ((StatementParser.whileKeyword == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[1];
                 children[0] = StatementParser.ParseWhileStatement(context);
-                return new ParseNode(StatementParser.Statement, "Statement", children, line__, column__, position__);
+                return new ParseNode(StatementParser.InnerStatement, "InnerStatement", children, line__, column__, position__);
             }
-            // Statement -> ReturnStatement
+            // InnerStatement -> ReturnStatement
             if ((StatementParser.returnKeyword == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[1];
                 children[0] = StatementParser.ParseReturnStatement(context);
-                return new ParseNode(StatementParser.Statement, "Statement", children, line__, column__, position__);
+                return new ParseNode(StatementParser.InnerStatement, "InnerStatement", children, line__, column__, position__);
             }
-            // Statement -> TryStatement
+            // InnerStatement -> TryStatement
             if ((StatementParser.tryKeyword == context.SymbolId)) {
                 ParseNode[] children = new ParseNode[1];
                 children[0] = StatementParser.ParseTryStatement(context);
-                return new ParseNode(StatementParser.Statement, "Statement", children, line__, column__, position__);
+                return new ParseNode(StatementParser.InnerStatement, "InnerStatement", children, line__, column__, position__);
+            }
+            // InnerStatement -> ThrowStatement
+            if ((StatementParser.throwKeyword == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[1];
+                children[0] = StatementParser.ParseThrowStatement(context);
+                return new ParseNode(StatementParser.InnerStatement, "InnerStatement", children, line__, column__, position__);
             }
             throw new SyntaxException(string.Format("Expecting EmptyStatement, VariableDeclarationOrLabelOrExpressionStatement, IfStat" +
-                        "ement, GotoStatement, ForStatement, WhileStatement, ReturnStatement, or TryState" +
-                        "ment at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
-        }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Statement= EmptyStatement | VariableDeclarationOrLabelOrExpressionStatement | IfStatement | GotoStatement | ForStatement | WhileStatement | ReturnStatement | GotoStatement | TryStatement
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Statement -> EmptyStatement
-        /// Statement -> VariableDeclarationOrLabelOrExpressionStatement
-        /// Statement -> IfStatement
-        /// Statement -> GotoStatement
-        /// Statement -> ForStatement
-        /// Statement -> WhileStatement
-        /// Statement -> ReturnStatement
-        /// Statement -> TryStatement
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            ParseNode result = StatementParser.ParseStatement(context);
-            if ((false == context.IsEnded)) {
-                context.Error("Unexpected remainder in input.");
-            }
-            return result;
-        }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Statement= EmptyStatement | VariableDeclarationOrLabelOrExpressionStatement | IfStatement | GotoStatement | ForStatement | WhileStatement | ReturnStatement | GotoStatement | TryStatement
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Statement -> EmptyStatement
-        /// Statement -> VariableDeclarationOrLabelOrExpressionStatement
-        /// Statement -> IfStatement
-        /// Statement -> GotoStatement
-        /// Statement -> ForStatement
-        /// Statement -> WhileStatement
-        /// Statement -> ReturnStatement
-        /// Statement -> TryStatement
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode ParseStatement(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            ParseNode result = StatementParser.ParseStatement(context);
-            if ((false == context.IsEnded)) {
-                context.Error("Unexpected remainder in input.");
-            }
-            return result;
+                        "ement, GotoStatement, ForStatement, WhileStatement, ReturnStatement, TryStatemen" +
+                        "t, or ThrowStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
         internal static ParseNode ParseStatements(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
             // Statements -> StatementList
-            if (((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
                         || (StatementParser.varType == context.SymbolId)) 
                         || (ExpressionParser.boolType == context.SymbolId)) 
                         || (ExpressionParser.identifier2 == context.SymbolId)) 
@@ -8378,7 +7614,8 @@ namespace CD {
                         || (StatementParser.forKeyword == context.SymbolId)) 
                         || (StatementParser.whileKeyword == context.SymbolId)) 
                         || (StatementParser.returnKeyword == context.SymbolId)) 
-                        || (StatementParser.tryKeyword == context.SymbolId))) {
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 children.AddRange(StatementParser.ParseStatementList(context).Children);
                 return new ParseNode(StatementParser.Statements, "Statements", children.ToArray(), line__, column__, position__);
@@ -9382,7 +8619,7 @@ namespace CD {
             int column__ = context.Column;
             long position__ = context.Position;
             // StatementList -> Statement StatementListRightAssoc
-            if (((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
                         || (StatementParser.varType == context.SymbolId)) 
                         || (ExpressionParser.boolType == context.SymbolId)) 
                         || (ExpressionParser.identifier2 == context.SymbolId)) 
@@ -9425,7 +8662,8 @@ namespace CD {
                         || (StatementParser.forKeyword == context.SymbolId)) 
                         || (StatementParser.whileKeyword == context.SymbolId)) 
                         || (StatementParser.returnKeyword == context.SymbolId)) 
-                        || (StatementParser.tryKeyword == context.SymbolId))) {
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 children.Add(StatementParser.ParseStatement(context));
                 children.AddRange(StatementParser.ParseStatementListRightAssoc(context).Children);
@@ -9438,7 +8676,7 @@ namespace CD {
             int column__ = context.Column;
             long position__ = context.Position;
             // StatementList2 -> Statement StatementList2RightAssoc
-            if (((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
                         || (StatementParser.varType == context.SymbolId)) 
                         || (ExpressionParser.boolType == context.SymbolId)) 
                         || (ExpressionParser.identifier2 == context.SymbolId)) 
@@ -9481,7 +8719,8 @@ namespace CD {
                         || (StatementParser.forKeyword == context.SymbolId)) 
                         || (StatementParser.whileKeyword == context.SymbolId)) 
                         || (StatementParser.returnKeyword == context.SymbolId)) 
-                        || (StatementParser.tryKeyword == context.SymbolId))) {
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 children.Add(StatementParser.ParseStatement(context));
                 children.AddRange(StatementParser.ParseStatementList2RightAssoc(context).Children);
@@ -9499,6 +8738,42 @@ namespace CD {
         }
         internal static bool WhereForStatement(ParserContext context) {
             return true;
+        }
+        internal static ParseNode ParseStatement(ParserContext context) {
+            // Statement
+            return _ParseStatement(context);
+        }
+        internal static bool WhereStatement(ParserContext context) {
+            return true;
+        }
+        /// <summary>
+        /// Parses a production of the form:
+        /// Statement
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Statement -> semi
+        /// Statement -> varType
+        /// Statement -> Type
+        /// Statement -> Expression
+        /// Statement -> identifier
+        /// Statement -> IfStatement
+        /// Statement -> gotoKeyword
+        /// Statement -> ForStatement
+        /// Statement -> whileKeyword
+        /// Statement -> returnKeyword
+        /// Statement -> tryKeyword
+        /// Statement -> throwKeyword
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            ParseNode result = StatementParser.ParseStatement(context);
+            if ((false == context.IsEnded)) {
+                context.Error("Unexpected remainder in input.");
+            }
+            return result;
         }
         internal static ParseNode ParseExpressionFollows(ParserContext context) {
             int line__ = context.Line;
@@ -9839,12 +9114,12 @@ namespace CD {
             }
             throw new SyntaxException(string.Format("Expecting Type at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        internal static ParseNode ParseStatementsFollows(ParserContext context) {
+        internal static ParseNode ParseStatementFollows(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
-            // StatementsFollows -> Statements #EOS
-            if (((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+            // StatementFollows -> Statement semi
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
                         || (StatementParser.varType == context.SymbolId)) 
                         || (ExpressionParser.boolType == context.SymbolId)) 
                         || (ExpressionParser.identifier2 == context.SymbolId)) 
@@ -9887,7 +9162,1724 @@ namespace CD {
                         || (StatementParser.forKeyword == context.SymbolId)) 
                         || (StatementParser.whileKeyword == context.SymbolId)) 
                         || (StatementParser.returnKeyword == context.SymbolId)) 
-                        || (StatementParser.tryKeyword == context.SymbolId))) {
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                if ((false 
+                            == (StatementParser.semi == context.SymbolId))) {
+                    context.Error("Expecting semi at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(StatementParser.semi, "semi", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(StatementParser.StatementFollows, "StatementFollows", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows2(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows2 -> Statement varType
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                if ((false 
+                            == (StatementParser.varType == context.SymbolId))) {
+                    context.Error("Expecting varType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(StatementParser.varType, "varType", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(StatementParser.StatementFollows2, "StatementFollows2", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows3(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows3 -> Statement ifKeyword
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                if ((false 
+                            == (StatementParser.ifKeyword == context.SymbolId))) {
+                    context.Error("Expecting ifKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(StatementParser.ifKeyword, "ifKeyword", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(StatementParser.StatementFollows3, "StatementFollows3", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows4(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows4 -> Statement gotoKeyword
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                if ((false 
+                            == (StatementParser.gotoKeyword == context.SymbolId))) {
+                    context.Error("Expecting gotoKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(StatementParser.gotoKeyword, "gotoKeyword", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(StatementParser.StatementFollows4, "StatementFollows4", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows5(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows5 -> Statement forKeyword
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                if ((false 
+                            == (StatementParser.forKeyword == context.SymbolId))) {
+                    context.Error("Expecting forKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(StatementParser.forKeyword, "forKeyword", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(StatementParser.StatementFollows5, "StatementFollows5", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows6(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows6 -> Statement whileKeyword
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                if ((false 
+                            == (StatementParser.whileKeyword == context.SymbolId))) {
+                    context.Error("Expecting whileKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(StatementParser.whileKeyword, "whileKeyword", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(StatementParser.StatementFollows6, "StatementFollows6", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows7(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows7 -> Statement returnKeyword
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                if ((false 
+                            == (StatementParser.returnKeyword == context.SymbolId))) {
+                    context.Error("Expecting returnKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(StatementParser.returnKeyword, "returnKeyword", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(StatementParser.StatementFollows7, "StatementFollows7", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows8(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows8 -> Statement tryKeyword
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                if ((false 
+                            == (StatementParser.tryKeyword == context.SymbolId))) {
+                    context.Error("Expecting tryKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(StatementParser.tryKeyword, "tryKeyword", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(StatementParser.StatementFollows8, "StatementFollows8", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows9(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows9 -> Statement throwKeyword
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                if ((false 
+                            == (StatementParser.throwKeyword == context.SymbolId))) {
+                    context.Error("Expecting throwKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(StatementParser.throwKeyword, "throwKeyword", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(StatementParser.StatementFollows9, "StatementFollows9", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows10(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows10 -> Statement Expression
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                children[1] = ExpressionParser.ParseExpression(context);
+                return new ParseNode(StatementParser.StatementFollows10, "StatementFollows10", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows11(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows11 -> Statement identifier
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                if ((false 
+                            == (ExpressionParser.identifier2 == context.SymbolId))) {
+                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(ExpressionParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(StatementParser.StatementFollows11, "StatementFollows11", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows12(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows12 -> Statement Type
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                children[1] = ExpressionParser.ParseType(context);
+                return new ParseNode(StatementParser.StatementFollows12, "StatementFollows12", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows13(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows13 -> Statement rbrace
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                if ((false 
+                            == (ExpressionParser.rbrace == context.SymbolId))) {
+                    context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(ExpressionParser.rbrace, "rbrace", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(StatementParser.StatementFollows13, "StatementFollows13", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows14(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows14 -> Statement #EOS
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                if ((false 
+                            == (StatementParser.EosSymbol == context.SymbolId))) {
+                    context.Error("Expecting #EOS at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(StatementParser.EosSymbol, "#EOS", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(StatementParser.StatementFollows14, "StatementFollows14", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows -> InnerStatement semi
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(StatementParser.ParseInnerStatement(context).Children);
+                if ((false 
+                            == (StatementParser.semi == context.SymbolId))) {
+                    context.Error("Expecting semi at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(StatementParser.semi, "semi", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(StatementParser.InnerStatementFollows, "InnerStatementFollows", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows2(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows2 -> InnerStatement varType
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(StatementParser.ParseInnerStatement(context).Children);
+                if ((false 
+                            == (StatementParser.varType == context.SymbolId))) {
+                    context.Error("Expecting varType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(StatementParser.varType, "varType", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(StatementParser.InnerStatementFollows2, "InnerStatementFollows2", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows3(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows3 -> InnerStatement ifKeyword
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(StatementParser.ParseInnerStatement(context).Children);
+                if ((false 
+                            == (StatementParser.ifKeyword == context.SymbolId))) {
+                    context.Error("Expecting ifKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(StatementParser.ifKeyword, "ifKeyword", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(StatementParser.InnerStatementFollows3, "InnerStatementFollows3", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows4(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows4 -> InnerStatement gotoKeyword
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(StatementParser.ParseInnerStatement(context).Children);
+                if ((false 
+                            == (StatementParser.gotoKeyword == context.SymbolId))) {
+                    context.Error("Expecting gotoKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(StatementParser.gotoKeyword, "gotoKeyword", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(StatementParser.InnerStatementFollows4, "InnerStatementFollows4", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows5(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows5 -> InnerStatement forKeyword
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(StatementParser.ParseInnerStatement(context).Children);
+                if ((false 
+                            == (StatementParser.forKeyword == context.SymbolId))) {
+                    context.Error("Expecting forKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(StatementParser.forKeyword, "forKeyword", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(StatementParser.InnerStatementFollows5, "InnerStatementFollows5", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows6(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows6 -> InnerStatement whileKeyword
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(StatementParser.ParseInnerStatement(context).Children);
+                if ((false 
+                            == (StatementParser.whileKeyword == context.SymbolId))) {
+                    context.Error("Expecting whileKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(StatementParser.whileKeyword, "whileKeyword", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(StatementParser.InnerStatementFollows6, "InnerStatementFollows6", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows7(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows7 -> InnerStatement returnKeyword
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(StatementParser.ParseInnerStatement(context).Children);
+                if ((false 
+                            == (StatementParser.returnKeyword == context.SymbolId))) {
+                    context.Error("Expecting returnKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(StatementParser.returnKeyword, "returnKeyword", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(StatementParser.InnerStatementFollows7, "InnerStatementFollows7", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows8(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows8 -> InnerStatement tryKeyword
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(StatementParser.ParseInnerStatement(context).Children);
+                if ((false 
+                            == (StatementParser.tryKeyword == context.SymbolId))) {
+                    context.Error("Expecting tryKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(StatementParser.tryKeyword, "tryKeyword", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(StatementParser.InnerStatementFollows8, "InnerStatementFollows8", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows9(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows9 -> InnerStatement throwKeyword
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(StatementParser.ParseInnerStatement(context).Children);
+                if ((false 
+                            == (StatementParser.throwKeyword == context.SymbolId))) {
+                    context.Error("Expecting throwKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(StatementParser.throwKeyword, "throwKeyword", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(StatementParser.InnerStatementFollows9, "InnerStatementFollows9", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows10(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows10 -> InnerStatement Expression
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(StatementParser.ParseInnerStatement(context).Children);
+                children.Add(ExpressionParser.ParseExpression(context));
+                return new ParseNode(StatementParser.InnerStatementFollows10, "InnerStatementFollows10", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows11(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows11 -> InnerStatement identifier
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(StatementParser.ParseInnerStatement(context).Children);
+                if ((false 
+                            == (ExpressionParser.identifier2 == context.SymbolId))) {
+                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(StatementParser.InnerStatementFollows11, "InnerStatementFollows11", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows12(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows12 -> InnerStatement Type
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(StatementParser.ParseInnerStatement(context).Children);
+                children.Add(ExpressionParser.ParseType(context));
+                return new ParseNode(StatementParser.InnerStatementFollows12, "InnerStatementFollows12", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows13(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows13 -> InnerStatement rbrace
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(StatementParser.ParseInnerStatement(context).Children);
+                if ((false 
+                            == (ExpressionParser.rbrace == context.SymbolId))) {
+                    context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.rbrace, "rbrace", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(StatementParser.InnerStatementFollows13, "InnerStatementFollows13", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows14(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows14 -> InnerStatement #EOS
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.AddRange(StatementParser.ParseInnerStatement(context).Children);
+                if ((false 
+                            == (StatementParser.EosSymbol == context.SymbolId))) {
+                    context.Error("Expecting #EOS at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(StatementParser.EosSymbol, "#EOS", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(StatementParser.InnerStatementFollows14, "InnerStatementFollows14", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementsFollows(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementsFollows -> Statements #EOS
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
                 ParseNode[] children = new ParseNode[2];
                 children[0] = StatementParser.ParseStatements(context);
                 if ((false 
@@ -10756,9 +11748,65 @@ namespace CD {
                 return new ParseNode(StatementParser.CatchClauseListRightAssoc, "CatchClauseListRightAssoc", children.ToArray(), line__, column__, position__);
             }
             // CatchClauseListRightAssoc ->
-            if ((((((((((((((((((((((((((((((((((((((((((((((((StatementParser.finallyKeyword == context.SymbolId) 
-                        || (StatementParser.EosSymbol == context.SymbolId)) 
+            if (((((((((((((((((((((((((((((((((((((((((((((((((StatementParser.finallyKeyword == context.SymbolId) 
                         || (StatementParser.semi == context.SymbolId)) 
+                        || (StatementParser.varType == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
+                        || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (ExpressionParser.charType == context.SymbolId)) 
+                        || (ExpressionParser.stringType == context.SymbolId)) 
+                        || (ExpressionParser.floatType == context.SymbolId)) 
+                        || (ExpressionParser.doubleType == context.SymbolId)) 
+                        || (ExpressionParser.decimalType == context.SymbolId)) 
+                        || (ExpressionParser.sbyteType == context.SymbolId)) 
+                        || (ExpressionParser.byteType == context.SymbolId)) 
+                        || (ExpressionParser.shortType == context.SymbolId)) 
+                        || (ExpressionParser.ushortType == context.SymbolId)) 
+                        || (ExpressionParser.intType == context.SymbolId)) 
+                        || (ExpressionParser.uintType == context.SymbolId)) 
+                        || (ExpressionParser.longType == context.SymbolId)) 
+                        || (ExpressionParser.ulongType == context.SymbolId)) 
+                        || (ExpressionParser.objectType == context.SymbolId)) 
+                        || (ExpressionParser.rbrace == context.SymbolId)) 
+                        || (StatementParser.EosSymbol == context.SymbolId))) {
+                ParseNode[] children = new ParseNode[0];
+                return new ParseNode(StatementParser.CatchClauseListRightAssoc, "CatchClauseListRightAssoc", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting CatchClause at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementListRightAssoc(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementListRightAssoc -> Statement StatementListRightAssoc
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
                         || (StatementParser.varType == context.SymbolId)) 
                         || (ExpressionParser.boolType == context.SymbolId)) 
                         || (ExpressionParser.identifier2 == context.SymbolId)) 
@@ -10802,61 +11850,7 @@ namespace CD {
                         || (StatementParser.whileKeyword == context.SymbolId)) 
                         || (StatementParser.returnKeyword == context.SymbolId)) 
                         || (StatementParser.tryKeyword == context.SymbolId)) 
-                        || (ExpressionParser.rbrace == context.SymbolId))) {
-                ParseNode[] children = new ParseNode[0];
-                return new ParseNode(StatementParser.CatchClauseListRightAssoc, "CatchClauseListRightAssoc", children, line__, column__, position__);
-            }
-            throw new SyntaxException(string.Format("Expecting CatchClause at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
-        }
-        internal static ParseNode ParseStatementListRightAssoc(ParserContext context) {
-            int line__ = context.Line;
-            int column__ = context.Column;
-            long position__ = context.Position;
-            // StatementListRightAssoc -> Statement StatementListRightAssoc
-            if (((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
-                        || (StatementParser.varType == context.SymbolId)) 
-                        || (ExpressionParser.boolType == context.SymbolId)) 
-                        || (ExpressionParser.identifier2 == context.SymbolId)) 
-                        || (ExpressionParser.charType == context.SymbolId)) 
-                        || (ExpressionParser.stringType == context.SymbolId)) 
-                        || (ExpressionParser.floatType == context.SymbolId)) 
-                        || (ExpressionParser.doubleType == context.SymbolId)) 
-                        || (ExpressionParser.decimalType == context.SymbolId)) 
-                        || (ExpressionParser.sbyteType == context.SymbolId)) 
-                        || (ExpressionParser.byteType == context.SymbolId)) 
-                        || (ExpressionParser.shortType == context.SymbolId)) 
-                        || (ExpressionParser.ushortType == context.SymbolId)) 
-                        || (ExpressionParser.intType == context.SymbolId)) 
-                        || (ExpressionParser.uintType == context.SymbolId)) 
-                        || (ExpressionParser.longType == context.SymbolId)) 
-                        || (ExpressionParser.ulongType == context.SymbolId)) 
-                        || (ExpressionParser.objectType == context.SymbolId)) 
-                        || (ExpressionParser.add == context.SymbolId)) 
-                        || (ExpressionParser.sub == context.SymbolId)) 
-                        || (ExpressionParser.not == context.SymbolId)) 
-                        || (ExpressionParser.inc == context.SymbolId)) 
-                        || (ExpressionParser.dec == context.SymbolId)) 
-                        || (ExpressionParser.lparen == context.SymbolId)) 
-                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
-                        || (ExpressionParser.typeOf == context.SymbolId)) 
-                        || (ExpressionParser.nameOf == context.SymbolId)) 
-                        || (ExpressionParser.defaultOf == context.SymbolId)) 
-                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
-                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
-                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
-                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
-                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
-                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
-                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
-                        || (ExpressionParser.newKeyword == context.SymbolId)) 
-                        || (ExpressionParser.thisRef == context.SymbolId)) 
-                        || (ExpressionParser.baseRef == context.SymbolId)) 
-                        || (StatementParser.ifKeyword == context.SymbolId)) 
-                        || (StatementParser.gotoKeyword == context.SymbolId)) 
-                        || (StatementParser.forKeyword == context.SymbolId)) 
-                        || (StatementParser.whileKeyword == context.SymbolId)) 
-                        || (StatementParser.returnKeyword == context.SymbolId)) 
-                        || (StatementParser.tryKeyword == context.SymbolId))) {
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 children.Add(StatementParser.ParseStatement(context));
                 children.AddRange(StatementParser.ParseStatementListRightAssoc(context).Children);
@@ -10874,7 +11868,7 @@ namespace CD {
             int column__ = context.Column;
             long position__ = context.Position;
             // StatementList2RightAssoc -> Statement StatementList2RightAssoc
-            if (((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
                         || (StatementParser.varType == context.SymbolId)) 
                         || (ExpressionParser.boolType == context.SymbolId)) 
                         || (ExpressionParser.identifier2 == context.SymbolId)) 
@@ -10917,7 +11911,8 @@ namespace CD {
                         || (StatementParser.forKeyword == context.SymbolId)) 
                         || (StatementParser.whileKeyword == context.SymbolId)) 
                         || (StatementParser.returnKeyword == context.SymbolId)) 
-                        || (StatementParser.tryKeyword == context.SymbolId))) {
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 children.Add(StatementParser.ParseStatement(context));
                 children.AddRange(StatementParser.ParseStatementList2RightAssoc(context).Children);
@@ -11135,11 +12130,37 @@ namespace CD {
                 return new ParseNode(StatementParser.TryStatementPart, "TryStatementPart", children.ToArray(), line__, column__, position__);
             }
             // TryStatementPart ->
-            if (((((((((((((((((((((((((((((((((((((((((((((((StatementParser.EosSymbol == context.SymbolId) 
-                        || (StatementParser.semi == context.SymbolId)) 
+            if ((((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
                         || (StatementParser.varType == context.SymbolId)) 
-                        || (ExpressionParser.boolType == context.SymbolId)) 
+                        || (StatementParser.ifKeyword == context.SymbolId)) 
+                        || (StatementParser.gotoKeyword == context.SymbolId)) 
+                        || (StatementParser.forKeyword == context.SymbolId)) 
+                        || (StatementParser.whileKeyword == context.SymbolId)) 
+                        || (StatementParser.returnKeyword == context.SymbolId)) 
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId)) 
+                        || (ExpressionParser.add == context.SymbolId)) 
+                        || (ExpressionParser.sub == context.SymbolId)) 
+                        || (ExpressionParser.not == context.SymbolId)) 
+                        || (ExpressionParser.inc == context.SymbolId)) 
+                        || (ExpressionParser.dec == context.SymbolId)) 
+                        || (ExpressionParser.lparen == context.SymbolId)) 
+                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
                         || (ExpressionParser.identifier2 == context.SymbolId)) 
+                        || (ExpressionParser.typeOf == context.SymbolId)) 
+                        || (ExpressionParser.nameOf == context.SymbolId)) 
+                        || (ExpressionParser.defaultOf == context.SymbolId)) 
+                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
+                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
+                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
+                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
+                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
+                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
+                        || (ExpressionParser.newKeyword == context.SymbolId)) 
+                        || (ExpressionParser.thisRef == context.SymbolId)) 
+                        || (ExpressionParser.baseRef == context.SymbolId)) 
+                        || (ExpressionParser.boolType == context.SymbolId)) 
                         || (ExpressionParser.charType == context.SymbolId)) 
                         || (ExpressionParser.stringType == context.SymbolId)) 
                         || (ExpressionParser.floatType == context.SymbolId)) 
@@ -11154,33 +12175,8 @@ namespace CD {
                         || (ExpressionParser.longType == context.SymbolId)) 
                         || (ExpressionParser.ulongType == context.SymbolId)) 
                         || (ExpressionParser.objectType == context.SymbolId)) 
-                        || (ExpressionParser.add == context.SymbolId)) 
-                        || (ExpressionParser.sub == context.SymbolId)) 
-                        || (ExpressionParser.not == context.SymbolId)) 
-                        || (ExpressionParser.inc == context.SymbolId)) 
-                        || (ExpressionParser.dec == context.SymbolId)) 
-                        || (ExpressionParser.lparen == context.SymbolId)) 
-                        || (ExpressionParser.nullLiteral == context.SymbolId)) 
-                        || (ExpressionParser.typeOf == context.SymbolId)) 
-                        || (ExpressionParser.nameOf == context.SymbolId)) 
-                        || (ExpressionParser.defaultOf == context.SymbolId)) 
-                        || (ExpressionParser.verbatimIdentifier == context.SymbolId)) 
-                        || (ExpressionParser.verbatimStringLiteral == context.SymbolId)) 
-                        || (ExpressionParser.characterLiteral == context.SymbolId)) 
-                        || (ExpressionParser.integerLiteral == context.SymbolId)) 
-                        || (ExpressionParser.floatLiteral == context.SymbolId)) 
-                        || (ExpressionParser.stringLiteral == context.SymbolId)) 
-                        || (ExpressionParser.boolLiteral == context.SymbolId)) 
-                        || (ExpressionParser.newKeyword == context.SymbolId)) 
-                        || (ExpressionParser.thisRef == context.SymbolId)) 
-                        || (ExpressionParser.baseRef == context.SymbolId)) 
-                        || (StatementParser.ifKeyword == context.SymbolId)) 
-                        || (StatementParser.gotoKeyword == context.SymbolId)) 
-                        || (StatementParser.forKeyword == context.SymbolId)) 
-                        || (StatementParser.whileKeyword == context.SymbolId)) 
-                        || (StatementParser.returnKeyword == context.SymbolId)) 
-                        || (StatementParser.tryKeyword == context.SymbolId)) 
-                        || (ExpressionParser.rbrace == context.SymbolId))) {
+                        || (ExpressionParser.rbrace == context.SymbolId)) 
+                        || (StatementParser.EosSymbol == context.SymbolId))) {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(StatementParser.TryStatementPart, "TryStatementPart", children, line__, column__, position__);
             }
@@ -11266,7 +12262,7 @@ namespace CD {
             int column__ = context.Column;
             long position__ = context.Position;
             // StatementBlockPart -> StatementList2 rbrace
-            if (((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
+            if ((((((((((((((((((((((((((((((((((((((((((((((StatementParser.semi == context.SymbolId) 
                         || (StatementParser.varType == context.SymbolId)) 
                         || (ExpressionParser.boolType == context.SymbolId)) 
                         || (ExpressionParser.identifier2 == context.SymbolId)) 
@@ -11309,7 +12305,8 @@ namespace CD {
                         || (StatementParser.forKeyword == context.SymbolId)) 
                         || (StatementParser.whileKeyword == context.SymbolId)) 
                         || (StatementParser.returnKeyword == context.SymbolId)) 
-                        || (StatementParser.tryKeyword == context.SymbolId))) {
+                        || (StatementParser.tryKeyword == context.SymbolId)) 
+                        || (StatementParser.throwKeyword == context.SymbolId))) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 children.AddRange(StatementParser.ParseStatementList2(context).Children);
                 if ((false 
@@ -11589,534 +12586,7 @@ namespace CD {
             throw new SyntaxException(string.Format("Expecting FinallyPart or CatchClauseList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
     }
-    /// <summary>Parses the following grammar:
-    /// CustomAttribute= TypeBase [ "(" [ CustomAttributeArgList ] ")" ];
-    /// CustomAttributeArgList= CustomAttributeArg { "," CustomAttributeArg };
-    /// CustomAttributeArg= Identifier "=" Expression | Expression;
-    /// CustomAttributeTarget= ( assemblyKeyword | returnKeyword ) ":";
-    /// CustomAttributeGroup= "[" [ CustomAttributeTarget ] CustomAttribute { "," CustomAttribute } "]";
-    /// CustomAttributeGroups= { CustomAttributeGroup }+;
-    /// TypeAttributes= { publicKeyword | internalKeyword | privateKeyword };
-    /// {EnumPart}= "{" EnumFields "}" | ":" Type "{" EnumFields "}";
-    /// {EnumFields}= [ EnumField { "," EnumField } ];
-    /// EnumField= Identifier "=" Expression;
-    /// Where= "where" WhereClauses;
-    /// WhereClauses;
-    /// WhereClause= Identifier ":" WhereClausePart { "," WhereClausePart };
-    /// WhereClausePart= Type | newKeyword "(" ")";
-    /// {BaseType}= Type;
-    /// BaseTypes;
-    /// TypeDeclPart;
-    /// TypeParams= [ "<" [ CustomAttributeGroup ] Identifier { "," Identifier } ">" ];
-    /// Enum= MemberAttributes "enum" Identifier EnumPart;
-    /// Struct= MemberAttributes "struct" Identifier TypeParams TypeDeclPart;
-    /// Class= MemberAttributes "class" Identifier TypeParams TypeDeclPart;
-    /// Interface= MemberAttributes "interface" Identifier [ "<" TypeParams ">" ] TypeDeclPart;
-    /// TypeDecl;
-    /// {MemberAttribute}= newKeyword | constKeyword | publicKeyword | protectedKeyword | internalKeyword | privateKeyword | staticKeyword | overrideKeyword;
-    /// MemberAttributes= { MemberAttribute };
-    /// PrivateImplementationType;
-    /// MethodParamList= [ MethodParam { "," MethodParam } ];
-    /// MethodParam= [ outKeyword | refKeyword ] Type Identifier;
-    /// ParamList= [ Param { "," Param } ];
-    /// Param= Type Identifier;
-    /// PropertyAccessors;
-    /// PropertyGet= "get" ( StatementBlock | ";" );
-    /// PropertySet= "set" ( StatementBlock | ";" );
-    /// ConstructorChain= ( "base" | "this" ) "(" ParamList ")";
-    /// Constructor;
-    /// Method;
-    /// Property;
-    /// Event;
-    /// Field;
-    /// Member;
-    /// Members;
-    /// assemblyKeyword= "assembly";
-    /// voidType= "void";
-    /// partialKeyword= "partial";
-    /// classKeyword= "class";
-    /// enumKeyword= "enum";
-    /// structKeyword= "struct";
-    /// interfaceKeyword= "interface";
-    /// getKeyword= "get";
-    /// setKeyword= "set";
-    /// eventKeyword= "event";
-    /// publicKeyword= "public";
-    /// privateKeyword= "private";
-    /// protectedKeyword= "protected";
-    /// internalKeyword= "internal";
-    /// staticKeyword= "static";
-    /// abstractKeyword= "abstract";
-    /// constKeyword= "const";
-    /// overrideKeyword= "override";
-    /// whereKeyword= "where";
-    /// </summary>
-    /// <remarks>The rules for the factored grammar are as follows:
-    /// CustomAttributeArg -> Identifier eq Expression
-    /// CustomAttributeArg -> Expression
-    /// CustomAttributeTarget -> assemblyKeyword colon
-    /// CustomAttributeTarget -> returnKeyword colon
-    /// CustomAttributeGroups -> CustomAttributeGroupList3
-    /// TypeAttributes -> TypeAttributesList
-    /// TypeAttributes ->
-    /// EnumPart -> lbrace EnumFields rbrace
-    /// EnumPart -> colon Type lbrace EnumFields rbrace
-    /// EnumFields ->
-    /// EnumField -> Identifier eq Expression
-    /// Where -> whereKeyword WhereClauses
-    /// WhereClausePart -> Type
-    /// WhereClausePart -> newKeyword lparen rparen
-    /// BaseType -> Type
-    /// TypeParams ->
-    /// Enum -> MemberAttributes enumKeyword Identifier EnumPart
-    /// Struct -> MemberAttributes structKeyword Identifier TypeParams TypeDeclPart
-    /// Class -> MemberAttributes classKeyword Identifier TypeParams TypeDeclPart
-    /// MemberAttribute -> newKeyword
-    /// MemberAttribute -> constKeyword
-    /// MemberAttribute -> publicKeyword
-    /// MemberAttribute -> protectedKeyword
-    /// MemberAttribute -> internalKeyword
-    /// MemberAttribute -> privateKeyword
-    /// MemberAttribute -> staticKeyword
-    /// MemberAttribute -> overrideKeyword
-    /// MemberAttributes -> MemberAttributeList
-    /// MemberAttributes ->
-    /// MethodParamList ->
-    /// MethodParam -> outKeyword Type Identifier
-    /// MethodParam -> refKeyword Type Identifier
-    /// MethodParam -> Type Identifier
-    /// ParamList ->
-    /// Param -> Type Identifier
-    /// ConstructorChain -> baseRef lparen ParamList rparen
-    /// ConstructorChain -> thisRef lparen ParamList rparen
-    /// NamespaceNameList -> dot Identifier NamespaceNameListRightAssoc
-    /// RelationalExpressionList -> lt TermExpression RelationalExpressionListRightAssoc RelationalExpressionListRightAssoc2 RelationalExpressionListRightAssoc3
-    /// RelationalExpressionList -> lte TermExpression RelationalExpressionListRightAssoc RelationalExpressionListRightAssoc2 RelationalExpressionListRightAssoc3
-    /// RelationalExpressionList -> gt TermExpression RelationalExpressionListRightAssoc RelationalExpressionListRightAssoc2 RelationalExpressionListRightAssoc3
-    /// RelationalExpressionList -> gte TermExpression RelationalExpressionListRightAssoc RelationalExpressionListRightAssoc2 RelationalExpressionListRightAssoc3
-    /// EqualityExpressionList -> eqEq RelationalExpression EqualityExpressionListRightAssoc EqualityExpressionListRightAssoc2
-    /// EqualityExpressionList -> notEq RelationalExpression EqualityExpressionListRightAssoc EqualityExpressionListRightAssoc2
-    /// BitwiseAndExpressionList -> bitwiseAnd EqualityExpression BitwiseAndExpressionListRightAssoc
-    /// BitwiseOrExpressionList -> bitwiseOr BitwiseAndExpression BitwiseOrExpressionListRightAssoc
-    /// AndExpressionList -> and BitwiseOrExpression AndExpressionListRightAssoc
-    /// OrExpressionList -> or AndExpression OrExpressionListRightAssoc
-    /// AssignExpressionList -> eq OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> addAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> subAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> mulAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> divAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> modAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> bitwiseAndAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// AssignExpressionList -> bitwiseOrAssign OrExpression AssignExpressionListRightAssoc AssignExpressionListRightAssoc2 AssignExpressionListRightAssoc3 AssignExpressionListRightAssoc4 AssignExpressionListRightAssoc5
-    /// TermExpressionList -> add FactorExpression TermExpressionListRightAssoc TermExpressionListRightAssoc2
-    /// TermExpressionList -> sub FactorExpression TermExpressionListRightAssoc TermExpressionListRightAssoc2
-    /// FactorExpressionList -> mul UnaryExpression FactorExpressionListRightAssoc FactorExpressionListRightAssoc2 FactorExpressionListRightAssoc3
-    /// FactorExpressionList -> div UnaryExpression FactorExpressionListRightAssoc FactorExpressionListRightAssoc2 FactorExpressionListRightAssoc3
-    /// FactorExpressionList -> mod UnaryExpression FactorExpressionListRightAssoc FactorExpressionListRightAssoc2 FactorExpressionListRightAssoc3
-    /// MemberInvokeRefList -> comma MethodArg MemberInvokeRefListRightAssoc
-    /// MemberIndexerRefList -> comma Expression MemberIndexerRefListRightAssoc
-    /// TypeBaseList -> dot identifier TypeBaseListRightAssoc
-    /// TypeArraySpecList -> TypeArraySpec TypeArraySpecListRightAssoc
-    /// TypeGenericPartList -> comma Type TypeGenericPartListRightAssoc
-    /// TypeArraySpecRankList -> TypeArraySpecRank TypeArraySpecRankListRightAssoc
-    /// NewObjectPartList -> comma Expression NewObjectPartListRightAssoc
-    /// ArraySpecExpressionListList -> comma Expression ArraySpecExpressionListListRightAssoc
-    /// ArrayInitializerList -> comma Expression ArrayInitializerListRightAssoc
-    /// MemberAnyRefList -> MemberAnyRef MemberAnyRefListRightAssoc
-    /// MemberAnyRefList2 -> MemberAnyRef MemberAnyRefList2RightAssoc
-    /// MemberAnyRefList3 -> MemberAnyRef MemberAnyRefList3RightAssoc
-    /// MemberAnyRefList4 -> MemberAnyRef MemberAnyRefList4RightAssoc
-    /// MemberAnyRefList5 -> MemberAnyRef MemberAnyRefList5RightAssoc
-    /// MemberAnyRefList6 -> MemberAnyRef MemberAnyRefList6RightAssoc
-    /// MemberAnyRefList7 -> MemberAnyRef MemberAnyRefList7RightAssoc
-    /// MemberAnyRefList8 -> MemberAnyRef MemberAnyRefList8RightAssoc
-    /// MemberAnyRefList9 -> MemberAnyRef MemberAnyRefList9RightAssoc
-    /// MemberAnyRefList10 -> MemberAnyRef MemberAnyRefList10RightAssoc
-    /// MemberAnyRefList11 -> MemberAnyRef MemberAnyRefList11RightAssoc
-    /// MemberAnyRefList12 -> MemberAnyRef MemberAnyRefList12RightAssoc
-    /// MemberAnyRefList13 -> MemberAnyRef MemberAnyRefList13RightAssoc
-    /// MemberAnyRefList14 -> MemberAnyRef MemberAnyRefList14RightAssoc
-    /// CatchClauseList -> CatchClause CatchClauseListRightAssoc
-    /// StatementList -> Statement StatementListRightAssoc
-    /// StatementList2 -> Statement StatementList2RightAssoc
-    /// CustomAttributeArgListList -> comma CustomAttributeArg CustomAttributeArgListListRightAssoc
-    /// CustomAttributeGroupList -> comma CustomAttribute CustomAttributeGroupListRightAssoc
-    /// CustomAttributeGroupList2 -> comma CustomAttribute CustomAttributeGroupList2RightAssoc
-    /// CustomAttributeGroupList3 -> CustomAttributeGroup CustomAttributeGroupList3RightAssoc
-    /// TypeAttributesList -> publicKeyword TypeAttributesListRightAssoc TypeAttributesListRightAssoc2 TypeAttributesListRightAssoc3
-    /// TypeAttributesList -> internalKeyword TypeAttributesListRightAssoc TypeAttributesListRightAssoc2 TypeAttributesListRightAssoc3
-    /// TypeAttributesList -> privateKeyword TypeAttributesListRightAssoc TypeAttributesListRightAssoc2 TypeAttributesListRightAssoc3
-    /// EnumFieldsList -> comma EnumField EnumFieldsListRightAssoc
-    /// WhereClauseList -> comma WhereClausePart WhereClauseListRightAssoc
-    /// TypeParamsList -> comma Identifier TypeParamsListRightAssoc
-    /// TypeParamsList2 -> comma Identifier TypeParamsList2RightAssoc
-    /// MemberAttributeList -> MemberAttribute MemberAttributeListRightAssoc
-    /// MethodParamListList -> comma MethodParam MethodParamListListRightAssoc
-    /// ParamListList -> comma Param ParamListListRightAssoc
-    /// WhereClauses -> Identifier
-    /// TypeDeclPart -> colon
-    /// TypeDeclPart -> whereKeyword
-    /// TypeDeclPart -> lbrace
-    /// TypeDecl -> publicKeyword
-    /// TypeDecl -> internalKeyword
-    /// TypeDecl -> privateKeyword
-    /// TypeDecl -> structKeyword
-    /// TypeDecl -> classKeyword
-    /// TypeDecl -> enumKeyword
-    /// TypeDecl -> interfaceKeyword
-    /// TypeDecl -> partialKeyword
-    /// TypeDecl -> lbracket
-    /// PrivateImplementationType -> Identifier
-    /// PropertyAccessors -> getKeyword
-    /// PropertyAccessors -> setKeyword
-    /// Member -> lbracket
-    /// Member -> newKeyword
-    /// Member -> constKeyword
-    /// Member -> publicKeyword
-    /// Member -> protectedKeyword
-    /// Member -> internalKeyword
-    /// Member -> privateKeyword
-    /// Member -> staticKeyword
-    /// Member -> overrideKeyword
-    /// Member -> Type
-    /// Member -> eventKeyword
-    /// Member -> Identifier
-    /// Members -> lbracket
-    /// Members -> newKeyword
-    /// Members -> constKeyword
-    /// Members -> publicKeyword
-    /// Members -> protectedKeyword
-    /// Members -> internalKeyword
-    /// Members -> privateKeyword
-    /// Members -> staticKeyword
-    /// Members -> overrideKeyword
-    /// Members -> Type
-    /// Members -> eventKeyword
-    /// Members -> Identifier
-    /// ExpressionFollows -> Expression semi
-    /// ExpressionFollows2 -> Expression rparen
-    /// ExpressionFollows3 -> Expression rbracket
-    /// ExpressionFollows4 -> Expression comma
-    /// TypeFollows -> Type Identifier
-    /// TypeFollows2 -> Type lbrace
-    /// TypeFollows3 -> Type rbracket
-    /// TypeFollows4 -> Type #EOS
-    /// CustomAttributeGroupFollows -> CustomAttributeGroup lbracket
-    /// CustomAttributeGroupFollows2 -> CustomAttributeGroup newKeyword
-    /// CustomAttributeGroupFollows3 -> CustomAttributeGroup constKeyword
-    /// CustomAttributeGroupFollows4 -> CustomAttributeGroup publicKeyword
-    /// CustomAttributeGroupFollows5 -> CustomAttributeGroup protectedKeyword
-    /// CustomAttributeGroupFollows6 -> CustomAttributeGroup internalKeyword
-    /// CustomAttributeGroupFollows7 -> CustomAttributeGroup privateKeyword
-    /// CustomAttributeGroupFollows8 -> CustomAttributeGroup staticKeyword
-    /// CustomAttributeGroupFollows9 -> CustomAttributeGroup overrideKeyword
-    /// CustomAttributeGroupFollows10 -> CustomAttributeGroup Type
-    /// CustomAttributeGroupFollows11 -> CustomAttributeGroup eventKeyword
-    /// CustomAttributeGroupFollows12 -> CustomAttributeGroup Identifier
-    /// CustomAttributeGroupFollows13 -> CustomAttributeGroup publicKeyword
-    /// CustomAttributeGroupFollows14 -> CustomAttributeGroup internalKeyword
-    /// CustomAttributeGroupFollows15 -> CustomAttributeGroup privateKeyword
-    /// CustomAttributeGroupFollows16 -> CustomAttributeGroup structKeyword
-    /// CustomAttributeGroupFollows17 -> CustomAttributeGroup classKeyword
-    /// CustomAttributeGroupFollows18 -> CustomAttributeGroup enumKeyword
-    /// CustomAttributeGroupFollows19 -> CustomAttributeGroup interfaceKeyword
-    /// CustomAttributeGroupFollows20 -> CustomAttributeGroup partialKeyword
-    /// CustomAttributeGroupFollows21 -> CustomAttributeGroup lbracket
-    /// CustomAttributeGroupsFollows -> CustomAttributeGroups lbracket
-    /// CustomAttributeGroupsFollows2 -> CustomAttributeGroups newKeyword
-    /// CustomAttributeGroupsFollows3 -> CustomAttributeGroups constKeyword
-    /// CustomAttributeGroupsFollows4 -> CustomAttributeGroups publicKeyword
-    /// CustomAttributeGroupsFollows5 -> CustomAttributeGroups protectedKeyword
-    /// CustomAttributeGroupsFollows6 -> CustomAttributeGroups internalKeyword
-    /// CustomAttributeGroupsFollows7 -> CustomAttributeGroups privateKeyword
-    /// CustomAttributeGroupsFollows8 -> CustomAttributeGroups staticKeyword
-    /// CustomAttributeGroupsFollows9 -> CustomAttributeGroups overrideKeyword
-    /// CustomAttributeGroupsFollows10 -> CustomAttributeGroups Type
-    /// CustomAttributeGroupsFollows11 -> CustomAttributeGroups eventKeyword
-    /// CustomAttributeGroupsFollows12 -> CustomAttributeGroups Identifier
-    /// CustomAttributeGroupsFollows13 -> CustomAttributeGroups publicKeyword
-    /// CustomAttributeGroupsFollows14 -> CustomAttributeGroups internalKeyword
-    /// CustomAttributeGroupsFollows15 -> CustomAttributeGroups privateKeyword
-    /// CustomAttributeGroupsFollows16 -> CustomAttributeGroups structKeyword
-    /// CustomAttributeGroupsFollows17 -> CustomAttributeGroups classKeyword
-    /// CustomAttributeGroupsFollows18 -> CustomAttributeGroups enumKeyword
-    /// CustomAttributeGroupsFollows19 -> CustomAttributeGroups interfaceKeyword
-    /// CustomAttributeGroupsFollows20 -> CustomAttributeGroups partialKeyword
-    /// CustomAttributeGroupsFollows21 -> CustomAttributeGroups lbracket
-    /// CustomAttributeGroupsFollows22 -> CustomAttributeGroups Identifier
-    /// CustomAttributeGroupsFollows23 -> CustomAttributeGroups namespaceKeyword
-    /// TypeAttributesFollows -> TypeAttributes classKeyword
-    /// TypeAttributesFollows2 -> TypeAttributes enumKeyword
-    /// TypeAttributesFollows3 -> TypeAttributes structKeyword
-    /// TypeAttributesFollows4 -> TypeAttributes interfaceKeyword
-    /// TypeAttributesFollows5 -> TypeAttributes partialKeyword
-    /// WhereFollows -> Where lbrace
-    /// WhereClauseFollows -> WhereClause lbrace
-    /// BaseTypeFollows -> BaseType comma
-    /// BaseTypeFollows2 -> BaseType whereKeyword
-    /// BaseTypeFollows3 -> BaseType lbrace
-    /// TypeDeclPartFollows -> TypeDeclPart rbrace
-    /// TypeParamsFollows -> TypeParams colon
-    /// TypeParamsFollows2 -> TypeParams whereKeyword
-    /// TypeParamsFollows3 -> TypeParams lbrace
-    /// TypeDeclFollows -> TypeDecl publicKeyword
-    /// TypeDeclFollows2 -> TypeDecl internalKeyword
-    /// TypeDeclFollows3 -> TypeDecl privateKeyword
-    /// TypeDeclFollows4 -> TypeDecl structKeyword
-    /// TypeDeclFollows5 -> TypeDecl classKeyword
-    /// TypeDeclFollows6 -> TypeDecl enumKeyword
-    /// TypeDeclFollows7 -> TypeDecl interfaceKeyword
-    /// TypeDeclFollows8 -> TypeDecl partialKeyword
-    /// TypeDeclFollows9 -> TypeDecl lbracket
-    /// TypeDeclFollows10 -> TypeDecl usingKeyword
-    /// TypeDeclFollows11 -> TypeDecl namespaceKeyword
-    /// TypeDeclFollows12 -> TypeDecl rbrace
-    /// TypeDeclFollows13 -> TypeDecl lbracket
-    /// MethodParamListFollows -> MethodParamList rparen
-    /// ParamListFollows -> ParamList rparen
-    /// ParamListFollows2 -> ParamList rbracket
-    /// MemberFollows -> Member rbrace
-    /// NamespaceNameListRightAssoc -> dot Identifier NamespaceNameListRightAssoc
-    /// NamespaceNameListRightAssoc ->
-    /// RelationalExpressionListRightAssoc -> lt TermExpression RelationalExpressionListRightAssoc
-    /// RelationalExpressionListRightAssoc ->
-    /// RelationalExpressionListRightAssoc2 -> gt TermExpression RelationalExpressionListRightAssoc2
-    /// RelationalExpressionListRightAssoc2 ->
-    /// EqualityExpressionListRightAssoc -> eqEq RelationalExpression EqualityExpressionListRightAssoc
-    /// EqualityExpressionListRightAssoc ->
-    /// BitwiseAndExpressionListRightAssoc -> bitwiseAnd EqualityExpression BitwiseAndExpressionListRightAssoc
-    /// BitwiseAndExpressionListRightAssoc ->
-    /// BitwiseOrExpressionListRightAssoc -> bitwiseOr BitwiseAndExpression BitwiseOrExpressionListRightAssoc
-    /// BitwiseOrExpressionListRightAssoc ->
-    /// AndExpressionListRightAssoc -> and BitwiseOrExpression AndExpressionListRightAssoc
-    /// AndExpressionListRightAssoc ->
-    /// OrExpressionListRightAssoc -> or AndExpression OrExpressionListRightAssoc
-    /// OrExpressionListRightAssoc ->
-    /// AssignExpressionListRightAssoc -> eq OrExpression AssignExpressionListRightAssoc
-    /// AssignExpressionListRightAssoc ->
-    /// AssignExpressionListRightAssoc2 -> subAssign OrExpression AssignExpressionListRightAssoc2
-    /// AssignExpressionListRightAssoc2 ->
-    /// AssignExpressionListRightAssoc3 -> divAssign OrExpression AssignExpressionListRightAssoc3
-    /// AssignExpressionListRightAssoc3 ->
-    /// AssignExpressionListRightAssoc4 -> bitwiseAndAssign OrExpression AssignExpressionListRightAssoc4
-    /// AssignExpressionListRightAssoc4 ->
-    /// TermExpressionListRightAssoc -> add FactorExpression TermExpressionListRightAssoc
-    /// TermExpressionListRightAssoc ->
-    /// FactorExpressionListRightAssoc -> mul UnaryExpression FactorExpressionListRightAssoc
-    /// FactorExpressionListRightAssoc ->
-    /// FactorExpressionListRightAssoc2 -> mod UnaryExpression FactorExpressionListRightAssoc2
-    /// FactorExpressionListRightAssoc2 ->
-    /// MemberInvokeRefListRightAssoc -> comma MethodArg MemberInvokeRefListRightAssoc
-    /// MemberInvokeRefListRightAssoc ->
-    /// MemberIndexerRefListRightAssoc -> comma Expression MemberIndexerRefListRightAssoc
-    /// MemberIndexerRefListRightAssoc ->
-    /// TypeBaseListRightAssoc -> dot identifier TypeBaseListRightAssoc
-    /// TypeBaseListRightAssoc ->
-    /// TypeArraySpecListRightAssoc -> TypeArraySpec TypeArraySpecListRightAssoc
-    /// TypeArraySpecListRightAssoc ->
-    /// TypeGenericPartListRightAssoc -> comma Type TypeGenericPartListRightAssoc
-    /// TypeGenericPartListRightAssoc ->
-    /// TypeArraySpecRankListRightAssoc -> TypeArraySpecRank TypeArraySpecRankListRightAssoc
-    /// TypeArraySpecRankListRightAssoc ->
-    /// NewObjectPartListRightAssoc -> comma Expression NewObjectPartListRightAssoc
-    /// NewObjectPartListRightAssoc ->
-    /// ArraySpecExpressionListListRightAssoc -> comma Expression ArraySpecExpressionListListRightAssoc
-    /// ArraySpecExpressionListListRightAssoc ->
-    /// ArrayInitializerListRightAssoc -> comma Expression ArrayInitializerListRightAssoc
-    /// ArrayInitializerListRightAssoc ->
-    /// MemberAnyRefListRightAssoc -> MemberAnyRef MemberAnyRefListRightAssoc
-    /// MemberAnyRefListRightAssoc ->
-    /// MemberAnyRefList2RightAssoc -> MemberAnyRef MemberAnyRefList2RightAssoc
-    /// MemberAnyRefList2RightAssoc ->
-    /// MemberAnyRefList3RightAssoc -> MemberAnyRef MemberAnyRefList3RightAssoc
-    /// MemberAnyRefList3RightAssoc ->
-    /// MemberAnyRefList4RightAssoc -> MemberAnyRef MemberAnyRefList4RightAssoc
-    /// MemberAnyRefList4RightAssoc ->
-    /// MemberAnyRefList5RightAssoc -> MemberAnyRef MemberAnyRefList5RightAssoc
-    /// MemberAnyRefList5RightAssoc ->
-    /// MemberAnyRefList6RightAssoc -> MemberAnyRef MemberAnyRefList6RightAssoc
-    /// MemberAnyRefList6RightAssoc ->
-    /// MemberAnyRefList7RightAssoc -> MemberAnyRef MemberAnyRefList7RightAssoc
-    /// MemberAnyRefList7RightAssoc ->
-    /// MemberAnyRefList8RightAssoc -> MemberAnyRef MemberAnyRefList8RightAssoc
-    /// MemberAnyRefList8RightAssoc ->
-    /// MemberAnyRefList9RightAssoc -> MemberAnyRef MemberAnyRefList9RightAssoc
-    /// MemberAnyRefList9RightAssoc ->
-    /// MemberAnyRefList10RightAssoc -> MemberAnyRef MemberAnyRefList10RightAssoc
-    /// MemberAnyRefList10RightAssoc ->
-    /// MemberAnyRefList11RightAssoc -> MemberAnyRef MemberAnyRefList11RightAssoc
-    /// MemberAnyRefList11RightAssoc ->
-    /// MemberAnyRefList12RightAssoc -> MemberAnyRef MemberAnyRefList12RightAssoc
-    /// MemberAnyRefList12RightAssoc ->
-    /// MemberAnyRefList13RightAssoc -> MemberAnyRef MemberAnyRefList13RightAssoc
-    /// MemberAnyRefList13RightAssoc ->
-    /// MemberAnyRefList14RightAssoc -> MemberAnyRef MemberAnyRefList14RightAssoc
-    /// MemberAnyRefList14RightAssoc ->
-    /// CatchClauseListRightAssoc -> CatchClause CatchClauseListRightAssoc
-    /// CatchClauseListRightAssoc ->
-    /// StatementListRightAssoc -> Statement StatementListRightAssoc
-    /// StatementListRightAssoc ->
-    /// StatementList2RightAssoc -> Statement StatementList2RightAssoc
-    /// StatementList2RightAssoc ->
-    /// CustomAttributeArgListListRightAssoc -> comma CustomAttributeArg CustomAttributeArgListListRightAssoc
-    /// CustomAttributeArgListListRightAssoc ->
-    /// CustomAttributeGroupListRightAssoc -> comma CustomAttribute CustomAttributeGroupListRightAssoc
-    /// CustomAttributeGroupListRightAssoc ->
-    /// CustomAttributeGroupList2RightAssoc -> comma CustomAttribute CustomAttributeGroupList2RightAssoc
-    /// CustomAttributeGroupList2RightAssoc ->
-    /// CustomAttributeGroupList3RightAssoc -> CustomAttributeGroup CustomAttributeGroupList3RightAssoc
-    /// CustomAttributeGroupList3RightAssoc ->
-    /// TypeAttributesListRightAssoc -> publicKeyword TypeAttributesListRightAssoc
-    /// TypeAttributesListRightAssoc ->
-    /// TypeAttributesListRightAssoc2 -> privateKeyword TypeAttributesListRightAssoc2
-    /// TypeAttributesListRightAssoc2 ->
-    /// EnumFieldsListRightAssoc -> comma EnumField EnumFieldsListRightAssoc
-    /// EnumFieldsListRightAssoc ->
-    /// WhereClauseListRightAssoc -> comma WhereClausePart WhereClauseListRightAssoc
-    /// WhereClauseListRightAssoc ->
-    /// TypeParamsListRightAssoc -> comma Identifier TypeParamsListRightAssoc
-    /// TypeParamsListRightAssoc ->
-    /// TypeParamsList2RightAssoc -> comma Identifier TypeParamsList2RightAssoc
-    /// TypeParamsList2RightAssoc ->
-    /// MemberAttributeListRightAssoc -> MemberAttribute MemberAttributeListRightAssoc
-    /// MemberAttributeListRightAssoc ->
-    /// MethodParamListListRightAssoc -> comma MethodParam MethodParamListListRightAssoc
-    /// MethodParamListListRightAssoc ->
-    /// ParamListListRightAssoc -> comma Param ParamListListRightAssoc
-    /// ParamListListRightAssoc ->
-    /// CustomAttributePart -> CustomAttributeArgList rparen
-    /// CustomAttributePart -> rparen
-    /// CustomAttributeArgList -> CustomAttributeArg CustomAttributeArgListPart
-    /// CustomAttributeArgListPart -> CustomAttributeArgListList
-    /// CustomAttributeArgListPart ->
-    /// CustomAttributeGroupPart -> CustomAttributeGroupList rbracket
-    /// CustomAttributeGroupPart -> rbracket
-    /// CustomAttributeGroupPart2 -> CustomAttributeGroupList2 rbracket
-    /// CustomAttributeGroupPart2 -> rbracket
-    /// EnumFields -> EnumField EnumFieldsPart
-    /// EnumFieldsPart -> EnumFieldsList
-    /// EnumFieldsPart ->
-    /// WhereClause -> Identifier colon WhereClausePart WhereClausePart2
-    /// WhereClausePart2 -> WhereClauseList
-    /// WhereClausePart2 ->
-    /// TypeParamsPart -> TypeParamsList gt
-    /// TypeParamsPart -> gt
-    /// TypeParamsPart2 -> TypeParamsList2 gt
-    /// TypeParamsPart2 -> gt
-    /// Interface -> MemberAttributes interfaceKeyword Identifier InterfacePart
-    /// InterfacePart -> lt TypeParams gt TypeDeclPart
-    /// InterfacePart -> TypeDeclPart
-    /// MethodParamList -> MethodParam MethodParamListPart
-    /// MethodParamListPart -> MethodParamListList
-    /// MethodParamListPart ->
-    /// ParamList -> Param ParamListPart
-    /// ParamListPart -> ParamListList
-    /// ParamListPart ->
-    /// PropertyGet -> getKeyword PropertyGetPart
-    /// PropertyGetPart -> StatementBlock
-    /// PropertyGetPart -> semi
-    /// PropertySet -> setKeyword PropertySetPart
-    /// PropertySetPart -> StatementBlock
-    /// PropertySetPart -> semi
-    /// RelationalExpressionListPart -> lte TermExpression
-    /// RelationalExpressionListPart -> gte TermExpression
-    /// AssignExpressionListPart -> addAssign OrExpression
-    /// AssignExpressionListPart -> mulAssign OrExpression
-    /// AssignExpressionListPart -> modAssign OrExpression
-    /// AssignExpressionListPart -> bitwiseOrAssign OrExpression
-    /// EqualityExpressionListRightAssoc2 -> notEq RelationalExpression EqualityExpressionListRightAssoc2
-    /// EqualityExpressionListRightAssoc2 ->
-    /// TermExpressionListRightAssoc2 -> sub FactorExpression TermExpressionListRightAssoc2
-    /// TermExpressionListRightAssoc2 ->
-    /// FactorExpressionListRightAssoc3 -> div UnaryExpression FactorExpressionListRightAssoc3
-    /// FactorExpressionListRightAssoc3 ->
-    /// TypeAttributesListRightAssoc3 -> internalKeyword TypeAttributesListRightAssoc3
-    /// TypeAttributesListRightAssoc3 ->
-    /// RelationalExpressionListRightAssoc3 -> RelationalExpressionListPart RelationalExpressionListRightAssoc3
-    /// RelationalExpressionListRightAssoc3 ->
-    /// AssignExpressionListRightAssoc5 -> AssignExpressionListPart AssignExpressionListRightAssoc5
-    /// AssignExpressionListRightAssoc5 ->
-    /// CustomAttribute -> TypeBase CustomAttributePart2
-    /// CustomAttributePart2 ->
-    /// CustomAttributePart2 -> lparen CustomAttributePart
-    /// TypeParams -> lt TypeParamsPart3
-    /// TypeParamsPart3 -> CustomAttributeGroup Identifier TypeParamsPart
-    /// TypeParamsPart3 -> Identifier TypeParamsPart2
-    /// CustomAttributeGroup -> lbracket CustomAttributeGroupPart3
-    /// CustomAttributeGroupPart3 -> CustomAttributeTarget CustomAttribute CustomAttributeGroupPart
-    /// CustomAttributeGroupPart3 -> CustomAttribute CustomAttributeGroupPart2
-    /// TypeBase -> boolType
-    /// TypeBase -> identifier
-    /// TypeBase -> charType
-    /// TypeBase -> stringType
-    /// TypeBase -> floatType
-    /// TypeBase -> doubleType
-    /// TypeBase -> decimalType
-    /// TypeBase -> sbyteType
-    /// TypeBase -> byteType
-    /// TypeBase -> shortType
-    /// TypeBase -> ushortType
-    /// TypeBase -> intType
-    /// TypeBase -> uintType
-    /// TypeBase -> longType
-    /// TypeBase -> ulongType
-    /// TypeBase -> objectType
-    /// Identifier -> verbatimIdentifier
-    /// Identifier -> identifier
-    /// Expression -> add
-    /// Expression -> sub
-    /// Expression -> not
-    /// Expression -> inc
-    /// Expression -> dec
-    /// Expression -> lparen
-    /// Expression -> nullLiteral
-    /// Expression -> identifier
-    /// Expression -> typeOf
-    /// Expression -> nameOf
-    /// Expression -> defaultOf
-    /// Expression -> verbatimIdentifier
-    /// Expression -> verbatimStringLiteral
-    /// Expression -> characterLiteral
-    /// Expression -> integerLiteral
-    /// Expression -> floatLiteral
-    /// Expression -> stringLiteral
-    /// Expression -> boolLiteral
-    /// Expression -> newKeyword
-    /// Expression -> thisRef
-    /// Expression -> baseRef
-    /// Expression -> boolType
-    /// Expression -> charType
-    /// Expression -> stringType
-    /// Expression -> floatType
-    /// Expression -> doubleType
-    /// Expression -> decimalType
-    /// Expression -> sbyteType
-    /// Expression -> byteType
-    /// Expression -> shortType
-    /// Expression -> ushortType
-    /// Expression -> intType
-    /// Expression -> uintType
-    /// Expression -> longType
-    /// Expression -> ulongType
-    /// Expression -> objectType
-    /// Type -> boolType
-    /// Type -> identifier
-    /// Type -> charType
-    /// Type -> stringType
-    /// Type -> floatType
-    /// Type -> doubleType
-    /// Type -> decimalType
-    /// Type -> sbyteType
-    /// Type -> byteType
-    /// Type -> shortType
-    /// Type -> ushortType
-    /// Type -> intType
-    /// Type -> uintType
-    /// Type -> longType
-    /// Type -> ulongType
-    /// Type -> objectType
-    /// StatementBlock -> lbrace
-    /// </remarks>
+    /// <summary>Parses the indicated grammar. Refer to C:\dev\BuildPack\scratch\SlangType.xbnf</summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal partial class TypeDeclParser {
         internal const int ErrorSymbol = -1;
@@ -12224,263 +12694,270 @@ namespace CD {
         public const int FactorExpressionListRightAssoc3 = 158;
         public const int RelationalExpressionListRightAssoc3 = 159;
         public const int AssignExpressionListRightAssoc5 = 160;
-        public const int Statement = 182;
+        public const int InnerStatement = 182;
         public const int CatchClauseList = 184;
         public const int StatementList = 185;
         public const int StatementList2 = 186;
-        public const int CatchClauseListRightAssoc = 190;
-        public const int StatementListRightAssoc = 191;
-        public const int StatementList2RightAssoc = 192;
-        public const int CatchClause = 199;
-        public const int StatementBlock = 201;
-        public const int CustomAttributeArg = 206;
-        public const int CustomAttributeTarget = 207;
-        public const int CustomAttributeGroups = 208;
-        public const int TypeAttributes = 209;
-        public const int EnumPart = 210;
-        public const int EnumFields = 211;
-        public const int EnumField = 212;
-        public const int Where = 213;
-        public const int WhereClausePart = 214;
-        public const int BaseType = 215;
-        public const int TypeParams = 216;
-        public const int Enum = 217;
-        public const int Struct = 218;
-        public const int Class = 219;
-        public const int MemberAttribute = 220;
-        public const int MemberAttributes = 221;
-        public const int MethodParamList = 222;
-        public const int MethodParam = 223;
-        public const int ParamList = 224;
-        public const int Param = 225;
-        public const int ConstructorChain = 226;
-        public const int CustomAttributeArgListList = 227;
-        public const int CustomAttributeGroupList = 228;
-        public const int CustomAttributeGroupList2 = 229;
-        public const int CustomAttributeGroupList3 = 230;
-        public const int TypeAttributesList = 231;
-        public const int EnumFieldsList = 232;
-        public const int WhereClauseList = 233;
-        public const int TypeParamsList = 234;
-        public const int TypeParamsList2 = 235;
-        public const int MemberAttributeList = 236;
-        public const int MethodParamListList = 237;
-        public const int ParamListList = 238;
-        public const int WhereClauses = 239;
-        public const int TypeDeclPart = 240;
-        public const int TypeDecl = 241;
-        public const int PrivateImplementationType = 242;
-        public const int PropertyAccessors = 243;
-        public const int Member = 244;
-        public const int Members = 245;
-        public const int CustomAttributeGroupFollows = 246;
-        public const int CustomAttributeGroupFollows2 = 247;
-        public const int CustomAttributeGroupFollows3 = 248;
-        public const int CustomAttributeGroupFollows4 = 249;
-        public const int CustomAttributeGroupFollows5 = 250;
-        public const int CustomAttributeGroupFollows6 = 251;
-        public const int CustomAttributeGroupFollows7 = 252;
-        public const int CustomAttributeGroupFollows8 = 253;
-        public const int CustomAttributeGroupFollows9 = 254;
-        public const int CustomAttributeGroupFollows10 = 255;
-        public const int CustomAttributeGroupFollows11 = 256;
-        public const int CustomAttributeGroupFollows12 = 257;
-        public const int CustomAttributeGroupFollows13 = 258;
-        public const int CustomAttributeGroupFollows14 = 259;
-        public const int CustomAttributeGroupFollows15 = 260;
-        public const int CustomAttributeGroupFollows16 = 261;
-        public const int CustomAttributeGroupFollows17 = 262;
-        public const int CustomAttributeGroupFollows18 = 263;
-        public const int CustomAttributeGroupFollows19 = 264;
-        public const int CustomAttributeGroupFollows20 = 265;
-        public const int CustomAttributeGroupFollows21 = 266;
-        public const int CustomAttributeGroupsFollows = 267;
-        public const int CustomAttributeGroupsFollows2 = 268;
-        public const int CustomAttributeGroupsFollows3 = 269;
-        public const int CustomAttributeGroupsFollows4 = 270;
-        public const int CustomAttributeGroupsFollows5 = 271;
-        public const int CustomAttributeGroupsFollows6 = 272;
-        public const int CustomAttributeGroupsFollows7 = 273;
-        public const int CustomAttributeGroupsFollows8 = 274;
-        public const int CustomAttributeGroupsFollows9 = 275;
-        public const int CustomAttributeGroupsFollows10 = 276;
-        public const int CustomAttributeGroupsFollows11 = 277;
-        public const int CustomAttributeGroupsFollows12 = 278;
-        public const int CustomAttributeGroupsFollows13 = 279;
-        public const int CustomAttributeGroupsFollows14 = 280;
-        public const int CustomAttributeGroupsFollows15 = 281;
-        public const int CustomAttributeGroupsFollows16 = 282;
-        public const int CustomAttributeGroupsFollows17 = 283;
-        public const int CustomAttributeGroupsFollows18 = 284;
-        public const int CustomAttributeGroupsFollows19 = 285;
-        public const int CustomAttributeGroupsFollows20 = 286;
-        public const int CustomAttributeGroupsFollows21 = 287;
-        public const int CustomAttributeGroupsFollows22 = 288;
-        public const int CustomAttributeGroupsFollows23 = 289;
-        public const int TypeAttributesFollows = 290;
-        public const int TypeAttributesFollows2 = 291;
-        public const int TypeAttributesFollows3 = 292;
-        public const int TypeAttributesFollows4 = 293;
-        public const int TypeAttributesFollows5 = 294;
-        public const int WhereFollows = 295;
-        public const int WhereClauseFollows = 296;
-        public const int BaseTypeFollows = 297;
-        public const int BaseTypeFollows2 = 298;
-        public const int BaseTypeFollows3 = 299;
-        public const int TypeDeclPartFollows = 300;
-        public const int TypeParamsFollows = 301;
-        public const int TypeParamsFollows2 = 302;
-        public const int TypeParamsFollows3 = 303;
-        public const int TypeDeclFollows = 304;
-        public const int TypeDeclFollows2 = 305;
-        public const int TypeDeclFollows3 = 306;
-        public const int TypeDeclFollows4 = 307;
-        public const int TypeDeclFollows5 = 308;
-        public const int TypeDeclFollows6 = 309;
-        public const int TypeDeclFollows7 = 310;
-        public const int TypeDeclFollows8 = 311;
-        public const int TypeDeclFollows9 = 312;
-        public const int TypeDeclFollows10 = 313;
-        public const int TypeDeclFollows11 = 314;
-        public const int TypeDeclFollows12 = 315;
-        public const int TypeDeclFollows13 = 316;
-        public const int MethodParamListFollows = 317;
-        public const int ParamListFollows = 318;
-        public const int ParamListFollows2 = 319;
-        public const int MemberFollows = 320;
-        public const int CustomAttributeArgListListRightAssoc = 321;
-        public const int CustomAttributeGroupListRightAssoc = 322;
-        public const int CustomAttributeGroupList2RightAssoc = 323;
-        public const int CustomAttributeGroupList3RightAssoc = 324;
-        public const int TypeAttributesListRightAssoc = 325;
-        public const int TypeAttributesListRightAssoc2 = 326;
-        public const int EnumFieldsListRightAssoc = 327;
-        public const int WhereClauseListRightAssoc = 328;
-        public const int TypeParamsListRightAssoc = 329;
-        public const int TypeParamsList2RightAssoc = 330;
-        public const int MemberAttributeListRightAssoc = 331;
-        public const int MethodParamListListRightAssoc = 332;
-        public const int ParamListListRightAssoc = 333;
-        public const int CustomAttributePart = 334;
-        public const int CustomAttributeArgList = 335;
-        public const int CustomAttributeArgListPart = 336;
-        public const int CustomAttributeGroupPart = 337;
-        public const int CustomAttributeGroupPart2 = 338;
-        public const int EnumFieldsPart = 339;
-        public const int WhereClause = 340;
-        public const int WhereClausePart2 = 341;
-        public const int TypeParamsPart = 342;
-        public const int TypeParamsPart2 = 343;
-        public const int Interface = 344;
-        public const int InterfacePart = 345;
-        public const int MethodParamListPart = 346;
-        public const int ParamListPart = 347;
-        public const int PropertyGet = 348;
-        public const int PropertyGetPart = 349;
-        public const int PropertySet = 350;
-        public const int PropertySetPart = 351;
-        public const int TypeAttributesListRightAssoc3 = 352;
-        public const int CustomAttribute = 353;
-        public const int CustomAttributePart2 = 354;
-        public const int TypeParamsPart3 = 355;
-        public const int CustomAttributeGroup = 356;
-        public const int CustomAttributeGroupPart3 = 357;
-        public const int BaseTypes = 358;
-        public const int Constructor = 359;
-        public const int Method = 360;
-        public const int Property = 361;
-        public const int Event = 362;
-        public const int Field = 363;
-        public const int namespaceKeyword = 364;
-        public const int usingKeyword = 365;
-        public const int verbatimIdentifier = 366;
-        public const int outKeyword = 367;
-        public const int refKeyword = 368;
-        public const int typeOf = 369;
-        public const int nameOf = 370;
-        public const int defaultOf = 371;
-        public const int newKeyword = 372;
-        public const int stringType = 373;
-        public const int boolType = 374;
-        public const int charType = 375;
-        public const int floatType = 376;
-        public const int doubleType = 377;
-        public const int decimalType = 378;
-        public const int sbyteType = 379;
-        public const int byteType = 380;
-        public const int shortType = 381;
-        public const int ushortType = 382;
-        public const int intType = 383;
-        public const int uintType = 384;
-        public const int longType = 385;
-        public const int ulongType = 386;
-        public const int objectType = 387;
-        public const int boolLiteral = 388;
-        public const int nullLiteral = 389;
-        public const int thisRef = 390;
-        public const int baseRef = 391;
-        public const int verbatimStringLiteral = 392;
-        public const int identifier2 = 393;
-        public const int stringLiteral = 394;
-        public const int characterLiteral = 395;
-        public const int lte = 396;
-        public const int lt = 397;
-        public const int gte = 398;
-        public const int gt = 399;
-        public const int eqEq = 400;
-        public const int notEq = 401;
-        public const int eq = 402;
-        public const int inc = 403;
-        public const int addAssign = 404;
-        public const int add = 405;
-        public const int dec = 406;
-        public const int subAssign = 407;
-        public const int sub = 408;
-        public const int mulAssign = 409;
-        public const int mul = 410;
-        public const int divAssign = 411;
-        public const int div = 412;
-        public const int modAssign = 413;
-        public const int mod = 414;
-        public const int and = 415;
-        public const int bitwiseAndAssign = 416;
-        public const int bitwiseAnd = 417;
-        public const int or = 418;
-        public const int bitwiseOrAssign = 419;
-        public const int bitwiseOr = 420;
-        public const int not = 421;
-        public const int lbracket = 422;
-        public const int rbracket = 423;
-        public const int lparen = 424;
-        public const int rparen = 425;
-        public const int lbrace = 426;
-        public const int rbrace = 427;
-        public const int comma = 428;
-        public const int dot = 430;
-        public const int integerLiteral = 431;
-        public const int floatLiteral = 432;
-        public const int returnKeyword = 440;
-        public const int semi = 444;
-        public const int colon = 446;
-        public const int assemblyKeyword = 450;
-        public const int voidType = 451;
-        public const int partialKeyword = 452;
-        public const int classKeyword = 453;
-        public const int enumKeyword = 454;
-        public const int structKeyword = 455;
-        public const int interfaceKeyword = 456;
-        public const int getKeyword = 457;
-        public const int setKeyword = 458;
-        public const int eventKeyword = 459;
-        public const int publicKeyword = 460;
-        public const int privateKeyword = 461;
-        public const int protectedKeyword = 462;
-        public const int internalKeyword = 463;
-        public const int staticKeyword = 464;
-        public const int abstractKeyword = 465;
-        public const int constKeyword = 466;
-        public const int overrideKeyword = 467;
-        public const int whereKeyword = 468;
+        public const int Statement = 189;
+        public const int StatementFollows = 190;
+        public const int StatementFollows2 = 191;
+        public const int StatementFollows3 = 192;
+        public const int InnerStatementFollows = 204;
+        public const int InnerStatementFollows2 = 205;
+        public const int InnerStatementFollows3 = 206;
+        public const int CatchClauseListRightAssoc = 219;
+        public const int StatementListRightAssoc = 220;
+        public const int StatementList2RightAssoc = 221;
+        public const int CatchClause = 228;
+        public const int StatementBlock = 230;
+        public const int CustomAttributeArg = 235;
+        public const int CustomAttributeTarget = 236;
+        public const int CustomAttributeGroups = 237;
+        public const int TypeAttributes = 238;
+        public const int EnumPart = 239;
+        public const int EnumFields = 240;
+        public const int EnumField = 241;
+        public const int Where = 242;
+        public const int WhereClausePart = 243;
+        public const int BaseType = 244;
+        public const int TypeParams = 245;
+        public const int Enum = 246;
+        public const int Struct = 247;
+        public const int Class = 248;
+        public const int MemberAttribute = 249;
+        public const int MemberAttributes = 250;
+        public const int MethodParamList = 251;
+        public const int MethodParam = 252;
+        public const int ParamList = 253;
+        public const int Param = 254;
+        public const int ConstructorChain = 255;
+        public const int CustomAttributeArgListList = 256;
+        public const int CustomAttributeGroupList = 257;
+        public const int CustomAttributeGroupList2 = 258;
+        public const int CustomAttributeGroupList3 = 259;
+        public const int TypeAttributesList = 260;
+        public const int EnumFieldsList = 261;
+        public const int WhereClauseList = 262;
+        public const int TypeParamsList = 263;
+        public const int TypeParamsList2 = 264;
+        public const int MemberAttributeList = 265;
+        public const int MethodParamListList = 266;
+        public const int ParamListList = 267;
+        public const int WhereClauses = 268;
+        public const int TypeDeclPart = 269;
+        public const int TypeDecl = 270;
+        public const int PrivateImplementationType = 271;
+        public const int PropertyAccessors = 272;
+        public const int Member = 273;
+        public const int Members = 274;
+        public const int CustomAttributeGroupFollows = 275;
+        public const int CustomAttributeGroupFollows2 = 276;
+        public const int CustomAttributeGroupFollows3 = 277;
+        public const int CustomAttributeGroupFollows4 = 278;
+        public const int CustomAttributeGroupFollows5 = 279;
+        public const int CustomAttributeGroupFollows6 = 280;
+        public const int CustomAttributeGroupFollows7 = 281;
+        public const int CustomAttributeGroupFollows8 = 282;
+        public const int CustomAttributeGroupFollows9 = 283;
+        public const int CustomAttributeGroupFollows10 = 284;
+        public const int CustomAttributeGroupFollows11 = 285;
+        public const int CustomAttributeGroupFollows12 = 286;
+        public const int CustomAttributeGroupFollows13 = 287;
+        public const int CustomAttributeGroupFollows14 = 288;
+        public const int CustomAttributeGroupFollows15 = 289;
+        public const int CustomAttributeGroupFollows16 = 290;
+        public const int CustomAttributeGroupFollows17 = 291;
+        public const int CustomAttributeGroupFollows18 = 292;
+        public const int CustomAttributeGroupFollows19 = 293;
+        public const int CustomAttributeGroupFollows20 = 294;
+        public const int CustomAttributeGroupFollows21 = 295;
+        public const int CustomAttributeGroupsFollows = 296;
+        public const int CustomAttributeGroupsFollows2 = 297;
+        public const int CustomAttributeGroupsFollows3 = 298;
+        public const int CustomAttributeGroupsFollows4 = 299;
+        public const int CustomAttributeGroupsFollows5 = 300;
+        public const int CustomAttributeGroupsFollows6 = 301;
+        public const int CustomAttributeGroupsFollows7 = 302;
+        public const int CustomAttributeGroupsFollows8 = 303;
+        public const int CustomAttributeGroupsFollows9 = 304;
+        public const int CustomAttributeGroupsFollows10 = 305;
+        public const int CustomAttributeGroupsFollows11 = 306;
+        public const int CustomAttributeGroupsFollows12 = 307;
+        public const int CustomAttributeGroupsFollows13 = 308;
+        public const int CustomAttributeGroupsFollows14 = 309;
+        public const int CustomAttributeGroupsFollows15 = 310;
+        public const int CustomAttributeGroupsFollows16 = 311;
+        public const int CustomAttributeGroupsFollows17 = 312;
+        public const int CustomAttributeGroupsFollows18 = 313;
+        public const int CustomAttributeGroupsFollows19 = 314;
+        public const int CustomAttributeGroupsFollows20 = 315;
+        public const int CustomAttributeGroupsFollows21 = 316;
+        public const int CustomAttributeGroupsFollows22 = 317;
+        public const int CustomAttributeGroupsFollows23 = 318;
+        public const int TypeAttributesFollows = 319;
+        public const int TypeAttributesFollows2 = 320;
+        public const int TypeAttributesFollows3 = 321;
+        public const int TypeAttributesFollows4 = 322;
+        public const int TypeAttributesFollows5 = 323;
+        public const int WhereFollows = 324;
+        public const int WhereClauseFollows = 325;
+        public const int BaseTypeFollows = 326;
+        public const int BaseTypeFollows2 = 327;
+        public const int BaseTypeFollows3 = 328;
+        public const int TypeDeclPartFollows = 329;
+        public const int TypeParamsFollows = 330;
+        public const int TypeParamsFollows2 = 331;
+        public const int TypeParamsFollows3 = 332;
+        public const int TypeDeclFollows = 333;
+        public const int TypeDeclFollows2 = 334;
+        public const int TypeDeclFollows3 = 335;
+        public const int TypeDeclFollows4 = 336;
+        public const int TypeDeclFollows5 = 337;
+        public const int TypeDeclFollows6 = 338;
+        public const int TypeDeclFollows7 = 339;
+        public const int TypeDeclFollows8 = 340;
+        public const int TypeDeclFollows9 = 341;
+        public const int TypeDeclFollows10 = 342;
+        public const int TypeDeclFollows11 = 343;
+        public const int TypeDeclFollows12 = 344;
+        public const int TypeDeclFollows13 = 345;
+        public const int MethodParamListFollows = 346;
+        public const int ParamListFollows = 347;
+        public const int ParamListFollows2 = 348;
+        public const int MemberFollows = 349;
+        public const int CustomAttributeArgListListRightAssoc = 350;
+        public const int CustomAttributeGroupListRightAssoc = 351;
+        public const int CustomAttributeGroupList2RightAssoc = 352;
+        public const int CustomAttributeGroupList3RightAssoc = 353;
+        public const int TypeAttributesListRightAssoc = 354;
+        public const int TypeAttributesListRightAssoc2 = 355;
+        public const int EnumFieldsListRightAssoc = 356;
+        public const int WhereClauseListRightAssoc = 357;
+        public const int TypeParamsListRightAssoc = 358;
+        public const int TypeParamsList2RightAssoc = 359;
+        public const int MemberAttributeListRightAssoc = 360;
+        public const int MethodParamListListRightAssoc = 361;
+        public const int ParamListListRightAssoc = 362;
+        public const int CustomAttributePart = 363;
+        public const int CustomAttributeArgList = 364;
+        public const int CustomAttributeArgListPart = 365;
+        public const int CustomAttributeGroupPart = 366;
+        public const int CustomAttributeGroupPart2 = 367;
+        public const int EnumFieldsPart = 368;
+        public const int WhereClause = 369;
+        public const int WhereClausePart2 = 370;
+        public const int TypeParamsPart = 371;
+        public const int TypeParamsPart2 = 372;
+        public const int Interface = 373;
+        public const int InterfacePart = 374;
+        public const int MethodParamListPart = 375;
+        public const int ParamListPart = 376;
+        public const int PropertyGet = 377;
+        public const int PropertyGetPart = 378;
+        public const int PropertySet = 379;
+        public const int PropertySetPart = 380;
+        public const int TypeAttributesListRightAssoc3 = 381;
+        public const int CustomAttribute = 382;
+        public const int CustomAttributePart2 = 383;
+        public const int TypeParamsPart3 = 384;
+        public const int CustomAttributeGroup = 385;
+        public const int CustomAttributeGroupPart3 = 386;
+        public const int BaseTypes = 387;
+        public const int Constructor = 388;
+        public const int Method = 389;
+        public const int Property = 390;
+        public const int Event = 391;
+        public const int Field = 392;
+        public const int namespaceKeyword = 393;
+        public const int usingKeyword = 394;
+        public const int verbatimIdentifier = 395;
+        public const int outKeyword = 396;
+        public const int refKeyword = 397;
+        public const int typeOf = 398;
+        public const int nameOf = 399;
+        public const int defaultOf = 400;
+        public const int newKeyword = 401;
+        public const int stringType = 402;
+        public const int boolType = 403;
+        public const int charType = 404;
+        public const int floatType = 405;
+        public const int doubleType = 406;
+        public const int decimalType = 407;
+        public const int sbyteType = 408;
+        public const int byteType = 409;
+        public const int shortType = 410;
+        public const int ushortType = 411;
+        public const int intType = 412;
+        public const int uintType = 413;
+        public const int longType = 414;
+        public const int ulongType = 415;
+        public const int objectType = 416;
+        public const int boolLiteral = 417;
+        public const int nullLiteral = 418;
+        public const int thisRef = 419;
+        public const int baseRef = 420;
+        public const int verbatimStringLiteral = 421;
+        public const int identifier2 = 422;
+        public const int stringLiteral = 423;
+        public const int characterLiteral = 424;
+        public const int lte = 425;
+        public const int lt = 426;
+        public const int gte = 427;
+        public const int gt = 428;
+        public const int eqEq = 429;
+        public const int notEq = 430;
+        public const int eq = 431;
+        public const int inc = 432;
+        public const int addAssign = 433;
+        public const int add = 434;
+        public const int dec = 435;
+        public const int subAssign = 436;
+        public const int sub = 437;
+        public const int mulAssign = 438;
+        public const int mul = 439;
+        public const int divAssign = 440;
+        public const int div = 441;
+        public const int modAssign = 442;
+        public const int mod = 443;
+        public const int and = 444;
+        public const int bitwiseAndAssign = 445;
+        public const int bitwiseAnd = 446;
+        public const int or = 447;
+        public const int bitwiseOrAssign = 448;
+        public const int bitwiseOr = 449;
+        public const int not = 450;
+        public const int lbracket = 451;
+        public const int rbracket = 452;
+        public const int lparen = 453;
+        public const int rparen = 454;
+        public const int lbrace = 455;
+        public const int rbrace = 456;
+        public const int comma = 457;
+        public const int dot = 459;
+        public const int integerLiteral = 460;
+        public const int floatLiteral = 461;
+        public const int returnKeyword = 469;
+        public const int semi = 473;
+        public const int colon = 475;
+        public const int assemblyKeyword = 479;
+        public const int voidType = 480;
+        public const int partialKeyword = 481;
+        public const int classKeyword = 482;
+        public const int enumKeyword = 483;
+        public const int structKeyword = 484;
+        public const int interfaceKeyword = 485;
+        public const int getKeyword = 486;
+        public const int setKeyword = 487;
+        public const int eventKeyword = 488;
+        public const int publicKeyword = 489;
+        public const int privateKeyword = 490;
+        public const int protectedKeyword = 491;
+        public const int internalKeyword = 492;
+        public const int staticKeyword = 493;
+        public const int abstractKeyword = 494;
+        public const int constKeyword = 495;
+        public const int overrideKeyword = 496;
+        public const int whereKeyword = 497;
         internal static ParseNode ParseCustomAttributeArg(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
@@ -14268,14 +14745,9 @@ namespace CD {
             int column__ = context.Column;
             long position__ = context.Position;
             // StatementList -> Statement StatementListRightAssoc
-            if ((StatementParser.Statement == context.SymbolId)) {
+            if ((StatementParser.InnerStatement == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                if ((false 
-                            == (StatementParser.Statement == context.SymbolId))) {
-                    context.Error("Expecting Statement at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
-                }
-                children.Add(new ParseNode(StatementParser.Statement, "Statement", context.Value, context.Line, context.Column, context.Position));
-                context.Advance();
+                children.Add(StatementParser.ParseStatement(context));
                 children.AddRange(StatementParser.ParseStatementListRightAssoc(context).Children);
                 return new ParseNode(StatementParser.StatementList, "StatementList", children.ToArray(), line__, column__, position__);
             }
@@ -14286,14 +14758,9 @@ namespace CD {
             int column__ = context.Column;
             long position__ = context.Position;
             // StatementList2 -> Statement StatementList2RightAssoc
-            if ((StatementParser.Statement == context.SymbolId)) {
+            if ((StatementParser.InnerStatement == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                if ((false 
-                            == (StatementParser.Statement == context.SymbolId))) {
-                    context.Error("Expecting Statement at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
-                }
-                children.Add(new ParseNode(StatementParser.Statement, "Statement", context.Value, context.Line, context.Column, context.Position));
-                context.Advance();
+                children.Add(StatementParser.ParseStatement(context));
                 children.AddRange(StatementParser.ParseStatementList2RightAssoc(context).Children);
                 return new ParseNode(StatementParser.StatementList2, "StatementList2", children.ToArray(), line__, column__, position__);
             }
@@ -14552,6 +15019,22 @@ namespace CD {
             }
             throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
+        internal static ParseNode ParseStatement(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // Statement -> InnerStatement
+            if ((StatementParser.InnerStatement == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (StatementParser.InnerStatement == context.SymbolId))) {
+                    context.Error("Expecting InnerStatement at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                context.Advance();
+                return new ParseNode(StatementParser.Statement, "Statement", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
         internal static ParseNode ParseWhereClauses(ParserContext context) {
             // WhereClauses
             return _ParseWhereClauses(context);
@@ -14565,7 +15048,7 @@ namespace CD {
         }
         internal static ParseNode ParseTypeDecl(ParserContext context) {
             // TypeDecl
-            return _ParseTypeDecl(context, false, null, context.Line, context.Column, context.Position, null);
+            return _ParseTypeDecl(context, false, null, null, context.Line, context.Column, context.Position, null);
         }
         /// <summary>
         /// Parses a production of the form:
@@ -14982,6 +15465,124 @@ namespace CD {
                 return new ParseNode(ExpressionParser.TypeFollows4, "TypeFollows4", children, line__, column__, position__);
             }
             throw new SyntaxException(string.Format("Expecting Type at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows -> Statement InnerStatement
+            if ((StatementParser.InnerStatement == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                children.Add(StatementParser.ParseStatement(context));
+                if ((false 
+                            == (StatementParser.InnerStatement == context.SymbolId))) {
+                    context.Error("Expecting InnerStatement at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                context.Advance();
+                return new ParseNode(StatementParser.StatementFollows, "StatementFollows", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows2(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows2 -> Statement rbrace
+            if ((StatementParser.InnerStatement == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                if ((false 
+                            == (ExpressionParser.rbrace == context.SymbolId))) {
+                    context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(ExpressionParser.rbrace, "rbrace", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(StatementParser.StatementFollows2, "StatementFollows2", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseStatementFollows3(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // StatementFollows3 -> Statement #EOS
+            if ((StatementParser.InnerStatement == context.SymbolId)) {
+                ParseNode[] children = new ParseNode[2];
+                children[0] = StatementParser.ParseStatement(context);
+                if ((false 
+                            == (TypeDeclParser.EosSymbol == context.SymbolId))) {
+                    context.Error("Expecting #EOS at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children[1] = new ParseNode(TypeDeclParser.EosSymbol, "#EOS", context.Value, context.Line, context.Column, context.Position);
+                context.Advance();
+                return new ParseNode(StatementParser.StatementFollows3, "StatementFollows3", children, line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows -> InnerStatement InnerStatement
+            if ((StatementParser.InnerStatement == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (StatementParser.InnerStatement == context.SymbolId))) {
+                    context.Error("Expecting InnerStatement at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                context.Advance();
+                if ((false 
+                            == (StatementParser.InnerStatement == context.SymbolId))) {
+                    context.Error("Expecting InnerStatement at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                context.Advance();
+                return new ParseNode(StatementParser.InnerStatementFollows, "InnerStatementFollows", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows2(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows2 -> InnerStatement rbrace
+            if ((StatementParser.InnerStatement == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (StatementParser.InnerStatement == context.SymbolId))) {
+                    context.Error("Expecting InnerStatement at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                context.Advance();
+                if ((false 
+                            == (ExpressionParser.rbrace == context.SymbolId))) {
+                    context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(ExpressionParser.rbrace, "rbrace", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(StatementParser.InnerStatementFollows2, "InnerStatementFollows2", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+        }
+        internal static ParseNode ParseInnerStatementFollows3(ParserContext context) {
+            int line__ = context.Line;
+            int column__ = context.Column;
+            long position__ = context.Position;
+            // InnerStatementFollows3 -> InnerStatement #EOS
+            if ((StatementParser.InnerStatement == context.SymbolId)) {
+                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
+                if ((false 
+                            == (StatementParser.InnerStatement == context.SymbolId))) {
+                    context.Error("Expecting InnerStatement at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                context.Advance();
+                if ((false 
+                            == (TypeDeclParser.EosSymbol == context.SymbolId))) {
+                    context.Error("Expecting #EOS at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                }
+                children.Add(new ParseNode(TypeDeclParser.EosSymbol, "#EOS", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
+                return new ParseNode(StatementParser.InnerStatementFollows3, "InnerStatementFollows3", children.ToArray(), line__, column__, position__);
+            }
+            throw new SyntaxException(string.Format("Expecting InnerStatement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeGroupFollows(ParserContext context) {
             int line__ = context.Line;
@@ -17410,14 +18011,9 @@ namespace CD {
             int column__ = context.Column;
             long position__ = context.Position;
             // StatementListRightAssoc -> Statement StatementListRightAssoc
-            if ((StatementParser.Statement == context.SymbolId)) {
+            if ((StatementParser.InnerStatement == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                if ((false 
-                            == (StatementParser.Statement == context.SymbolId))) {
-                    context.Error("Expecting Statement at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
-                }
-                children.Add(new ParseNode(StatementParser.Statement, "Statement", context.Value, context.Line, context.Column, context.Position));
-                context.Advance();
+                children.Add(StatementParser.ParseStatement(context));
                 children.AddRange(StatementParser.ParseStatementListRightAssoc(context).Children);
                 return new ParseNode(StatementParser.StatementListRightAssoc, "StatementListRightAssoc", children.ToArray(), line__, column__, position__);
             }
@@ -17428,14 +18024,9 @@ namespace CD {
             int column__ = context.Column;
             long position__ = context.Position;
             // StatementList2RightAssoc -> Statement StatementList2RightAssoc
-            if ((StatementParser.Statement == context.SymbolId)) {
+            if ((StatementParser.InnerStatement == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                if ((false 
-                            == (StatementParser.Statement == context.SymbolId))) {
-                    context.Error("Expecting Statement at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
-                }
-                children.Add(new ParseNode(StatementParser.Statement, "Statement", context.Value, context.Line, context.Column, context.Position));
-                context.Advance();
+                children.Add(StatementParser.ParseStatement(context));
                 children.AddRange(StatementParser.ParseStatementList2RightAssoc(context).Children);
                 return new ParseNode(StatementParser.StatementList2RightAssoc, "StatementList2RightAssoc", children.ToArray(), line__, column__, position__);
             }
@@ -18908,17 +19499,11 @@ namespace CD {
             }
             return false;
         }
-        public void Error(string message, object arg1, object arg2, object arg3) {
-            throw new SyntaxException(string.Format(message, arg1, arg2, arg3), this.Line, this.Column, this.Position);
-        }
-        public void Error(string message, object arg1, object arg2) {
-            throw new SyntaxException(string.Format(message, arg1, arg2), this.Line, this.Column, this.Position);
-        }
-        public void Error(string message, object arg) {
-            throw new SyntaxException(string.Format(message, arg), this.Line, this.Column, this.Position);
+        public void Error(string message, int line, int column, long position) {
+            throw new SyntaxException(string.Format((message + " at line {0}, column {1}, position"), line, column, position), line, column, position);
         }
         public void Error(string message) {
-            throw new SyntaxException(message, this.Line, this.Column, this.Position);
+            this.Error(message, this.Line, this.Column, this.Position);
         }
         public void Dispose() {
             this._e.Dispose();

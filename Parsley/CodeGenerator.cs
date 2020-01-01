@@ -109,12 +109,8 @@ namespace Parsley
 				var parser = Deslanged.Parser.Namespaces[Deslanged.Parser.Namespaces.Count - 1].Types[0];
 				parser.CustomAttributes.Add(GeneratedCodeAttribute);
 				parser.Comments.Clear();
-				var dc = doc.ToString("xc");
-				var sb = new StringBuilder();
-				for (int ic = cfg.Rules.Count, i = 0; i < ic; ++i)
-					sb.AppendLine(cfg.Rules[i].ToString());
-				var cc = sb.ToString();
-				parser.Comments.AddRange(C.ToComments(string.Format("<summary>Parses the following grammar:\r\n{0}\r\n</summary>\r\n<remarks>The rules for the factored grammar are as follows:\r\n{1}\r\n</remarks>", dc.TrimEnd(), cc.TrimEnd()), true));
+				var dc = "Refer to " + doc.Filename;
+				parser.Comments.AddRange(C.ToComments(string.Format("<summary>Parses the indicated grammar. {0}</summary>", dc.TrimEnd()), true));
 				
 				var syms = cfg.FillSymbols();
 				var consts = new string[symtbl.Length];

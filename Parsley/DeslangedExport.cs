@@ -270,43 +270,21 @@ internal partial class Deslanged {
                                                             new CodeMethodReturnStatement(new CodePrimitiveExpression(false))}, new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(void)), "Error", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[] {
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(string)), "message"),
-                                                            new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(object)), "arg1"),
-                                                            new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(object)), "arg2"),
-                                                            new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(object)), "arg3")}, new CodeStatement[] {
+                                                            new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(int)), "line"),
+                                                            new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(int)), "column"),
+                                                            new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(long)), "position")}, new CodeStatement[] {
                                                             new CodeThrowExceptionStatement(new CodeObjectCreateExpression(new CodeTypeReference("SyntaxException"), new CodeExpression[] {
                                                                             new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(string))), "Format"), new CodeExpression[] {
-                                                                                        new CodeArgumentReferenceExpression("message"),
-                                                                                        new CodeArgumentReferenceExpression("arg1"),
-                                                                                        new CodeArgumentReferenceExpression("arg2"),
-                                                                                        new CodeArgumentReferenceExpression("arg3")}),
-                                                                            new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Line"),
-                                                                            new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Column"),
-                                                                            new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Position")}))}, new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
-                                                Deslanged._MemberMethod(new CodeTypeReference(typeof(void)), "Error", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[] {
-                                                            new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(string)), "message"),
-                                                            new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(object)), "arg1"),
-                                                            new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(object)), "arg2")}, new CodeStatement[] {
-                                                            new CodeThrowExceptionStatement(new CodeObjectCreateExpression(new CodeTypeReference("SyntaxException"), new CodeExpression[] {
-                                                                            new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(string))), "Format"), new CodeExpression[] {
-                                                                                        new CodeArgumentReferenceExpression("message"),
-                                                                                        new CodeArgumentReferenceExpression("arg1"),
-                                                                                        new CodeArgumentReferenceExpression("arg2")}),
-                                                                            new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Line"),
-                                                                            new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Column"),
-                                                                            new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Position")}))}, new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
-                                                Deslanged._MemberMethod(new CodeTypeReference(typeof(void)), "Error", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[] {
-                                                            new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(string)), "message"),
-                                                            new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(object)), "arg")}, new CodeStatement[] {
-                                                            new CodeThrowExceptionStatement(new CodeObjectCreateExpression(new CodeTypeReference("SyntaxException"), new CodeExpression[] {
-                                                                            new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(string))), "Format"), new CodeExpression[] {
-                                                                                        new CodeArgumentReferenceExpression("message"),
-                                                                                        new CodeArgumentReferenceExpression("arg")}),
-                                                                            new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Line"),
-                                                                            new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Column"),
-                                                                            new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Position")}))}, new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                                                        new CodeBinaryOperatorExpression(new CodeArgumentReferenceExpression("message"), CodeBinaryOperatorType.Add, new CodePrimitiveExpression(" at line {0}, column {1}, position")),
+                                                                                        new CodeArgumentReferenceExpression("line"),
+                                                                                        new CodeArgumentReferenceExpression("column"),
+                                                                                        new CodeArgumentReferenceExpression("position")}),
+                                                                            new CodeArgumentReferenceExpression("line"),
+                                                                            new CodeArgumentReferenceExpression("column"),
+                                                                            new CodeArgumentReferenceExpression("position")}))}, new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(void)), "Error", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[] {
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(string)), "message")}, new CodeStatement[] {
-                                                            new CodeThrowExceptionStatement(new CodeObjectCreateExpression(new CodeTypeReference("SyntaxException"), new CodeExpression[] {
+                                                            new CodeExpressionStatement(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeThisReferenceExpression(), "Error"), new CodeExpression[] {
                                                                             new CodeArgumentReferenceExpression("message"),
                                                                             new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Line"),
                                                                             new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Column"),

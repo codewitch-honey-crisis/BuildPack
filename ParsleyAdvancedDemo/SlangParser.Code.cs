@@ -258,7 +258,10 @@ namespace CD
 				constKeyword == context.SymbolId)
 			{
 				if (!seen.Add(context.Value))
-					context.Error("Duplicate attribute {0} specified in member", context.Value);
+				{
+					var fu = string.Format("Duplicate attribute {0} specified in member", context.Value);
+					context.Error(fu);
+				}
 				attrs.Add(new ParseNode(context.SymbolId, string.Concat(context.Value, "Keyword"), context.Value, context.Line, context.Column, context.Position));
 				context.Advance();
 			}

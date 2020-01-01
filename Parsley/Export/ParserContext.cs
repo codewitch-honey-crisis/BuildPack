@@ -87,22 +87,15 @@ namespace Parsley
 			}
 			return false;
 		}
-		public void Error(string message, object arg1, object arg2,object arg3)
+		public void Error(string message, int line, int column,long position)
 		{
-			throw new SyntaxException(string.Format(message, arg1, arg2,arg3), Line, Column, Position);
-		}
-		public void Error(string message, object arg1,object arg2)
-		{
-			throw new SyntaxException(string.Format(message, arg1,arg2), Line, Column, Position);
-		}
-		public void Error(string message, object arg)
-		{
-			throw new SyntaxException(string.Format(message, arg), Line, Column, Position);
+			throw new SyntaxException(string.Format(message+" at line {0}, column {1}, position",line,column,position), line, column, position);
 		}
 		public void Error(string message)
 		{
-			throw new SyntaxException(message, Line, Column, Position);
+			Error(message, Line, Column, Position);
 		}
+		
 		public void Dispose()
 		{
 			_e.Dispose();

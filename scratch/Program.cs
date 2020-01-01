@@ -8,7 +8,10 @@ using CD;
 
 namespace scratch
 { 
-
+	/// <summary>
+	/// FOOO
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	class Bar<[Foo] T> where T:IComparable<T>,new()
 	{
 
@@ -47,7 +50,7 @@ namespace scratch
 			Stream stm = null;
 			try
 			{
-				stm = File.Open(@"..\..\..\Program.cs", FileMode.Open);
+				stm = File.Open(@"..\..\..\SlangParser.cs", FileMode.Open);
 				var tokenizer = new SlangTokenizer(stm);
 				var e = tokenizer.GetEnumerator();
 				while (e.MoveNext())
@@ -61,16 +64,14 @@ namespace scratch
 		}
 		[return: Foo]
 		static int Main()
-		{
-
-			
+		{			
 			Stream stm = null;
 			try
 			{
-				stm = File.OpenRead(@"..\..\..\Program.cs");
+				stm = File.OpenRead(@"..\..\..\SlangParser.cs");
 				var tokenizer = new SlangTokenizer(stm);
 				var pt = SlangParser.Parse(tokenizer);
-				_WriteTree(pt.Children[0], Console.Out);
+				_WriteTree(pt, Console.Out);
 			}
 			finally
 			{

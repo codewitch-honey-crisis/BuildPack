@@ -68,7 +68,7 @@
 			t.Value = yytext;
 			t.Skipped = null;
 			_skipped.Add(t);
-			var result = yylex();
+			int result = yylex();
 			return result;
 		}
 		public void Advance()
