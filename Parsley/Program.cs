@@ -137,17 +137,28 @@ namespace Parsley
 				if (ifstale && null != outputfile)
 				{
 					stale = false;
-					if (_IsStale(inputfile, outputfile))
-						stale = true;
 					if (!stale && null != rolexfile)
 						if (_IsStale(inputfile, rolexfile))
 							stale = true;
 					if (!stale && null != gplexfile)
 						if (_IsStale(inputfile, gplexfile))
 							stale = true;
+					if(!stale)
+					{
+						foreach(var s in XbnfDocument.GetResources(inputfile))
+						{
+							if(_IsStale(s,outputfile))
+							{
+								stale = true;
+								break;
+							}
+						}
+
+					}
 					// see if our exe has changed
 					if (!stale && _IsStale(CodeBase, outputfile))
 						stale = true;
+
 				}
 
 				if (!stale)
@@ -380,7 +391,6 @@ namespace Parsley
 							}
 						}
 					}
-
 				}
 			}
 #if !DEBUG

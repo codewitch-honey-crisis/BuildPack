@@ -183,8 +183,6 @@ namespace Parsley
 						break;
 					}
 				}
-				if (char.IsLower(se.Key[0]))
-					System.Diagnostics.Debugger.Break();
 				//var te = genInfo.TerminalMap[i];
 				//var sym = te.Value;
 				//var id = stbli.IndexOf(new KeyValuePair<string, XbnfDocument>(sym, d));
@@ -198,6 +196,7 @@ namespace Parsley
 					var pi = se.Value.Productions.IndexOf(se.Key);
 					var isHidden = false;
 					string blockEnd = null;
+					var isSkipped = false;
 					if (-1 < pi)
 					{
 						var p = se.Value.Productions[pi];
@@ -207,6 +206,16 @@ namespace Parsley
 							blockEnd = p.Attributes[ai].Value as string;
 						if (string.IsNullOrEmpty(blockEnd))
 							blockEnd = null;
+						ai = p.Attributes.IndexOf("skipped");
+						if(-1<ai)
+						{
+							var o = p.Attributes[ai].Value;
+							if (o is bool && (bool)o)
+							{
+								isHidden = false;
+								isSkipped = true;
+							}
+						}
 					}
 					if (!isHidden || null != blockEnd)
 					{
@@ -218,22 +227,41 @@ namespace Parsley
 							decls.Append(") return -1;");
 							if (isHidden)
 							{
-								// skip it
+								// hide it
 								decls.Append("UpdatePosition(yytext); return yylex();");
+							} else if(isSkipped)
+							{
+								decls.Append("UpdatePosition(yytext); return Skip("+id.ToString()+");");
 							}
 						}
 						if (!isHidden)
 						{
-							decls.Append("UpdatePosition(yytext); return ");
-							decls.Append(id.ToString());
-							decls.Append(";");
+							if (!isSkipped)
+							{
+								decls.Append("UpdatePosition(yytext); return ");
+								decls.Append(id.ToString());
+								decls.Append(";");
+							} else
+							{
+								decls.Append("UpdatePosition(yytext); return Skip(");
+								decls.Append(id.ToString());
+								decls.Append(");");
+							}
 						}
 						decls.AppendLine(" }");
 					}
 					else
 					{
-						decls.Append("\t { UpdatePosition(yytext); return yylex(); }");
-						decls.AppendLine();
+						if (isSkipped)
+						{
+							decls.Append("\t { UpdatePosition(yytext); return Skip("+id.ToString()+"); }");
+							decls.AppendLine();
+						}
+						else
+						{
+							decls.Append("\t { UpdatePosition(yytext); return yylex(); }");
+							decls.AppendLine();
+						}
 					}
 				}
 				else System.Diagnostics.Debugger.Break();
@@ -769,13 +797,13 @@ namespace Parsley
 										s = cfg.GetUniqueSymbolName(s);
 										cfg.Rules.Add(new CfgRule(s, fl.Key, sym));
 										CfgAttributeList attrs;
-										if (!cfg.AttributeSets.TryGetValue(s, out attrs))
-										{
-											attrs = new CfgAttributeList();
-											cfg.AttributeSets.Add(s, attrs);
-											attrs.Add(new CfgAttribute("terminal", false));
-											attrs.Add(new CfgAttribute("nowarn", true));
-										}
+										
+										attrs = new CfgAttributeList();
+										cfg.AttributeSets.Add(s, attrs);
+										attrs.Add(new CfgAttribute("terminal", false));
+										attrs.Add(new CfgAttribute("nowarn", true));
+										attrs.Add(new CfgAttribute("nocode", true));
+
 
 									}
 								}

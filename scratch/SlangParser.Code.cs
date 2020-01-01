@@ -525,9 +525,36 @@ namespace CD
 
 		static ParseNode _ParseTypeDecl(ParserContext context, bool isNested, ParseNode customAttributes, int line, int column, long position, List<ParseNode> attrs)
 		{
+			
 			var children = new List<ParseNode>();
 			if (!isNested)
 			{
+				var cc = new List<ParseNode>();
+				var l = line;
+				var c = column;
+				var p = position;
+
+				if (null!=context.Skipped)
+				{
+					for(var i = 0;i<context.Skipped.Length;i++)
+					{
+						var t = context.Skipped[i];
+						if(StatementParser.lineComment==t.SymbolId)
+						{
+							cc.Add(new ParseNode(t.SymbolId, "lineComment", t.Value, t.Line, t.Column, t.Position));
+						} else if(StatementParser.blockComment==t.SymbolId)
+							cc.Add(new ParseNode(t.SymbolId, "blockComment", t.Value, t.Line, t.Column, t.Position));
+					}
+					if(0<context.Skipped.Length)
+					{
+						var tt = context.Skipped[0];
+						l = tt.Line;
+						c = tt.Column;
+						p = tt.Position;
+					}
+				}
+
+				children.Add(new ParseNode(StatementParser.Comments, "Comments", cc.ToArray(), l, c, p));
 				line = context.Line;
 				column = context.Column;
 				position = context.Position;

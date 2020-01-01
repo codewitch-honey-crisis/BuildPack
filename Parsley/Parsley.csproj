@@ -100,7 +100,6 @@
     <Compile Include="Xbnf\XbnfConvert.cs" />
     <Compile Include="Xbnf\XbnfUnaryExpression.cs" />
     <None Include="Slang.xbnf" />
-    <None Include="SlangAttribute.xbnf" />
     <None Include="SlangExpression.xbnf" />
     <Content Include="SlangStatement.xbnf" />
     <None Include="SlangType.xbnf" />

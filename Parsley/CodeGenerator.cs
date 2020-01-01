@@ -243,13 +243,23 @@ namespace Parsley
 				var isStart = 0==string.Compare(row.Key ,start,StringComparison.InvariantCulture);
 				var nt = row.Key;
 				var rmap = _BuildRuleMap(parseTable, nt);
-				var parseNtImpl = C.Method(C.Type("ParseNode"), string.Concat("Parse", nt), MemberAttributes.FamilyAndAssembly| MemberAttributes.Static, C.Param(C.Type("ParserContext"), "context"));
-				parser.Members.Add(parseNtImpl);
-				
+				var isShared = false;
 				var pi = doc.Productions.IndexOf(nt);
 				XbnfProduction prod = null;
 				if (-1 < pi)
 					prod = doc.Productions[pi];
+				if (null!=prod)
+				{
+					var ai = prod.Attributes.IndexOf("shared");
+					if (-1 < ai)
+					{
+						var o = prod.Attributes[ai].Value;
+						if (o is bool && (bool)o)
+							isShared = true;
+					}
+				}
+				var parseNtImpl = C.Method(C.Type("ParseNode"), string.Concat("Parse", nt), (isShared ? MemberAttributes.Public : MemberAttributes.FamilyAndAssembly) | MemberAttributes.Static, C.Param(C.Type("ParserContext"), "context"));
+				parser.Members.Add(parseNtImpl);
 				if (null != prod && prod.IsVirtual)
 				{
 					var body = CD.SlangParser.ParseStatements(prod.Body.Value, true);
@@ -268,8 +278,12 @@ namespace Parsley
 					var p = C.VarRef("position__");
 					foreach (var kvp in rmap)
 					{
+					
 						foreach (CodeCommentStatement comment in C.ToComments(kvp.Key))
 							parseNtImpl.Statements.Add(comment);
+						var nocode = cfg.GetAttribute(kvp.Key,"nocode");
+						if (nocode is bool && (bool)nocode)
+							continue;
 						if (null == prod || (!prod.IsVirtual && !prod.IsAbstract))
 						{
 							
@@ -970,6 +984,8 @@ namespace Parsley
 							(0 == string.Compare("IEnumerable`1", ctr.BaseType, StringComparison.InvariantCulture)) ||
 							(0 == string.Compare("System.Collections.IEnumerator`1", ctr.BaseType, StringComparison.InvariantCulture)) ||
 							(0 == string.Compare("IEnumerator`1", ctr.BaseType, StringComparison.InvariantCulture)) ||
+							(0 == string.Compare("IList`1", ctr.BaseType, StringComparison.InvariantCulture)) ||
+							(0 == string.Compare("List`1", ctr.BaseType, StringComparison.InvariantCulture)) ||
 							(0==string.Compare("Parsley.LookAheadEnumerator`1",ctr.BaseType,StringComparison.InvariantCulture)) ||
 							(0 == string.Compare("LookAheadEnumerator`1", ctr.BaseType, StringComparison.InvariantCulture)))
 						{

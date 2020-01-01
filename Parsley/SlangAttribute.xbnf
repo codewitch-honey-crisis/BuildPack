@@ -1,6 +1,0 @@
-﻿@import "SlangExpression.xbnf";
-
-CustomAttribute<start>= TypeBase [ "(" [ CustomAttributeArgList ] ")"];
-//CustomAttributeArgList<virtual, firsts="Identifier Expression"> { return _ParseCustomAttributeArgList(context); }
-CustomAttributeArgList = CustomAttributeArg { "," CustomAttributeArg };
-CustomAttributeArg = Identifier "=" Expression | Expression : where { return true; }

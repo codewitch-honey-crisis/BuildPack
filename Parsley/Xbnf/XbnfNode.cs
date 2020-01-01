@@ -18,7 +18,7 @@ namespace Parsley
 		internal static string ParseIdentifier(ParseContext pc)
 		{
 			var l = pc.CaptureBuffer.Length;
-			pc.TryReadUntil(false, '(', ')', '[', ']', '{', '}', '<', '>',',',':', ';','-', '=', '|','/', '\'', '\"', ' ', '\t', '\r', '\n', '\f', '\v');
+			pc.TryReadUntil(false, '@','(', ')', '[', ']', '{', '}', '<', '>',',',':', ';','-', '=', '|','/', '\'', '\"', ' ', '\t', '\r', '\n', '\f', '\v');
 			return pc.GetCapture(l);
 		}
 		public static string Escape(string str)

@@ -3,6 +3,11 @@
 // Slang is a CodeDOM compliant subset of C#
 @import "SlangExpression.xbnf";
 // Statements
+
+// we use this with our skipped lists to get comments on to relevant nodes
+Comments<abstract>; // { lineComment | blockComment }
+
+
 // must reference a symbol here rather than ";" or XBNF thinks it's a terminal
 // TODO: test terminal=false attribute setting in Parsley
 EmptyStatement= semi;
@@ -72,4 +77,6 @@ finallyKeyword="finally";
 semi=";";
 varType="var";
 colon=":";
-directive<hidden,blockEnd="\n">='#[A-Za-z]+';
+directive<skipped>='#[A-Za-z]+[\t ]*[^\n]*';
+lineComment<skipped>='\/\/[^\n]*';
+blockComment<skipped,blockEnd="*/">="/*";

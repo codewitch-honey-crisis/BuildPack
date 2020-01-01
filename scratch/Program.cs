@@ -9,8 +9,6 @@ using CD;
 namespace scratch
 { 
 
-
-	
 	class Bar<[Foo] T> where T:IComparable<T>,new()
 	{
 
@@ -23,6 +21,9 @@ namespace scratch
 	{
 
 	}
+	/// <summary>
+	/// MOAR COMMENTS (test Skipped)
+	/// </summary>
 	partial class Program
 	{
 		static void _Lex()
@@ -58,7 +59,6 @@ namespace scratch
 		[return: Foo]
 		static int Main()
 		{
-
 
 
 			Stream stm = null;
@@ -118,6 +118,5 @@ namespace scratch
 				}
 			}
 		}
-
 	}
 }

@@ -17,6 +17,7 @@
 		int _line=1;
 		int _column=1;
 		long _position=0;
+		List<Token> _skipped=new List<Token>();
 		// required to shut gplex up
 		enum Tokens {
 		EOF = -1
@@ -30,6 +31,7 @@
 			result.Line = 1;
 			result.Column = 1;
 			result.Position = 0;
+			result.Skipped=null;
 			return result;
 		}
 		public void UpdatePosition(string text) 
@@ -57,6 +59,18 @@
 				++_position;
 			}
 		}
+		public int Skip(int sym) {
+			Token t = _InitToken();
+			t.SymbolId=sym;
+			t.Line = Current.Line;
+			t.Column =Current.Column;
+			t.Position=Current.Position;
+			t.Value = yytext;
+			t.Skipped = null;
+			_skipped.Add(t);
+			var result = yylex();
+			return result;
+		}
 		public void Advance()
 		{
 			Current.SymbolId = yylex();
@@ -64,6 +78,9 @@
 			Current.Line = _line;
 			Current.Column = _column;
 			Current.Position = _position;
+			Current.Skipped=new Token[_skipped.Count];
+			_skipped.CopyTo(Current.Skipped,0);
+			_skipped.Clear();
 			
 		}
 		public void Close()

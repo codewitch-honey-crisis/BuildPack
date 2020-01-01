@@ -18974,7 +18974,6 @@ namespace CD {
                 throw new NotSupportedException("This parser context does not support lookahead.");
             }
             ParserContext result = new ParserContext(this._el.LookAhead.GetEnumerator(), true);
-            result.SetLocation((this.Line - 1), (this.Column - 1), this.Position);
             return result;
         }
         public Token Current {
@@ -19025,6 +19024,11 @@ namespace CD {
         public bool IsEnded {
             get {
                 return (-2 == this._state);
+            }
+        }
+        public Token[] Skipped {
+            get {
+                return this._t.Skipped;
             }
         }
         public bool Advance() {

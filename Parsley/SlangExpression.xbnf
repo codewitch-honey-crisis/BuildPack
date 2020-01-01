@@ -35,7 +35,9 @@ IntrinsicType=	boolType	|
 				ulongType	|
 				objectType	;
 TypeBase = (identifier { "."  identifier }) | IntrinsicType;
-Type<follows="Identifier">=TypeElement { TypeArraySpec };
+// the first follows is for fields and methods, second two 
+// are for base types and custom attributes, respectively
+Type<follows="Identifier lbrace rbracket">=TypeElement { TypeArraySpec };
 TypeElement = TypeBase [ TypeGenericPart ];
 TypeGenericPart= "<" [ Type { "," Type } ] ">";
 TypeArraySpec= "[" { TypeArraySpecRank } "]";
@@ -119,6 +121,7 @@ nullLiteral = "null";
 thisRef = "this";
 baseRef = "base";
 verbatimStringLiteral='@"([^"|""])*"';
+// bury this
 identifier<priority=-100>='(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
 stringLiteral='"([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*"';
 characterLiteral='[\u0027]([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})[\u0027]';
@@ -157,9 +160,8 @@ rbrace="}";
 comma=",";
 colonColon="::";
 dot=".";
-directive<blockEnd="\n">='#[A-Za-z]+';
 integerLiteral = '(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)?';
 floatLiteral= '(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)';
-lineComment<hidden>='\/\/[^\n]*';
-blockComment<hidden,blockEnd="*/">="/*";
+lineComment<skipped>='\/\/[^\n]*';
+blockComment<skipped,blockEnd="*/">="/*";
 whitespace<hidden>='[ \t\r\n\v\f]+';

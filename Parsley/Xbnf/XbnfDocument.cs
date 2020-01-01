@@ -53,6 +53,69 @@ namespace Parsley
 				}
 			}
 		}
+		public static string[] GetResources(string fileOrUrl)
+		{
+			if (!fileOrUrl.Contains("://") && !Path.IsPathRooted(fileOrUrl))
+				fileOrUrl = Path.GetFullPath(fileOrUrl);
+			return _GatherImports(fileOrUrl);
+		}
+		static string[] _GatherImports(string res)
+		{
+			var result = new List<string>();
+			result.Add(res);
+			if (res.Contains("://"))
+				using (var pc = ParseContext.CreateFromUrl(res))
+					_ParseImports(pc, result);
+			else
+			{
+				using (var pc = ParseContext.CreateFrom(res))
+				{
+					_ParseImports(pc, result);
+				}
+			}
+			for(var i = 1;i<result.Count;++i)
+			{
+				var s = result[i];
+				if(!s.Contains("://"))
+				{
+					if(!Path.IsPathRooted(s))
+					{
+						s=Path.Combine(Path.GetDirectoryName(res), s);
+					} 
+				}
+				var gi = _GatherImports(s);
+				for (var j = 0; j < gi.Length; j++)
+					if (!result.Contains(gi[j]))
+						result.Add(gi[j]);
+			}
+			return result.ToArray();
+		}
+		static void _ParseImports(ParseContext pc,IList<string> result)
+		{
+			pc.TrySkipCCommentsAndWhiteSpace();
+			while('@'==pc.Current)
+			{
+				pc.Advance();
+				var s = XbnfNode.ParseIdentifier(pc);
+				if("import"==s)
+				{
+					pc.TrySkipCCommentsAndWhiteSpace();
+					var lit = XbnfExpression.Parse(pc) as XbnfLiteralExpression;
+					if (!result.Contains(lit.Value))
+						result.Add(lit.Value);
+					pc.TryReadCCommentsAndWhitespace();
+					pc.Advance();
+					pc.TryReadCCommentsAndWhitespace();
+				}
+				else
+				{
+					while (-1 != pc.Current && ';' != pc.Current) pc.Advance();
+					if (';' == pc.Current)
+						pc.Advance();
+					pc.TrySkipCCommentsAndWhiteSpace();
+				}
+			}
+		}
 		public IList<XbnfCode> Code { get; } = new List<XbnfCode>();
 
 		public bool HasNonTerminalProductions {

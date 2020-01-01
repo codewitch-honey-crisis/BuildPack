@@ -25,5 +25,12 @@
 		/// Indicates the position where the token occurs
 		/// </summary>
 		public long Position;
+		/// <summary>
+		/// If supported, indicates the tokens that were 
+		/// skipped between here and the last read
+		/// </summary>
+		#pragma warning disable CS0649
+		public Token[] Skipped;
+		#pragma warning restore CS0649
 	}
 }

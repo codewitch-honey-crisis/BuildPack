@@ -17,6 +17,7 @@
 		int _line=1;
 		int _column=1;
 		long _position=0;
+		List<Token> _skipped=new List<Token>();
 		// required to shut gplex up
 		enum Tokens {
 		EOF = -1
@@ -30,6 +31,7 @@
 			result.Line = 1;
 			result.Column = 1;
 			result.Position = 0;
+			result.Skipped=null;
 			return result;
 		}
 		public void UpdatePosition(string text) 
@@ -57,6 +59,18 @@
 				++_position;
 			}
 		}
+		public int Skip(int sym) {
+			Token t = _InitToken();
+			t.SymbolId=sym;
+			t.Line = Current.Line;
+			t.Column =Current.Column;
+			t.Position=Current.Position;
+			t.Value = yytext;
+			t.Skipped = null;
+			_skipped.Add(t);
+			var result = yylex();
+			return result;
+		}
 		public void Advance()
 		{
 			Current.SymbolId = yylex();
@@ -64,6 +78,9 @@
 			Current.Line = _line;
 			Current.Column = _column;
 			Current.Position = _position;
+			Current.Skipped=new Token[_skipped.Count];
+			_skipped.CopyTo(Current.Skipped,0);
+			_skipped.Clear();
 			
 		}
 		public void Close()
@@ -150,111 +167,111 @@
 
 %%
 <<EOF>>		{ return -2; }
-"namespace" 	{ UpdatePosition(yytext); return 356; }
-"while" 	{ UpdatePosition(yytext); return 433; }
-"throw" 	{ UpdatePosition(yytext); return 432; }
-"for" 	{ UpdatePosition(yytext); return 431; }
-"else" 	{ UpdatePosition(yytext); return 430; }
-"goto" 	{ UpdatePosition(yytext); return 429; }
-"if" 	{ UpdatePosition(yytext); return 428; }
+"namespace" 	{ UpdatePosition(yytext); return 357; }
+"try" 	{ UpdatePosition(yytext); return 434; }
+"return" 	{ UpdatePosition(yytext); return 433; }
+"while" 	{ UpdatePosition(yytext); return 432; }
+"throw" 	{ UpdatePosition(yytext); return 431; }
+"for" 	{ UpdatePosition(yytext); return 430; }
+"else" 	{ UpdatePosition(yytext); return 429; }
+"goto" 	{ UpdatePosition(yytext); return 428; }
+"if" 	{ UpdatePosition(yytext); return 427; }
 [ \t\r\n\v\f]+ 	 { UpdatePosition(yytext); return yylex(); }
-"/*" 	{ if(!_TryReadUntilBlockEnd("*/")) return -1;UpdatePosition(yytext); return yylex(); }
-\/\/[^\n]* 	 { UpdatePosition(yytext); return yylex(); }
-(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?) 	{ UpdatePosition(yytext); return 424; }
-"return" 	{ UpdatePosition(yytext); return 434; }
-(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)? 	{ UpdatePosition(yytext); return 423; }
-"::" 	{ UpdatePosition(yytext); return 421; }
-"," 	{ UpdatePosition(yytext); return 420; }
-"}" 	{ UpdatePosition(yytext); return 419; }
-"{" 	{ UpdatePosition(yytext); return 418; }
-")" 	{ UpdatePosition(yytext); return 417; }
-"(" 	{ UpdatePosition(yytext); return 416; }
-"]" 	{ UpdatePosition(yytext); return 415; }
-"[" 	{ UpdatePosition(yytext); return 414; }
-"!" 	{ UpdatePosition(yytext); return 413; }
-"|" 	{ UpdatePosition(yytext); return 412; }
-"." 	{ UpdatePosition(yytext); return 422; }
-"try" 	{ UpdatePosition(yytext); return 435; }
-"catch" 	{ UpdatePosition(yytext); return 436; }
-"finally" 	{ UpdatePosition(yytext); return 437; }
-"where" 	{ UpdatePosition(yytext); return 460; }
-"override" 	{ UpdatePosition(yytext); return 459; }
-"const" 	{ UpdatePosition(yytext); return 458; }
-"abstract" 	{ UpdatePosition(yytext); return 457; }
-"static" 	{ UpdatePosition(yytext); return 456; }
-"internal" 	{ UpdatePosition(yytext); return 455; }
-"protected" 	{ UpdatePosition(yytext); return 454; }
-"private" 	{ UpdatePosition(yytext); return 453; }
-"public" 	{ UpdatePosition(yytext); return 452; }
-"event" 	{ UpdatePosition(yytext); return 451; }
-"set" 	{ UpdatePosition(yytext); return 450; }
-"get" 	{ UpdatePosition(yytext); return 449; }
-"interface" 	{ UpdatePosition(yytext); return 448; }
-"struct" 	{ UpdatePosition(yytext); return 447; }
-"enum" 	{ UpdatePosition(yytext); return 446; }
-"class" 	{ UpdatePosition(yytext); return 445; }
-"partial" 	{ UpdatePosition(yytext); return 444; }
-"void" 	{ UpdatePosition(yytext); return 443; }
-"assembly" 	{ UpdatePosition(yytext); return 442; }
-#[A-Za-z]+ 	{ if(!_TryReadUntilBlockEnd("\n")) return -1;UpdatePosition(yytext); return yylex(); }
-":" 	{ UpdatePosition(yytext); return 440; }
-"var" 	{ UpdatePosition(yytext); return 439; }
-";" 	{ UpdatePosition(yytext); return 438; }
-"|=" 	{ UpdatePosition(yytext); return 411; }
-"||" 	{ UpdatePosition(yytext); return 410; }
-"&" 	{ UpdatePosition(yytext); return 409; }
-"object" 	{ UpdatePosition(yytext); return 379; }
-"ulong" 	{ UpdatePosition(yytext); return 378; }
-"long" 	{ UpdatePosition(yytext); return 377; }
-"uint" 	{ UpdatePosition(yytext); return 376; }
-"int" 	{ UpdatePosition(yytext); return 375; }
-"ushort" 	{ UpdatePosition(yytext); return 374; }
-"short" 	{ UpdatePosition(yytext); return 373; }
-"byte" 	{ UpdatePosition(yytext); return 372; }
-"sbyte" 	{ UpdatePosition(yytext); return 371; }
-"decimal" 	{ UpdatePosition(yytext); return 370; }
-"double" 	{ UpdatePosition(yytext); return 369; }
-"float" 	{ UpdatePosition(yytext); return 368; }
-"char" 	{ UpdatePosition(yytext); return 367; }
-"bool" 	{ UpdatePosition(yytext); return 366; }
-"string" 	{ UpdatePosition(yytext); return 365; }
-"new" 	{ UpdatePosition(yytext); return 364; }
-"default" 	{ UpdatePosition(yytext); return 363; }
-"nameOf" 	{ UpdatePosition(yytext); return 362; }
-"typeof" 	{ UpdatePosition(yytext); return 361; }
-"ref" 	{ UpdatePosition(yytext); return 360; }
-"out" 	{ UpdatePosition(yytext); return 359; }
-@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])* 	{ UpdatePosition(yytext); return 358; }
-"using" 	{ UpdatePosition(yytext); return 357; }
-"true|false" 	{ UpdatePosition(yytext); return 380; }
-"null" 	{ UpdatePosition(yytext); return 381; }
-"this" 	{ UpdatePosition(yytext); return 382; }
-"base" 	{ UpdatePosition(yytext); return 383; }
-"&&" 	{ UpdatePosition(yytext); return 407; }
-"%" 	{ UpdatePosition(yytext); return 406; }
-"%=" 	{ UpdatePosition(yytext); return 405; }
-"/" 	{ UpdatePosition(yytext); return 404; }
-"/=" 	{ UpdatePosition(yytext); return 403; }
-"*" 	{ UpdatePosition(yytext); return 402; }
-"*=" 	{ UpdatePosition(yytext); return 401; }
-"-" 	{ UpdatePosition(yytext); return 400; }
-"-=" 	{ UpdatePosition(yytext); return 399; }
-"--" 	{ UpdatePosition(yytext); return 398; }
-"+" 	{ UpdatePosition(yytext); return 397; }
-"&=" 	{ UpdatePosition(yytext); return 408; }
-"+=" 	{ UpdatePosition(yytext); return 396; }
-"=" 	{ UpdatePosition(yytext); return 394; }
-"!=" 	{ UpdatePosition(yytext); return 393; }
-"==" 	{ UpdatePosition(yytext); return 392; }
-">" 	{ UpdatePosition(yytext); return 391; }
-">=" 	{ UpdatePosition(yytext); return 390; }
-"<" 	{ UpdatePosition(yytext); return 389; }
-"<=" 	{ UpdatePosition(yytext); return 388; }
-[\u0027]([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})[\u0027] 	{ UpdatePosition(yytext); return 387; }
-\"([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*\" 	{ UpdatePosition(yytext); return 386; }
-@\"([^\"|\"\"])*\" 	{ UpdatePosition(yytext); return 384; }
-"++" 	{ UpdatePosition(yytext); return 395; }
-(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])* 	{ UpdatePosition(yytext); return 385; }
+(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?) 	{ UpdatePosition(yytext); return 425; }
+"catch" 	{ UpdatePosition(yytext); return 435; }
+(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)? 	{ UpdatePosition(yytext); return 424; }
+"::" 	{ UpdatePosition(yytext); return 422; }
+"," 	{ UpdatePosition(yytext); return 421; }
+"}" 	{ UpdatePosition(yytext); return 420; }
+"{" 	{ UpdatePosition(yytext); return 419; }
+")" 	{ UpdatePosition(yytext); return 418; }
+"(" 	{ UpdatePosition(yytext); return 417; }
+"]" 	{ UpdatePosition(yytext); return 416; }
+"[" 	{ UpdatePosition(yytext); return 415; }
+"!" 	{ UpdatePosition(yytext); return 414; }
+"|" 	{ UpdatePosition(yytext); return 413; }
+"." 	{ UpdatePosition(yytext); return 423; }
+"finally" 	{ UpdatePosition(yytext); return 436; }
+";" 	{ UpdatePosition(yytext); return 437; }
+"var" 	{ UpdatePosition(yytext); return 438; }
+"where" 	{ UpdatePosition(yytext); return 461; }
+"override" 	{ UpdatePosition(yytext); return 460; }
+"const" 	{ UpdatePosition(yytext); return 459; }
+"abstract" 	{ UpdatePosition(yytext); return 458; }
+"static" 	{ UpdatePosition(yytext); return 457; }
+"internal" 	{ UpdatePosition(yytext); return 456; }
+"protected" 	{ UpdatePosition(yytext); return 455; }
+"private" 	{ UpdatePosition(yytext); return 454; }
+"public" 	{ UpdatePosition(yytext); return 453; }
+"event" 	{ UpdatePosition(yytext); return 452; }
+"set" 	{ UpdatePosition(yytext); return 451; }
+"get" 	{ UpdatePosition(yytext); return 450; }
+"interface" 	{ UpdatePosition(yytext); return 449; }
+"struct" 	{ UpdatePosition(yytext); return 448; }
+"enum" 	{ UpdatePosition(yytext); return 447; }
+"class" 	{ UpdatePosition(yytext); return 446; }
+"partial" 	{ UpdatePosition(yytext); return 445; }
+"void" 	{ UpdatePosition(yytext); return 444; }
+"assembly" 	{ UpdatePosition(yytext); return 443; }
+"/*" 	{ if(!_TryReadUntilBlockEnd("*/")) return -1;UpdatePosition(yytext); return Skip(442);UpdatePosition(yytext); return Skip(442); }
+\/\/[^\n]* 	{ UpdatePosition(yytext); return Skip(441); }
+#[A-Za-z]+[\t ]*[^\n]* 	{ UpdatePosition(yytext); return Skip(440); }
+":" 	{ UpdatePosition(yytext); return 439; }
+"|=" 	{ UpdatePosition(yytext); return 412; }
+"||" 	{ UpdatePosition(yytext); return 411; }
+"&" 	{ UpdatePosition(yytext); return 410; }
+"object" 	{ UpdatePosition(yytext); return 380; }
+"ulong" 	{ UpdatePosition(yytext); return 379; }
+"long" 	{ UpdatePosition(yytext); return 378; }
+"uint" 	{ UpdatePosition(yytext); return 377; }
+"int" 	{ UpdatePosition(yytext); return 376; }
+"ushort" 	{ UpdatePosition(yytext); return 375; }
+"short" 	{ UpdatePosition(yytext); return 374; }
+"byte" 	{ UpdatePosition(yytext); return 373; }
+"sbyte" 	{ UpdatePosition(yytext); return 372; }
+"decimal" 	{ UpdatePosition(yytext); return 371; }
+"double" 	{ UpdatePosition(yytext); return 370; }
+"float" 	{ UpdatePosition(yytext); return 369; }
+"char" 	{ UpdatePosition(yytext); return 368; }
+"bool" 	{ UpdatePosition(yytext); return 367; }
+"string" 	{ UpdatePosition(yytext); return 366; }
+"new" 	{ UpdatePosition(yytext); return 365; }
+"default" 	{ UpdatePosition(yytext); return 364; }
+"nameOf" 	{ UpdatePosition(yytext); return 363; }
+"typeof" 	{ UpdatePosition(yytext); return 362; }
+"ref" 	{ UpdatePosition(yytext); return 361; }
+"out" 	{ UpdatePosition(yytext); return 360; }
+@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])* 	{ UpdatePosition(yytext); return 359; }
+"using" 	{ UpdatePosition(yytext); return 358; }
+"true|false" 	{ UpdatePosition(yytext); return 381; }
+"null" 	{ UpdatePosition(yytext); return 382; }
+"this" 	{ UpdatePosition(yytext); return 383; }
+"base" 	{ UpdatePosition(yytext); return 384; }
+"&&" 	{ UpdatePosition(yytext); return 408; }
+"%" 	{ UpdatePosition(yytext); return 407; }
+"%=" 	{ UpdatePosition(yytext); return 406; }
+"/" 	{ UpdatePosition(yytext); return 405; }
+"/=" 	{ UpdatePosition(yytext); return 404; }
+"*" 	{ UpdatePosition(yytext); return 403; }
+"*=" 	{ UpdatePosition(yytext); return 402; }
+"-" 	{ UpdatePosition(yytext); return 401; }
+"-=" 	{ UpdatePosition(yytext); return 400; }
+"--" 	{ UpdatePosition(yytext); return 399; }
+"+" 	{ UpdatePosition(yytext); return 398; }
+"&=" 	{ UpdatePosition(yytext); return 409; }
+"+=" 	{ UpdatePosition(yytext); return 397; }
+"=" 	{ UpdatePosition(yytext); return 395; }
+"!=" 	{ UpdatePosition(yytext); return 394; }
+"==" 	{ UpdatePosition(yytext); return 393; }
+">" 	{ UpdatePosition(yytext); return 392; }
+">=" 	{ UpdatePosition(yytext); return 391; }
+"<" 	{ UpdatePosition(yytext); return 390; }
+"<=" 	{ UpdatePosition(yytext); return 389; }
+[\u0027]([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})[\u0027] 	{ UpdatePosition(yytext); return 388; }
+\"([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*\" 	{ UpdatePosition(yytext); return 387; }
+@\"([^\"|\"\"])*\" 	{ UpdatePosition(yytext); return 385; }
+"++" 	{ UpdatePosition(yytext); return 396; }
+(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])* 	{ UpdatePosition(yytext); return 386; }
 
 [\n]|[^\n]		{ UpdatePosition(yytext); return -1; }
 

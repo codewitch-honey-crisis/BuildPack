@@ -162,6 +162,4 @@ colonColon="::";
 dot=".";
 integerLiteral = '(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)?';
 floatLiteral= '(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)';
-lineComment<hidden>='\/\/[^\n]*';
-blockComment<hidden,blockEnd="*/">="/*";
 whitespace<hidden>='[ \t\r\n\v\f]+';

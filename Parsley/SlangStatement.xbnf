@@ -7,17 +7,7 @@
 // TODO: test terminal=false attribute setting in Parsley
 EmptyStatement= semi;
 VariableDeclarationStatement= (varType | Type) Identifier [ "=" Expression ] ";";
-ExpressionStatement=Expression ";" : where { 
-	try 
-	{
-		ParseVariableDeclarationStatement(context);
-		return false;
-	}
-	catch(SyntaxException) 
-	{
-		return true;
-	}
-}
+ExpressionStatement=Expression ";" : where { return _WhereExpressionStatement(context); }
 // enable automatic backtracking here
 VariableDeclarationOrLabelOrExpressionStatement<collapsed>=
 	VariableDeclarationStatement| 
@@ -28,7 +18,10 @@ VariableDeclarationOrLabelOrExpressionStatement<collapsed>=
 // override via a where constraint
 ElsePart<collapsed> = "else" StatementOrBlock;
 IfStatementPart<collapsed>= "if" "(" Expression ")" StatementOrBlock ;
-IfStatement=IfStatementPart ElsePart | IfStatementPart : where { return true; }
+// backtracking seems to be choosing incorrectly on trailing else here
+// make it virtual
+//IfStatement=IfStatementPart [ ElsePart ]
+IfStatement<virtual,firsts="ifKeyword"> { return _ParseIfStatement(context);}
 GotoStatement= "goto" identifier ";";
 // we already check to disambiguate in ExpressionStatement,
 // so all we do here is override the first first conflict
@@ -60,6 +53,7 @@ Statement<start>=
 	ReturnStatement |
 	GotoStatement	|
 	TryStatement	;
+	
 
 StatementBlock= "{" {Statement} "}";
 
@@ -78,3 +72,4 @@ finallyKeyword="finally";
 semi=";";
 varType="var";
 colon=":";
+directive<skipped,blockEnd="\n">='#[A-Za-z]+';

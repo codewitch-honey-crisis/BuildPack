@@ -17,6 +17,7 @@ namespace Parsley
 		{
 			
 		}
+		
 		private ParserContext(IEnumerator<object> enumerator,bool wrap)
 		{
 			_e = enumerator;
@@ -45,7 +46,6 @@ namespace Parsley
 			if (null == _el)
 				throw new NotSupportedException("This parser context does not support lookahead.");
 			var result = new ParserContext(_el.LookAhead.GetEnumerator(), true);
-			result.SetLocation(Line-1, Column-1, Position);
 			return result;
 		}
 		public Token Current { get { return _t; } }
@@ -64,6 +64,7 @@ namespace Parsley
 		public int Column { get { return _t.Column; } }
 		public long Position { get { return _t.Position; } }
 		public bool IsEnded { get { return -2 == _state; } }
+		public Token[] Skipped {  get { return _t.Skipped; } }
 		public bool Advance()
 		{
 			if (!_e.MoveNext())

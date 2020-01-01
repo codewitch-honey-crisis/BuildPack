@@ -244,6 +244,8 @@ namespace Parsley
 			var ic = Rules.Count;
 			for (var i = 0; i < ic; ++i)
 				seen.Add(Rules[i].Left);
+			seen.Add("#EOS");
+			seen.Add("#ERROR");
 			for (var i = 0; i < ic; ++i)
 			{
 				var right = Rules[i].Right;
