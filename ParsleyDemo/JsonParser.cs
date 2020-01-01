@@ -79,19 +79,19 @@ namespace ParsleyDemo {
         public const int ObjectPart2 = 11;
         public const int Array = 12;
         public const int ArrayPart2 = 13;
-        public const int @string = 14;
-        public const int colon = 15;
-        public const int number = 16;
-        public const int @null = 17;
-        public const int @true = 18;
-        public const int @false = 19;
-        public const int comma = 20;
-        public const int rbrace = 21;
-        public const int rbracket = 22;
-        public const int lbrace = 23;
-        public const int lbracket = 24;
+        public const int number = 14;
+        public const int @string = 15;
+        public const int @true = 16;
+        public const int @false = 17;
+        public const int @null = 18;
+        public const int lbracket = 19;
+        public const int rbracket = 20;
+        public const int lbrace = 21;
+        public const int rbrace = 22;
+        public const int colon = 23;
+        public const int comma = 24;
         public const int whitespace = 25;
-        private static ParseNode ParseJson(ParserContext context) {
+        internal static ParseNode ParseJson(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -107,23 +107,7 @@ namespace ParsleyDemo {
                 children[0] = JsonParser.ParseArray(context);
                 return new ParseNode(JsonParser.Json, "Json", children, line__, column__, position__);
             }
-            context.Error("Expecting lbrace or lbracket at line {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
-        }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Json= Object | Array
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Json -> Object
-        /// Json -> Array
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode ParseJson(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return JsonParser.ParseJson(context);
+            throw new SyntaxException(string.Format("Expecting Object or Array at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
         /// <summary>
         /// Parses a production of the form:
@@ -138,9 +122,13 @@ namespace ParsleyDemo {
         public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
-            return JsonParser.ParseJson(context);
+            ParseNode result = JsonParser.ParseJson(context);
+            if ((false == context.IsEnded)) {
+                context.Error("Unexpected remainder in input.");
+            }
+            return result;
         }
-        private static ParseNode ParseField(ParserContext context) {
+        internal static ParseNode ParseField(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -161,24 +149,9 @@ namespace ParsleyDemo {
                 children.AddRange(JsonParser.ParseValue(context).Children);
                 return new ParseNode(JsonParser.Field, "Field", children.ToArray(), line__, column__, position__);
             }
-            context.Error("Expecting string at line {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting string at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Field= string ":" Value
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Field -> string colon Value
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode ParseField(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return JsonParser.ParseField(context);
-        }
-        private static ParseNode ParseValue(ParserContext context) {
+        internal static ParseNode ParseValue(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -234,11 +207,10 @@ namespace ParsleyDemo {
                 context.Advance();
                 return new ParseNode(JsonParser.Value, "Value", children, line__, column__, position__);
             }
-            context.Error("Expecting string, number, lbrace, lbracket, true, false, or null at line {0}, col" +
-                    "umn {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting string, number, Object, Array, Boolean, or null at line {0}, column {1}" +
+                        ", position {2}", line__, column__, position__), line__, column__, position__);
         }
-        private static ParseNode ParseBoolean(ParserContext context) {
+        internal static ParseNode ParseBoolean(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -264,25 +236,9 @@ namespace ParsleyDemo {
                 context.Advance();
                 return new ParseNode(JsonParser.Boolean, "Boolean", children, line__, column__, position__);
             }
-            context.Error("Expecting true or false at line {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting true or false at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Boolean= true | false
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Boolean -> true
-        /// Boolean -> false
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode ParseBoolean(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return JsonParser.ParseBoolean(context);
-        }
-        private static ParseNode ParseObjectList(ParserContext context) {
+        internal static ParseNode ParseObjectList(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -298,10 +254,9 @@ namespace ParsleyDemo {
                 children.AddRange(JsonParser.ParseObjectListRightAssoc(context).Children);
                 return new ParseNode(JsonParser.ObjectList, "ObjectList", children.ToArray(), line__, column__, position__);
             }
-            context.Error("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        private static ParseNode ParseArrayList(ParserContext context) {
+        internal static ParseNode ParseArrayList(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -317,10 +272,9 @@ namespace ParsleyDemo {
                 children.AddRange(JsonParser.ParseArrayListRightAssoc(context).Children);
                 return new ParseNode(JsonParser.ArrayList, "ArrayList", children.ToArray(), line__, column__, position__);
             }
-            context.Error("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        private static ParseNode ParseObjectListRightAssoc(ParserContext context) {
+        internal static ParseNode ParseObjectListRightAssoc(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -341,10 +295,9 @@ namespace ParsleyDemo {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(JsonParser.ObjectListRightAssoc, "ObjectListRightAssoc", children, line__, column__, position__);
             }
-            context.Error("Expecting comma or rbrace at line {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        private static ParseNode ParseArrayListRightAssoc(ParserContext context) {
+        internal static ParseNode ParseArrayListRightAssoc(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -365,10 +318,9 @@ namespace ParsleyDemo {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(JsonParser.ArrayListRightAssoc, "ArrayListRightAssoc", children, line__, column__, position__);
             }
-            context.Error("Expecting comma or rbracket at line {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        private static ParseNode ParseObjectPart(ParserContext context) {
+        internal static ParseNode ParseObjectPart(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -393,10 +345,9 @@ namespace ParsleyDemo {
                 context.Advance();
                 return new ParseNode(JsonParser.ObjectPart, "ObjectPart", children.ToArray(), line__, column__, position__);
             }
-            context.Error("Expecting comma or rbrace at line {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting ObjectList or rbrace at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        private static ParseNode ParseArrayPart(ParserContext context) {
+        internal static ParseNode ParseArrayPart(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -421,10 +372,9 @@ namespace ParsleyDemo {
                 context.Advance();
                 return new ParseNode(JsonParser.ArrayPart, "ArrayPart", children.ToArray(), line__, column__, position__);
             }
-            context.Error("Expecting comma or rbracket at line {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting ArrayList or rbracket at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        private static ParseNode ParseObject(ParserContext context) {
+        internal static ParseNode ParseObject(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -439,24 +389,9 @@ namespace ParsleyDemo {
                 children.AddRange(JsonParser.ParseObjectPart2(context).Children);
                 return new ParseNode(JsonParser.Object, "Object", children.ToArray(), line__, column__, position__);
             }
-            context.Error("Expecting lbrace at line {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting lbrace at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Object= "{" [ Field { "," Field } ] "}"
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Object -> lbrace ObjectPart2
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode ParseObject(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return JsonParser.ParseObject(context);
-        }
-        private static ParseNode ParseObjectPart2(ParserContext context) {
+        internal static ParseNode ParseObjectPart2(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -477,10 +412,9 @@ namespace ParsleyDemo {
                 children.AddRange(JsonParser.ParseObjectPart(context).Children);
                 return new ParseNode(JsonParser.ObjectPart2, "ObjectPart2", children.ToArray(), line__, column__, position__);
             }
-            context.Error("Expecting rbrace or string at line {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting rbrace or Field at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        private static ParseNode ParseArray(ParserContext context) {
+        internal static ParseNode ParseArray(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -495,24 +429,9 @@ namespace ParsleyDemo {
                 children.AddRange(JsonParser.ParseArrayPart2(context).Children);
                 return new ParseNode(JsonParser.Array, "Array", children.ToArray(), line__, column__, position__);
             }
-            context.Error("Expecting lbracket at line {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting lbracket at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Array= "[" [ Value { "," Value } ] "]"
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Array -> lbracket ArrayPart2
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode ParseArray(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return JsonParser.ParseArray(context);
-        }
-        private static ParseNode ParseArrayPart2(ParserContext context) {
+        internal static ParseNode ParseArrayPart2(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -539,9 +458,7 @@ namespace ParsleyDemo {
                 children.AddRange(JsonParser.ParseArrayPart(context).Children);
                 return new ParseNode(JsonParser.ArrayPart2, "ArrayPart2", children.ToArray(), line__, column__, position__);
             }
-            context.Error("Expecting rbracket, string, number, lbrace, lbracket, true, false, or null at lin" +
-                    "e {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting rbracket or Value at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
     }
 }

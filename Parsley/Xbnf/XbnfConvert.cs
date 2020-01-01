@@ -352,7 +352,7 @@ namespace Parsley
 				cfgMap.Add(imports[i].Document, new CfgDocument());
 			}
 
-			return _TryToCfg(document,cfgMap,out genInfo);
+			return _TryToGenInfo(document,cfgMap,out genInfo);
 		}
 		static void _GatherImports(XbnfDocument doc,XbnfImportList result)
 		{
@@ -377,7 +377,7 @@ namespace Parsley
 			}
 		}
 		
-		static IList<CfgMessage> _TryToCfg(XbnfDocument document,IDictionary<XbnfDocument, CfgDocument> cfgMap,out XbnfGenerationInfo genInfo)
+		static IList<CfgMessage> _TryToGenInfo(XbnfDocument document,IDictionary<XbnfDocument, CfgDocument> cfgMap,out XbnfGenerationInfo genInfo)
 		{
 			genInfo = default(XbnfGenerationInfo);
 			var hasErrors = false;
@@ -459,16 +459,22 @@ namespace Parsley
 				if (!done.Contains(term))
 				{
 					var newId = _GetImplicitTermId(syms);
+					var found = false;
 					foreach (var d in cfgMap.Keys)
 					{
 						var prod = d.GetProductionForExpression(term);
 						if (null != prod)
 						{
+							found = true;
 							// recycle this symbol
 							newId = prod.Name;
 							break;
 						}
-						
+					}
+					if(!found)
+					{
+						document.Productions.Add(new XbnfProduction(newId, term));
+
 					}
 					tmap.Add(term, newId);
 				}

@@ -26,9 +26,10 @@ namespace scratch
 	/// </summary>
 	partial class Program
 	{
+		
 		static void _Lex()
 		{
-
+			#region Fetch constants
 			var consts = new Dictionary<int, string>();
 			var fa = typeof(SlangTokenizer).GetFields(BindingFlags.Public | BindingFlags.Static);
 			for (var i = 0; i < fa.Length; ++i)
@@ -41,6 +42,8 @@ namespace scratch
 						consts[j] = f.Name;
 				}
 			}
+			#endregion
+
 			Stream stm = null;
 			try
 			{
@@ -60,14 +63,14 @@ namespace scratch
 		static int Main()
 		{
 
-
+			
 			Stream stm = null;
 			try
 			{
 				stm = File.OpenRead(@"..\..\..\Program.cs");
 				var tokenizer = new SlangTokenizer(stm);
 				var pt = SlangParser.Parse(tokenizer);
-				_WriteTree(pt, Console.Out);
+				_WriteTree(pt.Children[0], Console.Out);
 			}
 			finally
 			{
@@ -75,6 +78,12 @@ namespace scratch
 					stm.Close();
 			}
 			return 0;
+		}
+		static void _Statements()
+		{
+			var test = "a=1;int b =2;";
+			var tokenizer = new SlangTokenizer(test);
+			_WriteTree(StatementParser.ParseStatements(tokenizer), Console.Out);
 		}
 		static void _WriteTree(ParseNode node, TextWriter writer)
 		{

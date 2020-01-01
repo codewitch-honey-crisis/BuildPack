@@ -48,7 +48,7 @@ LabelStatement= identifier ":" : where {
 	return colon==context.SymbolId;
 }
 StatementOrBlock = (Statement | StatementBlock);
-Statement<start>=
+Statement<start,shared>=
 	EmptyStatement	|
 	VariableDeclarationOrLabelOrExpressionStatement | 
 	IfStatement		|
@@ -59,7 +59,7 @@ Statement<start>=
 	GotoStatement	|
 	TryStatement	;
 	
-
+Statements<shared,follows="#EOS"> = {Statement};
 StatementBlock= "{" {Statement} "}";
 
 ifKeyword="if";

@@ -3,7 +3,7 @@
 // Slang is a CodeDOM compliant subset of C#
 // Expressions
 
-Expression<start,follows="semi rparen rbracket comma">=AssignExpression;
+Expression<start,shared,follows="semi rparen rbracket comma">=AssignExpression;
 RelationalExpression = TermExpression { ("<"|"<="|">"|">=") TermExpression };
 EqualityExpression = RelationalExpression { ("=="|"!=") RelationalExpression };
 BitwiseAndExpression = EqualityExpression { "&" EqualityExpression };
@@ -37,7 +37,7 @@ IntrinsicType=	boolType	|
 TypeBase = (identifier { "."  identifier }) | IntrinsicType;
 // the first follows is for fields and methods, second two 
 // are for base types and custom attributes, respectively
-Type<follows="Identifier lbrace rbracket">=TypeElement { TypeArraySpec };
+Type<shared,follows="Identifier lbrace rbracket #EOS">=TypeElement { TypeArraySpec };
 TypeElement = TypeBase [ TypeGenericPart ];
 TypeGenericPart= "<" [ Type { "," Type } ] ">";
 TypeArraySpec= "[" { TypeArraySpecRank } "]";
@@ -162,6 +162,4 @@ colonColon="::";
 dot=".";
 integerLiteral = '(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)?';
 floatLiteral= '(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)';
-lineComment<skipped>='\/\/[^\n]*';
-blockComment<skipped,blockEnd="*/">="/*";
 whitespace<hidden>='[ \t\r\n\v\f]+';

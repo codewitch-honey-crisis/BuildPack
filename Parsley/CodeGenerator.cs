@@ -230,6 +230,8 @@ namespace Parsley
 			)
 
 		{
+			// for error reporting
+			var firstsNT = cfg.FillFirstNonTerminals();
 			var context = C.ArgRef("context");
 			var syms = cfg.FillSymbols();
 			syms.Remove("#ERROR");
@@ -258,7 +260,7 @@ namespace Parsley
 							isShared = true;
 					}
 				}
-				var parseNtImpl = C.Method(C.Type("ParseNode"), string.Concat("Parse", nt), (isShared ? MemberAttributes.Public : MemberAttributes.FamilyAndAssembly) | MemberAttributes.Static, C.Param(C.Type("ParserContext"), "context"));
+				var parseNtImpl = C.Method(C.Type("ParseNode"), string.Concat("Parse", nt),  MemberAttributes.FamilyAndAssembly | MemberAttributes.Static, C.Param(C.Type("ParserContext"), "context"));
 				parser.Members.Add(parseNtImpl);
 				if (null != prod && prod.IsVirtual)
 				{
@@ -371,9 +373,9 @@ namespace Parsley
 
 				
 					StringBuilder exp = new StringBuilder();
-					_BuildErrorList(row, exp);
-					parseNtImpl.Statements.Add(C.Call(context, "Error", C.Literal(string.Concat("Expecting ", exp.ToString(), " at line {0}, column {1}, position {2}")), l, c, p));
-					parseNtImpl.Statements.Add(C.Return(C.Null));
+					_BuildErrorList(row,firstsNT, exp);
+					var sx = C.New(C.Type("SyntaxException"), C.Invoke(C.TypeRef(typeof(string)), "Format", C.Literal(string.Concat("Expecting ", exp.ToString(), " at line {0}, column {1}, position {2}")), l, c, p), l, c, p);
+					parseNtImpl.Statements.Add(C.Throw(sx));
 					
 				}
 				if (null != prod)
@@ -407,30 +409,26 @@ namespace Parsley
 						foreach (var r in cfg.FillNonTerminalRules(prod.Name))
 							rs.AppendLine(r.ToString());
 
-						/*
 						stmts.Add(C.Var(C.Type("ParserContext"), "context", C.New(C.Type("ParserContext"), C.ArgRef("tokenizer"))));
 						stmts.Add(C.Call(C.VarRef("context"), "EnsureStarted"));
-						stmts.Add(C.Return(C.Invoke(C.TypeRef(codeclass), parseNtImpl.Name, C.VarRef("context"))));
+						stmts.Add(C.Var(C.Type("ParseNode"), "result", C.Invoke(C.TypeRef(codeclass), parseNtImpl.Name, C.VarRef("context"))));
+						stmts.Add(C.If(C.Not(C.PropRef(C.VarRef("context"), "IsEnded")),
+							C.Call(C.VarRef("context"), "Error", C.Literal("Unexpected remainder in input."))));
+						stmts.Add(C.Return(C.VarRef("result")));
 						var ctr = C.Type(typeof(IEnumerable<>));
 						ctr.TypeArguments.Add(C.Type("Token"));
-						var parseNt = C.Method(parseNtImpl.ReturnType, parseNtImpl.Name, MemberAttributes.Public | MemberAttributes.Static, C.Param(ctr, "tokenizer"));
-						parseNt.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nParses a production of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"tokenizer\">The tokenizer to parse with</param><returns>A <see cref=\"ParseNode\" /> representing the parsed tokens</returns>", prod.ToString("p").TrimEnd(), rs.ToString().TrimEnd()), true));
-						parseNt.Statements.AddRange(stmts);
-					
-						parser.Members.Add(parseNt);
-						*/
+
 						if (0 == string.Compare(nt, cfg.StartSymbol, StringComparison.InvariantCulture))
 						{
-							stmts.Add(C.Var(C.Type("ParserContext"), "context", C.New(C.Type("ParserContext"), C.ArgRef("tokenizer"))));
-							stmts.Add(C.Call(C.VarRef("context"), "EnsureStarted"));
-							stmts.Add(C.Var(C.Type("ParseNode"), "result", C.Invoke(C.TypeRef(codeclass), parseNtImpl.Name, C.VarRef("context"))));
-							stmts.Add(C.If(C.Not(C.PropRef(C.VarRef("context"), "IsEnded")),
-								C.Call(C.VarRef("context"), "Error", C.Literal("Unexpected remainder in input."))));
-							stmts.Add(C.Return(C.VarRef("result")));
-							var ctr = C.Type(typeof(IEnumerable<>));
-							ctr.TypeArguments.Add(C.Type("Token"));
-
+							
 							var parse = C.Method(parseNtImpl.ReturnType, "Parse", MemberAttributes.Public | MemberAttributes.Static, C.Param(ctr,"tokenizer"));
+							parse.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nParses a production of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"tokenizer\">The tokenizer to parse with</param><returns>A <see cref=\"ParseNode\" /> representing the parsed tokens</returns>", prod.ToString("p").TrimEnd(), rs.ToString().TrimEnd()), true));
+							parse.Statements.AddRange(stmts);
+							parser.Members.Add(parse);
+						}
+						if(isShared)
+						{
+							var parse = C.Method(parseNtImpl.ReturnType, string.Concat("Parse",nt), MemberAttributes.Public | MemberAttributes.Static, C.Param(ctr, "tokenizer"));
 							parse.Comments.AddRange(C.ToComments(string.Format("<summary>\r\nParses a production of the form:\r\n{0}\r\n</summary>\r\n<remarks>\r\nThe production rules are:\r\n{1}\r\n</remarks>\r\n<param name=\"tokenizer\">The tokenizer to parse with</param><returns>A <see cref=\"ParseNode\" /> representing the parsed tokens</returns>", prod.ToString("p").TrimEnd(), rs.ToString().TrimEnd()), true));
 							parse.Statements.AddRange(stmts);
 							parser.Members.Add(parse);
@@ -440,7 +438,7 @@ namespace Parsley
 				}
 			}
 		}
-		private static void _BuildErrorList(IList<string> terms, StringBuilder exp)
+		private static void _BuildErrorList(IList<string> terms,StringBuilder exp)
 		{
 			
 			exp.Append(terms[0]);
@@ -454,12 +452,15 @@ namespace Parsley
 			if (1 < ic)
 				exp.Append(string.Concat(" or ", terms[ic - 1]));
 		}
-		private static void _BuildErrorList(KeyValuePair<string, IDictionary<string, CfgLL1ParseTableEntry>> row, StringBuilder exp)
+		private static void _BuildErrorList(KeyValuePair<string, IDictionary<string, CfgLL1ParseTableEntry>> row, IDictionary<string,ICollection<string>> firsts, StringBuilder exp)
 		{
 			var terms = new List<string>();
-			foreach (var col in row.Value)
-				if (null != col.Value.Rules && 0 < col.Value.Rules.Count)
-					terms.Add(col.Key);
+			var col = firsts[row.Key];
+			foreach (var s in col)
+			{
+				if(!string.IsNullOrWhiteSpace(s))
+					terms.Add(s);
+			}
 
 			exp.Append(terms[0]);
 			int ic = terms.Count;
@@ -504,7 +505,7 @@ namespace Parsley
 			XbnfGenerationInfo genInfo
 			)
 		{
-			var collapsed =_BuildCollapsed(cfg, rule);
+			var collapsed =_BuildCollapsed(genInfo, rule);
 			var cnd = C.If(_BuildIfRuleExprsCnd(primaryDoc, prod, syms,symtbl, consts,context, rmapEntry.Value,codeclass,symmap));
 			if (null!=prod && prod.IsVirtual)
 			{
@@ -592,15 +593,17 @@ namespace Parsley
 			stmts.Add(cnd);
 		}
 
-		
-		private static HashSet<string> _BuildCollapsed(CfgDocument cfg, CfgRule rule)
+		private static HashSet<string> _BuildCollapsed(XbnfGenerationInfo genInfo, CfgRule rule)
 		{
 			var result = new HashSet<string>();
-			for (int jc = rule.Right.Count, j = 0; j < jc; ++j)
+			foreach (var cfg in genInfo.CfgMap.Values)
 			{
-				var o = cfg.GetAttribute(rule.Right[j], "collapsed");
-				if (o is bool && (bool)o)
-					result.Add(rule.Right[j]);
+				for (int jc = rule.Right.Count, j = 0; j < jc; ++j)
+				{
+					var o = cfg.GetAttribute(rule.Right[j], "collapsed");
+					if (o is bool && (bool)o)
+						result.Add(rule.Right[j]);
+				}
 			}
 			return result;
 		}

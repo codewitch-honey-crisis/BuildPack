@@ -521,8 +521,6 @@ namespace CD
 				children.Add(ParseMember(context));
 			return new ParseNode(Members, "Members", children.ToArray(), line, column, position);
 		}
-
-
 		static ParseNode _ParseTypeDecl(ParserContext context, bool isNested, ParseNode customAttributes, int line, int column, long position, List<ParseNode> attrs)
 		{
 			

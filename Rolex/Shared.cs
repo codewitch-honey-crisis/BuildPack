@@ -98,6 +98,10 @@ namespace Rolex {
                                             Shared._MemberField(new CodeTypeReference(typeof(string)), "Value", null, (MemberAttributes.Final | MemberAttributes. Public), new CodeCommentStatement[] {
                                                         new CodeCommentStatement("<summary>", true),
                                                         new CodeCommentStatement("Indicates the value of the token", true),
+                                                        new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                            Shared._MemberField(new CodeTypeReference(new CodeTypeReference("Token"), 1), "Skipped", null, (MemberAttributes.Final | MemberAttributes. Public), new CodeCommentStatement[] {
+                                                        new CodeCommentStatement("<summary>", true),
+                                                        new CodeCommentStatement("Always null in Rolex", true),
                                                         new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[] {
                                             new CodeCommentStatement("<summary>", true),
                                             new CodeCommentStatement("Reference implementation for generated shared code", true),

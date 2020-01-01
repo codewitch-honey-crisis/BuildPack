@@ -28,12 +28,11 @@ TypeDeclPart<virtual,firsts="colon whereKeyword lbrace", follows="rbrace"> { ret
 TypeParams<follows="colon whereKeyword lbrace"> = [ "<" [ CustomAttributeGroup ] Identifier { "," Identifier } ">" ];
 			
 // we narrow the attributes this accepts as a base in our parse routine for parse member
-// TODO: do it for non-nested types
 Enum<dependency>= MemberAttributes "enum" Identifier EnumPart;
 Struct<dependency>= MemberAttributes "struct" Identifier TypeParams TypeDeclPart;
 Class<dependency>= MemberAttributes "class" Identifier TypeParams TypeDeclPart;
 Interface<dependency>= MemberAttributes "interface" Identifier [ "<" TypeParams ">" ] TypeDeclPart;
-TypeDecl<start,virtual,follows="TypeDecl usingKeyword namespaceKeyword rbrace lbracket",firsts="TypeAttributes structKeyword classKeyword enumKeyword interfaceKeyword partialKeyword lbracket"> { return _ParseTypeDecl(context,false,null,context.Line,context.Column,context.Position,null); }
+TypeDecl<start,shared,virtual,follows="TypeDecl usingKeyword namespaceKeyword rbrace lbracket",firsts="TypeAttributes structKeyword classKeyword enumKeyword interfaceKeyword partialKeyword lbracket"> { return _ParseTypeDecl(context,false,null,context.Line,context.Column,context.Position,null); }
 // Members
 MemberAttribute<collapsed>= newKeyword | constKeyword | publicKeyword | protectedKeyword | internalKeyword | privateKeyword | staticKeyword | overrideKeyword;
 MemberAttributes<dependency> = { MemberAttribute };
@@ -41,7 +40,7 @@ MemberAttributes<dependency> = { MemberAttribute };
 // for it. The trouble is in the ambiguity because the type leads the identifier, so
 // it's hard to know where the type ends and the identifier begins.
 // note that we restrict the Identifier below, 
-// by copying it's where clause.
+// by copying its where clause.
 PrivateImplementationType<virtual,firsts="Identifier"> 
 	{ return _ParsePrivateImplementationType(context); } 
 	: where { return !ExpressionParser.Keywords.Contains(context.Value); } 
@@ -49,7 +48,7 @@ PrivateImplementationType<virtual,firsts="Identifier">
 // the grammar can't trace it
 MethodParamList<dependency,follows="rparen">= [ MethodParam { "," MethodParam } ];
 MethodParam= [ outKeyword | refKeyword ] Type Identifier;
-ParamList<dependency>= [ Param { "," Param } ];
+ParamList<dependency,follows="rparen rbracket">= [ Param { "," Param } ];
 Param= Type Identifier;
 // property accessors are weird for the parser because one
 // can be optional, but only one of each may be specifed

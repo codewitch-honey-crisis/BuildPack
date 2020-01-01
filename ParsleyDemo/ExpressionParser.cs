@@ -22,6 +22,10 @@ namespace ParsleyDemo {
     /// integer= '[0-9]+';
     /// identifier= '[A-Z_a-z][0-9A-Z_a-z]*';
     /// (whitespace)= '\s+';
+    /// Implicit= "-";
+    /// Implicit2= "/";
+    /// Implicit3= "(";
+    /// Implicit4= ")";
     /// </summary>
     /// <remarks>The rules for the factored grammar are as follows:
     /// Unary -> add Unary
@@ -66,15 +70,15 @@ namespace ParsleyDemo {
         public const int TermListRightAssoc2 = 10;
         public const int FactorListRightAssoc2 = 11;
         public const int add = 12;
-        public const int Implicit = 13;
+        public const int mul = 13;
         public const int integer = 14;
         public const int identifier = 15;
-        public const int Implicit3 = 16;
-        public const int Implicit4 = 17;
-        public const int mul = 18;
-        public const int Implicit2 = 19;
-        public const int whitespace = 20;
-        private static ParseNode ParseUnary(ParserContext context) {
+        public const int whitespace = 16;
+        public const int Implicit = 17;
+        public const int Implicit2 = 18;
+        public const int Implicit3 = 19;
+        public const int Implicit4 = 20;
+        internal static ParseNode ParseUnary(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -110,27 +114,9 @@ namespace ParsleyDemo {
                 children[0] = ExpressionParser.ParseLeaf(context);
                 return new ParseNode(ExpressionParser.Unary, "Unary", children, line__, column__, position__);
             }
-            context.Error("Expecting add, Implicit, integer, identifier, or Implicit3 at line {0}, column {1" +
-                    "}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting add, Implicit, or Leaf at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Unary= ( "+" | "-" ) Unary | Leaf
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Unary -> add Unary
-        /// Unary -> Implicit Unary
-        /// Unary -> Leaf
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode ParseUnary(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return ExpressionParser.ParseUnary(context);
-        }
-        private static ParseNode ParseLeaf(ParserContext context) {
+        internal static ParseNode ParseLeaf(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -174,27 +160,10 @@ namespace ParsleyDemo {
                 context.Advance();
                 return new ParseNode(ExpressionParser.Leaf, "Leaf", children, line__, column__, position__);
             }
-            context.Error("Expecting integer, identifier, or Implicit3 at line {0}, column {1}, position {2}" +
-                    "", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting integer, identifier, or Implicit3 at line {0}, column {1}, position {2}" +
+                        "", line__, column__, position__), line__, column__, position__);
         }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Leaf= integer | identifier | "(" Term ")"
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Leaf -> integer
-        /// Leaf -> identifier
-        /// Leaf -> Implicit3 Term Implicit4
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode ParseLeaf(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return ExpressionParser.ParseLeaf(context);
-        }
-        private static ParseNode ParseTermList(ParserContext context) {
+        internal static ParseNode ParseTermList(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -226,10 +195,9 @@ namespace ParsleyDemo {
                 children.AddRange(ExpressionParser.ParseTermListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.TermList, "TermList", children.ToArray(), line__, column__, position__);
             }
-            context.Error("Expecting add or Implicit at line {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting add or Implicit at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        private static ParseNode ParseFactorList(ParserContext context) {
+        internal static ParseNode ParseFactorList(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -261,10 +229,9 @@ namespace ParsleyDemo {
                 children.AddRange(ExpressionParser.ParseFactorListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.FactorList, "FactorList", children.ToArray(), line__, column__, position__);
             }
-            context.Error("Expecting mul or Implicit2 at line {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting mul or Implicit2 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        private static ParseNode ParseTermListRightAssoc(ParserContext context) {
+        internal static ParseNode ParseTermListRightAssoc(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -288,11 +255,9 @@ namespace ParsleyDemo {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TermListRightAssoc, "TermListRightAssoc", children, line__, column__, position__);
             }
-            context.Error("Expecting add, Implicit, #EOS, or Implicit4 at line {0}, column {1}, position {2}" +
-                    "", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting add at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        private static ParseNode ParseFactorListRightAssoc(ParserContext context) {
+        internal static ParseNode ParseFactorListRightAssoc(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -318,11 +283,9 @@ namespace ParsleyDemo {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.FactorListRightAssoc, "FactorListRightAssoc", children, line__, column__, position__);
             }
-            context.Error("Expecting mul, Implicit2, add, Implicit, #EOS, or Implicit4 at line {0}, column {" +
-                    "1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting mul at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        private static ParseNode ParseTerm(ParserContext context) {
+        internal static ParseNode ParseTerm(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -337,23 +300,7 @@ namespace ParsleyDemo {
                 children.AddRange(ExpressionParser.ParseTermPart(context).Children);
                 return new ParseNode(ExpressionParser.Term, "Term", children.ToArray(), line__, column__, position__);
             }
-            context.Error("Expecting add, Implicit, integer, identifier, or Implicit3 at line {0}, column {1" +
-                    "}, position {2}", line__, column__, position__);
-            return null;
-        }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Term= Factor { ( "+" | "-" ) Factor }
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Term -> Factor TermPart
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode ParseTerm(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return ExpressionParser.ParseTerm(context);
+            throw new SyntaxException(string.Format("Expecting Factor at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
         /// <summary>
         /// Parses a production of the form:
@@ -367,9 +314,13 @@ namespace ParsleyDemo {
         public static ParseNode Parse(System.Collections.Generic.IEnumerable<Token> tokenizer) {
             ParserContext context = new ParserContext(tokenizer);
             context.EnsureStarted();
-            return ExpressionParser.ParseTerm(context);
+            ParseNode result = ExpressionParser.ParseTerm(context);
+            if ((false == context.IsEnded)) {
+                context.Error("Unexpected remainder in input.");
+            }
+            return result;
         }
-        private static ParseNode ParseTermPart(ParserContext context) {
+        internal static ParseNode ParseTermPart(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -386,11 +337,9 @@ namespace ParsleyDemo {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TermPart, "TermPart", children, line__, column__, position__);
             }
-            context.Error("Expecting add, Implicit, #EOS, or Implicit4 at line {0}, column {1}, position {2}" +
-                    "", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting TermList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        private static ParseNode ParseFactor(ParserContext context) {
+        internal static ParseNode ParseFactor(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -405,25 +354,9 @@ namespace ParsleyDemo {
                 children.AddRange(ExpressionParser.ParseFactorPart(context).Children);
                 return new ParseNode(ExpressionParser.Factor, "Factor", children.ToArray(), line__, column__, position__);
             }
-            context.Error("Expecting add, Implicit, integer, identifier, or Implicit3 at line {0}, column {1" +
-                    "}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting Unary at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        /// <summary>
-        /// Parses a production of the form:
-        /// Factor= Unary { ( "*" | "/" ) Unary }
-        /// </summary>
-        /// <remarks>
-        /// The production rules are:
-        /// Factor -> Unary FactorPart
-        /// </remarks>
-        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
-        public static ParseNode ParseFactor(System.Collections.Generic.IEnumerable<Token> tokenizer) {
-            ParserContext context = new ParserContext(tokenizer);
-            context.EnsureStarted();
-            return ExpressionParser.ParseFactor(context);
-        }
-        private static ParseNode ParseFactorPart(ParserContext context) {
+        internal static ParseNode ParseFactorPart(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -442,11 +375,9 @@ namespace ParsleyDemo {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.FactorPart, "FactorPart", children, line__, column__, position__);
             }
-            context.Error("Expecting mul, Implicit2, add, Implicit, #EOS, or Implicit4 at line {0}, column {" +
-                    "1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting FactorList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        private static ParseNode ParseTermListRightAssoc2(ParserContext context) {
+        internal static ParseNode ParseTermListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -469,10 +400,9 @@ namespace ParsleyDemo {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TermListRightAssoc2, "TermListRightAssoc2", children, line__, column__, position__);
             }
-            context.Error("Expecting Implicit, #EOS, or Implicit4 at line {0}, column {1}, position {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting Implicit at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
-        private static ParseNode ParseFactorListRightAssoc2(ParserContext context) {
+        internal static ParseNode ParseFactorListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
             long position__ = context.Position;
@@ -497,9 +427,7 @@ namespace ParsleyDemo {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.FactorListRightAssoc2, "FactorListRightAssoc2", children, line__, column__, position__);
             }
-            context.Error("Expecting Implicit2, add, Implicit, #EOS, or Implicit4 at line {0}, column {1}, p" +
-                    "osition {2}", line__, column__, position__);
-            return null;
+            throw new SyntaxException(string.Format("Expecting Implicit2 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
         }
         /// <summary>
         /// Evaluates a derivation of the form:
@@ -733,13 +661,25 @@ namespace ParsleyDemo {
             if ((node.SymbolId == ExpressionParser.add)) {
                 return node.Value;
             }
-            if ((node.SymbolId == ExpressionParser.mul)) {
+            if ((node.SymbolId == ExpressionParser.Implicit2)) {
                 return node.Value;
             }
             if ((node.SymbolId == ExpressionParser.integer)) {
                 return node.Value;
             }
             if ((node.SymbolId == ExpressionParser.identifier)) {
+                return node.Value;
+            }
+            if ((node.SymbolId == ExpressionParser.mul)) {
+                return node.Value;
+            }
+            if ((node.SymbolId == ExpressionParser.Implicit3)) {
+                return node.Value;
+            }
+            if ((node.SymbolId == ExpressionParser.whitespace)) {
+                return node.Value;
+            }
+            if ((node.SymbolId == ExpressionParser.Implicit)) {
                 return node.Value;
             }
             return null;
@@ -901,7 +841,6 @@ namespace ParsleyDemo {
                 throw new NotSupportedException("This parser context does not support lookahead.");
             }
             ParserContext result = new ParserContext(this._el.LookAhead.GetEnumerator(), true);
-            result.SetLocation((this.Line - 1), (this.Column - 1), this.Position);
             return result;
         }
         public Token Current {
@@ -952,6 +891,11 @@ namespace ParsleyDemo {
         public bool IsEnded {
             get {
                 return (-2 == this._state);
+            }
+        }
+        public Token[] Skipped {
+            get {
+                return this._t.Skipped;
             }
         }
         public bool Advance() {

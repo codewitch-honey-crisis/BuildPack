@@ -311,7 +311,7 @@ namespace Parsley
 		#endregion
 
 		#region First/Follows/Predict
-		IDictionary<string, ICollection<string>> _FillFirstsNT(IDictionary<string, ICollection<string>> result = null)
+		public IDictionary<string, ICollection<string>> FillFirstNonTerminals(IDictionary<string, ICollection<string>> result = null)
 		{
 			if (null == result)
 				result = new Dictionary<string, ICollection<string>>();
@@ -383,7 +383,7 @@ namespace Parsley
 		{
 			if (null == result)
 				result = new Dictionary<string, ICollection<string>>();
-			_FillFirstsNT(result);
+			FillFirstNonTerminals(result);
 			// finally, for each non-terminal N we still have in the firsts, resolve FIRSTS(N)
 			var done = false;
 			while (!done)
