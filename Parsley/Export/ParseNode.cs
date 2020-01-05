@@ -68,5 +68,11 @@ namespace Parsley
 				return _position;
 			}
 		}
+		public override string ToString()
+		{
+			if (IsNonTerminal)
+				return string.Concat(Symbol, ": Count = ", _children.Length.ToString());
+			return string.Concat(Symbol, ": ", Value);
+		}
 	}
 }

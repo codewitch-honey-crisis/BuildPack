@@ -13,6 +13,7 @@ namespace Parsley
 		private int _line;
 		private int _column;
 		private long _position;
+		private List<object> _skipped;
 		public ParserContext(IEnumerable<object> tokenizer) : this(tokenizer.GetEnumerator(),true)
 		{
 			
@@ -29,6 +30,13 @@ namespace Parsley
 			_state = -1;
 			_t.SymbolId = -1;
 			_advanceCount = 0;
+			_skipped = new List<object>();
+		}
+		public List<object> Skipped 
+		{
+			get {
+				return _skipped;
+			}
 		}
 		public void SetLocation(int line,int column,long position)
 		{
@@ -64,7 +72,6 @@ namespace Parsley
 		public int Column { get { return _t.Column; } }
 		public long Position { get { return _t.Position; } }
 		public bool IsEnded { get { return -2 == _state; } }
-		public Token[] Skipped {  get { return _t.Skipped; } }
 		public bool Advance()
 		{
 			if (!_e.MoveNext())
@@ -83,6 +90,8 @@ namespace Parsley
 				((Token)_t).Line += _line;
 				((Token)_t).Column += _column;
 				((Token)_t).Position += _position;
+				if(null!=((Token)_t).Skipped)
+					_skipped.AddRange(((Token)_t).Skipped);
 				return true;
 			}
 			return false;

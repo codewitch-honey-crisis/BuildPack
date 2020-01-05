@@ -3,7 +3,7 @@
 // Slang is a CodeDOM compliant subset of C#
 // Expressions
 
-Expression<start,follows="semi rparen rbracket comma">=AssignExpression;
+Expression<start,shared,follows="semi rparen rbracket comma">=AssignExpression;
 RelationalExpression = TermExpression { ("<"|"<="|">"|">=") TermExpression };
 EqualityExpression = RelationalExpression { ("=="|"!=") RelationalExpression };
 BitwiseAndExpression = EqualityExpression { "&" EqualityExpression };
@@ -13,9 +13,11 @@ OrExpression= AndExpression { "||" AndExpression };
 AssignExpression= OrExpression { ("="|"+="|"-="|"*="|"/="|"%="|"&="|"|=") OrExpression };
 TermExpression= FactorExpression { ("+"|"-") FactorExpression };
 FactorExpression= UnaryExpression { ("*"|"/"|"%") UnaryExpression };
+ArgList<follows="rbracket">= Expression { "," Expression };
+MethodArgList = MethodArg { "," MethodArg } |;
 MemberFieldRef = "." Identifier;
-MemberInvokeRef = "(" [ MethodArg { "," MethodArg } ] ")";
-MemberIndexerRef = "[" Expression { "," Expression } "]";
+MemberInvokeRef = "(" MethodArgList ")";
+MemberIndexerRef = "[" ArgList "]";
 MemberAnyRef<collapsed> = MemberFieldRef | MemberInvokeRef | MemberIndexerRef ;
 MethodArg = [ outKeyword | refKeyword ] Expression;
 TypeRef = Type;
@@ -34,10 +36,10 @@ IntrinsicType=	boolType	|
 				longType	|
 				ulongType	|
 				objectType	;
-TypeBase = (identifier { "."  identifier }) | IntrinsicType;
+TypeBase = (Identifier { "."  Identifier }) | IntrinsicType;
 // the first follows is for fields and methods, second two 
 // are for base types and custom attributes, respectively
-Type<follows="Identifier lbrace rbracket">=TypeElement { TypeArraySpec };
+Type<shared,follows="Identifier lbrace rbracket thisRef whereKeyword #EOS">=TypeElement { TypeArraySpec };
 TypeElement = TypeBase [ TypeGenericPart ];
 TypeGenericPart= "<" [ Type { "," Type } ] ">";
 TypeArraySpec= "[" { TypeArraySpecRank } "]";
@@ -51,25 +53,24 @@ ArraySpec<virtual,firsts="lbracket"> {
 	return _ParseArraySpec(context);
 }
 NewExpression= newKeyword TypeElement ( NewObjectPart | NewArrayPart );
-NewObjectPart<collapsed>= "(" [ Expression { "," Expression } ] ")";
+NewObjectPart<collapsed>= "(" (ArgList|) ")";
 NewArrayPart<collapsed>= ArraySpec;
 
 // this is necessary so we can get Parsley to generate a 
 // method called ParseTypeCastExpressionPart() which we use
 // when resolving casts
 TypeCastExpressionPart<dependency,collapsed>= Type ")"; 
-ArraySpecExpressionList<dependency,collapsed>= Expression { "," Expression } "]";
-ArrayInitializer<dependency>= "=" "{" [ Expression { "," Expression } ] "}";
+ArraySpecExpressionList<dependency,collapsed>= ArgList "]";
+ArrayInitializer<dependency>= "{" [ Expression { "," Expression } ] "}";
 SubExpression<collapsed> = "(" Expression ")" : where { return !_IsCastExpression(context);}
 // use the where clause to override first first conflict.
-UnaryExpression= ("+"|"-"|"!") UnaryExpression | ("++"|"--") PrimaryExpression | SubExpression | PrimaryExpression : where { return true;}
+UnaryExpression= ("+"|"-"|"!"|"++"|"--") UnaryExpression | SubExpression | PrimaryExpression : where { return true;}
 FieldRef<dependency>= Identifier { MemberAnyRef };
 // This is a virtual but here's the basic description
 //TypeOrFieldRef = ( Identifier | IntrinsicType )	{ MemberAnyRef } | (TypeRef) {MemberAnyRef}+ : where {return true;}
-TypeOrFieldRef<virtual,firsts="Identifier IntrinsicType"> { return _ParseTypeOrFieldRef(context); }
+TypeOrFieldRef<virtual,firsts="Identifier IntrinsicType"> { return _ParseTypeOrFieldRef(context); } 
 
 PrimaryExpression=	
-		TypeOrFieldRef { MemberAnyRef } 					|
 		verbatimStringLiteral { MemberAnyRef }				|
 		characterLiteral { MemberAnyRef }					|
 		integerLiteral { MemberAnyRef }						| 
@@ -79,11 +80,11 @@ PrimaryExpression=
 		nullLiteral											|
 		CastExpression										|
 		typeOf "(" Type ")"	{ MemberAnyRef }				|
-		nameOf "(" Identifier ")" { MemberAnyRef }			|
 		defaultOf "(" Type ")" { MemberAnyRef }				|
 		NewExpression { MemberAnyRef }						|
 		thisRef { MemberAnyRef }							|
-		baseRef { MemberAnyRef }							;
+		baseRef { MemberAnyRef }							|
+		TypeOrFieldRef { MemberAnyRef } 					;
 		
 // Identifier exists as a non-terminal solely to attach a semantic constraint to identifiers.
 // we collapse it because we don't need it in the final parse tree but in the grammar 
@@ -98,7 +99,6 @@ verbatimIdentifier='@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
 outKeyword="out";
 refKeyword="ref";
 typeOf="typeof";
-nameOf="nameOf";
 defaultOf="default";
 newKeyword="new";
 stringType="string";
@@ -116,7 +116,7 @@ uintType="uint";
 longType="long";
 ulongType="ulong";
 objectType="object";
-boolLiteral = "true|false";
+boolLiteral = 'true|false';
 nullLiteral = "null";
 thisRef = "this";
 baseRef = "base";
@@ -160,8 +160,6 @@ rbrace="}";
 comma=",";
 colonColon="::";
 dot=".";
-integerLiteral = '(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)?';
-floatLiteral= '(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)';
-lineComment<hidden>='\/\/[^\n]*';
-blockComment<hidden,blockEnd="*/">="/*";
+integerLiteral<priority=-50>= '(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)?';
+floatLiteral<priority=-51>= '(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?)';
 whitespace<hidden>='[ \t\r\n\v\f]+';

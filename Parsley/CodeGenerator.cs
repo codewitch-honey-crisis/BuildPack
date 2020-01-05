@@ -119,7 +119,10 @@ namespace Parsley
 				{
 					if ('#' != consts[i][0])
 					{
-						var s = _MakeSafeName(consts[i]);
+						var sym = consts[i];
+						if (genInfo.GetCfgAttribute(sym, "nocode", false))
+							continue;
+						var s = _MakeSafeName(sym);
 						s = _MakeUniqueMember(parser, s);
 						if (syms.Contains(symtbl[i]) 
 							// || ReferenceEquals(doc,document)
@@ -235,6 +238,9 @@ namespace Parsley
 			var start = doc.StartProduction.Name;
 			foreach(var row in parseTable)
 			{
+				var nocode = genInfo.GetCfgAttribute(row.Key, "nocode", false);
+				if (nocode)
+					continue;
 				var isExtern = genInfo.ExternalsMap[doc].Contains(row.Key);
 				if (isExtern)
 					continue;
@@ -276,12 +282,10 @@ namespace Parsley
 					var p = C.VarRef("position__");
 					foreach (var kvp in rmap)
 					{
-					
-						foreach (CodeCommentStatement comment in C.ToComments(kvp.Key))
+
+					foreach (CodeCommentStatement comment in C.ToComments(kvp.Key))
 							parseNtImpl.Statements.Add(comment);
-						var nocode = cfg.GetAttribute(kvp.Key,"nocode");
-						if (nocode is bool && (bool)nocode)
-							continue;
+						
 						if (null == prod || (!prod.IsVirtual && !prod.IsAbstract))
 						{
 							
@@ -370,7 +374,7 @@ namespace Parsley
 				
 					StringBuilder exp = new StringBuilder();
 					_BuildErrorList(row,firstsNT, exp);
-					var sx = C.New(C.Type("SyntaxException"), C.Invoke(C.TypeRef(typeof(string)), "Format", C.Literal(string.Concat("Expecting ", exp.ToString(), " at line {0}, column {1}, position {2}")), l, c, p), l, c, p);
+					var sx = C.New(C.Type("SyntaxException"), C.Literal(string.Concat("Expecting ", exp.ToString())), l, c, p);
 					parseNtImpl.Statements.Add(C.Throw(sx));
 					
 				}
@@ -552,7 +556,7 @@ namespace Parsley
 						var fr = C.FieldRef(C.TypeRef(cls), consts[si]);
 						var np = C.New(C.Type("ParseNode"), fr, C.Literal(right), C.FieldRef(context, "Value"), C.PropRef(context, "Line"), C.PropRef(context, "Column"), C.PropRef(context, "Position"));
 						var ccs = C.If(C.NotEq(fr, C.FieldRef(context, "SymbolId")),
-							C.Call(context, "Error", C.Literal(string.Concat("Expecting ", right, " at line {0}, column {1}, position {2}")), C.PropRef(context, "Line"), C.PropRef(context, "Column"), C.PropRef(context, "Position")));
+							C.Call(context, "Error", C.Literal(string.Concat("Expecting ", right))));
 						cnd.TrueStatements.Add(ccs);
 
 						if (!collapsed.Contains(right))

@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="&quot;$(SolutionDir)Parsley\bin\Release\parsley.exe&quot; &quot;$(ProjectDir)Slang.xbnf&quot; /output &quot;SlangParser.cs&quot; /gplex &quot;$(ProjectDir)Slang.lex&quot; /namespace CD /ifstale /fast&#xD;&#xA;&quot;$(SolutionDir)Gplex\bin\Release\gplex.exe&quot; &quot;$(ProjectDir)Slang.lex&quot;" />
+    <Exec Command="&quot;$(SolutionDir)Parsley\bin\Release\parsley.exe&quot; &quot;$(ProjectDir)Slang.xbnf&quot; /output &quot;SlangParser.cs&quot; /gplex &quot;$(ProjectDir)Slang.lex&quot; /namespace CD /ifstale /fast&#xD;&#xA;&quot;$(SolutionDir)Gplex\bin\Release\gplex.exe&quot; /out:&quot;$(ProjectDir)SlangScanner.cs&quot; &quot;$(ProjectDir)Slang.lex&quot;" />
   </Target>
 
 </Project>

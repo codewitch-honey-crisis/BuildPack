@@ -13,5 +13,16 @@ namespace Parsley
 		public IDictionary<XbnfDocument, CfgDocument> CfgMap;
 		public IDictionary<string, KeyValuePair<XbnfDocument, XbnfProduction>> AllExternals;
 		public IDictionary<XbnfDocument, HashSet<string>> ExternalsMap;
+		public T GetCfgAttribute<T>(string sym,string name,T @default=default(T))
+		{
+			foreach(var cfg in CfgMap)
+			{
+				var o = cfg.Value.GetAttribute(sym, name, @default);
+				if (!Equals(@default ,o))
+					if (o is T)
+						return (T)o;
+			}
+			return @default;
+		}
 	}
 }

@@ -136,23 +136,6 @@ internal partial class Deslanged {
         result.LinePragma = linePragma;
         return result;
     }
-    private static CodeMemberMethod _MemberMethod(CodeTypeReference returnType, string name, MemberAttributes attributes, CodeParameterDeclarationExpression[] parameters, CodeStatement[] statements, CodeTypeReference[] implementationTypes, CodeTypeReference privateImplementationType, CodeCommentStatement[] comments, CodeAttributeDeclaration[] customAttributes, CodeAttributeDeclaration[] returnTypeCustomAttributes, CodeDirective[] startDirectives, CodeDirective[] endDirectives, CodeLinePragma linePragma) {
-        CodeMemberMethod result = new CodeMemberMethod();
-        result.ReturnType = returnType;
-        result.Name = name;
-        result.Attributes = attributes;
-        result.Parameters.AddRange(parameters);
-        result.Statements.AddRange(statements);
-        result.ImplementationTypes.AddRange(implementationTypes);
-        result.PrivateImplementationType = privateImplementationType;
-        result.Comments.AddRange(comments);
-        result.CustomAttributes.AddRange(customAttributes);
-        result.ReturnTypeCustomAttributes.AddRange(returnTypeCustomAttributes);
-        result.StartDirectives.AddRange(startDirectives);
-        result.EndDirectives.AddRange(endDirectives);
-        result.LinePragma = linePragma;
-        return result;
-    }
     private static CodeMemberProperty _MemberProperty(CodeTypeReference type, string name, MemberAttributes attributes, CodeParameterDeclarationExpression[] parameters, CodeStatement[] getStatements, CodeStatement[] setStatements, CodeTypeReference[] implementationTypes, CodeTypeReference privateImplementationType, CodeCommentStatement[] comments, CodeAttributeDeclaration[] customAttributes, CodeDirective[] startDirectives, CodeDirective[] endDirectives, CodeLinePragma linePragma) {
         CodeMemberProperty result = new CodeMemberProperty();
         result.Type = type;
@@ -165,6 +148,23 @@ internal partial class Deslanged {
         result.PrivateImplementationType = privateImplementationType;
         result.Comments.AddRange(comments);
         result.CustomAttributes.AddRange(customAttributes);
+        result.StartDirectives.AddRange(startDirectives);
+        result.EndDirectives.AddRange(endDirectives);
+        result.LinePragma = linePragma;
+        return result;
+    }
+    private static CodeMemberMethod _MemberMethod(CodeTypeReference returnType, string name, MemberAttributes attributes, CodeParameterDeclarationExpression[] parameters, CodeStatement[] statements, CodeTypeReference[] implementationTypes, CodeTypeReference privateImplementationType, CodeCommentStatement[] comments, CodeAttributeDeclaration[] customAttributes, CodeAttributeDeclaration[] returnTypeCustomAttributes, CodeDirective[] startDirectives, CodeDirective[] endDirectives, CodeLinePragma linePragma) {
+        CodeMemberMethod result = new CodeMemberMethod();
+        result.ReturnType = returnType;
+        result.Name = name;
+        result.Attributes = attributes;
+        result.Parameters.AddRange(parameters);
+        result.Statements.AddRange(statements);
+        result.ImplementationTypes.AddRange(implementationTypes);
+        result.PrivateImplementationType = privateImplementationType;
+        result.Comments.AddRange(comments);
+        result.CustomAttributes.AddRange(customAttributes);
+        result.ReturnTypeCustomAttributes.AddRange(returnTypeCustomAttributes);
         result.StartDirectives.AddRange(startDirectives);
         result.EndDirectives.AddRange(endDirectives);
         result.LinePragma = linePragma;
@@ -190,6 +190,8 @@ internal partial class Deslanged {
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_line", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_column", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(long)), "_position", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                Deslanged._MemberField(new CodeTypeReference("List`1", new CodeTypeReference[] {
+                                                                new CodeTypeReference("System.Object", CodeTypeReferenceOptions.GenericTypeParameter)}), "_skipped", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._Constructor((MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[] {
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference("IEnumerable`1", new CodeTypeReference[] {
                                                                             new CodeTypeReference("System.Object", CodeTypeReferenceOptions.GenericTypeParameter)}), "tokenizer")}, new CodeExpression[] {
@@ -208,7 +210,12 @@ internal partial class Deslanged {
                                                                         new CodeCommentStatement("we need both pointers to point to the lookahead")}, new CodeStatement[0]),
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state"), new CodePrimitiveExpression(-1)),
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_t"), "SymbolId"), new CodePrimitiveExpression(-1)),
-                                                            new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_advanceCount"), new CodePrimitiveExpression(0))}, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_advanceCount"), new CodePrimitiveExpression(0)),
+                                                            new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_skipped"), new CodeObjectCreateExpression(new CodeTypeReference("List`1", new CodeTypeReference[] {
+                                                                                new CodeTypeReference("System.Object", CodeTypeReferenceOptions.GenericTypeParameter)}), new CodeExpression[0]))}, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                Deslanged._MemberProperty(new CodeTypeReference("List`1", new CodeTypeReference[] {
+                                                                new CodeTypeReference("System.Object", CodeTypeReferenceOptions.GenericTypeParameter)}), "Skipped", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
+                                                            new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_skipped"))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(void)), "SetLocation", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[] {
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(int)), "line"),
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(int)), "column"),
@@ -251,8 +258,6 @@ internal partial class Deslanged {
                                                             new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_t"), "Position"))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberProperty(new CodeTypeReference(typeof(bool)), "IsEnded", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeMethodReturnStatement(new CodeBinaryOperatorExpression(new CodePrimitiveExpression(-2), CodeBinaryOperatorType.ValueEquality, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state")))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
-                                                Deslanged._MemberProperty(new CodeTypeReference(new CodeTypeReference("Token"), 1), "Skipped", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
-                                                            new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_t"), "Skipped"))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(bool)), "Advance", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodePrimitiveExpression(false), CodeBinaryOperatorType.ValueEquality, new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_e"), "MoveNext"), new CodeExpression[0])), new CodeStatement[] {
                                                                         new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_t"), "SymbolId"), new CodePrimitiveExpression(-2)),
@@ -266,6 +271,9 @@ internal partial class Deslanged {
                                                                         new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeCastExpression(new CodeTypeReference("Token"), new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_t")), "Line"), new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeCastExpression(new CodeTypeReference("Token"), new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_t")), "Line"), CodeBinaryOperatorType.Add, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_line"))),
                                                                         new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeCastExpression(new CodeTypeReference("Token"), new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_t")), "Column"), new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeCastExpression(new CodeTypeReference("Token"), new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_t")), "Column"), CodeBinaryOperatorType.Add, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_column"))),
                                                                         new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeCastExpression(new CodeTypeReference("Token"), new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_t")), "Position"), new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeCastExpression(new CodeTypeReference("Token"), new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_t")), "Position"), CodeBinaryOperatorType.Add, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_position"))),
+                                                                        new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodePrimitiveExpression(null), CodeBinaryOperatorType.IdentityInequality, new CodeFieldReferenceExpression(new CodeCastExpression(new CodeTypeReference("Token"), new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_t")), "Skipped")), new CodeStatement[] {
+                                                                                    new CodeExpressionStatement(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_skipped"), "AddRange"), new CodeExpression[] {
+                                                                                                    new CodeFieldReferenceExpression(new CodeCastExpression(new CodeTypeReference("Token"), new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_t")), "Skipped")}))}, new CodeStatement[0]),
                                                                         new CodeMethodReturnStatement(new CodePrimitiveExpression(true))}),
                                                             new CodeMethodReturnStatement(new CodePrimitiveExpression(false))}, new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(void)), "Error", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[] {
@@ -352,7 +360,17 @@ internal partial class Deslanged {
                                                 Deslanged._MemberProperty(new CodeTypeReference(typeof(int)), "Column", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_column"))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberProperty(new CodeTypeReference(typeof(long)), "Position", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
-                                                            new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_position"))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0])}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0]);
+                                                            new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_position"))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                Deslanged._MemberMethod(new CodeTypeReference(typeof(string)), "ToString", (MemberAttributes.Override | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
+                                                            new CodeConditionStatement(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "IsNonTerminal"), new CodeStatement[] {
+                                                                        new CodeMethodReturnStatement(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(string))), "Concat"), new CodeExpression[] {
+                                                                                        new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Symbol"),
+                                                                                        new CodePrimitiveExpression(": Count = "),
+                                                                                        new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodePropertyReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_children"), "Length"), "ToString"), new CodeExpression[0])}))}, new CodeStatement[0]),
+                                                            new CodeMethodReturnStatement(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(string))), "Concat"), new CodeExpression[] {
+                                                                            new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Symbol"),
+                                                                            new CodePrimitiveExpression(": "),
+                                                                            new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Value")}))}, new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0])}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0]);
         }
     }
     public static System.CodeDom.CodeCompileUnit SyntaxException {

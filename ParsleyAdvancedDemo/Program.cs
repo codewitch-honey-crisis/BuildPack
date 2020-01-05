@@ -1,77 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using CD;
-[assembly: ParsleyAdvancedDemo.Foo]
-
-
-namespace ParsleyAdvancedDemo
+[assembly: Foo]
+class FooAttribute : Attribute
 {
 
-
-
-	class Bar<[Foo] T> where T : IComparable<T>, new()
-	{
-
-	}
-	// line comment
-	/* block comment */
-
-	[AttributeUsage(AttributeTargets.All)]
-	class FooAttribute : System.Attribute
-	{
-
-	}
+}
+class Foo<T, T2> where T : IComparable<T>, IEquatable<T> where T2 : IComparable<T2>
+{
+	
+}
+namespace ParsleyAdvancedDemo
+{
+	
 	partial class Program
 	{
-		static void _Lex()
+	
+		static void _Main()
 		{
-
-			var consts = new Dictionary<int, string>();
-			var fa = typeof(SlangTokenizer).GetFields(BindingFlags.Public | BindingFlags.Static);
-			for (var i = 0; i < fa.Length; ++i)
-			{
-				var f = fa[i];
-				if (f.FieldType == typeof(int) && f.IsLiteral)
-				{
-					var j = (int)f.GetValue(null);
-					if (-3 < j)
-						consts[j] = f.Name;
-				}
-			}
-			Stream stm = null;
-			try
-			{
-				stm = File.Open(@"..\..\Program.cs", FileMode.Open);
-				var tokenizer = new SlangTokenizer(stm);
-				var e = tokenizer.GetEnumerator();
-				while (e.MoveNext())
-					Console.WriteLine("{0}: {1} at line {2}", consts[e.Current.SymbolId], e.Current.Value, e.Current.Line);
-			}
-			finally
-			{
-				if (null != stm)
-					stm.Close();
-			}
+			var text = "1.ToString(\"x2\")";
+			//text = "try { a=0; } catch(SyntaxException ex) {a=1;} catch(IOException) {a=3;} finally {a=2;}";
+			text = "[Foo(1,foo=2)] class Foo<[Foo] T,T2> : Bar, IBar where T:IComparable<T>,IEquatable<T> where T2:IComparable<T2>,new() { Foo() {Console.WriteLine(\"Hello World!\");}}";
+			var tokenizer = new SlangTokenizer(text);
+			var node = TypeDeclParser.ParseMember(tokenizer);
+			_WriteTree(node, Console.Out);
+			Console.WriteLine(CodeDomUtility.ToString(SlangParser.ToMember(node)));
+			
 		}
-		[return: Foo]
+		
 		static int Main()
 		{
 			Stream stm = null;
 			// Slang doesn't understand the using directive
+			ParseNode node;
 			try
 			{
 				stm = File.OpenRead(@"..\..\Program.cs");
 				var tokenizer = new SlangTokenizer(stm);
-				var pt = SlangParser.Parse(tokenizer);
-				_WriteTree(pt, Console.Out);
+				node = SlangParser.Parse(tokenizer);
 			}
 			finally
 			{
 				if (null != stm)
 					stm.Close();
 			}
+			_WriteTree(node, Console.Out);
+			Console.WriteLine(CodeDomUtility.ToString(SlangParser.ToCompileUnit(node)));
+
 			return 0;
 		}
 		static void _WriteTree(ParseNode node, TextWriter writer)
@@ -116,6 +92,5 @@ namespace ParsleyAdvancedDemo
 				}
 			}
 		}
-
 	}
 }

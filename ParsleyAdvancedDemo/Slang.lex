@@ -2,9 +2,9 @@
 
 %visibility internal
 
-%option stack, classes, minimize, noparser, verbose, persistbuffer, noembedbuffers, out:SlangScanner.cs
+%option stack, classes, minimize, noparser, verbose, persistbuffer, noembedbuffers
 
-/* 
+/* , out:SlangScanner.cs
  * Expected file format is Unicode. In the event that no 
  * byte order mark prefix is found, revert to raw bytes.
  */
@@ -165,111 +165,110 @@
 
 %%
 <<EOF>>		{ return -2; }
-"namespace" 	{ UpdatePosition(yytext); return 356; }
-"while" 	{ UpdatePosition(yytext); return 433; }
-"throw" 	{ UpdatePosition(yytext); return 432; }
-"for" 	{ UpdatePosition(yytext); return 431; }
-"else" 	{ UpdatePosition(yytext); return 430; }
-"goto" 	{ UpdatePosition(yytext); return 429; }
-"if" 	{ UpdatePosition(yytext); return 428; }
-[ \t\r\n\v\f]+ 	{ UpdatePosition(yytext); return 427; }
-"/*" 	{ if(!_TryReadUntilBlockEnd("*/")) { UpdatePosition(yytext); return -1; } UpdatePosition(yytext); return 426; }
-\/\/[^\n]* 	{ UpdatePosition(yytext); return 425; }
-(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?) 	{ UpdatePosition(yytext); return 424; }
-"return" 	{ UpdatePosition(yytext); return 434; }
-(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)? 	{ UpdatePosition(yytext); return 423; }
-"::" 	{ UpdatePosition(yytext); return 421; }
-"," 	{ UpdatePosition(yytext); return 420; }
-"}" 	{ UpdatePosition(yytext); return 419; }
-"{" 	{ UpdatePosition(yytext); return 418; }
-")" 	{ UpdatePosition(yytext); return 417; }
-"(" 	{ UpdatePosition(yytext); return 416; }
-"]" 	{ UpdatePosition(yytext); return 415; }
-"[" 	{ UpdatePosition(yytext); return 414; }
-"!" 	{ UpdatePosition(yytext); return 413; }
-"|" 	{ UpdatePosition(yytext); return 412; }
-"." 	{ UpdatePosition(yytext); return 422; }
-"try" 	{ UpdatePosition(yytext); return 435; }
-"catch" 	{ UpdatePosition(yytext); return 436; }
-"finally" 	{ UpdatePosition(yytext); return 437; }
-"where" 	{ UpdatePosition(yytext); return 460; }
-"override" 	{ UpdatePosition(yytext); return 459; }
-"const" 	{ UpdatePosition(yytext); return 458; }
-"abstract" 	{ UpdatePosition(yytext); return 457; }
-"static" 	{ UpdatePosition(yytext); return 456; }
-"internal" 	{ UpdatePosition(yytext); return 455; }
-"protected" 	{ UpdatePosition(yytext); return 454; }
-"private" 	{ UpdatePosition(yytext); return 453; }
-"public" 	{ UpdatePosition(yytext); return 452; }
-"event" 	{ UpdatePosition(yytext); return 451; }
-"set" 	{ UpdatePosition(yytext); return 450; }
-"get" 	{ UpdatePosition(yytext); return 449; }
-"interface" 	{ UpdatePosition(yytext); return 448; }
-"struct" 	{ UpdatePosition(yytext); return 447; }
-"enum" 	{ UpdatePosition(yytext); return 446; }
-"class" 	{ UpdatePosition(yytext); return 445; }
-"partial" 	{ UpdatePosition(yytext); return 444; }
-"void" 	{ UpdatePosition(yytext); return 443; }
-"assembly" 	{ UpdatePosition(yytext); return 442; }
-#[A-Za-z]+ 	{ if(!_TryReadUntilBlockEnd("\n")) { UpdatePosition(yytext); return -1; } UpdatePosition(yytext); return 441; }
-":" 	{ UpdatePosition(yytext); return 440; }
-"var" 	{ UpdatePosition(yytext); return 439; }
-";" 	{ UpdatePosition(yytext); return 438; }
-"|=" 	{ UpdatePosition(yytext); return 411; }
-"||" 	{ UpdatePosition(yytext); return 410; }
-"&" 	{ UpdatePosition(yytext); return 409; }
-"object" 	{ UpdatePosition(yytext); return 379; }
-"ulong" 	{ UpdatePosition(yytext); return 378; }
-"long" 	{ UpdatePosition(yytext); return 377; }
-"uint" 	{ UpdatePosition(yytext); return 376; }
-"int" 	{ UpdatePosition(yytext); return 375; }
-"ushort" 	{ UpdatePosition(yytext); return 374; }
-"short" 	{ UpdatePosition(yytext); return 373; }
-"byte" 	{ UpdatePosition(yytext); return 372; }
-"sbyte" 	{ UpdatePosition(yytext); return 371; }
-"decimal" 	{ UpdatePosition(yytext); return 370; }
-"double" 	{ UpdatePosition(yytext); return 369; }
-"float" 	{ UpdatePosition(yytext); return 368; }
-"char" 	{ UpdatePosition(yytext); return 367; }
-"bool" 	{ UpdatePosition(yytext); return 366; }
-"string" 	{ UpdatePosition(yytext); return 365; }
-"new" 	{ UpdatePosition(yytext); return 364; }
-"default" 	{ UpdatePosition(yytext); return 363; }
-"nameOf" 	{ UpdatePosition(yytext); return 362; }
-"typeof" 	{ UpdatePosition(yytext); return 361; }
-"ref" 	{ UpdatePosition(yytext); return 360; }
-"out" 	{ UpdatePosition(yytext); return 359; }
-@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])* 	{ UpdatePosition(yytext); return 358; }
-"using" 	{ UpdatePosition(yytext); return 357; }
-"true|false" 	{ UpdatePosition(yytext); return 380; }
-"null" 	{ UpdatePosition(yytext); return 381; }
-"this" 	{ UpdatePosition(yytext); return 382; }
-"base" 	{ UpdatePosition(yytext); return 383; }
-"&&" 	{ UpdatePosition(yytext); return 407; }
-"%" 	{ UpdatePosition(yytext); return 406; }
-"%=" 	{ UpdatePosition(yytext); return 405; }
-"/" 	{ UpdatePosition(yytext); return 404; }
-"/=" 	{ UpdatePosition(yytext); return 403; }
-"*" 	{ UpdatePosition(yytext); return 402; }
-"*=" 	{ UpdatePosition(yytext); return 401; }
-"-" 	{ UpdatePosition(yytext); return 400; }
-"-=" 	{ UpdatePosition(yytext); return 399; }
-"--" 	{ UpdatePosition(yytext); return 398; }
-"+" 	{ UpdatePosition(yytext); return 397; }
-"&=" 	{ UpdatePosition(yytext); return 408; }
-"+=" 	{ UpdatePosition(yytext); return 396; }
-"=" 	{ UpdatePosition(yytext); return 394; }
-"!=" 	{ UpdatePosition(yytext); return 393; }
-"==" 	{ UpdatePosition(yytext); return 392; }
-">" 	{ UpdatePosition(yytext); return 391; }
-">=" 	{ UpdatePosition(yytext); return 390; }
-"<" 	{ UpdatePosition(yytext); return 389; }
-"<=" 	{ UpdatePosition(yytext); return 388; }
-[\u0027]([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})[\u0027] 	{ UpdatePosition(yytext); return 387; }
-\"([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*\" 	{ UpdatePosition(yytext); return 386; }
-@\"([^\"|\"\"])*\" 	{ UpdatePosition(yytext); return 384; }
-"++" 	{ UpdatePosition(yytext); return 395; }
-(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])* 	{ UpdatePosition(yytext); return 385; }
+"where" 	{ UpdatePosition(yytext); return 493; }
+"override" 	{ UpdatePosition(yytext); return 492; }
+"const" 	{ UpdatePosition(yytext); return 491; }
+"abstract" 	{ UpdatePosition(yytext); return 490; }
+"static" 	{ UpdatePosition(yytext); return 489; }
+"internal" 	{ UpdatePosition(yytext); return 488; }
+"protected" 	{ UpdatePosition(yytext); return 487; }
+"private" 	{ UpdatePosition(yytext); return 486; }
+"public" 	{ UpdatePosition(yytext); return 485; }
+"event" 	{ UpdatePosition(yytext); return 484; }
+"set" 	{ UpdatePosition(yytext); return 483; }
+"get" 	{ UpdatePosition(yytext); return 482; }
+"interface" 	{ UpdatePosition(yytext); return 481; }
+"struct" 	{ UpdatePosition(yytext); return 480; }
+"enum" 	{ UpdatePosition(yytext); return 479; }
+"class" 	{ UpdatePosition(yytext); return 478; }
+"partial" 	{ UpdatePosition(yytext); return 477; }
+"void" 	{ UpdatePosition(yytext); return 476; }
+"assembly" 	{ UpdatePosition(yytext); return 475; }
+"/*" 	{ if(!_TryReadUntilBlockEnd("*/")) { UpdatePosition(yytext); return -1; } UpdatePosition(yytext); Skip(474); }
+(\/\/[^\n]*[\n])+ 	{ UpdatePosition(yytext); Skip(473); }
+#[A-Za-z]+[\t ]*[^\n]* 	{ UpdatePosition(yytext);  }
+":" 	{ UpdatePosition(yytext); return 471; }
+"var" 	{ UpdatePosition(yytext); return 470; }
+";" 	{ UpdatePosition(yytext); return 469; }
+"finally" 	{ UpdatePosition(yytext); return 468; }
+"catch" 	{ UpdatePosition(yytext); return 467; }
+"try" 	{ UpdatePosition(yytext); return 466; }
+"return" 	{ UpdatePosition(yytext); return 465; }
+"while" 	{ UpdatePosition(yytext); return 464; }
+"throw" 	{ UpdatePosition(yytext); return 463; }
+"for" 	{ UpdatePosition(yytext); return 462; }
+"else" 	{ UpdatePosition(yytext); return 461; }
+"goto" 	{ UpdatePosition(yytext); return 460; }
+"if" 	{ UpdatePosition(yytext); return 459; }
+[ \t\r\n\v\f]+ 	{ UpdatePosition(yytext);  }
+"." 	{ UpdatePosition(yytext); return 455; }
+"::" 	{ UpdatePosition(yytext); return 454; }
+"," 	{ UpdatePosition(yytext); return 453; }
+"}" 	{ UpdatePosition(yytext); return 452; }
+"{" 	{ UpdatePosition(yytext); return 451; }
+")" 	{ UpdatePosition(yytext); return 450; }
+"(" 	{ UpdatePosition(yytext); return 449; }
+"]" 	{ UpdatePosition(yytext); return 448; }
+"[" 	{ UpdatePosition(yytext); return 447; }
+"!" 	{ UpdatePosition(yytext); return 446; }
+"|" 	{ UpdatePosition(yytext); return 445; }
+"|=" 	{ UpdatePosition(yytext); return 444; }
+"||" 	{ UpdatePosition(yytext); return 443; }
+"&" 	{ UpdatePosition(yytext); return 442; }
+"&=" 	{ UpdatePosition(yytext); return 441; }
+"&&" 	{ UpdatePosition(yytext); return 440; }
+"%" 	{ UpdatePosition(yytext); return 439; }
+"%=" 	{ UpdatePosition(yytext); return 438; }
+"/" 	{ UpdatePosition(yytext); return 437; }
+"/=" 	{ UpdatePosition(yytext); return 436; }
+"*" 	{ UpdatePosition(yytext); return 435; }
+"*=" 	{ UpdatePosition(yytext); return 434; }
+"-" 	{ UpdatePosition(yytext); return 433; }
+"-=" 	{ UpdatePosition(yytext); return 432; }
+"--" 	{ UpdatePosition(yytext); return 431; }
+"+" 	{ UpdatePosition(yytext); return 430; }
+"+=" 	{ UpdatePosition(yytext); return 429; }
+"++" 	{ UpdatePosition(yytext); return 428; }
+"=" 	{ UpdatePosition(yytext); return 427; }
+"!=" 	{ UpdatePosition(yytext); return 426; }
+"==" 	{ UpdatePosition(yytext); return 425; }
+">" 	{ UpdatePosition(yytext); return 424; }
+">=" 	{ UpdatePosition(yytext); return 423; }
+"<" 	{ UpdatePosition(yytext); return 422; }
+"<=" 	{ UpdatePosition(yytext); return 421; }
+[\u0027]([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})[\u0027] 	{ UpdatePosition(yytext); return 420; }
+\"([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*\" 	{ UpdatePosition(yytext); return 419; }
+@\"([^\"|\"\"])*\" 	{ UpdatePosition(yytext); return 417; }
+"base" 	{ UpdatePosition(yytext); return 416; }
+"this" 	{ UpdatePosition(yytext); return 415; }
+"null" 	{ UpdatePosition(yytext); return 414; }
+true|false 	{ UpdatePosition(yytext); return 413; }
+"object" 	{ UpdatePosition(yytext); return 412; }
+"ulong" 	{ UpdatePosition(yytext); return 411; }
+"long" 	{ UpdatePosition(yytext); return 410; }
+"uint" 	{ UpdatePosition(yytext); return 409; }
+"int" 	{ UpdatePosition(yytext); return 408; }
+"ushort" 	{ UpdatePosition(yytext); return 407; }
+"short" 	{ UpdatePosition(yytext); return 406; }
+"byte" 	{ UpdatePosition(yytext); return 405; }
+"sbyte" 	{ UpdatePosition(yytext); return 404; }
+"decimal" 	{ UpdatePosition(yytext); return 403; }
+"double" 	{ UpdatePosition(yytext); return 402; }
+"float" 	{ UpdatePosition(yytext); return 401; }
+"char" 	{ UpdatePosition(yytext); return 400; }
+"bool" 	{ UpdatePosition(yytext); return 399; }
+"string" 	{ UpdatePosition(yytext); return 398; }
+"new" 	{ UpdatePosition(yytext); return 397; }
+"default" 	{ UpdatePosition(yytext); return 396; }
+"typeof" 	{ UpdatePosition(yytext); return 395; }
+"ref" 	{ UpdatePosition(yytext); return 394; }
+"out" 	{ UpdatePosition(yytext); return 393; }
+@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])* 	{ UpdatePosition(yytext); return 392; }
+"using" 	{ UpdatePosition(yytext); return 391; }
+"namespace" 	{ UpdatePosition(yytext); return 390; }
+(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)? 	{ UpdatePosition(yytext); return 456; }
+(([0-9]+)(\.[0-9]+)?([Ee][\+\-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][\+\-]?[0-9]+)?[DdMmFf]?) 	{ UpdatePosition(yytext); return 457; }
+(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])* 	{ UpdatePosition(yytext); return 418; }
 
 [\n]|[^\n]		{ UpdatePosition(yytext); return -1; }
 

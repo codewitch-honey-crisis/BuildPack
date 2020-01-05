@@ -117,16 +117,17 @@ namespace Parsley
 			public _TermPriorityComparer(ICollection<CfgDocument> cfgs) { _cfgs = cfgs; }
 			public int Compare(TermPriEntry x, TermPriEntry y)
 			{
+				var px = _FindPriority(x.Key.Key) * 0x100000000 + x.Value;
 				// aloha
-				return _Compare(x.Key.Key, y.Key.Key);
+				var py = _FindPriority(y.Key.Key) * 0x100000000 + y.Value;
+				// TODO: verify this.
+				var c = py - px;
+				if (0 == c) return 0;
+				else if (0 > c)
+					return -1;
+				return 1;
 			}
-			int _Compare(string x, string y)
-			{
-				if (x == y) return 0;
-				var p1 = -_FindPriority(x);
-				var p2 = -_FindPriority(y);
-				return p1 - p2;
-			}
+			
 			int _FindPriority(string x)
 			{
 				// not working?!
@@ -144,6 +145,7 @@ namespace Parsley
 				return 0;
 			}
 		}
+		
 		public static string ToGplexSpec(XbnfGenerationInfo genInfo,string codenamespace,string codeclass)
 		{
 			var cfgMap = genInfo.CfgMap;
@@ -155,11 +157,14 @@ namespace Parsley
 			var stbl = GetMasterSymbolTable(cfgMap,out termStart);
 			var stbli = new List<KeyValuePair<KeyValuePair<string, XbnfDocument>, int>>();
 			var id = 0;
-			// assign ids
+			
+			// assign temp ids
 			foreach (var se in stbl)
 			{
-				if(id>=termStart)
+				if (id >= termStart)
+				{
 					stbli.Add(new KeyValuePair<KeyValuePair<string, XbnfDocument>, int>(se, id));
+				}
 				++id;
 			}
 			stbli.Sort( new _TermPriorityComparer(cfgMap.Values));
@@ -784,6 +789,7 @@ namespace Parsley
 										attrs.Add(new CfgAttribute("terminal", false));
 										attrs.Add(new CfgAttribute("nowarn", true));
 										attrs.Add(new CfgAttribute("nocode", true));
+										attrs.Add(new CfgAttribute("constrained", true));
 
 
 									}
@@ -800,6 +806,7 @@ namespace Parsley
 									attrs = new CfgAttributeList();
 									cfg.AttributeSets.Add(s, attrs);
 									attrs.Add(new CfgAttribute("nowarn", true));
+									attrs.Add(new CfgAttribute("nocode", true));
 								}
 							}
 						}

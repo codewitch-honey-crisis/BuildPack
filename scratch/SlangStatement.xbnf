@@ -6,7 +6,7 @@
 
 // we use this with our skipped lists to get comments on to relevant nodes
 Comments<abstract>; // { lineComment | blockComment }
-
+Directives<abstract>; // { directive }
 
 // must reference a symbol here rather than ";" or XBNF thinks it's a terminal
 // TODO: test terminal=false attribute setting in Parsley

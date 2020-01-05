@@ -79,7 +79,6 @@ PrimaryExpression=
 		nullLiteral											|
 		CastExpression										|
 		typeOf "(" Type ")"	{ MemberAnyRef }				|
-		nameOf "(" Identifier ")" { MemberAnyRef }			|
 		defaultOf "(" Type ")" { MemberAnyRef }				|
 		NewExpression { MemberAnyRef }						|
 		thisRef { MemberAnyRef }							|

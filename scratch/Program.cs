@@ -29,6 +29,12 @@ namespace scratch
 	/// </summary>
 	partial class Program
 	{
+		static void _Expr()
+		{
+			var text = "1";
+			var tokenizer = new SlangTokenizer(text);
+			_WriteTree(ExpressionParser.Parse(tokenizer),Console.Out);
+		}
 		static void _Lex()
 		{
 			#region Fetch constants
@@ -61,7 +67,7 @@ namespace scratch
 					stm.Close();
 			}
 		}
-		[return: Foo]
+[return: Foo]
 		static int Main()
 		{
 			var i = 0;
