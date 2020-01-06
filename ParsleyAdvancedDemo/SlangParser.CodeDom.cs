@@ -11,40 +11,40 @@ namespace CD
 	{
 		public static CodeTypeMember ToMember(ParseNode node)
 		{
-			return _EvalMember(node);
+			return _BuildMember(node);
 		}
 		public static CodeStatement ToStatement(ParseNode node)
 		{
-			return _EvalStatement(node);
+			return _BuildStatement(node);
 		}
 		public static CodeCompileUnit ToCompileUnit(ParseNode node)
 		{
-			return _EvalCompileUnit(node);
+			return _BuildCompileUnit(node);
 		}
-		static CodeNamespace _EvalNamespace(ParseNode node)
+		static CodeNamespace _BuildNamespace(ParseNode node)
 		{
 			var result = new CodeNamespace().Mark(node);
-			result.Name = _EvalNamespaceName(node.C(1));
+			result.Name = _BuildNamespaceName(node.C(1));
 			for (var i = 2;i<node.Children.Length;i++)
 			{
 				var c = node.C(i);
 				switch (c.SymbolId)
 				{
 					case UsingDirective:
-						var nsi = new CodeNamespaceImport(_EvalNamespaceName(c.C(1))).Mark(c.C(1));
+						var nsi = new CodeNamespaceImport(_BuildNamespaceName(c.C(1))).Mark(c.C(1));
 						result.Imports.Add(nsi);
 						break;
 					case TypeDeclParser.Class:
 					case TypeDeclParser.Struct:
 					case TypeDeclParser.Enum:
 					case TypeDeclParser.Interface:
-						result.Types.Add(_EvalTypeDecl(c));
+						result.Types.Add(_BuildTypeDecl(c));
 						break;
 				}
 			}
 			return result;
 		}
-		static CodeCompileUnit _EvalCompileUnit(ParseNode node)
+		static CodeCompileUnit _BuildCompileUnit(ParseNode node)
 		{
 			var result = new CodeCompileUnit().Mark(node);
 			var rootns = new CodeNamespace().Mark(node);
@@ -54,11 +54,11 @@ namespace CD
 				switch(c.SymbolId)
 				{
 					case UsingDirective:
-						var nsi = new CodeNamespaceImport(_EvalNamespaceName(c.C(1))).Mark(c.C(1));
+						var nsi = new CodeNamespaceImport(_BuildNamespaceName(c.C(1))).Mark(c.C(1));
 						rootns.Imports.Add(nsi);
 						break;
 					case TypeDeclParser.CustomAttributeGroups:
-						var ca= _EvalCustomAttributeGroups(c);
+						var ca= _BuildCustomAttributeGroups(c);
 						_AddCustomAttributes(ca, "assembly", result.AssemblyCustomAttributes);
 						ca.Remove("assembly");
 						if (0 < ca.Count)
@@ -68,10 +68,10 @@ namespace CD
 					case TypeDeclParser.Struct:
 					case TypeDeclParser.Enum:
 					case TypeDeclParser.Interface:
-						rootns.Types.Add(_EvalTypeDecl(c));
+						rootns.Types.Add(_BuildTypeDecl(c));
 						break;
 					case Namespace:
-						result.Namespaces.Add(_EvalNamespace(c));
+						result.Namespaces.Add(_BuildNamespace(c));
 						break;
 				}
 			}
@@ -79,14 +79,14 @@ namespace CD
 				result.Namespaces.Insert(0,rootns);
 			return result;
 		}
-		static string _EvalNamespaceName(ParseNode node)
+		static string _BuildNamespaceName(ParseNode node)
 		{
 			var result = "";
 			for(var i = 0;i<node.Children.Length;i++)
 				result = string.Concat(result, node.C(i).Value);
 			return result;
 		}
-		static MemberAttributes _EvalMemberAttributes(ParseNode node)
+		static MemberAttributes _BuildMemberAttributes(ParseNode node)
 		{
 			var modifiers = new HashSet<string>();
 			for(var i = 0;i<node.Children.Length;i++)
@@ -141,7 +141,7 @@ namespace CD
 			}
 			return result;
 		}
-		static TypeAttributes _EvalMemberTypeAttributes(ParseNode node)
+		static TypeAttributes _BuildMemberTypeAttributes(ParseNode node)
 		{
 			var attrs = new HashSet<string>();
 			for (var i = 0; i < node.Children.Length; i++)
@@ -177,7 +177,7 @@ namespace CD
 			}
 			return result;
 		}
-		static TypeAttributes _EvalTypeAttributes(ParseNode node)
+		static TypeAttributes _BuildTypeAttributes(ParseNode node)
 		{
 			var attrs = new HashSet<string>();
 			for (var i = 0; i < node.Children.Length; i++)
@@ -213,11 +213,11 @@ namespace CD
 			}
 			return result;
 		}
-		static CodeTypeMember _EvalMember(ParseNode node)
+		static CodeTypeMember _BuildMember(ParseNode node)
 		{
 			var c = node.C(0);
-			var ca = _EvalCustomAttributeGroups(c.C(1));
-			var ma = _EvalMemberAttributes(c.C(2));
+			var ca = _BuildCustomAttributeGroups(c.C(1));
+			var ma = _BuildMemberAttributes(c.C(2));
 			
 			var isPublic = (ma & MemberAttributes.Public) == MemberAttributes.Public;
 			var isStatic = (ma & MemberAttributes.Static) == MemberAttributes.Static;
@@ -231,12 +231,12 @@ namespace CD
 					ca.Remove("");
 					if (0<ca.Count)
 						throw new SyntaxException("Unsupported attribute target.", node.Line, node.Column, node.Position);
-					fld.Type = _EvalType(c.C(3));
+					fld.Type = _BuildType(c.C(3));
 					var n = c.C(4).Value;
 					if (verbatimIdentifier == c.C(4).SymbolId)
 						n = n.Substring(1);
 					if (6 < c.CL())
-						fld.InitExpression = _EvalExpression(c.C(6));
+						fld.InitExpression = _BuildExpression(c.C(6));
 					fld.Name = n;
 					return fld;
 				#endregion
@@ -248,7 +248,7 @@ namespace CD
 					ca.Remove("");
 					if (0 < ca.Count)
 						throw new SyntaxException("Unsupported attribute target.", node.Line, node.Column, node.Position);
-					eve.Type = _EvalType(c.C(4));
+					eve.Type = _BuildType(c.C(4));
 					n = c.C(5).Value;
 					if (verbatimIdentifier == c.C(5).SymbolId)
 						n = n.Substring(1);
@@ -270,9 +270,9 @@ namespace CD
 						{
 							var cpn = c.C(8);
 							if (TypeDeclParser.baseRef == cpn.C(0).SymbolId)
-								ctor.BaseConstructorArgs.AddRange(_EvalArgList(cpn.C(2)));
+								ctor.BaseConstructorArgs.AddRange(_BuildArgList(cpn.C(2)));
 							else
-								ctor.ChainedConstructorArgs.AddRange(_EvalArgList(cpn.C(2)));
+								ctor.ChainedConstructorArgs.AddRange(_BuildArgList(cpn.C(2)));
 						}
 						mctor = ctor;
 					}
@@ -287,9 +287,9 @@ namespace CD
 					mctor.Name = n;
 					_AddCustomAttributes(ca, "", mctor.CustomAttributes);
 					mctor.Attributes = ma;
-					mctor.Parameters.AddRange(_EvalParamList(c.C(5)));
+					mctor.Parameters.AddRange(_BuildParamList(c.C(5)));
 					var sn = c.C(c.CL() - 1);
-					mctor.Statements.AddRange(_EvalStatementBlock(sn));
+					mctor.Statements.AddRange(_BuildStatementBlock(sn));
 					return mctor;
 					#endregion
 				case TypeDeclParser.Method:
@@ -325,15 +325,15 @@ namespace CD
 						meth.Name = c.C(5).Value;
 					if(TypeDeclParser.voidType != c.C(3).SymbolId)
 					{
-						meth.ReturnType = _EvalType(c.C(3));
+						meth.ReturnType = _BuildType(c.C(3));
 					}
 					if (0 != c.C(4).CL())
-						meth.PrivateImplementationType = _EvalType(c.C(4).C(0));
+						meth.PrivateImplementationType = _BuildType(c.C(4).C(0));
 
-					meth.Parameters.AddRange(_EvalMethodParamList(c.C(7)));
+					meth.Parameters.AddRange(_BuildMethodParamList(c.C(7)));
 					sn = c.C(c.CL() - 1);
 					if(TypeDeclParser.StatementBlock==sn.SymbolId)
-						meth.Statements.AddRange(_EvalStatementBlock(sn));
+						meth.Statements.AddRange(_BuildStatementBlock(sn));
 					return meth;
 					#endregion
 				case TypeDeclParser.Property:
@@ -351,13 +351,13 @@ namespace CD
 					else
 						prop.Name = c.C(5).Value;
 					
-					prop.Type= _EvalType(c.C(3));
+					prop.Type= _BuildType(c.C(3));
 					if (0 != c.C(4).CL())
-						prop.PrivateImplementationType = _EvalType(c.C(4).C(0));
+						prop.PrivateImplementationType = _BuildType(c.C(4).C(0));
 					var pai = 7;
 					if (TypeDeclParser.ParamList == c.C(pai).SymbolId)
 					{
-						prop.Parameters.AddRange(_EvalParamList(c.C(7)));
+						prop.Parameters.AddRange(_BuildParamList(c.C(7)));
 						pai += 3;
 					}
 					var ps = c.C(pai);
@@ -368,13 +368,13 @@ namespace CD
 						{
 							if(TypeDeclParser.StatementBlock ==psn.C(1).SymbolId)
 							{
-								prop.GetStatements.AddRange(_EvalStatementBlock(psn.C(1)));
+								prop.GetStatements.AddRange(_BuildStatementBlock(psn.C(1)));
 							}
 						} else if (TypeDeclParser.PropertySet == psn.SymbolId)
 						{
 							if (TypeDeclParser.StatementBlock == psn.C(1).SymbolId)
 							{
-								prop.SetStatements.AddRange(_EvalStatementBlock(psn.C(1)));
+								prop.SetStatements.AddRange(_BuildStatementBlock(psn.C(1)));
 							}
 						}
 					}
@@ -384,16 +384,16 @@ namespace CD
 				case TypeDeclParser.Struct:
 				case TypeDeclParser.Interface:
 				case TypeDeclParser.Enum:
-					return _EvalTypeDecl(c);
+					return _BuildTypeDecl(c);
 			}
 			throw new NotImplementedException();
 		}
-		static IDictionary<string,CodeAttributeDeclarationCollection> _EvalCustomAttributeGroups(ParseNode node)
+		static IDictionary<string,CodeAttributeDeclarationCollection> _BuildCustomAttributeGroups(ParseNode node)
 		{
 			var result = new Dictionary<string, CodeAttributeDeclarationCollection>();
 			for(var i = 0;i<node.Children.Length;i++)
 			{
-				var res = _EvalCustomAttributeGroup(node.C(i));
+				var res = _BuildCustomAttributeGroup(node.C(i));
 				CodeAttributeDeclarationCollection col;
 				if (!result.TryGetValue(res.Key,out col))
 				{
@@ -410,7 +410,7 @@ namespace CD
 			if(attrs.TryGetValue(target, out col))
 				mem.AddRange(col);
 		}
-		static KeyValuePair<string,CodeAttributeDeclarationCollection> _EvalCustomAttributeGroup(ParseNode node)
+		static KeyValuePair<string,CodeAttributeDeclarationCollection> _BuildCustomAttributeGroup(ParseNode node)
 		{
 			var result = new CodeAttributeDeclarationCollection();
 			string target = "";
@@ -419,53 +419,51 @@ namespace CD
 				target = t.C(0).Value;
 
 			for (var i = 2; i < node.Children.Length-1; i++)
-				result.Add(_EvalCustomAttribute(node.C(i)));
+				result.Add(_BuildCustomAttribute(node.C(i)));
 			return new KeyValuePair<string, CodeAttributeDeclarationCollection>(target, result);
 		}
-		static CodeAttributeDeclaration _EvalCustomAttribute(ParseNode node)
+		static CodeAttributeDeclaration _BuildCustomAttribute(ParseNode node)
 		{
-			var result = new CodeAttributeDeclaration(_EvalTypeBase(node.C(0)));
-			result.Arguments.AddRange(_EvalCustomAttributeArgList(node.C(1)));
+			var result = new CodeAttributeDeclaration(_BuildTypeBase(node.C(0)));
+			result.AttributeType.Mark(node, true);
+			result.Arguments.AddRange(_BuildCustomAttributeArgList(node.C(1)));
 			return result;
 		}
-		static CodeAttributeArgumentCollection _EvalCustomAttributeArgList(ParseNode node)
+		static CodeAttributeArgumentCollection _BuildCustomAttributeArgList(ParseNode node)
 		{
 			var result = new CodeAttributeArgumentCollection();
 			for(var i = 1;i<node.Children.Length;i++)
 			{
-				result.Add(_EvalCustomAttributeArg(node.C(i)));
+				result.Add(_BuildCustomAttributeArg(node.C(i)));
 				++i;
 			}
 			return result;
 		}
-		static CodeAttributeArgument _EvalCustomAttributeArg(ParseNode node)
+		static CodeAttributeArgument _BuildCustomAttributeArg(ParseNode node)
 		{
 			if(node.CL()==1)
-				return new CodeAttributeArgument(_EvalExpression(node.C(0)));
+				return new CodeAttributeArgument(_BuildExpression(node.C(0)));
 			var name = node.C(0).Value;
 			if (verbatimIdentifier == node.C(0).SymbolId)
 				name = name.Substring(1);
-			return new CodeAttributeArgument(name, _EvalExpression(node.C(2)));
+			return new CodeAttributeArgument(name, _BuildExpression(node.C(2)));
 		}
-		static CodeTypeDeclaration _EvalTypeDecl(ParseNode node)
+		static CodeTypeDeclaration _BuildTypeDecl(ParseNode node)
 		{
 			var result = new CodeTypeDeclaration().Mark(node);
-			var ca = _EvalCustomAttributeGroups(node.C(1));
+			var ca = _BuildCustomAttributeGroups(node.C(1));
 			_AddCustomAttributes(ca, "", result.CustomAttributes);
 			ca.Remove("");
 			if (0 < ca.Count)
 				throw new SyntaxException("Invalid attribute target", node.Line, node.Column, node.Position);
-			// TODO: test these and make sure it does the right thing 
-			// for nested types. may need to copy member attrs to 
-			// type attrs.
 			result.Attributes = 0;
 			if (TypeDeclParser.MemberAttributes == node.C(2).SymbolId)
 			{
-				result.Attributes = _EvalMemberAttributes(node.C(2));
-				result.TypeAttributes = _EvalMemberTypeAttributes(node.C(2));
+				result.Attributes = _BuildMemberAttributes(node.C(2));
+				result.TypeAttributes = _BuildMemberTypeAttributes(node.C(2));
 			}
 			else
-				result.TypeAttributes = _EvalTypeAttributes(node.C(2));
+				result.TypeAttributes = _BuildTypeAttributes(node.C(2));
 			result.IsPartial = 0<node.C(3).CL();
 			var name = node.C(5).Value;
 			if (verbatimIdentifier == node.C(5).SymbolId)
@@ -486,8 +484,8 @@ namespace CD
 					result.IsInterface = true;
 					break;
 			}
-			result.TypeParameters.AddRange(_EvalTypeParams(node.C(6)));
-			result.BaseTypes.AddRange(_EvalBaseTypes(node.C(7)));
+			result.TypeParameters.AddRange(_BuildTypeParams(node.C(6)));
+			result.BaseTypes.AddRange(_BuildBaseTypes(node.C(7)));
 			var wn = node.C(8);
 			for(var i = 0;i<wn.Children.Length-1;i++)
 			{
@@ -514,42 +512,42 @@ namespace CD
 					if(TypeDeclParser.newKeyword==wcc.C(0).SymbolId)
 						p.HasConstructorConstraint = true;
 					else
-						p.Constraints.Add(_EvalType(wcc.C(0)));
+						p.Constraints.Add(_BuildType(wcc.C(0)));
 					
 					++j;
 				}
 			}
 			var mn = node.C(9);
 			for(var i = 0;i<mn.Children.Length;i++)
-				result.Members.Add(_EvalMember(mn.C(i)));
+				result.Members.Add(_BuildMember(mn.C(i)));
 			return result;
 		}
-		static CodeTypeReferenceCollection _EvalBaseTypes(ParseNode node)
+		static CodeTypeReferenceCollection _BuildBaseTypes(ParseNode node)
 		{
 			var result = new CodeTypeReferenceCollection();
 			for(var i = 0;i<node.Children.Length;i++)
-				result.Add(_EvalType(node.C(i)));
+				result.Add(_BuildType(node.C(i)));
 			return result;
 
 		}
-		static CodeTypeParameterCollection _EvalTypeParams(ParseNode node)
+		static CodeTypeParameterCollection _BuildTypeParams(ParseNode node)
 		{
 			var result = new CodeTypeParameterCollection();
 
 			for(var i = 1;i<node.Children.Length;i++)
 			{
-				result.Add(_EvalTypeParam(node.C(i)));
+				result.Add(_BuildTypeParam(node.C(i)));
 				++i;
 			}
 			return result;
 		}
-		static CodeTypeParameter _EvalTypeParam(ParseNode node)
+		static CodeTypeParameter _BuildTypeParam(ParseNode node)
 		{
 			var result = new CodeTypeParameter().Mark(node);
 			var ci = 0;
 			if (TypeDeclParser.CustomAttributeGroups == node.C(0).SymbolId)
 			{
-				var ca = _EvalCustomAttributeGroups(node.C(0));
+				var ca = _BuildCustomAttributeGroups(node.C(0));
 				_AddCustomAttributes(ca, "", result.CustomAttributes);
 				ca.Remove("");
 				if (0 < ca.Count)
@@ -562,52 +560,55 @@ namespace CD
 			result.Name = name;
 			return result;
 		}
-		static CodeStatementCollection _EvalStatementBlock(ParseNode node)
+		static CodeStatementCollection _BuildStatementBlock(ParseNode node)
 		{
 			var result = new CodeStatementCollection();
 			for(var i=1;i<node.Children.Length-1;i++)
-				result.Add(_EvalStatement(node.C(i)));
+				result.Add(_BuildStatement(node.C(i)));
 			return result;
 		}
-		static CodeParameterDeclarationExpressionCollection _EvalParamList(ParseNode node)
+		static CodeParameterDeclarationExpressionCollection _BuildParamList(ParseNode node)
 		{
 			var result = new CodeParameterDeclarationExpressionCollection();
-			for(var i = 0;i<node.Children.Length;++i)
-				result.Add(_EvalParam(node.C(i)));
+			for (var i = 0; i < node.Children.Length; ++i)
+			{
+				result.Add(_BuildParam(node.C(i)));
+				++i;
+			}
 			return result ;
 		}
-		static CodeParameterDeclarationExpression _EvalParam(ParseNode node)
+		static CodeParameterDeclarationExpression _BuildParam(ParseNode node)
 		{
-			var ctr = _EvalType(node.C(0));
+			var ctr = _BuildType(node.C(0));
 			var name = node.C(1).Value;
 			if(verbatimIdentifier==node.C(1).SymbolId)
 				name = name.Substring(1);
 			return new CodeParameterDeclarationExpression(ctr, name).Mark(node);
 		}
 
-		static CodeParameterDeclarationExpressionCollection _EvalMethodParamList(ParseNode node)
+		static CodeParameterDeclarationExpressionCollection _BuildMethodParamList(ParseNode node)
 		{
 			var result = new CodeParameterDeclarationExpressionCollection();
 			for (var i = 0; i < node.Children.Length; ++i)
 			{
-				result.Add(_EvalMethodParam(node.C(i)));
+				result.Add(_BuildMethodParam(node.C(i)));
 				++i;
 			}
 
 			return result;
 		}
-		static CodeParameterDeclarationExpression _EvalMethodParam(ParseNode node)
+		static CodeParameterDeclarationExpression _BuildMethodParam(ParseNode node)
 		{
 			if (node.CL() == 2)
 			{
-				var ctr = _EvalType(node.C(0));
+				var ctr = _BuildType(node.C(0));
 				var name = node.C(1).Value;
 				if (verbatimIdentifier == node.C(1).SymbolId)
 					name = name.Substring(1);
 				return new CodeParameterDeclarationExpression(ctr, name).Mark(node);
 			} else
 			{
-				var ctr = _EvalType(node.C(1));
+				var ctr = _BuildType(node.C(1));
 				var name = node.C(2).Value;
 				if (verbatimIdentifier == node.C(2).SymbolId)
 					name = name.Substring(2);
@@ -621,21 +622,21 @@ namespace CD
 				return result;
 			}
 		}
-		static CodeStatement _EvalExpressionStatement(ParseNode node)
+		static CodeStatement _BuildExpressionStatement(ParseNode node)
 		{
-			var expr = _EvalExpression(node.C(0));
+			var expr = _BuildExpression(node.C(0));
 			var bo = expr as CodeBinaryOperatorExpression;
 			// for compat with more languages, turn assign expressions
 			// into assign statements where possible
 			if (null != bo && CodeBinaryOperatorType.Assign == bo.Operator)
 				return new CodeAssignStatement(bo.Left, bo.Right).Mark(node);
-			return new CodeExpressionStatement(_EvalExpression(node.C(0))).Mark(node);
+			return new CodeExpressionStatement(_BuildExpression(node.C(0))).Mark(node);
 		}
-		static CodeExpression _EvalForTest(ParseNode node)
+		static CodeExpression _BuildForTest(ParseNode node)
 		{
-			return _EvalExpression(node.C(0));
+			return _BuildExpression(node.C(0));
 		}
-		static CodeStatement _EvalStatement(ParseNode node)
+		static CodeStatement _BuildStatement(ParseNode node)
 		{
 			var c = node.C(1);
 			switch(c.SymbolId)
@@ -643,36 +644,36 @@ namespace CD
 				case StatementParser.EmptyStatement:
 					return new CodeSnippetStatement().SetLoc(node);
 				case StatementParser.ExpressionStatement:
-					return _EvalExpressionStatement(c);
+					return _BuildExpressionStatement(c);
 				case StatementParser.LabelStatement:
 					return new CodeLabeledStatement(c.C(0).Value).SetLoc(node);
 				case StatementParser.VariableDeclarationStatement:
-					return _EvalVariableDeclarationStatement(c);
+					return _BuildVariableDeclarationStatement(c);
 				case StatementParser.ForStatement:
 					#region Evaluate For
 					var iter = new CodeIterationStatement().Mark(node);
 					var sid = c.C(2).SymbolId;
 					if (StatementParser.ExpressionStatement == sid)
-						iter.InitStatement = _EvalExpressionStatement(c.C(2));
+						iter.InitStatement = _BuildExpressionStatement(c.C(2));
 					else if (c.C(2).IsNonTerminal)
-						iter.InitStatement = _EvalVariableDeclarationStatement(c.C(2));
+						iter.InitStatement = _BuildVariableDeclarationStatement(c.C(2));
 					else
 						iter.InitStatement = new CodeSnippetStatement().SetLoc(c.C(2));
 					if (c.C(3).IsNonTerminal)
-						iter.TestExpression = _EvalForTest(c.C(3));
+						iter.TestExpression = _BuildForTest(c.C(3));
 					else
 						iter.TestExpression = new CodeSnippetExpression();
 					var si = 5;
 					if (c.C(4).IsNonTerminal)
 					{
 						++si;
-						var expr = _EvalExpression(c.C(4));
+						var expr = _BuildExpression(c.C(4));
 						var bo = expr as CodeBinaryOperatorExpression;
 						// turn assign exprs into assign stmts
 						if (null != bo && CodeBinaryOperatorType.Assign == bo.Operator)
 							iter.IncrementStatement = new CodeAssignStatement(bo.Left, bo.Right).Mark(c.C(5));
 						else
-							iter.IncrementStatement = new CodeExpressionStatement(_EvalExpression(c.C(5))).Mark(node);
+							iter.IncrementStatement = new CodeExpressionStatement(_BuildExpression(c.C(5))).Mark(node);
 					}
 					else
 						iter.IncrementStatement = new CodeSnippetStatement();
@@ -681,18 +682,18 @@ namespace CD
 					{
 						for (var i = 1; i < s.Children.Length - 1; i++)
 						{
-							var stmt = _EvalStatement(s.C(i));
+							var stmt = _BuildStatement(s.C(i));
 							iter.Statements.Add(stmt);
 						}
 					}
 					else
-						iter.Statements.Add(_EvalStatement(s));
+						iter.Statements.Add(_BuildStatement(s));
 					return iter;
 				#endregion
 				case StatementParser.WhileStatement:
 					#region Evaluate While
 					iter = new CodeIterationStatement().Mark(node);
-					iter.TestExpression = _EvalExpression(c.C(2));
+					iter.TestExpression = _BuildExpression(c.C(2));
 					iter.InitStatement = new CodeSnippetStatement();
 					iter.IncrementStatement = new CodeSnippetStatement();
 					s = c.C(4);
@@ -700,29 +701,29 @@ namespace CD
 					{
 						for (var i = 1; i < s.Children.Length - 1; i++)
 						{
-							var stmt = _EvalStatement(s.C(i));
+							var stmt = _BuildStatement(s.C(i));
 							iter.Statements.Add(stmt);
 						}
 					}
 					else
-						iter.Statements.Add(_EvalStatement(s));
+						iter.Statements.Add(_BuildStatement(s));
 					return iter;
 					#endregion
 				case StatementParser.IfStatement:
 					#region Evaluate If
 					var cnd = new CodeConditionStatement().Mark(node);
-					cnd.Condition = _EvalExpression(c.C(2));
+					cnd.Condition = _BuildExpression(c.C(2));
 					s = c.C(4);
 					if (StatementParser.StatementBlock == s.SymbolId)
 					{
 						for (var i = 1; i < s.Children.Length - 1; i++)
 						{
-							var stmt = _EvalStatement(s.C(i));
+							var stmt = _BuildStatement(s.C(i));
 							cnd.TrueStatements.Add(stmt);
 						}
 					}
 					else
-						cnd.TrueStatements.Add(_EvalStatement(s));
+						cnd.TrueStatements.Add(_BuildStatement(s));
 					if(5<c.CL())
 					{
 						s = c.C(6);
@@ -730,12 +731,12 @@ namespace CD
 						{
 							for (var i = 1; i < s.Children.Length - 1; i++)
 							{
-								var stmt = _EvalStatement(s.C(i));
+								var stmt = _BuildStatement(s.C(i));
 								cnd.FalseStatements.Add(stmt);
 							}
 						}
 						else
-							cnd.FalseStatements.Add(_EvalStatement(s));
+							cnd.FalseStatements.Add(_BuildStatement(s));
 					}
 					return cnd;
 					#endregion
@@ -743,12 +744,12 @@ namespace CD
 					return new CodeGotoStatement(c.C(1).Value).SetLoc(node);
 				case StatementParser.ThrowStatement:
 					if (2 < c.CL())
-						return new CodeThrowExceptionStatement(_EvalExpression(c.C(1))).Mark(node);
+						return new CodeThrowExceptionStatement(_BuildExpression(c.C(1))).Mark(node);
 					else
 						return new CodeThrowExceptionStatement().Mark(node);
 				case StatementParser.ReturnStatement:
 					if (2 < c.CL())
-						return new CodeMethodReturnStatement(_EvalExpression(c.C(1))).Mark(node);
+						return new CodeMethodReturnStatement(_BuildExpression(c.C(1))).Mark(node);
 					else
 						return new CodeMethodReturnStatement().Mark(node);
 				case StatementParser.TryStatement:
@@ -758,7 +759,7 @@ namespace CD
 					s = c.C(1);
 					for (var i = 1; i < s.Children.Length - 1; i++)
 					{
-						var stmt = _EvalStatement(s.C(i));
+						var stmt = _BuildStatement(s.C(i));
 						tcf.TryStatements.Add(stmt);
 					}
 					
@@ -766,7 +767,7 @@ namespace CD
 					while(StatementParser.CatchClause==c.C(si).SymbolId)
 					{
 						var cc = c.C(si);
-						var ctr = _EvalType(cc.C(2));
+						var ctr = _BuildType(cc.C(2));
 						++si;
 						var ctc = new CodeCatchClause();
 						ctc.CatchExceptionType = ctr;
@@ -781,7 +782,7 @@ namespace CD
 						s = cc.C(ssi);
 						for (var i = 1; i < s.Children.Length - 1; i++)
 						{
-							var stmt = _EvalStatement(s.C(i));
+							var stmt = _BuildStatement(s.C(i));
 							ctc.Statements.Add(stmt);
 						}
 						tcf.CatchClauses.Add(ctc);
@@ -792,7 +793,7 @@ namespace CD
 						s = c.C(si).C(1);
 						for (var i = 1; i < s.Children.Length - 1; i++)
 						{
-							var stmt = _EvalStatement(s.C(i));
+							var stmt = _BuildStatement(s.C(i));
 							tcf.FinallyStatements.Add(stmt);
 						}
 					}
@@ -802,18 +803,18 @@ namespace CD
 			throw new NotImplementedException();
 		}
 		
-		static CodeStatement _EvalVariableDeclarationStatement(ParseNode node)
+		static CodeStatement _BuildVariableDeclarationStatement(ParseNode node)
 		{
 			CodeTypeReference vt = null;
 			if (StatementParser.varType != node.C(0).SymbolId)
-				vt = _EvalType(node.C(0));
+				vt = _BuildType(node.C(0));
 			var vd = new CodeVariableDeclarationStatement().SetLoc(node);
 			if (null != vt)
 				vd.Type = vt;
 			vd.Name = node.C(1).Value;
 			if (3 < node.CL())
 			{
-				vd.InitExpression = _EvalExpression(node.C(3));
+				vd.InitExpression = _BuildExpression(node.C(3));
 			}
 			if (null != vd.InitExpression)
 				vd.Mark(node, null == vd.Type);
@@ -821,11 +822,11 @@ namespace CD
 		}
 		public static CodeExpression ToExpression(ParseNode node)
 		{
-			return _EvalExpression(node);
+			return _BuildExpression(node);
 		}
 		public static CodeTypeReference ToType(ParseNode node)
 		{
-			return _EvalType(node);
+			return _BuildType(node);
 		}
 		static T Mark<T>(this T obj,ParseNode node,bool unresolved=false) where T:CodeObject
 		{
@@ -852,17 +853,17 @@ namespace CD
 			return pn.Children.Length;
 		}
 		
-		static CodeExpression _EvalExpression(ParseNode node)
+		static CodeExpression _BuildExpression(ParseNode node)
 		{
-			return _EvalAssignExpression(node.C(0));
+			return _BuildAssignExpression(node.C(0));
 		}
-		static CodeExpression _EvalAssignExpression(ParseNode node)
+		static CodeExpression _BuildAssignExpression(ParseNode node)
 		{
-			var lhs = _EvalOrExpression(node.C(0));
+			var lhs = _BuildOrExpression(node.C(0));
 			if(3==node.CL())
 			{
 				var id = node.C(1).SymbolId;
-				var rhs = _EvalOrExpression(node.C(2));
+				var rhs = _BuildOrExpression(node.C(2));
 				if (ExpressionParser.eq == id)
 				{
 					return Mark(new CodeBinaryOperatorExpression(lhs, CodeBinaryOperatorType.Assign, rhs),node);
@@ -898,52 +899,52 @@ namespace CD
 			}
 			return lhs;
 		}
-		static CodeExpression _EvalOrExpression(ParseNode node)
+		static CodeExpression _BuildOrExpression(ParseNode node)
 		{
-			var lhs = _EvalAndExpression(node.C(0));
+			var lhs = _BuildAndExpression(node.C(0));
 			if (3 == node.CL())
 			{
-				var rhs = _EvalAndExpression(node.C(2));
+				var rhs = _BuildAndExpression(node.C(2));
 				return Mark(new CodeBinaryOperatorExpression(lhs, CodeBinaryOperatorType.BooleanOr, rhs),node);
 			}
 			return lhs;
 		}
-		static CodeExpression _EvalAndExpression(ParseNode node)
+		static CodeExpression _BuildAndExpression(ParseNode node)
 		{
-			var lhs = _EvalBitwiseOrExpression(node.C(0));
+			var lhs = _BuildBitwiseOrExpression(node.C(0));
 			if (3 == node.CL())
 			{
-				var rhs = _EvalBitwiseOrExpression(node.C(2));
+				var rhs = _BuildBitwiseOrExpression(node.C(2));
 				return Mark(new CodeBinaryOperatorExpression(lhs, CodeBinaryOperatorType.BooleanAnd, rhs),node);
 			}
 			return lhs;
 		}
-		static CodeExpression _EvalBitwiseOrExpression(ParseNode node)
+		static CodeExpression _BuildBitwiseOrExpression(ParseNode node)
 		{
-			var lhs = _EvalBitwiseAndExpression(node.C(0));
+			var lhs = _BuildBitwiseAndExpression(node.C(0));
 			if (3 == node.CL())
 			{
-				var rhs = _EvalBitwiseAndExpression(node.C(2));
+				var rhs = _BuildBitwiseAndExpression(node.C(2));
 				return Mark(new CodeBinaryOperatorExpression(lhs, CodeBinaryOperatorType.BitwiseOr, rhs),node);
 			}
 			return lhs;
 		}
-		static CodeExpression _EvalBitwiseAndExpression(ParseNode node)
+		static CodeExpression _BuildBitwiseAndExpression(ParseNode node)
 		{
-			var lhs = _EvalEqualityExpression(node.C(0));
+			var lhs = _BuildEqualityExpression(node.C(0));
 			if (3 == node.CL())
 			{
-				var rhs = _EvalEqualityExpression(node.C(2));
+				var rhs = _BuildEqualityExpression(node.C(2));
 				return Mark(new CodeBinaryOperatorExpression(lhs, CodeBinaryOperatorType.BitwiseAnd, rhs),node);
 			}
 			return lhs;
 		}
-		static CodeExpression _EvalEqualityExpression(ParseNode node)
+		static CodeExpression _BuildEqualityExpression(ParseNode node)
 		{
-			var lhs = _EvalRelationalExpression(node.C(0));
+			var lhs = _BuildRelationalExpression(node.C(0));
 			if (3 == node.CL())
 			{
-				var rhs = _EvalRelationalExpression(node.C(2));
+				var rhs = _BuildRelationalExpression(node.C(2));
 				CodeBinaryOperatorType op = CodeBinaryOperatorType.IdentityEquality;
 				if (ExpressionParser.notEq == node.C(1).SymbolId)
 					op = CodeBinaryOperatorType.IdentityInequality;
@@ -951,13 +952,13 @@ namespace CD
 			}
 			return lhs;
 		}
-		static CodeExpression _EvalRelationalExpression(ParseNode node)
+		static CodeExpression _BuildRelationalExpression(ParseNode node)
 		{
-			var lhs = _EvalTermExpression(node.C(0));
+			var lhs = _BuildTermExpression(node.C(0));
 			if (3 == node.CL())
 			{
 				var id = node.C(1).SymbolId;
-				var rhs = _EvalTermExpression(node.C(2));
+				var rhs = _BuildTermExpression(node.C(2));
 				CodeBinaryOperatorType op = CodeBinaryOperatorType.LessThan;
 				switch(id)
 				{
@@ -977,13 +978,13 @@ namespace CD
 			}
 			return lhs;
 		}
-		static CodeExpression _EvalTermExpression(ParseNode node)
+		static CodeExpression _BuildTermExpression(ParseNode node)
 		{
-			var lhs = _EvalFactorExpression(node.C(0));
+			var lhs = _BuildFactorExpression(node.C(0));
 			if (3 == node.CL())
 			{
 				var id = node.C(1).SymbolId;
-				var rhs = _EvalFactorExpression(node.C(2));
+				var rhs = _BuildFactorExpression(node.C(2));
 				CodeBinaryOperatorType op = CodeBinaryOperatorType.Add;
 				switch (id)
 				{
@@ -997,13 +998,13 @@ namespace CD
 			}
 			return lhs;
 		}
-		static CodeExpression _EvalFactorExpression(ParseNode node)
+		static CodeExpression _BuildFactorExpression(ParseNode node)
 		{
-			var lhs = _EvalUnaryExpression(node.C(0));
+			var lhs = _BuildUnaryExpression(node.C(0));
 			if (3 == node.CL())
 			{
 				var id = node.C(1).SymbolId;
-				var rhs = _EvalUnaryExpression(node.C(2));
+				var rhs = _BuildUnaryExpression(node.C(2));
 				CodeBinaryOperatorType op = CodeBinaryOperatorType.Multiply;
 				switch (id)
 				{
@@ -1021,7 +1022,7 @@ namespace CD
 			return lhs;
 		}
 
-		static CodeExpression _EvalUnaryExpression(ParseNode node)
+		static CodeExpression _BuildUnaryExpression(ParseNode node)
 		{
 			if(2==node.CL())
 			{
@@ -1029,9 +1030,9 @@ namespace CD
 				switch(id)
 				{
 					case ExpressionParser.add:
-						return _EvalUnaryExpression(node.C(1));
+						return _BuildUnaryExpression(node.C(1));
 					case ExpressionParser.sub:
-						var rhs = _EvalUnaryExpression(node.C(1));
+						var rhs = _BuildUnaryExpression(node.C(1));
 						var p = rhs as CodePrimitiveExpression;
 						if(null!=p)
 						{
@@ -1046,47 +1047,47 @@ namespace CD
 								return new CodePrimitiveExpression(-(double)p.Value).SetLoc(node);
 						}
 						return Mark(new CodeBinaryOperatorExpression(new CodePrimitiveExpression(0), CodeBinaryOperatorType.Subtract,
-							_EvalUnaryExpression(node.C(1))),node);
+							_BuildUnaryExpression(node.C(1))),node);
 					case ExpressionParser.not:
-						return Mark(new CodeBinaryOperatorExpression(new CodePrimitiveExpression(false), CodeBinaryOperatorType.ValueEquality, _EvalUnaryExpression(node.C(1))),node);
+						return Mark(new CodeBinaryOperatorExpression(new CodePrimitiveExpression(false), CodeBinaryOperatorType.ValueEquality, _BuildUnaryExpression(node.C(1))),node);
 					case ExpressionParser.inc:
-						rhs = _EvalUnaryExpression(node.C(1));
+						rhs = _BuildUnaryExpression(node.C(1));
 						return Mark(new CodeBinaryOperatorExpression(rhs, CodeBinaryOperatorType.Assign, new CodeBinaryOperatorExpression(rhs, CodeBinaryOperatorType.Add, new CodePrimitiveExpression(1))),node);
 					case ExpressionParser.dec:
-						rhs = _EvalUnaryExpression(node.C(1));
+						rhs = _BuildUnaryExpression(node.C(1));
 						return Mark(new CodeBinaryOperatorExpression(rhs, CodeBinaryOperatorType.Assign, new CodeBinaryOperatorExpression(rhs, CodeBinaryOperatorType.Subtract, new CodePrimitiveExpression(1))),node);
 				}
 			} else if(3==node.CL())
 			{
 				// subexpression
-				return _EvalExpression(node.C(1));
+				return _BuildExpression(node.C(1));
 			}
-			return _EvalPrimaryExpression(node.C(0));
+			return _BuildPrimaryExpression(node.C(0));
 		}
-		static CodeExpression _EvalPrimaryExpression(ParseNode node)
+		static CodeExpression _BuildPrimaryExpression(ParseNode node)
 		{
 			CodeExpression result = null;
-			
+			var i = 1;
 			var id = node.C(0).SymbolId;
 			switch(id)
 			{
 				case ExpressionParser.TypeRef:
-					result = new CodeTypeReferenceExpression(_EvalType(node.C(0).C(0))).Mark(node,true);
+					result = new CodeTypeReferenceExpression(_BuildType(node.C(0).C(0))).Mark(node,true);
 					break;
 				case ExpressionParser.integerLiteral:
-					result = _EvalInteger(node.C(0));
+					result = _BuildInteger(node.C(0));
 					break;
 				case ExpressionParser.floatLiteral:
-					result= _EvalFloat(node.C(0));
+					result= _BuildFloat(node.C(0));
 					break;
 				case ExpressionParser.stringLiteral:
-					result= _EvalString(node.C(0));
+					result= _BuildString(node.C(0));
 					break;
 				case ExpressionParser.verbatimStringLiteral:
-					result = _EvalVerbatimString(node.C(0));
+					result = _BuildVerbatimString(node.C(0));
 					break;
 				case ExpressionParser.characterLiteral:
-					result= _EvalChar(node.C(0));
+					result= _BuildChar(node.C(0));
 					break;
 				case ExpressionParser.boolLiteral:
 					// doesn't need to be Marked
@@ -1097,34 +1098,36 @@ namespace CD
 					return new CodePrimitiveExpression(null);
 				case ExpressionParser.typeOf:
 					// no need to mark since Type isn't marked
-					result = new CodeTypeOfExpression(_EvalType(node.C(2))).SetLoc(node);
+					result = new CodeTypeOfExpression(_BuildType(node.C(2))).SetLoc(node);
+					i = 4; // advance past typeof part
 					break;
 				case ExpressionParser.defaultOf:
 					// no need to mark since Type isn't marked
-					result = new CodeDefaultValueExpression(_EvalType(node.C(2))).SetLoc(node);
+					result = new CodeDefaultValueExpression(_BuildType(node.C(2))).SetLoc(node);
+					i = 4; // advance past default part
 					break;
 				case ExpressionParser.CastExpression:
-					return _EvalCastExpression(node.C(0));
+					return _BuildCastExpression(node.C(0));
 				case ExpressionParser.FieldRef:
 					// we treat these as variable refs in the codedom
 					result = new CodeVariableReferenceExpression(node.C(0).C(0).Value).Mark(node,true);
 					break;
 				case ExpressionParser.NewExpression:
 					var n = node.C(0);
-					var ctr= _EvalTypeElement(n.C(1));
+					var ctr= _BuildTypeElement(n.C(1));
 					if (ExpressionParser.rparen==n.C(n.CL()-1).SymbolId)
 					{
 						var no = new CodeObjectCreateExpression(ctr).Mark(node,true);
 						// new object
 						if(n.CL()==5)
 						{
-							no.Parameters.AddRange(_EvalArgList(n.C(3)));
+							no.Parameters.AddRange(_BuildArgList(n.C(3)));
 						}
 						result = no;
 					} else
 					{
 						// new array
-						result = _EvalArraySpec(ctr,n.C(2));
+						result = _BuildArraySpec(ctr,n.C(2));
 					}
 					break;
 				case ExpressionParser.thisRef:
@@ -1136,7 +1139,7 @@ namespace CD
 				default:
 					throw new NotImplementedException();
 			}
-			var i = 1;
+			
 			while(i<node.CL())
 			{
 				var pn = node.C(i);
@@ -1147,12 +1150,12 @@ namespace CD
 				else if (ExpressionParser.MemberInvokeRef == pn.SymbolId)
 				{
 					var di = new CodeDelegateInvokeExpression(result).Mark(node,true);
-					di.Parameters.AddRange(_EvalMethodArgList(pn.C(1)));
+					di.Parameters.AddRange(_BuildMethodArgList(pn.C(1)));
 					result = di;
 				} else if(ExpressionParser.MemberIndexerRef==pn.SymbolId)
 				{
 					var ie = new CodeIndexerExpression(result).Mark(node,true);
-					ie.Indices.AddRange(_EvalArgList(pn.C(1)));
+					ie.Indices.AddRange(_BuildArgList(pn.C(1)));
 				}
 				else
 					throw new NotImplementedException();
@@ -1160,7 +1163,7 @@ namespace CD
 			}
 			return result;
 		}
-		static CodeArrayCreateExpression _EvalArraySpec(CodeTypeReference typeElem,ParseNode node)
+		static CodeArrayCreateExpression _BuildArraySpec(CodeTypeReference typeElem,ParseNode node)
 		{
 			CodeArrayCreateExpression result = null;
 			var c = node.C(0);
@@ -1179,7 +1182,7 @@ namespace CD
 				for(i=i-1;0<=i;--i)
 				{
 					c = node.C(i);
-					ctr=_EvalTypeArraySpec(ctr, c);
+					ctr=_BuildTypeArraySpec(ctr, c);
 				}
 				if (1 < ctr.ArrayRank)
 					throw new NotSupportedException(string.Format("The CodeDOM does not support instantiation of multidimensional arrays at line {0}, column {1}, position {2}", c.Line, c.Column, c.Position));
@@ -1188,63 +1191,65 @@ namespace CD
 				for (i = 1; i < pn.Children.Length; i++)
 				{
 					var ppn = pn.Children[i];
-					result.Initializers.Add(_EvalExpression(ppn));
+					result.Initializers.Add(_BuildExpression(ppn));
 					++i;
 
 				}
 				return result.Mark(node);
 			}
 			var cn = c.C(0);
-			var expc=_EvalArgList(cn);
+			var expc=_BuildArgList(cn);
 			if(1<expc.Count)
 				throw new NotSupportedException(string.Format("The CodeDOM does not support instantiation of multidimensional arrays at line {0}, column {1}, position {2}", c.Line, c.Column, c.Position));
 			CodeTypeReference cctr = typeElem;
 			for (var i = 1;i<node.Children.Length;i++)
-				cctr = _EvalTypeArraySpec(cctr, node.C(i));
+				cctr = _BuildTypeArraySpec(cctr, node.C(i));
 			return new CodeArrayCreateExpression(new CodeTypeReference(cctr,1).Mark(node), expc[0]).Mark(node);
 		}
-		static CodeExpression _EvalCastExpression(ParseNode node)
+		static CodeExpression _BuildCastExpression(ParseNode node)
 		{
-			var ctr = _EvalType(node.C(1));
-			var expr = _EvalUnaryExpression(node.C(3));
+			var ctr = _BuildType(node.C(1));
+			var expr = _BuildUnaryExpression(node.C(3));
 			return Mark(new CodeCastExpression(ctr, expr),node);
 		}
-		static CodeTypeReference _EvalType(ParseNode node)
+		static CodeTypeReference _BuildType(ParseNode node)
 		{
-			var result = _EvalTypeElement(node.C(0));
-			return _EvalTypeArraySpec(result,node);
+			var result = _BuildTypeElement(node.C(0));
+			return _BuildTypeArraySpec(result,node);
 		}
 
-		private static CodeTypeReference _EvalTypeArraySpec(CodeTypeReference result,ParseNode node )
+		private static CodeTypeReference _BuildTypeArraySpec(CodeTypeReference result,ParseNode node )
 		{
-			if(2==node.Children.Length)
+			if (2 == node.Children.Length)
 			{
 				return new CodeTypeReference(result, 1).SetLoc(node);
 			}
+			else if (1 == node.Children.Length)
+				return result;
 			var rank = node.Children.Length - 1;
 			return new CodeTypeReference(result, rank).SetLoc(node);
 		}
 
-		static CodeTypeReference _EvalTypeElement(ParseNode node)
+		static CodeTypeReference _BuildTypeElement(ParseNode node)
 		{
-			var result = new CodeTypeReference(_EvalTypeBase(node.C(0))).SetLoc(node);
+			var result = new CodeTypeReference(_BuildTypeBase(node.C(0))).SetLoc(node);
 			if(2==node.CL())
 			{
-				result.TypeArguments.AddRange(_EvalTypeGenericPart(node.C(1)));
+				result.TypeArguments.AddRange(_BuildTypeGenericPart(node.C(1)));
 			}
 			return result;
 		}
-		static CodeTypeReferenceCollection _EvalTypeGenericPart(ParseNode node)
+		static CodeTypeReferenceCollection _BuildTypeGenericPart(ParseNode node)
 		{
 			var result = new CodeTypeReferenceCollection();
 			for(var i = 0;i<node.Children.Length-1;i++)
 			{
 				++i;
-				result.Add(_EvalType(node.C(i)));
+				result.Add(_BuildType(node.C(i)));
 			}
 			return result;
 		}
-		static string _EvalTypeBase(ParseNode node)
+		static string _BuildTypeBase(ParseNode node)
 		{
 			var result = "";
 			for(var i = 0;i<node.Children.Length;i++)
@@ -1304,7 +1309,7 @@ namespace CD
 			}
 			return result;
 		}
-		static CodeExpressionCollection _EvalMethodArgList(ParseNode node)
+		static CodeExpressionCollection _BuildMethodArgList(ParseNode node)
 		{
 			var result = new CodeExpressionCollection();
 			for(var i = 0;i<node.Children.Length;i++)
@@ -1312,7 +1317,7 @@ namespace CD
 				var pn = node.Children[i];
 				if (2 == pn.CL())
 				{
-					var expr = _EvalExpression(pn.C(1));
+					var expr = _BuildExpression(pn.C(1));
 					var id = pn.C(0).SymbolId;
 					FieldDirection fd = FieldDirection.In;
 					switch (id)
@@ -1327,24 +1332,24 @@ namespace CD
 					result.Add(Mark(new CodeDirectionExpression(fd, expr),node));
 				}
 				else
-					result.Add(_EvalExpression(pn.C(0)));
+					result.Add(_BuildExpression(pn.C(0)));
 				++i;
 			}
 			return result;
 		}
-		static CodeExpressionCollection _EvalArgList(ParseNode node)
+		static CodeExpressionCollection _BuildArgList(ParseNode node)
 		{
 			var result = new CodeExpressionCollection();
 			for (var i = 0; i < node.Children.Length; i++)
 			{
 				var pn = node.Children[i];
-				result.Add(_EvalExpression(pn));
+				result.Add(_BuildExpression(pn));
 				++i;
 			}
 			return result;
 		}
 		#region Eval Primitives
-		static CodePrimitiveExpression _EvalString(ParseNode node)
+		static CodePrimitiveExpression _BuildString(ParseNode node)
 		{
 			var sb = new StringBuilder();
 			var e = node.Value.GetEnumerator();
@@ -1367,7 +1372,7 @@ namespace CD
 			}
 			throw new SyntaxException("Unterminated string in input", node.Line,node.Column,node.Position);
 		}
-		static CodePrimitiveExpression _EvalVerbatimString(ParseNode node)
+		static CodePrimitiveExpression _BuildVerbatimString(ParseNode node)
 		{
 			var sb = new StringBuilder();
 			var e = node.Value.GetEnumerator();
@@ -1396,7 +1401,7 @@ namespace CD
 			}
 			throw new SyntaxException("Unterminated string in input", node.Line, node.Column, node.Position);
 		}
-		static CodePrimitiveExpression _EvalChar(ParseNode node)
+		static CodePrimitiveExpression _BuildChar(ParseNode node)
 		{
 			var s = node.Value;
 			// remove quotes.
@@ -1413,7 +1418,7 @@ namespace CD
 			}
 			return new CodePrimitiveExpression(s[0]).SetLoc(node);
 		}
-		static CodePrimitiveExpression _EvalFloat(ParseNode node)
+		static CodePrimitiveExpression _BuildFloat(ParseNode node)
 		{
 			var s = node.Value;
 			var ch = char.ToLowerInvariant(s[s.Length - 1]);
@@ -1433,7 +1438,7 @@ namespace CD
 				n = double.Parse(s);
 			return new CodePrimitiveExpression(n).SetLoc(node);
 		}
-		static CodePrimitiveExpression _EvalInteger(ParseNode node)
+		static CodePrimitiveExpression _BuildInteger(ParseNode node)
 		{
 			var s = node.Value;
 			var isLong = false;

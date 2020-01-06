@@ -10,6 +10,7 @@
 
 namespace CD {
     using System;
+    using System.Text;
     using System.Collections.Generic;
     
     /// <summary>Parses the indicated grammar. Refer to C:\dev\BuildPack\ParsleyAdvancedDemo\Slang.xbnf</summary>
@@ -14164,10 +14165,61 @@ namespace CD {
             }
         }
         public override string ToString() {
+            return this.ToString(null);
+        }
+        public string ToString(string format) {
+            if (("t" == format)) {
+                StringBuilder sb = new StringBuilder();
+                ParseNode._AppendTree(this, sb);
+                return sb.ToString();
+            }
             if (this.IsNonTerminal) {
                 return string.Concat(this.Symbol, ": Count = ", this._children.Length.ToString());
             }
             return string.Concat(this.Symbol, ": ", this.Value);
+        }
+        static void _AppendTree(ParseNode node, System.Text.StringBuilder builder) {
+            // adapted from https://stackoverflow.com/questions/1649027/how-do-i-print-out-a-tree-structure
+            List<ParseNode> firstStack = new List<ParseNode>();
+            firstStack.Add(node);
+            List<List<ParseNode>> childListStack = new List<List<ParseNode>>();
+            childListStack.Add(firstStack);
+            for (
+            ; (childListStack.Count > 0); 
+            ) {
+                List<ParseNode> childStack = childListStack[(childListStack.Count - 1)];
+                if ((childStack.Count == 0)) {
+                    childListStack.RemoveAt((childListStack.Count - 1));
+                }
+                else {
+                    node = childStack[0];
+                    childStack.RemoveAt(0);
+                    string indent = "";
+                    for (int i = 0; (i 
+                                < (childListStack.Count - 1)); i = (i + 1)) {
+                        if ((0 < childListStack[i].Count)) {
+                            indent = (indent + "|  ");
+                        }
+                        else {
+                            indent = (indent + "   ");
+                        }
+                    }
+                    string s = node.Symbol;
+                    string ns = "";
+                    if ((null != node.Value)) {
+                        ns = node.Value;
+                    }
+                    string ss = string.Concat(indent, "+- ", string.Concat(s, " ", ns));
+                    ss = ss.TrimEnd();
+                    builder.Append(ss);
+                    builder.AppendLine();
+                    if ((node.IsNonTerminal 
+                                && (0 < node.Children.Length))) {
+                        List<ParseNode> pnl = new List<ParseNode>(node.Children);
+                        childListStack.Add(pnl);
+                    }
+                }
+            }
         }
     }
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]

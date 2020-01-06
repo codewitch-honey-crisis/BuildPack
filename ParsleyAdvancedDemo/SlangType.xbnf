@@ -36,7 +36,7 @@ Enum<dependency>= MemberAttributes "enum" Identifier EnumPart;
 Struct<dependency>= MemberAttributes "struct" Identifier TypeParams TypeDeclPart;
 Class<dependency>= MemberAttributes "class" Identifier TypeParams TypeDeclPart;
 Interface<dependency>= MemberAttributes "interface" Identifier [ "<" TypeParams ">" ] TypeDeclPart;
-TypeDecl<start,shared,virtual,follows="TypeDecl usingKeyword namespaceKeyword rbrace lbracket",firsts="TypeAttributes structKeyword classKeyword enumKeyword interfaceKeyword partialKeyword lbracket"> { return _ParseTypeDecl(context,false,null,null,context.Line,context.Column,context.Position,null); }
+TypeDecl<start,shared,virtual,follows="TypeDecl usingKeyword namespaceKeyword rbrace lbracket",firsts="TypeAttributes structKeyword classKeyword enumKeyword interfaceKeyword partialKeyword lbracket"> { return ParseTypeDecl(context,false,null,null,context.Line,context.Column,context.Position,null); }
 // Members
 MemberAttribute<collapsed>= newKeyword | constKeyword | publicKeyword | protectedKeyword | internalKeyword | privateKeyword | staticKeyword | overrideKeyword;
 MemberAttributes<dependency> = { MemberAttribute };

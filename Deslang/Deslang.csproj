@@ -48,7 +48,6 @@
     <Content Include="Export\TableTokenizer.cs" />
     <Content Include="Export\TableTokenizerTemplate.cs" />
     <Content Include="Export\Token.cs" />
-    <Compile Include="CodeDomGoKit.brick.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Shared\CodeDomBuilder.cs" />
@@ -56,6 +55,12 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CodeDomGoKit\CodeDomGoKit.csproj">
+      <Project>{f1935a78-6eca-4aa9-9be2-0c64be4297c7}</Project>
+      <Name>CodeDomGoKit</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -17,39 +17,51 @@ namespace ParsleyAdvancedDemo
 	partial class Program
 	{
 	
-		static void _Main()
+		static void Main()
 		{
-			var text = "1.ToString(\"x2\")";
-			//text = "try { a=0; } catch(SyntaxException ex) {a=1;} catch(IOException) {a=3;} finally {a=2;}";
-			text = "[Foo(1,foo=2)] class Foo<[Foo] T,T2> : Bar, IBar where T:IComparable<T>,IEquatable<T> where T2:IComparable<T2>,new() { Foo() {Console.WriteLine(\"Hello World!\");}}";
+			var text = "using System;" +
+				"class Program {" +
+					"static void Main() {" +
+						"Console.WriteLine(\"Hello World!\");" +
+					"}" +
+				"}";
+
 			var tokenizer = new SlangTokenizer(text);
-			var node = TypeDeclParser.ParseMember(tokenizer);
-			_WriteTree(node, Console.Out);
-			Console.WriteLine(CodeDomUtility.ToString(SlangParser.ToMember(node)));
-			
-		}
-		
-		static int Main()
-		{
+			// parse the above
+			var pn = SlangParser.Parse(tokenizer);
+			// write the tree
+			Console.WriteLine(pn.ToString("t"));
+			// build our AST
+			var ccu=SlangParser.ToCompileUnit(pn);
+			// now write our compile unit AST to the console
+			Console.WriteLine(CodeDomUtility.ToString(ccu));
+			Console.Write("Press any key...");
+			Console.ReadKey();
+			Console.Clear();
+
 			Stream stm = null;
 			// Slang doesn't understand the using directive
-			ParseNode node;
 			try
 			{
+				// open this file
 				stm = File.OpenRead(@"..\..\Program.cs");
-				var tokenizer = new SlangTokenizer(stm);
-				node = SlangParser.Parse(tokenizer);
+				// parse it
+				tokenizer = new SlangTokenizer(stm);				
+				pn = SlangParser.Parse(tokenizer);
+				// write the AST to the console
+				ccu = SlangParser.ToCompileUnit(pn);
+				Console.WriteLine(CodeDomUtility.ToString(ccu));
+
 			}
 			finally
 			{
 				if (null != stm)
 					stm.Close();
 			}
-			_WriteTree(node, Console.Out);
-			Console.WriteLine(CodeDomUtility.ToString(SlangParser.ToCompileUnit(node)));
 
-			return 0;
+
 		}
+		
 		static void _WriteTree(ParseNode node, TextWriter writer)
 		{
 			// adapted from https://stackoverflow.com/questions/1649027/how-do-i-print-out-a-tree-structure
@@ -92,5 +104,6 @@ namespace ParsleyAdvancedDemo
 				}
 			}
 		}
+		
 	}
 }

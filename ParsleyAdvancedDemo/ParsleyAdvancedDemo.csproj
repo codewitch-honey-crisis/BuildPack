@@ -36,14 +36,51 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CodeDomUtility.cs" />
+    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.BindTo.cs">
+      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.BindTo.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.cs">
+      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.FindMostSpecific.cs">
+      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.FindMostSpecific.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.GetMembers.cs">
+      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.GetMembers.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.Select.cs">
+      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.Select.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomResolver\CodeDomResolver.cs">
+      <Link>CodeDomGoKit\CodeDomResolver\CodeDomResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomResolver\CodeDomResolver.Evaluate.cs">
+      <Link>CodeDomGoKit\CodeDomResolver\CodeDomResolver.Evaluate.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomResolver\CodeDomResolver.GetTypeOfExpression.cs">
+      <Link>CodeDomGoKit\CodeDomResolver\CodeDomResolver.GetTypeOfExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomUtility.cs">
+      <Link>CodeDomGoKit\CodeDomUtility.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomVariableTracer.cs">
+      <Link>CodeDomGoKit\CodeDomVariableTracer.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomVisitor.cs">
+      <Link>CodeDomGoKit\CodeDomVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeTypeReferenceEqualityComparer.cs">
+      <Link>CodeDomGoKit\CodeTypeReferenceEqualityComparer.cs</Link>
+    </Compile>
     <Compile Include="GplexBuffers.cs" />
     <Compile Include="GplexShared.cs" />
+    <Content Include="ParseNode.export.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SlangParser.Code.cs" />
     <Compile Include="SlangParser.CodeDom.cs" />
     <Compile Include="SlangParser.cs" />
+    <Compile Include="SlangPatcher.cs" />
     <Compile Include="SlangScanner.cs" />
     <Compile Include="SlangTokenizer.cs" />
   </ItemGroup>
@@ -55,6 +92,7 @@
     <Content Include="SlangStatement.xbnf" />
     <None Include="SlangType.xbnf" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"$(SolutionDir)Parsley\bin\Release\parsley.exe" "$(ProjectDir)Slang.xbnf" /output "$(ProjectDir)SlangParser.cs" /gplex "$(ProjectDir)Slang.lex" /namespace CD /fast /ifstale

@@ -52,7 +52,22 @@ namespace Parsley
 			});
 			return result;
 		}
-		
+		static bool _AddNamespace(CodeNamespace ns,string import)
+		{
+			var hasNS = false;
+
+			foreach (CodeNamespaceImport nsi in ns.Imports)
+			{
+				if (0 == string.Compare(nsi.Namespace, import,StringComparison.InvariantCulture))
+				{
+					hasNS = true;
+					break;
+				}
+			}
+			if (!hasNS)
+				ns.Imports.Add(new CodeNamespaceImport(import));
+			return !hasNS;
+		}
 		public static CodeCompileUnit GenerateCompileUnit(XbnfDocument document, XbnfGenerationInfo genInfo,string name = null,string @namespace=null,bool fast=false)
 		{
 			var docs = new List<XbnfDocument>();
@@ -73,20 +88,10 @@ namespace Parsley
 				ns.Name = @namespace;
 			result.ReferencedAssemblies.Add(typeof(HashSet<>).Assembly.GetName().FullName);
 			result.ReferencedAssemblies.Add(typeof(CodeObject).Assembly.GetName().FullName);
-			ns.Imports.Add(new CodeNamespaceImport("System"));
-			ns.Imports.Add(new CodeNamespaceImport("System.Collections.Generic"));
-			var hasColNS = false;
-			foreach (CodeNamespaceImport nsi in ns.Imports)
-			{
-				if (0 == string.Compare(nsi.Namespace, "System.Collections.Generic"))
-				{
-					hasColNS = true;
-					break;
-				}
-			}
-			if (!hasColNS)
-				ns.Imports.Add(new CodeNamespaceImport("System.Collections.Generic"));
-
+			_AddNamespace(ns, "System");
+			_AddNamespace(ns, "System.Text");
+			_AddNamespace(ns, "System.Collections.Generic");
+			
 			result.Namespaces.Add(ns);
 			foreach (var mapEntry in genInfo.CfgMap)
 			{
