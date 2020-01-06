@@ -47,6 +47,7 @@ namespace ParsleyAdvancedDemo
 							_Patch(ctx.Target as CodeIndexerExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeMemberMethod, ctx, resolver);
 							_Patch(ctx.Target as CodeMemberProperty, ctx, resolver);
+							_Patch(ctx.Target as CodeTypeReferenceExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeTypeReference, ctx, resolver);
 						}
 					});
@@ -75,6 +76,7 @@ namespace ParsleyAdvancedDemo
 							_Patch(ctx.Target as CodeIndexerExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeMemberMethod, ctx, resolver);
 							_Patch(ctx.Target as CodeMemberProperty, ctx, resolver);
+							_Patch(ctx.Target as CodeTypeReferenceExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeTypeReference, ctx, resolver);
 						}
 					});
@@ -159,6 +161,22 @@ namespace ParsleyAdvancedDemo
 				// this is probably a nested type but with . instead of +
 				// so now we need to crack it apart and hunt it down
 				throw new NotImplementedException();
+			}
+		}
+		static void _Patch(CodeTypeReferenceExpression tr,CodeDomVisitContext ctx,CodeDomResolver res)
+		{
+			if (null != tr)
+			{
+				if (res.IsValidType(tr.Type))
+				{
+					tr.Type.UserData.Remove("slang:unresolved");
+					tr.UserData.Remove("slang:unresolved");
+				}
+				else
+				{
+					// TODO: Check for nested type.
+					throw new ArgumentException(_AppendLineInfo(string.Format("Unable to resolve type {0}", tr.Type.BaseType), tr.Type), "compileUnits");
+				}
 			}
 		}
 		static void _Patch(CodeObjectCreateExpression oc, CodeDomVisitContext ctx, CodeDomResolver res)
@@ -353,8 +371,6 @@ namespace ParsleyAdvancedDemo
 				{
 					if (!CodeDomResolver.IsNullOrVoidType(ctr))
 					{
-						if (vr.VariableName == "done")
-							System.Diagnostics.Debug.WriteLine("done var resolved to var");
 						vr.UserData.Remove("slang:unresolved");
 						return;
 					}
@@ -479,6 +495,7 @@ namespace ParsleyAdvancedDemo
 					var mr = di.TargetObject as CodeMethodReferenceExpression;
 					if (null != mr)
 					{
+						
 						var mi = new CodeMethodInvokeExpression(mr);
 						mi.Parameters.AddRange(di.Parameters);
 						CodeDomVisitor.ReplaceTarget(ctx, mi);
@@ -521,8 +538,6 @@ namespace ParsleyAdvancedDemo
 		{
 			if (null != vd)
 			{
-				if (vd.Name == "done")
-					System.Diagnostics.Debug.WriteLine("debug var decl hit");
 				if (CodeDomResolver.IsNullOrVoidType(vd.Type) || (0 == vd.Type.ArrayRank && 0 == vd.Type.TypeArguments.Count && 0 == string.Compare("var", vd.Type.BaseType, StringComparison.InvariantCulture)))
 				{
 					if (null == vd.InitExpression)
@@ -534,11 +549,7 @@ namespace ParsleyAdvancedDemo
 						vd.Type = t;
 						if (!CodeDomResolver.IsNullOrVoidType(t))
 						{
-							if (vd.Name == "done")
-								System.Diagnostics.Debug.WriteLine("debug var decl resolved");
-
 							vd.UserData.Remove("slang:unresolved");
-
 						}
 					}
 				}
@@ -548,7 +559,7 @@ namespace ParsleyAdvancedDemo
 		{
 			if (null != fr)
 			{
-
+				
 				// this probably means part of our field has been resolved, or at the very least
 				// it does not come from a rooted var ref.
 				if (!fr.TargetObject.UserData.Contains("slang:unresolved"))

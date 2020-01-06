@@ -672,7 +672,7 @@ namespace CD
 				if (null != customAttributes)
 					children.Add(customAttributes);
 				else
-					children.Add(new ParseNode(CustomAttributeGroupList, "CustomAttributeGroupList", new ParseNode[0], line, column, position));
+					children.Add(new ParseNode(CustomAttributeGroups, "CustomAttributeGroups", new ParseNode[0], line, column, position));
 				children.Add(new ParseNode(MemberAttributes, "MemberAttributes", attrs.ToArray(), line, column, position));
 			}
 

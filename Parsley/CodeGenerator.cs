@@ -125,8 +125,14 @@ namespace Parsley
 					if ('#' != consts[i][0])
 					{
 						var sym = consts[i];
-						if (genInfo.GetCfgAttribute(sym, "nocode", false))
+						if (genInfo.GetCfgAttribute(sym, "nocode", false) ||
+							genInfo.GetCfgAttribute(sym, "factored", false) ||
+							genInfo.GetCfgAttribute(sym, "hidden", false))
+						{
+							if (sym == "MemberAnyRef")
+								System.Diagnostics.Debugger.Break();
 							continue;
+						}
 						var s = _MakeSafeName(sym);
 						s = _MakeUniqueMember(parser, s);
 						if (syms.Contains(symtbl[i]) 
@@ -578,7 +584,11 @@ namespace Parsley
 					}
 				}
 				var ccls = _GetClassName(primaryDoc, symtbl, codeclass, nt);
-				var ffr = C.FieldRef(C.TypeRef(ccls), consts[symmap[nt]]);
+				CodeExpression ffr = C.Literal(symmap[nt]);
+				if (!genInfo.GetCfgAttribute(nt, "hidden", false) &&
+					!genInfo.GetCfgAttribute(nt, "factored", false) &&
+					!genInfo.GetCfgAttribute(nt,"nocode",false))
+					C.FieldRef(C.TypeRef(ccls), consts[symmap[nt]]);
 				if (null != recover)
 				{
 					/*

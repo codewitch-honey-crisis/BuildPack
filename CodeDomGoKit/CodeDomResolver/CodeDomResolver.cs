@@ -1326,7 +1326,7 @@ namespace CD
 		/// Refreshes the code after the graphs have been changed, added to, or removed from.
 		/// </summary>
 		/// <param name="typesOnly">Only go as far as types and their members</param>
-		public void Refresh(bool typesOnly = false)
+		public void Refresh(CodeDomVisitAction customAction=null,bool typesOnly = false)
 		{
 			// make sure each object is weak rooted to its parent and has a weak reference to the root
 			for(int ic=CompileUnits.Count,i=0;i<ic;++i)
@@ -1342,6 +1342,9 @@ namespace CD
 							co.UserData[_parentKey] = new WeakReference<object>(ctx.Parent);
 						if (null != ctx.Root) // sanity check
 							co.UserData[_rootKey] = new WeakReference<object>(ctx.Root);
+					}
+					if(null!=customAction) {
+						customAction(ctx);
 					}
 				}, typesOnly ? CodeDomVisitTargets.Types | CodeDomVisitTargets.Members : CodeDomVisitTargets.All);
 			}

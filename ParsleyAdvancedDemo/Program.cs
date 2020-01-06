@@ -19,6 +19,51 @@ namespace ParsleyAdvancedDemo
 	
 		static void Main()
 		{
+			Stream stm = null;
+			// Slang doesn't understand the using directive
+			try
+			{
+				// open this file
+				stm = File.OpenRead(@"..\..\ParseNode.export.cs");
+				// parse it
+				var tokenizer = new SlangTokenizer(stm);
+				var pn = SlangParser.Parse(tokenizer);
+				// write the AST to the console
+				var ccu = SlangParser.ToCompileUnit(pn);
+				// patch it
+				SlangPatcher.Patch(ccu);
+				var co = SlangPatcher.GetNextUnresolvedElement(ccu);
+				if(null!=co)
+				{
+					Console.WriteLine("Next unresolved code element:");
+					Console.WriteLine(CodeDomUtility.ToString(co));
+					var line = 0;
+					var column = 0;
+					var position = 0L;
+					var o = co.UserData["slang:line"];
+					if (null != o)
+						line = (int)o;
+					o = co.UserData["slang:column"];
+					if (null != o)
+						column = (int)o;
+					o = co.UserData["slang:position"];
+					if (null != o)
+						position = (long)o;
+					Console.WriteLine("at line {0}, column {1}, position {2}", line, column, position);
+					
+				} else
+				{
+					Console.WriteLine(CodeDomUtility.ToString(ccu));
+				}
+			} 
+			finally
+			{
+				if (null != stm)
+					stm.Close();
+			}
+		}
+		static void Demo1()
+		{
 			var text = "using System;" +
 				"class Program {" +
 					"static void Main() {" +

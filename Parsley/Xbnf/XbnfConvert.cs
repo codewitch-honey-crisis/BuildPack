@@ -1360,9 +1360,11 @@ namespace Parsley
 			listId = ss;
 			var attr = new XbnfAttribute("collapsed", true);
 			var attr2 = new XbnfAttribute("nowarn", true);
+			var attr3 = new XbnfAttribute("factored", true);
 			var attrlist = new XbnfAttributeList();
 			attrlist.Add(attr);
-			attrlist.Add(attr);
+			attrlist.Add(attr2);
+			attrlist.Add(attr3);
 			attrs.Add(listId, attrlist);
 			var expr =
 				new XbnfOrExpression(

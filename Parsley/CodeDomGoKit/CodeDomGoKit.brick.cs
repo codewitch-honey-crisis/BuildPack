@@ -995,9 +995,10 @@ public void ClearCache(){_typeCache.Clear();}/// <summary>
 /// Refreshes the code after the graphs have been changed, added to, or removed from.
 /// </summary>
 /// <param name="typesOnly">Only go as far as types and their members</param>
-public void Refresh(bool typesOnly=false){ for(int ic=CompileUnits.Count,i=0;i<ic;++i){var ccu=CompileUnits[i]; CodeDomVisitor.Visit(ccu,(ctx)=>{var co
-=ctx.Target as CodeObject;if(null!=co){if(null!=ctx.Parent)co.UserData[_parentKey]=new WeakReference<object>(ctx.Parent);if(null!=ctx.Root) co.UserData[_rootKey]
-=new WeakReference<object>(ctx.Root);}},typesOnly?CodeDomVisitTargets.Types|CodeDomVisitTargets.Members:CodeDomVisitTargets.All);}}}/// <summary>
+public void Refresh(CodeDomVisitAction customAction=null,bool typesOnly=false){ for(int ic=CompileUnits.Count,i=0;i<ic;++i){var ccu=CompileUnits[i]; CodeDomVisitor.Visit(ccu,
+(ctx)=>{var co=ctx.Target as CodeObject;if(null!=co){if(null!=ctx.Parent)co.UserData[_parentKey]=new WeakReference<object>(ctx.Parent);if(null!=ctx.Root)
+ co.UserData[_rootKey]=new WeakReference<object>(ctx.Root);}if(null!=customAction){customAction(ctx);}},typesOnly?CodeDomVisitTargets.Types|CodeDomVisitTargets.Members
+:CodeDomVisitTargets.All);}}}/// <summary>
 /// Provides scope information from a particular point in the CodeDOM
 /// </summary>
 /// <remarks>The scope goes stale when its parent <see cref="CodeDomResolver"/> goes out of scope.</remarks>

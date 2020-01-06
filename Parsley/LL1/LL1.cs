@@ -192,6 +192,7 @@ namespace Parsley
 						//if (o is bool && (bool)o)
 							_SetAttribute(cfg, newId, "collapsed", true);
 							_SetAttribute(cfg, newId, "nowarn", true);
+							_SetAttribute(cfg, newId, "factored", true);
 						//else
 						//	_SetAttribute(cfg, newId, "substitute", rule.Left);
 
@@ -602,6 +603,7 @@ namespace Parsley
 
 					_SetAttribute(cfg,nnt, "collapsed", true);
 					_SetAttribute(cfg, nnt, "nowarn", true);
+					_SetAttribute(cfg, nnt, "factored", true);
 
 				}
 			}

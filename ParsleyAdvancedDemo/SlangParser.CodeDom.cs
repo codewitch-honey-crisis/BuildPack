@@ -817,7 +817,12 @@ namespace CD
 				vd.InitExpression = _BuildExpression(node.C(3));
 			}
 			if (null != vd.InitExpression)
-				vd.Mark(node, null == vd.Type);
+			{
+				if (null == vd.Type || 0 == string.Compare(vd.Type.BaseType, "System.Void"))
+					vd.Mark(node, true);
+				else
+					vd.Mark(node);
+			}
 			return vd;
 		}
 		public static CodeExpression ToExpression(ParseNode node)
