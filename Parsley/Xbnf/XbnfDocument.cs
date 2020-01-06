@@ -62,6 +62,7 @@ namespace Parsley
 		static string[] _GatherImports(string res)
 		{
 			var result = new List<string>();
+			var imps = new List<string>();
 			result.Add(res);
 			if (res.Contains("://"))
 				using (var pc = ParseContext.CreateFromUrl(res))
@@ -71,6 +72,7 @@ namespace Parsley
 				using (var pc = ParseContext.CreateFrom(res))
 				{
 					_ParseImports(pc, result);
+					
 				}
 			}
 			for(var i = 1;i<result.Count;++i)
@@ -87,6 +89,15 @@ namespace Parsley
 				for (var j = 0; j < gi.Length; j++)
 					if (!result.Contains(gi[j]))
 						result.Add(gi[j]);
+			}
+			for(int ic = result.Count,i=0;i<ic;++i)
+			{
+				if(!Path.IsPathRooted(result[i]))
+				{
+					result.RemoveAt(i);
+					--i;
+					--ic;
+				}
 			}
 			return result.ToArray();
 		}

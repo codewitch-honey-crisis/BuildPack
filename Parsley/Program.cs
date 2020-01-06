@@ -145,7 +145,8 @@ namespace Parsley
 							stale = true;
 					if(!stale)
 					{
-						foreach(var s in XbnfDocument.GetResources(inputfile))
+						var files = XbnfDocument.GetResources(inputfile);
+						foreach (var s in files)
 						{
 							if(_IsStale(s,outputfile))
 							{

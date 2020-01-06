@@ -10,6 +10,7 @@
 
 namespace CD {
     using System;
+    using System.Text;
     using System.Collections.Generic;
     
     /// <summary>Parses the indicated grammar. Refer to C:\dev\BuildPack\Parsley\Slang.xbnf</summary>
@@ -42,20 +43,20 @@ namespace CD {
                 ParseNode[] children = new ParseNode[3];
                 if ((false 
                             == (SlangParser.usingKeyword == context.SymbolId))) {
-                    context.Error("Expecting usingKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting usingKeyword");
                 }
                 children[0] = new ParseNode(SlangParser.usingKeyword, "usingKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[1] = SlangParser.ParseNamespaceName(context);
                 if ((false 
                             == (StatementParser.semi == context.SymbolId))) {
-                    context.Error("Expecting semi at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting semi");
                 }
                 children[2] = new ParseNode(StatementParser.semi, "semi", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(SlangParser.UsingDirective, "UsingDirective", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting usingKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting usingKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseCompileUnit(ParserContext context) {
             // CompileUnit
@@ -88,7 +89,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.dot == context.SymbolId))) {
-                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dot");
                 }
                 children.Add(new ParseNode(ExpressionParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -96,7 +97,7 @@ namespace CD {
                 children.AddRange(SlangParser.ParseNamespaceNameListRightAssoc(context).Children);
                 return new ParseNode(SlangParser.NamespaceNameList, "NamespaceNameList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting dot at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting dot", line__, column__, position__);
         }
         internal static ParseNode ParseNamespace(ParserContext context) {
             // Namespace
@@ -111,7 +112,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.dot == context.SymbolId))) {
-                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dot");
                 }
                 children.Add(new ParseNode(ExpressionParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -125,7 +126,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(SlangParser.NamespaceNameListRightAssoc, "NamespaceNameListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting dot at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting dot", line__, column__, position__);
         }
         internal static ParseNode ParseNamespaceName(ParserContext context) {
             int line__ = context.Line;
@@ -139,7 +140,7 @@ namespace CD {
                 children.AddRange(SlangParser.ParseNamespaceNamePart(context).Children);
                 return new ParseNode(SlangParser.NamespaceName, "NamespaceName", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Identifier at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Identifier", line__, column__, position__);
         }
         internal static ParseNode ParseNamespaceNamePart(ParserContext context) {
             int line__ = context.Line;
@@ -157,7 +158,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(SlangParser.NamespaceNamePart, "NamespaceNamePart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting NamespaceNameList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting NamespaceNameList", line__, column__, position__);
         }
     }
     /// <summary>Parses the indicated grammar. Refer to C:\dev\BuildPack\Parsley\SlangExpression.xbnf</summary>
@@ -431,7 +432,7 @@ namespace CD {
                 children[0] = ExpressionParser.ParseAssignExpression(context);
                 return new ParseNode(ExpressionParser.Expression, "Expression", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting AssignExpression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting AssignExpression", line__, column__, position__);
         }
         /// <summary>
         /// Parses a production of the form:
@@ -478,14 +479,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.dot == context.SymbolId))) {
-                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dot");
                 }
                 children.Add(new ParseNode(ExpressionParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseIdentifier(context).Children);
                 return new ParseNode(ExpressionParser.MemberFieldRef, "MemberFieldRef", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting dot at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting dot", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRef(ParserContext context) {
             int line__ = context.Line;
@@ -509,8 +510,7 @@ namespace CD {
                 children[0] = ExpressionParser.ParseMemberIndexerRef(context);
                 return new ParseNode(ExpressionParser.MemberAnyRef, "MemberAnyRef", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberFieldRef, MemberInvokeRef, or MemberIndexerRef at line {0}, colum" +
-                        "n {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberFieldRef, MemberInvokeRef, or MemberIndexerRef", line__, column__, position__);
         }
         internal static ParseNode ParseMethodArg(ParserContext context) {
             int line__ = context.Line;
@@ -521,7 +521,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.outKeyword == context.SymbolId))) {
-                    context.Error("Expecting outKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting outKeyword");
                 }
                 children[0] = new ParseNode(ExpressionParser.outKeyword, "outKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -533,7 +533,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.refKeyword == context.SymbolId))) {
-                    context.Error("Expecting refKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting refKeyword");
                 }
                 children[0] = new ParseNode(ExpressionParser.refKeyword, "refKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -581,8 +581,7 @@ namespace CD {
                 children[0] = ExpressionParser.ParseExpression(context);
                 return new ParseNode(ExpressionParser.MethodArg, "MethodArg", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting outKeyword, refKeyword, or Expression at line {0}, column {1}, position" +
-                        " {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting outKeyword, refKeyword, or Expression", line__, column__, position__);
         }
         internal static ParseNode ParseTypeRef(ParserContext context) {
             int line__ = context.Line;
@@ -609,7 +608,7 @@ namespace CD {
                 children[0] = ExpressionParser.ParseType(context);
                 return new ParseNode(ExpressionParser.TypeRef, "TypeRef", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Type at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Type", line__, column__, position__);
         }
         internal static ParseNode ParseIntrinsicType(ParserContext context) {
             int line__ = context.Line;
@@ -620,7 +619,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.boolType == context.SymbolId))) {
-                    context.Error("Expecting boolType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting boolType");
                 }
                 children[0] = new ParseNode(ExpressionParser.boolType, "boolType", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -631,7 +630,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.charType == context.SymbolId))) {
-                    context.Error("Expecting charType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting charType");
                 }
                 children[0] = new ParseNode(ExpressionParser.charType, "charType", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -642,7 +641,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.stringType == context.SymbolId))) {
-                    context.Error("Expecting stringType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting stringType");
                 }
                 children[0] = new ParseNode(ExpressionParser.stringType, "stringType", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -653,7 +652,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.floatType == context.SymbolId))) {
-                    context.Error("Expecting floatType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting floatType");
                 }
                 children[0] = new ParseNode(ExpressionParser.floatType, "floatType", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -664,7 +663,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.doubleType == context.SymbolId))) {
-                    context.Error("Expecting doubleType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting doubleType");
                 }
                 children[0] = new ParseNode(ExpressionParser.doubleType, "doubleType", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -675,7 +674,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.decimalType == context.SymbolId))) {
-                    context.Error("Expecting decimalType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting decimalType");
                 }
                 children[0] = new ParseNode(ExpressionParser.decimalType, "decimalType", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -686,7 +685,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.sbyteType == context.SymbolId))) {
-                    context.Error("Expecting sbyteType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting sbyteType");
                 }
                 children[0] = new ParseNode(ExpressionParser.sbyteType, "sbyteType", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -697,7 +696,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.byteType == context.SymbolId))) {
-                    context.Error("Expecting byteType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting byteType");
                 }
                 children[0] = new ParseNode(ExpressionParser.byteType, "byteType", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -708,7 +707,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.shortType == context.SymbolId))) {
-                    context.Error("Expecting shortType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting shortType");
                 }
                 children[0] = new ParseNode(ExpressionParser.shortType, "shortType", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -719,7 +718,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.ushortType == context.SymbolId))) {
-                    context.Error("Expecting ushortType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting ushortType");
                 }
                 children[0] = new ParseNode(ExpressionParser.ushortType, "ushortType", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -730,7 +729,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.intType == context.SymbolId))) {
-                    context.Error("Expecting intType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting intType");
                 }
                 children[0] = new ParseNode(ExpressionParser.intType, "intType", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -741,7 +740,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.uintType == context.SymbolId))) {
-                    context.Error("Expecting uintType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting uintType");
                 }
                 children[0] = new ParseNode(ExpressionParser.uintType, "uintType", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -752,7 +751,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.longType == context.SymbolId))) {
-                    context.Error("Expecting longType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting longType");
                 }
                 children[0] = new ParseNode(ExpressionParser.longType, "longType", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -763,7 +762,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.ulongType == context.SymbolId))) {
-                    context.Error("Expecting ulongType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting ulongType");
                 }
                 children[0] = new ParseNode(ExpressionParser.ulongType, "ulongType", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -774,15 +773,15 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.objectType == context.SymbolId))) {
-                    context.Error("Expecting objectType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting objectType");
                 }
                 children[0] = new ParseNode(ExpressionParser.objectType, "objectType", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.IntrinsicType, "IntrinsicType", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting boolType, charType, stringType, floatType, doubleType, decimalType, sby" +
-                        "teType, byteType, shortType, ushortType, intType, uintType, longType, ulongType," +
-                        " or objectType at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting boolType, charType, stringType, floatType, doubleType, decimalType, sby" +
+                    "teType, byteType, shortType, ushortType, intType, uintType, longType, ulongType," +
+                    " or objectType", line__, column__, position__);
         }
         internal static ParseNode ParseTypeBase(ParserContext context) {
             int line__ = context.Line;
@@ -813,14 +812,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.identifier2 == context.SymbolId))) {
-                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting identifier");
                 }
                 children.Add(new ParseNode(ExpressionParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeBasePart(context).Children);
                 return new ParseNode(ExpressionParser.TypeBase, "TypeBase", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting IntrinsicType or identifier at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting IntrinsicType or identifier", line__, column__, position__);
         }
         internal static ParseNode ParseTypeArraySpecRank(ParserContext context) {
             int line__ = context.Line;
@@ -831,13 +830,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children[0] = new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.TypeArraySpecRank, "TypeArraySpecRank", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseNewArrayPart(ParserContext context) {
             int line__ = context.Line;
@@ -849,7 +848,7 @@ namespace CD {
                 children[0] = ExpressionParser.ParseArraySpec(context);
                 return new ParseNode(ExpressionParser.NewArrayPart, "NewArrayPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting ArraySpec at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting ArraySpec", line__, column__, position__);
         }
         internal static ParseNode ParseTypeCastExpressionPart(ParserContext context) {
             int line__ = context.Line;
@@ -876,13 +875,13 @@ namespace CD {
                 children[0] = ExpressionParser.ParseType(context);
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[1] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.TypeCastExpressionPart, "TypeCastExpressionPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Type at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Type", line__, column__, position__);
         }
         internal static ParseNode ParseSubExpression(ParserContext context) {
             int line__ = context.Line;
@@ -894,20 +893,20 @@ namespace CD {
                 ParseNode[] children = new ParseNode[3];
                 if ((false 
                             == (ExpressionParser.lparen == context.SymbolId))) {
-                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lparen");
                 }
                 children[0] = new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[1] = ExpressionParser.ParseExpression(context);
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[2] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.SubExpression, "SubExpression", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lparen at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lparen", line__, column__, position__);
         }
         internal static bool WhereSubExpression(ParserContext context) {
             return (false == _IsCastExpression(context));
@@ -922,7 +921,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.add == context.SymbolId))) {
-                    context.Error("Expecting add at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting add");
                 }
                 children[0] = new ParseNode(ExpressionParser.add, "add", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -935,7 +934,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.sub == context.SymbolId))) {
-                    context.Error("Expecting sub at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting sub");
                 }
                 children[0] = new ParseNode(ExpressionParser.sub, "sub", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -948,7 +947,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.not == context.SymbolId))) {
-                    context.Error("Expecting not at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting not");
                 }
                 children[0] = new ParseNode(ExpressionParser.not, "not", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -961,7 +960,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.inc == context.SymbolId))) {
-                    context.Error("Expecting inc at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting inc");
                 }
                 children[0] = new ParseNode(ExpressionParser.inc, "inc", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -974,7 +973,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.dec == context.SymbolId))) {
-                    context.Error("Expecting dec at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dec");
                 }
                 children[0] = new ParseNode(ExpressionParser.dec, "dec", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -1070,8 +1069,7 @@ namespace CD {
                 children[0] = ExpressionParser.ParsePrimaryExpression(context);
                 return new ParseNode(ExpressionParser.UnaryExpression, "UnaryExpression", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting add, sub, not, inc, dec, SubExpression, or PrimaryExpression at line {0" +
-                        "}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting add, sub, not, inc, dec, SubExpression, or PrimaryExpression", line__, column__, position__);
         }
         internal static bool WhereUnaryExpression(ParserContext context) {
             return true;
@@ -1085,7 +1083,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.nullLiteral == context.SymbolId))) {
-                    context.Error("Expecting nullLiteral at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting nullLiteral");
                 }
                 children[0] = new ParseNode(ExpressionParser.nullLiteral, "nullLiteral", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -1102,20 +1100,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.typeOf == context.SymbolId))) {
-                    context.Error("Expecting typeOf at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting typeOf");
                 }
                 children.Add(new ParseNode(ExpressionParser.typeOf, "typeOf", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.lparen == context.SymbolId))) {
-                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lparen");
                 }
                 children.Add(new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.Add(ExpressionParser.ParseType(context));
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children.Add(new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1127,20 +1125,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.nameOf == context.SymbolId))) {
-                    context.Error("Expecting nameOf at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting nameOf");
                 }
                 children.Add(new ParseNode(ExpressionParser.nameOf, "nameOf", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.lparen == context.SymbolId))) {
-                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lparen");
                 }
                 children.Add(new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseIdentifier(context).Children);
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children.Add(new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1152,20 +1150,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.defaultOf == context.SymbolId))) {
-                    context.Error("Expecting defaultOf at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting defaultOf");
                 }
                 children.Add(new ParseNode(ExpressionParser.defaultOf, "defaultOf", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.lparen == context.SymbolId))) {
-                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lparen");
                 }
                 children.Add(new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.Add(ExpressionParser.ParseType(context));
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children.Add(new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1200,7 +1198,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.verbatimStringLiteral == context.SymbolId))) {
-                    context.Error("Expecting verbatimStringLiteral at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting verbatimStringLiteral");
                 }
                 children.Add(new ParseNode(ExpressionParser.verbatimStringLiteral, "verbatimStringLiteral", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1212,7 +1210,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.characterLiteral == context.SymbolId))) {
-                    context.Error("Expecting characterLiteral at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting characterLiteral");
                 }
                 children.Add(new ParseNode(ExpressionParser.characterLiteral, "characterLiteral", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1224,7 +1222,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.integerLiteral == context.SymbolId))) {
-                    context.Error("Expecting integerLiteral at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting integerLiteral");
                 }
                 children.Add(new ParseNode(ExpressionParser.integerLiteral, "integerLiteral", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1236,7 +1234,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.floatLiteral == context.SymbolId))) {
-                    context.Error("Expecting floatLiteral at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting floatLiteral");
                 }
                 children.Add(new ParseNode(ExpressionParser.floatLiteral, "floatLiteral", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1248,7 +1246,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.stringLiteral == context.SymbolId))) {
-                    context.Error("Expecting stringLiteral at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting stringLiteral");
                 }
                 children.Add(new ParseNode(ExpressionParser.stringLiteral, "stringLiteral", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1260,7 +1258,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.boolLiteral == context.SymbolId))) {
-                    context.Error("Expecting boolLiteral at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting boolLiteral");
                 }
                 children.Add(new ParseNode(ExpressionParser.boolLiteral, "boolLiteral", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1279,7 +1277,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.thisRef == context.SymbolId))) {
-                    context.Error("Expecting thisRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting thisRef");
                 }
                 children.Add(new ParseNode(ExpressionParser.thisRef, "thisRef", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1291,17 +1289,16 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.baseRef == context.SymbolId))) {
-                    context.Error("Expecting baseRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting baseRef");
                 }
                 children.Add(new ParseNode(ExpressionParser.baseRef, "baseRef", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParsePrimaryExpressionPart13(context).Children);
                 return new ParseNode(ExpressionParser.PrimaryExpression, "PrimaryExpression", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting nullLiteral, CastExpression, typeOf, nameOf, defaultOf, TypeOrFieldRef," +
-                        " verbatimStringLiteral, characterLiteral, integerLiteral, floatLiteral, stringLi" +
-                        "teral, boolLiteral, NewExpression, thisRef, or baseRef at line {0}, column {1}, " +
-                        "position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting nullLiteral, CastExpression, typeOf, nameOf, defaultOf, TypeOrFieldRef," +
+                    " verbatimStringLiteral, characterLiteral, integerLiteral, floatLiteral, stringLi" +
+                    "teral, boolLiteral, NewExpression, thisRef, or baseRef", line__, column__, position__);
         }
         internal static ParseNode ParseIdentifier(ParserContext context) {
             int line__ = context.Line;
@@ -1313,7 +1310,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.verbatimIdentifier == context.SymbolId))) {
-                    context.Error("Expecting verbatimIdentifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting verbatimIdentifier");
                 }
                 children[0] = new ParseNode(ExpressionParser.verbatimIdentifier, "verbatimIdentifier", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -1325,13 +1322,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.identifier2 == context.SymbolId))) {
-                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting identifier");
                 }
                 children[0] = new ParseNode(ExpressionParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.Identifier, "Identifier", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting verbatimIdentifier or identifier at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting verbatimIdentifier or identifier", line__, column__, position__);
         }
         internal static bool WhereIdentifier(ParserContext context) {
             return (false == Keywords.Contains(context.Value));
@@ -1345,7 +1342,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.dot == context.SymbolId))) {
-                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dot");
                 }
                 children.Add(new ParseNode(ExpressionParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1353,7 +1350,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseNamespaceNameListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.NamespaceNameList, "NamespaceNameList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting dot at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting dot", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -1364,7 +1361,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lt == context.SymbolId))) {
-                    context.Error("Expecting lt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lt");
                 }
                 children.Add(new ParseNode(ExpressionParser.lt, "lt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1379,7 +1376,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lte == context.SymbolId))) {
-                    context.Error("Expecting lte at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lte");
                 }
                 children.Add(new ParseNode(ExpressionParser.lte, "lte", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1394,7 +1391,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.gt == context.SymbolId))) {
-                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gt");
                 }
                 children.Add(new ParseNode(ExpressionParser.gt, "gt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1409,7 +1406,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.gte == context.SymbolId))) {
-                    context.Error("Expecting gte at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gte");
                 }
                 children.Add(new ParseNode(ExpressionParser.gte, "gte", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1419,7 +1416,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseRelationalExpressionListRightAssoc3(context).Children);
                 return new ParseNode(ExpressionParser.RelationalExpressionList, "RelationalExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lt, lte, gt, or gte at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lt, lte, gt, or gte", line__, column__, position__);
         }
         internal static ParseNode ParseEqualityExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -1430,7 +1427,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.eqEq == context.SymbolId))) {
-                    context.Error("Expecting eqEq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eqEq");
                 }
                 children.Add(new ParseNode(ExpressionParser.eqEq, "eqEq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1444,7 +1441,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.notEq == context.SymbolId))) {
-                    context.Error("Expecting notEq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting notEq");
                 }
                 children.Add(new ParseNode(ExpressionParser.notEq, "notEq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1453,7 +1450,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseEqualityExpressionListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.EqualityExpressionList, "EqualityExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting eqEq or notEq at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting eqEq or notEq", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseAndExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -1464,7 +1461,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseAnd == context.SymbolId))) {
-                    context.Error("Expecting bitwiseAnd at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseAnd");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseAnd, "bitwiseAnd", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1472,7 +1469,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseBitwiseAndExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.BitwiseAndExpressionList, "BitwiseAndExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting bitwiseAnd at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting bitwiseAnd", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseOrExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -1483,7 +1480,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseOr == context.SymbolId))) {
-                    context.Error("Expecting bitwiseOr at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseOr");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseOr, "bitwiseOr", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1491,7 +1488,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseBitwiseOrExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.BitwiseOrExpressionList, "BitwiseOrExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting bitwiseOr at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting bitwiseOr", line__, column__, position__);
         }
         internal static ParseNode ParseAndExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -1502,7 +1499,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.and == context.SymbolId))) {
-                    context.Error("Expecting and at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting and");
                 }
                 children.Add(new ParseNode(ExpressionParser.and, "and", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1510,7 +1507,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseAndExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.AndExpressionList, "AndExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting and at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting and", line__, column__, position__);
         }
         internal static ParseNode ParseOrExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -1521,7 +1518,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.or == context.SymbolId))) {
-                    context.Error("Expecting or at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting or");
                 }
                 children.Add(new ParseNode(ExpressionParser.or, "or", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1529,7 +1526,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseOrExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.OrExpressionList, "OrExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting or at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting or", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -1540,7 +1537,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.eq == context.SymbolId))) {
-                    context.Error("Expecting eq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eq");
                 }
                 children.Add(new ParseNode(ExpressionParser.eq, "eq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1557,7 +1554,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.addAssign == context.SymbolId))) {
-                    context.Error("Expecting addAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting addAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.addAssign, "addAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1574,7 +1571,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.subAssign == context.SymbolId))) {
-                    context.Error("Expecting subAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting subAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.subAssign, "subAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1591,7 +1588,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.mulAssign == context.SymbolId))) {
-                    context.Error("Expecting mulAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mulAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.mulAssign, "mulAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1608,7 +1605,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.divAssign == context.SymbolId))) {
-                    context.Error("Expecting divAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting divAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.divAssign, "divAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1625,7 +1622,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.modAssign == context.SymbolId))) {
-                    context.Error("Expecting modAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting modAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.modAssign, "modAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1642,7 +1639,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseAndAssign == context.SymbolId))) {
-                    context.Error("Expecting bitwiseAndAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseAndAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseAndAssign, "bitwiseAndAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1659,7 +1656,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseOrAssign == context.SymbolId))) {
-                    context.Error("Expecting bitwiseOrAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseOrAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseOrAssign, "bitwiseOrAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1671,8 +1668,8 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseAssignExpressionListRightAssoc5(context).Children);
                 return new ParseNode(ExpressionParser.AssignExpressionList, "AssignExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting eq, addAssign, subAssign, mulAssign, divAssign, modAssign, bitwiseAndAs" +
-                        "sign, or bitwiseOrAssign at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting eq, addAssign, subAssign, mulAssign, divAssign, modAssign, bitwiseAndAs" +
+                    "sign, or bitwiseOrAssign", line__, column__, position__);
         }
         internal static ParseNode ParseTermExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -1683,7 +1680,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.add == context.SymbolId))) {
-                    context.Error("Expecting add at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting add");
                 }
                 children.Add(new ParseNode(ExpressionParser.add, "add", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1697,7 +1694,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.sub == context.SymbolId))) {
-                    context.Error("Expecting sub at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting sub");
                 }
                 children.Add(new ParseNode(ExpressionParser.sub, "sub", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1706,7 +1703,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTermExpressionListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.TermExpressionList, "TermExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting add or sub at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting add or sub", line__, column__, position__);
         }
         internal static ParseNode ParseFactorExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -1717,7 +1714,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.mul == context.SymbolId))) {
-                    context.Error("Expecting mul at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mul");
                 }
                 children.Add(new ParseNode(ExpressionParser.mul, "mul", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1732,7 +1729,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.div == context.SymbolId))) {
-                    context.Error("Expecting div at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting div");
                 }
                 children.Add(new ParseNode(ExpressionParser.div, "div", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1747,7 +1744,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.mod == context.SymbolId))) {
-                    context.Error("Expecting mod at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mod");
                 }
                 children.Add(new ParseNode(ExpressionParser.mod, "mod", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1757,7 +1754,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseFactorExpressionListRightAssoc3(context).Children);
                 return new ParseNode(ExpressionParser.FactorExpressionList, "FactorExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting mul, div, or mod at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting mul, div, or mod", line__, column__, position__);
         }
         internal static ParseNode ParseMemberInvokeRefList(ParserContext context) {
             int line__ = context.Line;
@@ -1768,7 +1765,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1776,7 +1773,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberInvokeRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberInvokeRefList, "MemberInvokeRefList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseMemberIndexerRefList(ParserContext context) {
             int line__ = context.Line;
@@ -1787,7 +1784,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1795,7 +1792,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberIndexerRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberIndexerRefList, "MemberIndexerRefList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeBaseList(ParserContext context) {
             int line__ = context.Line;
@@ -1806,20 +1803,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.dot == context.SymbolId))) {
-                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dot");
                 }
                 children.Add(new ParseNode(ExpressionParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.identifier2 == context.SymbolId))) {
-                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting identifier");
                 }
                 children.Add(new ParseNode(ExpressionParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeBaseListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeBaseList, "TypeBaseList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting dot at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting dot", line__, column__, position__);
         }
         internal static ParseNode ParseTypeArraySpecList(ParserContext context) {
             int line__ = context.Line;
@@ -1832,7 +1829,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTypeArraySpecListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeArraySpecList, "TypeArraySpecList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeArraySpec at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeArraySpec", line__, column__, position__);
         }
         internal static ParseNode ParseTypeGenericPartList(ParserContext context) {
             int line__ = context.Line;
@@ -1843,7 +1840,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1851,7 +1848,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTypeGenericPartListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeGenericPartList, "TypeGenericPartList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeArraySpecRankList(ParserContext context) {
             int line__ = context.Line;
@@ -1864,7 +1861,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTypeArraySpecRankListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeArraySpecRankList, "TypeArraySpecRankList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeArraySpecRank at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeArraySpecRank", line__, column__, position__);
         }
         internal static ParseNode ParseNewObjectPartList(ParserContext context) {
             int line__ = context.Line;
@@ -1875,7 +1872,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1883,7 +1880,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseNewObjectPartListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.NewObjectPartList, "NewObjectPartList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseArraySpecExpressionListList(ParserContext context) {
             int line__ = context.Line;
@@ -1894,7 +1891,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1902,7 +1899,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseArraySpecExpressionListListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.ArraySpecExpressionListList, "ArraySpecExpressionListList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseArrayInitializerList(ParserContext context) {
             int line__ = context.Line;
@@ -1913,7 +1910,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -1921,7 +1918,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseArrayInitializerListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.ArrayInitializerList, "ArrayInitializerList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList(ParserContext context) {
             int line__ = context.Line;
@@ -1936,7 +1933,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList, "MemberAnyRefList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList2(ParserContext context) {
             int line__ = context.Line;
@@ -1951,7 +1948,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList2RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList2, "MemberAnyRefList2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList3(ParserContext context) {
             int line__ = context.Line;
@@ -1966,7 +1963,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList3RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList3, "MemberAnyRefList3", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList4(ParserContext context) {
             int line__ = context.Line;
@@ -1981,7 +1978,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList4RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList4, "MemberAnyRefList4", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList5(ParserContext context) {
             int line__ = context.Line;
@@ -1996,7 +1993,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList5RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList5, "MemberAnyRefList5", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList6(ParserContext context) {
             int line__ = context.Line;
@@ -2011,7 +2008,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList6RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList6, "MemberAnyRefList6", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList7(ParserContext context) {
             int line__ = context.Line;
@@ -2026,7 +2023,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList7RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList7, "MemberAnyRefList7", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList8(ParserContext context) {
             int line__ = context.Line;
@@ -2041,7 +2038,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList8RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList8, "MemberAnyRefList8", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList9(ParserContext context) {
             int line__ = context.Line;
@@ -2056,7 +2053,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList9RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList9, "MemberAnyRefList9", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList10(ParserContext context) {
             int line__ = context.Line;
@@ -2071,7 +2068,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList10RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList10, "MemberAnyRefList10", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList11(ParserContext context) {
             int line__ = context.Line;
@@ -2086,7 +2083,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList11RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList11, "MemberAnyRefList11", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList12(ParserContext context) {
             int line__ = context.Line;
@@ -2101,7 +2098,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList12RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList12, "MemberAnyRefList12", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList13(ParserContext context) {
             int line__ = context.Line;
@@ -2116,7 +2113,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList13RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList13, "MemberAnyRefList13", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList14(ParserContext context) {
             int line__ = context.Line;
@@ -2131,7 +2128,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList14RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList14, "MemberAnyRefList14", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseCastExpression(ParserContext context) {
             // CastExpression
@@ -2154,7 +2151,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.dot == context.SymbolId))) {
-                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dot");
                 }
                 children.Add(new ParseNode(ExpressionParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2162,7 +2159,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseNamespaceNameListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.NamespaceNameListRightAssoc, "NamespaceNameListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting dot at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting dot", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2173,7 +2170,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lt == context.SymbolId))) {
-                    context.Error("Expecting lt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lt");
                 }
                 children.Add(new ParseNode(ExpressionParser.lt, "lt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2208,7 +2205,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.RelationalExpressionListRightAssoc, "RelationalExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lt at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lt", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -2219,7 +2216,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.gt == context.SymbolId))) {
-                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gt");
                 }
                 children.Add(new ParseNode(ExpressionParser.gt, "gt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2253,7 +2250,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.RelationalExpressionListRightAssoc2, "RelationalExpressionListRightAssoc2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting gt at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting gt", line__, column__, position__);
         }
         internal static ParseNode ParseEqualityExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2264,7 +2261,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.eqEq == context.SymbolId))) {
-                    context.Error("Expecting eqEq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eqEq");
                 }
                 children.Add(new ParseNode(ExpressionParser.eqEq, "eqEq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2295,7 +2292,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.EqualityExpressionListRightAssoc, "EqualityExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting eqEq at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting eqEq", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseAndExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2306,7 +2303,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseAnd == context.SymbolId))) {
-                    context.Error("Expecting bitwiseAnd at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseAnd");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseAnd, "bitwiseAnd", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2335,7 +2332,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.BitwiseAndExpressionListRightAssoc, "BitwiseAndExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting bitwiseAnd at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting bitwiseAnd", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseOrExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2346,7 +2343,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseOr == context.SymbolId))) {
-                    context.Error("Expecting bitwiseOr at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseOr");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseOr, "bitwiseOr", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2374,7 +2371,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.BitwiseOrExpressionListRightAssoc, "BitwiseOrExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting bitwiseOr at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting bitwiseOr", line__, column__, position__);
         }
         internal static ParseNode ParseAndExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2385,7 +2382,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.and == context.SymbolId))) {
-                    context.Error("Expecting and at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting and");
                 }
                 children.Add(new ParseNode(ExpressionParser.and, "and", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2412,7 +2409,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AndExpressionListRightAssoc, "AndExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting and at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting and", line__, column__, position__);
         }
         internal static ParseNode ParseOrExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2423,7 +2420,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.or == context.SymbolId))) {
-                    context.Error("Expecting or at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting or");
                 }
                 children.Add(new ParseNode(ExpressionParser.or, "or", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2449,7 +2446,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.OrExpressionListRightAssoc, "OrExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting or at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting or", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2460,7 +2457,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.eq == context.SymbolId))) {
-                    context.Error("Expecting eq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eq");
                 }
                 children.Add(new ParseNode(ExpressionParser.eq, "eq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2485,7 +2482,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AssignExpressionListRightAssoc, "AssignExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting eq at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting eq", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -2496,7 +2493,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.subAssign == context.SymbolId))) {
-                    context.Error("Expecting subAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting subAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.subAssign, "subAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2520,7 +2517,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AssignExpressionListRightAssoc2, "AssignExpressionListRightAssoc2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting subAssign at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting subAssign", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListRightAssoc3(ParserContext context) {
             int line__ = context.Line;
@@ -2531,7 +2528,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.divAssign == context.SymbolId))) {
-                    context.Error("Expecting divAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting divAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.divAssign, "divAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2554,7 +2551,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AssignExpressionListRightAssoc3, "AssignExpressionListRightAssoc3", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting divAssign at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting divAssign", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListRightAssoc4(ParserContext context) {
             int line__ = context.Line;
@@ -2565,7 +2562,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseAndAssign == context.SymbolId))) {
-                    context.Error("Expecting bitwiseAndAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseAndAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseAndAssign, "bitwiseAndAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2587,7 +2584,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AssignExpressionListRightAssoc4, "AssignExpressionListRightAssoc4", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting bitwiseAndAssign at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting bitwiseAndAssign", line__, column__, position__);
         }
         internal static ParseNode ParseTermExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2598,7 +2595,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.add == context.SymbolId))) {
-                    context.Error("Expecting add at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting add");
                 }
                 children.Add(new ParseNode(ExpressionParser.add, "add", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2635,7 +2632,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TermExpressionListRightAssoc, "TermExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting add at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting add", line__, column__, position__);
         }
         internal static ParseNode ParseFactorExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2646,7 +2643,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.mul == context.SymbolId))) {
-                    context.Error("Expecting mul at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mul");
                 }
                 children.Add(new ParseNode(ExpressionParser.mul, "mul", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2686,7 +2683,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.FactorExpressionListRightAssoc, "FactorExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting mul at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting mul", line__, column__, position__);
         }
         internal static ParseNode ParseFactorExpressionListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -2697,7 +2694,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.mod == context.SymbolId))) {
-                    context.Error("Expecting mod at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mod");
                 }
                 children.Add(new ParseNode(ExpressionParser.mod, "mod", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2736,7 +2733,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.FactorExpressionListRightAssoc2, "FactorExpressionListRightAssoc2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting mod at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting mod", line__, column__, position__);
         }
         internal static ParseNode ParseMemberInvokeRefListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2747,7 +2744,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2760,7 +2757,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.MemberInvokeRefListRightAssoc, "MemberInvokeRefListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseMemberIndexerRefListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2771,7 +2768,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2784,7 +2781,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.MemberIndexerRefListRightAssoc, "MemberIndexerRefListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeBaseListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2795,13 +2792,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.dot == context.SymbolId))) {
-                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dot");
                 }
                 children.Add(new ParseNode(ExpressionParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.identifier2 == context.SymbolId))) {
-                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting identifier");
                 }
                 children.Add(new ParseNode(ExpressionParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2823,7 +2820,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TypeBaseListRightAssoc, "TypeBaseListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting dot at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting dot", line__, column__, position__);
         }
         internal static ParseNode ParseTypeArraySpecListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2848,7 +2845,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TypeArraySpecListRightAssoc, "TypeArraySpecListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeArraySpec at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeArraySpec", line__, column__, position__);
         }
         internal static ParseNode ParseTypeGenericPartListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2859,7 +2856,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2872,7 +2869,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TypeGenericPartListRightAssoc, "TypeGenericPartListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeArraySpecRankListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2890,7 +2887,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TypeArraySpecRankListRightAssoc, "TypeArraySpecRankListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeArraySpecRank at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeArraySpecRank", line__, column__, position__);
         }
         internal static ParseNode ParseNewObjectPartListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2901,7 +2898,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2914,7 +2911,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.NewObjectPartListRightAssoc, "NewObjectPartListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseArraySpecExpressionListListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2925,7 +2922,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2938,7 +2935,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.ArraySpecExpressionListListRightAssoc, "ArraySpecExpressionListListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseArrayInitializerListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2949,7 +2946,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -2962,7 +2959,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.ArrayInitializerListRightAssoc, "ArrayInitializerListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -2977,7 +2974,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefListRightAssoc, "MemberAnyRefListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList2RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -3025,7 +3022,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.MemberAnyRefList2RightAssoc, "MemberAnyRefList2RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList3RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -3073,7 +3070,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.MemberAnyRefList3RightAssoc, "MemberAnyRefList3RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList4RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -3121,7 +3118,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.MemberAnyRefList4RightAssoc, "MemberAnyRefList4RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList5RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -3169,7 +3166,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.MemberAnyRefList5RightAssoc, "MemberAnyRefList5RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList6RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -3217,7 +3214,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.MemberAnyRefList6RightAssoc, "MemberAnyRefList6RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList7RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -3265,7 +3262,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.MemberAnyRefList7RightAssoc, "MemberAnyRefList7RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList8RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -3313,7 +3310,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.MemberAnyRefList8RightAssoc, "MemberAnyRefList8RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList9RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -3361,7 +3358,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.MemberAnyRefList9RightAssoc, "MemberAnyRefList9RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList10RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -3409,7 +3406,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.MemberAnyRefList10RightAssoc, "MemberAnyRefList10RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList11RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -3457,7 +3454,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.MemberAnyRefList11RightAssoc, "MemberAnyRefList11RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList12RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -3505,7 +3502,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.MemberAnyRefList12RightAssoc, "MemberAnyRefList12RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList13RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -3553,7 +3550,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.MemberAnyRefList13RightAssoc, "MemberAnyRefList13RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList14RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -3601,7 +3598,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.MemberAnyRefList14RightAssoc, "MemberAnyRefList14RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpression(ParserContext context) {
             int line__ = context.Line;
@@ -3649,7 +3646,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseRelationalExpressionPart(context).Children);
                 return new ParseNode(ExpressionParser.RelationalExpression, "RelationalExpression", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TermExpression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TermExpression", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionPart(ParserContext context) {
             int line__ = context.Line;
@@ -3688,7 +3685,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.RelationalExpressionPart, "RelationalExpressionPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting RelationalExpressionList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting RelationalExpressionList", line__, column__, position__);
         }
         internal static ParseNode ParseEqualityExpression(ParserContext context) {
             int line__ = context.Line;
@@ -3736,7 +3733,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseEqualityExpressionPart(context).Children);
                 return new ParseNode(ExpressionParser.EqualityExpression, "EqualityExpression", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting RelationalExpression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting RelationalExpression", line__, column__, position__);
         }
         internal static ParseNode ParseEqualityExpressionPart(ParserContext context) {
             int line__ = context.Line;
@@ -3771,7 +3768,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.EqualityExpressionPart, "EqualityExpressionPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting EqualityExpressionList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting EqualityExpressionList", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseAndExpression(ParserContext context) {
             int line__ = context.Line;
@@ -3819,7 +3816,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseBitwiseAndExpressionPart(context).Children);
                 return new ParseNode(ExpressionParser.BitwiseAndExpression, "BitwiseAndExpression", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting EqualityExpression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting EqualityExpression", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseAndExpressionPart(ParserContext context) {
             int line__ = context.Line;
@@ -3852,7 +3849,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.BitwiseAndExpressionPart, "BitwiseAndExpressionPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting BitwiseAndExpressionList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting BitwiseAndExpressionList", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseOrExpression(ParserContext context) {
             int line__ = context.Line;
@@ -3900,7 +3897,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseBitwiseOrExpressionPart(context).Children);
                 return new ParseNode(ExpressionParser.BitwiseOrExpression, "BitwiseOrExpression", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting BitwiseAndExpression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting BitwiseAndExpression", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseOrExpressionPart(ParserContext context) {
             int line__ = context.Line;
@@ -3932,7 +3929,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.BitwiseOrExpressionPart, "BitwiseOrExpressionPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting BitwiseOrExpressionList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting BitwiseOrExpressionList", line__, column__, position__);
         }
         internal static ParseNode ParseAndExpression(ParserContext context) {
             int line__ = context.Line;
@@ -3980,7 +3977,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseAndExpressionPart(context).Children);
                 return new ParseNode(ExpressionParser.AndExpression, "AndExpression", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting BitwiseOrExpression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting BitwiseOrExpression", line__, column__, position__);
         }
         internal static ParseNode ParseAndExpressionPart(ParserContext context) {
             int line__ = context.Line;
@@ -4011,7 +4008,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AndExpressionPart, "AndExpressionPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting AndExpressionList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting AndExpressionList", line__, column__, position__);
         }
         internal static ParseNode ParseOrExpression(ParserContext context) {
             int line__ = context.Line;
@@ -4059,7 +4056,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseOrExpressionPart(context).Children);
                 return new ParseNode(ExpressionParser.OrExpression, "OrExpression", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting AndExpression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting AndExpression", line__, column__, position__);
         }
         internal static ParseNode ParseOrExpressionPart(ParserContext context) {
             int line__ = context.Line;
@@ -4089,7 +4086,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.OrExpressionPart, "OrExpressionPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting OrExpressionList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting OrExpressionList", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpression(ParserContext context) {
             int line__ = context.Line;
@@ -4137,7 +4134,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseAssignExpressionPart(context).Children);
                 return new ParseNode(ExpressionParser.AssignExpression, "AssignExpression", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting OrExpression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting OrExpression", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionPart(ParserContext context) {
             int line__ = context.Line;
@@ -4166,7 +4163,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AssignExpressionPart, "AssignExpressionPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting AssignExpressionList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting AssignExpressionList", line__, column__, position__);
         }
         internal static ParseNode ParseTermExpression(ParserContext context) {
             int line__ = context.Line;
@@ -4214,7 +4211,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTermExpressionPart(context).Children);
                 return new ParseNode(ExpressionParser.TermExpression, "TermExpression", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting FactorExpression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting FactorExpression", line__, column__, position__);
         }
         internal static ParseNode ParseTermExpressionPart(ParserContext context) {
             int line__ = context.Line;
@@ -4255,7 +4252,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TermExpressionPart, "TermExpressionPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TermExpressionList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TermExpressionList", line__, column__, position__);
         }
         internal static ParseNode ParseFactorExpression(ParserContext context) {
             int line__ = context.Line;
@@ -4303,7 +4300,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseFactorExpressionPart(context).Children);
                 return new ParseNode(ExpressionParser.FactorExpression, "FactorExpression", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting UnaryExpression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting UnaryExpression", line__, column__, position__);
         }
         internal static ParseNode ParseFactorExpressionPart(ParserContext context) {
             int line__ = context.Line;
@@ -4347,7 +4344,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.FactorExpressionPart, "FactorExpressionPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting FactorExpressionList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting FactorExpressionList", line__, column__, position__);
         }
         internal static ParseNode ParseMemberInvokeRefPart(ParserContext context) {
             int line__ = context.Line;
@@ -4359,7 +4356,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberInvokeRefList(context).Children);
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children.Add(new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -4370,13 +4367,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[0] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.MemberInvokeRefPart, "MemberInvokeRefPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberInvokeRefList or rparen at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberInvokeRefList or rparen", line__, column__, position__);
         }
         internal static ParseNode ParseMemberIndexerRef(ParserContext context) {
             int line__ = context.Line;
@@ -4387,7 +4384,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lbracket == context.SymbolId))) {
-                    context.Error("Expecting lbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lbracket");
                 }
                 children.Add(new ParseNode(ExpressionParser.lbracket, "lbracket", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -4395,7 +4392,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberIndexerRefPart(context).Children);
                 return new ParseNode(ExpressionParser.MemberIndexerRef, "MemberIndexerRef", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lbracket at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lbracket", line__, column__, position__);
         }
         internal static ParseNode ParseMemberIndexerRefPart(ParserContext context) {
             int line__ = context.Line;
@@ -4407,7 +4404,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberIndexerRefList(context).Children);
                 if ((false 
                             == (ExpressionParser.rbracket == context.SymbolId))) {
-                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbracket");
                 }
                 children.Add(new ParseNode(ExpressionParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -4418,13 +4415,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.rbracket == context.SymbolId))) {
-                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbracket");
                 }
                 children[0] = new ParseNode(ExpressionParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.MemberIndexerRefPart, "MemberIndexerRefPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberIndexerRefList or rbracket at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberIndexerRefList or rbracket", line__, column__, position__);
         }
         internal static ParseNode ParseTypeBasePart(ParserContext context) {
             int line__ = context.Line;
@@ -4451,7 +4448,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TypeBasePart, "TypeBasePart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeBaseList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeBaseList", line__, column__, position__);
         }
         internal static ParseNode ParseType(ParserContext context) {
             int line__ = context.Line;
@@ -4479,7 +4476,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTypePart(context).Children);
                 return new ParseNode(ExpressionParser.Type, "Type", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeElement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeElement", line__, column__, position__);
         }
         /// <summary>
         /// Parses a production of the form:
@@ -4521,7 +4518,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TypePart, "TypePart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeArraySpecList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeArraySpecList", line__, column__, position__);
         }
         internal static ParseNode ParseTypeElement(ParserContext context) {
             int line__ = context.Line;
@@ -4549,7 +4546,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTypeElementPart(context).Children);
                 return new ParseNode(ExpressionParser.TypeElement, "TypeElement", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeBase at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeBase", line__, column__, position__);
         }
         internal static ParseNode ParseTypeElementPart(ParserContext context) {
             int line__ = context.Line;
@@ -4575,7 +4572,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TypeElementPart, "TypeElementPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeGenericPart at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeGenericPart", line__, column__, position__);
         }
         internal static ParseNode ParseTypeGenericPartPart(ParserContext context) {
             int line__ = context.Line;
@@ -4587,7 +4584,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTypeGenericPartList(context).Children);
                 if ((false 
                             == (ExpressionParser.gt == context.SymbolId))) {
-                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gt");
                 }
                 children.Add(new ParseNode(ExpressionParser.gt, "gt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -4598,13 +4595,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.gt == context.SymbolId))) {
-                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gt");
                 }
                 children[0] = new ParseNode(ExpressionParser.gt, "gt", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.TypeGenericPartPart, "TypeGenericPartPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeGenericPartList or gt at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeGenericPartList or gt", line__, column__, position__);
         }
         internal static ParseNode ParseTypeArraySpec(ParserContext context) {
             int line__ = context.Line;
@@ -4615,14 +4612,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lbracket == context.SymbolId))) {
-                    context.Error("Expecting lbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lbracket");
                 }
                 children.Add(new ParseNode(ExpressionParser.lbracket, "lbracket", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeArraySpecPart(context).Children);
                 return new ParseNode(ExpressionParser.TypeArraySpec, "TypeArraySpec", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lbracket at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lbracket", line__, column__, position__);
         }
         internal static ParseNode ParseTypeArraySpecPart(ParserContext context) {
             int line__ = context.Line;
@@ -4634,7 +4631,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTypeArraySpecRankList(context).Children);
                 if ((false 
                             == (ExpressionParser.rbracket == context.SymbolId))) {
-                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbracket");
                 }
                 children.Add(new ParseNode(ExpressionParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -4645,14 +4642,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.rbracket == context.SymbolId))) {
-                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbracket");
                 }
                 children[0] = new ParseNode(ExpressionParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.TypeArraySpecPart, "TypeArraySpecPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeArraySpecRankList or rbracket at line {0}, column {1}, position {2}" +
-                        "", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeArraySpecRankList or rbracket", line__, column__, position__);
         }
         internal static ParseNode ParseNewExpression(ParserContext context) {
             int line__ = context.Line;
@@ -4663,7 +4659,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.newKeyword == context.SymbolId))) {
-                    context.Error("Expecting newKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting newKeyword");
                 }
                 children.Add(new ParseNode(ExpressionParser.newKeyword, "newKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -4671,7 +4667,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseNewExpressionPart(context).Children);
                 return new ParseNode(ExpressionParser.NewExpression, "NewExpression", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting newKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting newKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseNewExpressionPart(ParserContext context) {
             int line__ = context.Line;
@@ -4689,7 +4685,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseNewArrayPart(context).Children);
                 return new ParseNode(ExpressionParser.NewExpressionPart, "NewExpressionPart", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting NewObjectPart or NewArrayPart at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting NewObjectPart or NewArrayPart", line__, column__, position__);
         }
         internal static ParseNode ParseNewObjectPartPart(ParserContext context) {
             int line__ = context.Line;
@@ -4701,7 +4697,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseNewObjectPartList(context).Children);
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children.Add(new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -4712,13 +4708,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[0] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.NewObjectPartPart, "NewObjectPartPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting NewObjectPartList or rparen at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting NewObjectPartList or rparen", line__, column__, position__);
         }
         internal static ParseNode ParseArraySpecExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -4766,7 +4762,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseArraySpecExpressionListPart(context).Children);
                 return new ParseNode(ExpressionParser.ArraySpecExpressionList, "ArraySpecExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Expression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Expression", line__, column__, position__);
         }
         internal static ParseNode ParseArraySpecExpressionListPart(ParserContext context) {
             int line__ = context.Line;
@@ -4778,7 +4774,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseArraySpecExpressionListList(context).Children);
                 if ((false 
                             == (ExpressionParser.rbracket == context.SymbolId))) {
-                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbracket");
                 }
                 children.Add(new ParseNode(ExpressionParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -4789,14 +4785,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.rbracket == context.SymbolId))) {
-                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbracket");
                 }
                 children[0] = new ParseNode(ExpressionParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.ArraySpecExpressionListPart, "ArraySpecExpressionListPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting ArraySpecExpressionListList or rbracket at line {0}, column {1}, positi" +
-                        "on {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting ArraySpecExpressionListList or rbracket", line__, column__, position__);
         }
         internal static ParseNode ParseArrayInitializerPart(ParserContext context) {
             int line__ = context.Line;
@@ -4808,7 +4803,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseArrayInitializerList(context).Children);
                 if ((false 
                             == (ExpressionParser.rbrace == context.SymbolId))) {
-                    context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbrace");
                 }
                 children.Add(new ParseNode(ExpressionParser.rbrace, "rbrace", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -4819,13 +4814,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.rbrace == context.SymbolId))) {
-                    context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbrace");
                 }
                 children[0] = new ParseNode(ExpressionParser.rbrace, "rbrace", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.ArrayInitializerPart, "ArrayInitializerPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting ArrayInitializerList or rbrace at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting ArrayInitializerList or rbrace", line__, column__, position__);
         }
         internal static ParseNode ParseFieldRef(ParserContext context) {
             int line__ = context.Line;
@@ -4839,7 +4834,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseFieldRefPart(context).Children);
                 return new ParseNode(ExpressionParser.FieldRef, "FieldRef", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Identifier at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Identifier", line__, column__, position__);
         }
         internal static ParseNode ParseFieldRefPart(ParserContext context) {
             int line__ = context.Line;
@@ -4853,7 +4848,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList(context).Children);
                 return new ParseNode(ExpressionParser.FieldRefPart, "FieldRefPart", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRefList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRefList", line__, column__, position__);
         }
         internal static ParseNode ParsePrimaryExpressionPart(ParserContext context) {
             int line__ = context.Line;
@@ -4900,7 +4895,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.PrimaryExpressionPart, "PrimaryExpressionPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRefList9 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRefList9", line__, column__, position__);
         }
         internal static ParseNode ParsePrimaryExpressionPart2(ParserContext context) {
             int line__ = context.Line;
@@ -4947,7 +4942,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.PrimaryExpressionPart2, "PrimaryExpressionPart2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRefList10 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRefList10", line__, column__, position__);
         }
         internal static ParseNode ParsePrimaryExpressionPart3(ParserContext context) {
             int line__ = context.Line;
@@ -4994,7 +4989,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.PrimaryExpressionPart3, "PrimaryExpressionPart3", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRefList11 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRefList11", line__, column__, position__);
         }
         internal static ParseNode ParsePrimaryExpressionPart4(ParserContext context) {
             int line__ = context.Line;
@@ -5041,7 +5036,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.PrimaryExpressionPart4, "PrimaryExpressionPart4", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRefList2 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRefList2", line__, column__, position__);
         }
         internal static ParseNode ParsePrimaryExpressionPart5(ParserContext context) {
             int line__ = context.Line;
@@ -5088,7 +5083,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.PrimaryExpressionPart5, "PrimaryExpressionPart5", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRefList3 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRefList3", line__, column__, position__);
         }
         internal static ParseNode ParsePrimaryExpressionPart6(ParserContext context) {
             int line__ = context.Line;
@@ -5135,7 +5130,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.PrimaryExpressionPart6, "PrimaryExpressionPart6", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRefList4 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRefList4", line__, column__, position__);
         }
         internal static ParseNode ParsePrimaryExpressionPart7(ParserContext context) {
             int line__ = context.Line;
@@ -5182,7 +5177,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.PrimaryExpressionPart7, "PrimaryExpressionPart7", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRefList5 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRefList5", line__, column__, position__);
         }
         internal static ParseNode ParsePrimaryExpressionPart8(ParserContext context) {
             int line__ = context.Line;
@@ -5229,7 +5224,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.PrimaryExpressionPart8, "PrimaryExpressionPart8", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRefList6 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRefList6", line__, column__, position__);
         }
         internal static ParseNode ParsePrimaryExpressionPart9(ParserContext context) {
             int line__ = context.Line;
@@ -5276,7 +5271,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.PrimaryExpressionPart9, "PrimaryExpressionPart9", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRefList7 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRefList7", line__, column__, position__);
         }
         internal static ParseNode ParsePrimaryExpressionPart10(ParserContext context) {
             int line__ = context.Line;
@@ -5323,7 +5318,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.PrimaryExpressionPart10, "PrimaryExpressionPart10", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRefList8 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRefList8", line__, column__, position__);
         }
         internal static ParseNode ParsePrimaryExpressionPart11(ParserContext context) {
             int line__ = context.Line;
@@ -5370,7 +5365,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.PrimaryExpressionPart11, "PrimaryExpressionPart11", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRefList12 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRefList12", line__, column__, position__);
         }
         internal static ParseNode ParsePrimaryExpressionPart12(ParserContext context) {
             int line__ = context.Line;
@@ -5417,7 +5412,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.PrimaryExpressionPart12, "PrimaryExpressionPart12", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRefList13 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRefList13", line__, column__, position__);
         }
         internal static ParseNode ParsePrimaryExpressionPart13(ParserContext context) {
             int line__ = context.Line;
@@ -5464,7 +5459,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.PrimaryExpressionPart13, "PrimaryExpressionPart13", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRefList14 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRefList14", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionListPart(ParserContext context) {
             int line__ = context.Line;
@@ -5475,7 +5470,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.lte == context.SymbolId))) {
-                    context.Error("Expecting lte at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lte");
                 }
                 children[0] = new ParseNode(ExpressionParser.lte, "lte", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -5487,14 +5482,14 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.gte == context.SymbolId))) {
-                    context.Error("Expecting gte at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gte");
                 }
                 children[0] = new ParseNode(ExpressionParser.gte, "gte", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[1] = ExpressionParser.ParseTermExpression(context);
                 return new ParseNode(ExpressionParser.RelationalExpressionListPart, "RelationalExpressionListPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lte or gte at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lte or gte", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListPart(ParserContext context) {
             int line__ = context.Line;
@@ -5505,7 +5500,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.addAssign == context.SymbolId))) {
-                    context.Error("Expecting addAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting addAssign");
                 }
                 children[0] = new ParseNode(ExpressionParser.addAssign, "addAssign", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -5517,7 +5512,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.mulAssign == context.SymbolId))) {
-                    context.Error("Expecting mulAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mulAssign");
                 }
                 children[0] = new ParseNode(ExpressionParser.mulAssign, "mulAssign", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -5529,7 +5524,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.modAssign == context.SymbolId))) {
-                    context.Error("Expecting modAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting modAssign");
                 }
                 children[0] = new ParseNode(ExpressionParser.modAssign, "modAssign", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -5541,15 +5536,14 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.bitwiseOrAssign == context.SymbolId))) {
-                    context.Error("Expecting bitwiseOrAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseOrAssign");
                 }
                 children[0] = new ParseNode(ExpressionParser.bitwiseOrAssign, "bitwiseOrAssign", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[1] = ExpressionParser.ParseOrExpression(context);
                 return new ParseNode(ExpressionParser.AssignExpressionListPart, "AssignExpressionListPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting addAssign, mulAssign, modAssign, or bitwiseOrAssign at line {0}, column" +
-                        " {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting addAssign, mulAssign, modAssign, or bitwiseOrAssign", line__, column__, position__);
         }
         internal static ParseNode ParseEqualityExpressionListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -5560,7 +5554,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.notEq == context.SymbolId))) {
-                    context.Error("Expecting notEq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting notEq");
                 }
                 children.Add(new ParseNode(ExpressionParser.notEq, "notEq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -5590,7 +5584,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.EqualityExpressionListRightAssoc2, "EqualityExpressionListRightAssoc2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting notEq at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting notEq", line__, column__, position__);
         }
         internal static ParseNode ParseTermExpressionListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -5601,7 +5595,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.sub == context.SymbolId))) {
-                    context.Error("Expecting sub at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting sub");
                 }
                 children.Add(new ParseNode(ExpressionParser.sub, "sub", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -5637,7 +5631,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TermExpressionListRightAssoc2, "TermExpressionListRightAssoc2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting sub at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting sub", line__, column__, position__);
         }
         internal static ParseNode ParseFactorExpressionListRightAssoc3(ParserContext context) {
             int line__ = context.Line;
@@ -5648,7 +5642,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.div == context.SymbolId))) {
-                    context.Error("Expecting div at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting div");
                 }
                 children.Add(new ParseNode(ExpressionParser.div, "div", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -5686,7 +5680,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.FactorExpressionListRightAssoc3, "FactorExpressionListRightAssoc3", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting div at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting div", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionListRightAssoc3(ParserContext context) {
             int line__ = context.Line;
@@ -5724,7 +5718,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.RelationalExpressionListRightAssoc3, "RelationalExpressionListRightAssoc3", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting RelationalExpressionListPart at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting RelationalExpressionListPart", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListRightAssoc5(ParserContext context) {
             int line__ = context.Line;
@@ -5750,7 +5744,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AssignExpressionListRightAssoc5, "AssignExpressionListRightAssoc5", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting AssignExpressionListPart at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting AssignExpressionListPart", line__, column__, position__);
         }
         internal static ParseNode ParseMemberInvokeRef(ParserContext context) {
             int line__ = context.Line;
@@ -5761,14 +5755,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lparen == context.SymbolId))) {
-                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lparen");
                 }
                 children.Add(new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberInvokeRefPart2(context).Children);
                 return new ParseNode(ExpressionParser.MemberInvokeRef, "MemberInvokeRef", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lparen at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lparen", line__, column__, position__);
         }
         internal static ParseNode ParseMemberInvokeRefPart2(ParserContext context) {
             int line__ = context.Line;
@@ -5779,7 +5773,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[0] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -5829,7 +5823,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberInvokeRefPart(context).Children);
                 return new ParseNode(ExpressionParser.MemberInvokeRefPart2, "MemberInvokeRefPart2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting rparen or MethodArg at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting rparen or MethodArg", line__, column__, position__);
         }
         internal static ParseNode ParseTypeGenericPart(ParserContext context) {
             int line__ = context.Line;
@@ -5840,14 +5834,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lt == context.SymbolId))) {
-                    context.Error("Expecting lt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lt");
                 }
                 children.Add(new ParseNode(ExpressionParser.lt, "lt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeGenericPartPart2(context).Children);
                 return new ParseNode(ExpressionParser.TypeGenericPart, "TypeGenericPart", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lt at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lt", line__, column__, position__);
         }
         internal static ParseNode ParseTypeGenericPartPart2(ParserContext context) {
             int line__ = context.Line;
@@ -5858,7 +5852,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.gt == context.SymbolId))) {
-                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gt");
                 }
                 children[0] = new ParseNode(ExpressionParser.gt, "gt", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -5886,7 +5880,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTypeGenericPartPart(context).Children);
                 return new ParseNode(ExpressionParser.TypeGenericPartPart2, "TypeGenericPartPart2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting gt or Type at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting gt or Type", line__, column__, position__);
         }
         internal static ParseNode ParseNewObjectPart(ParserContext context) {
             int line__ = context.Line;
@@ -5897,14 +5891,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lparen == context.SymbolId))) {
-                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lparen");
                 }
                 children.Add(new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseNewObjectPartPart2(context).Children);
                 return new ParseNode(ExpressionParser.NewObjectPart, "NewObjectPart", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lparen at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lparen", line__, column__, position__);
         }
         internal static ParseNode ParseNewObjectPartPart2(ParserContext context) {
             int line__ = context.Line;
@@ -5915,7 +5909,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[0] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -5963,7 +5957,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseNewObjectPartPart(context).Children);
                 return new ParseNode(ExpressionParser.NewObjectPartPart2, "NewObjectPartPart2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting rparen or Expression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting rparen or Expression", line__, column__, position__);
         }
         internal static ParseNode ParseArrayInitializer(ParserContext context) {
             int line__ = context.Line;
@@ -5974,20 +5968,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.eq == context.SymbolId))) {
-                    context.Error("Expecting eq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eq");
                 }
                 children.Add(new ParseNode(ExpressionParser.eq, "eq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.lbrace == context.SymbolId))) {
-                    context.Error("Expecting lbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lbrace");
                 }
                 children.Add(new ParseNode(ExpressionParser.lbrace, "lbrace", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseArrayInitializerPart2(context).Children);
                 return new ParseNode(ExpressionParser.ArrayInitializer, "ArrayInitializer", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting eq at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting eq", line__, column__, position__);
         }
         internal static ParseNode ParseArrayInitializerPart2(ParserContext context) {
             int line__ = context.Line;
@@ -5998,7 +5992,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.rbrace == context.SymbolId))) {
-                    context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbrace");
                 }
                 children[0] = new ParseNode(ExpressionParser.rbrace, "rbrace", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -6046,7 +6040,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseArrayInitializerPart(context).Children);
                 return new ParseNode(ExpressionParser.ArrayInitializerPart2, "ArrayInitializerPart2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting rbrace or Expression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting rbrace or Expression", line__, column__, position__);
         }
     }
     /// <summary>Parses the indicated grammar. Refer to C:\dev\BuildPack\Parsley\SlangStatement.xbnf</summary>
@@ -6272,13 +6266,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (StatementParser.semi == context.SymbolId))) {
-                    context.Error("Expecting semi at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting semi");
                 }
                 children[0] = new ParseNode(StatementParser.semi, "semi", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(StatementParser.EmptyStatement, "EmptyStatement", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting semi at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting semi", line__, column__, position__);
         }
         internal static ParseNode ParseExpressionStatement(ParserContext context) {
             int line__ = context.Line;
@@ -6326,13 +6320,13 @@ namespace CD {
                 children[0] = ExpressionParser.ParseExpression(context);
                 if ((false 
                             == (StatementParser.semi == context.SymbolId))) {
-                    context.Error("Expecting semi at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting semi");
                 }
                 children[1] = new ParseNode(StatementParser.semi, "semi", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(StatementParser.ExpressionStatement, "ExpressionStatement", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Expression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Expression", line__, column__, position__);
         }
         internal static bool WhereExpressionStatement(ParserContext context) {
             return _WhereExpressionStatement(context);
@@ -6549,8 +6543,7 @@ namespace CD {
                 children[0] = StatementParser.ParseExpressionStatement(context);
                 return new ParseNode(StatementParser.VariableDeclarationOrLabelOrExpressionStatement, "VariableDeclarationOrLabelOrExpressionStatement", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting VariableDeclarationStatement, ExpressionStatement, or LabelStatement at" +
-                        " line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting VariableDeclarationStatement, ExpressionStatement, or LabelStatement", line__, column__, position__);
         }
         internal static bool WhereVariableDeclarationOrLabelOrExpressionStatement(ParserContext context) {
             return true;
@@ -6564,14 +6557,14 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (StatementParser.elseKeyword == context.SymbolId))) {
-                    context.Error("Expecting elseKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting elseKeyword");
                 }
                 children[0] = new ParseNode(StatementParser.elseKeyword, "elseKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[1] = StatementParser.ParseStatementOrBlock(context);
                 return new ParseNode(StatementParser.ElsePart, "ElsePart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting elseKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting elseKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseIfStatementPart(ParserContext context) {
             int line__ = context.Line;
@@ -6582,27 +6575,27 @@ namespace CD {
                 ParseNode[] children = new ParseNode[5];
                 if ((false 
                             == (StatementParser.ifKeyword == context.SymbolId))) {
-                    context.Error("Expecting ifKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting ifKeyword");
                 }
                 children[0] = new ParseNode(StatementParser.ifKeyword, "ifKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.lparen == context.SymbolId))) {
-                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lparen");
                 }
                 children[1] = new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[2] = ExpressionParser.ParseExpression(context);
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[3] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[4] = StatementParser.ParseStatementOrBlock(context);
                 return new ParseNode(StatementParser.IfStatementPart, "IfStatementPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting ifKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting ifKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseGotoStatement(ParserContext context) {
             int line__ = context.Line;
@@ -6613,25 +6606,25 @@ namespace CD {
                 ParseNode[] children = new ParseNode[3];
                 if ((false 
                             == (StatementParser.gotoKeyword == context.SymbolId))) {
-                    context.Error("Expecting gotoKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gotoKeyword");
                 }
                 children[0] = new ParseNode(StatementParser.gotoKeyword, "gotoKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.identifier2 == context.SymbolId))) {
-                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting identifier");
                 }
                 children[1] = new ParseNode(ExpressionParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (StatementParser.semi == context.SymbolId))) {
-                    context.Error("Expecting semi at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting semi");
                 }
                 children[2] = new ParseNode(StatementParser.semi, "semi", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(StatementParser.GotoStatement, "GotoStatement", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting gotoKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting gotoKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseLocalAssignStatement(ParserContext context) {
             int line__ = context.Line;
@@ -6772,8 +6765,7 @@ namespace CD {
                 children[0] = StatementParser.ParseVariableDeclarationStatement(context);
                 return new ParseNode(StatementParser.LocalAssignStatement, "LocalAssignStatement", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting ExpressionStatement or VariableDeclarationStatement at line {0}, column" +
-                        " {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting ExpressionStatement or VariableDeclarationStatement", line__, column__, position__);
         }
         internal static bool WhereLocalAssignStatement(ParserContext context) {
             return true;
@@ -6823,7 +6815,7 @@ namespace CD {
                 children[0] = ExpressionParser.ParseExpression(context);
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[1] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -6834,13 +6826,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[0] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(StatementParser.ForIncPart, "ForIncPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Expression or rparen at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Expression or rparen", line__, column__, position__);
         }
         internal static ParseNode ParseWhileStatement(ParserContext context) {
             int line__ = context.Line;
@@ -6851,27 +6843,27 @@ namespace CD {
                 ParseNode[] children = new ParseNode[5];
                 if ((false 
                             == (StatementParser.whileKeyword == context.SymbolId))) {
-                    context.Error("Expecting whileKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting whileKeyword");
                 }
                 children[0] = new ParseNode(StatementParser.whileKeyword, "whileKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.lparen == context.SymbolId))) {
-                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lparen");
                 }
                 children[1] = new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[2] = ExpressionParser.ParseExpression(context);
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[3] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[4] = StatementParser.ParseStatementOrBlock(context);
                 return new ParseNode(StatementParser.WhileStatement, "WhileStatement", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting whileKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting whileKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseReturnStatement(ParserContext context) {
             int line__ = context.Line;
@@ -6882,20 +6874,20 @@ namespace CD {
                 ParseNode[] children = new ParseNode[3];
                 if ((false 
                             == (StatementParser.returnKeyword == context.SymbolId))) {
-                    context.Error("Expecting returnKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting returnKeyword");
                 }
                 children[0] = new ParseNode(StatementParser.returnKeyword, "returnKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[1] = ExpressionParser.ParseExpression(context);
                 if ((false 
                             == (StatementParser.semi == context.SymbolId))) {
-                    context.Error("Expecting semi at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting semi");
                 }
                 children[2] = new ParseNode(StatementParser.semi, "semi", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(StatementParser.ReturnStatement, "ReturnStatement", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting returnKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting returnKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseFinallyPart(ParserContext context) {
             int line__ = context.Line;
@@ -6906,14 +6898,14 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (StatementParser.finallyKeyword == context.SymbolId))) {
-                    context.Error("Expecting finallyKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting finallyKeyword");
                 }
                 children[0] = new ParseNode(StatementParser.finallyKeyword, "finallyKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[1] = StatementParser.ParseStatementBlock(context);
                 return new ParseNode(StatementParser.FinallyPart, "FinallyPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting finallyKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting finallyKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseLabelStatement(ParserContext context) {
             int line__ = context.Line;
@@ -6925,19 +6917,19 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.identifier2 == context.SymbolId))) {
-                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting identifier");
                 }
                 children[0] = new ParseNode(ExpressionParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (StatementParser.colon == context.SymbolId))) {
-                    context.Error("Expecting colon at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting colon");
                 }
                 children[1] = new ParseNode(StatementParser.colon, "colon", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(StatementParser.LabelStatement, "LabelStatement", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting identifier at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting identifier", line__, column__, position__);
         }
         internal static bool WhereLabelStatement(ParserContext context) {
             context.Advance();
@@ -7002,7 +6994,7 @@ namespace CD {
                 children[0] = StatementParser.ParseStatementBlock(context);
                 return new ParseNode(StatementParser.StatementOrBlock, "StatementOrBlock", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Statement or StatementBlock at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Statement or StatementBlock", line__, column__, position__);
         }
         internal static ParseNode ParseStatement(ParserContext context) {
             int line__ = context.Line;
@@ -7092,9 +7084,9 @@ namespace CD {
                 children[0] = StatementParser.ParseTryStatement(context);
                 return new ParseNode(StatementParser.Statement, "Statement", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting EmptyStatement, VariableDeclarationOrLabelOrExpressionStatement, IfStat" +
-                        "ement, GotoStatement, ForStatement, WhileStatement, ReturnStatement, or TryState" +
-                        "ment at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting EmptyStatement, VariableDeclarationOrLabelOrExpressionStatement, IfStat" +
+                    "ement, GotoStatement, ForStatement, WhileStatement, ReturnStatement, or TryState" +
+                    "ment", line__, column__, position__);
         }
         /// <summary>
         /// Parses a production of the form:
@@ -7204,7 +7196,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(StatementParser.Statements, "Statements", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting StatementList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting StatementList", line__, column__, position__);
         }
         /// <summary>
         /// Parses a production of the form:
@@ -7234,7 +7226,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.dot == context.SymbolId))) {
-                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dot");
                 }
                 children.Add(new ParseNode(ExpressionParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7242,7 +7234,7 @@ namespace CD {
                 children.AddRange(StatementParser.ParseNamespaceNameListRightAssoc(context).Children);
                 return new ParseNode(StatementParser.NamespaceNameList, "NamespaceNameList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting dot at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting dot", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -7253,13 +7245,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lt == context.SymbolId))) {
-                    context.Error("Expecting lt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lt");
                 }
                 children.Add(new ParseNode(ExpressionParser.lt, "lt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7273,13 +7265,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lte == context.SymbolId))) {
-                    context.Error("Expecting lte at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lte");
                 }
                 children.Add(new ParseNode(ExpressionParser.lte, "lte", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7293,13 +7285,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.gt == context.SymbolId))) {
-                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gt");
                 }
                 children.Add(new ParseNode(ExpressionParser.gt, "gt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7313,13 +7305,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.gte == context.SymbolId))) {
-                    context.Error("Expecting gte at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gte");
                 }
                 children.Add(new ParseNode(ExpressionParser.gte, "gte", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7328,7 +7320,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseRelationalExpressionListRightAssoc3(context).Children);
                 return new ParseNode(ExpressionParser.RelationalExpressionList, "RelationalExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lt, lte, gt, or gte at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lt, lte, gt, or gte", line__, column__, position__);
         }
         internal static ParseNode ParseEqualityExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -7339,13 +7331,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.eqEq == context.SymbolId))) {
-                    context.Error("Expecting eqEq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eqEq");
                 }
                 children.Add(new ParseNode(ExpressionParser.eqEq, "eqEq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.RelationalExpression == context.SymbolId))) {
-                    context.Error("Expecting RelationalExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting RelationalExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.RelationalExpression, "RelationalExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7358,13 +7350,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.notEq == context.SymbolId))) {
-                    context.Error("Expecting notEq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting notEq");
                 }
                 children.Add(new ParseNode(ExpressionParser.notEq, "notEq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.RelationalExpression == context.SymbolId))) {
-                    context.Error("Expecting RelationalExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting RelationalExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.RelationalExpression, "RelationalExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7372,7 +7364,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseEqualityExpressionListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.EqualityExpressionList, "EqualityExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting eqEq or notEq at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting eqEq or notEq", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseAndExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -7383,20 +7375,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseAnd == context.SymbolId))) {
-                    context.Error("Expecting bitwiseAnd at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseAnd");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseAnd, "bitwiseAnd", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.EqualityExpression == context.SymbolId))) {
-                    context.Error("Expecting EqualityExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting EqualityExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.EqualityExpression, "EqualityExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseBitwiseAndExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.BitwiseAndExpressionList, "BitwiseAndExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting bitwiseAnd at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting bitwiseAnd", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseOrExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -7407,20 +7399,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseOr == context.SymbolId))) {
-                    context.Error("Expecting bitwiseOr at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseOr");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseOr, "bitwiseOr", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.BitwiseAndExpression == context.SymbolId))) {
-                    context.Error("Expecting BitwiseAndExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting BitwiseAndExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.BitwiseAndExpression, "BitwiseAndExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseBitwiseOrExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.BitwiseOrExpressionList, "BitwiseOrExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting bitwiseOr at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting bitwiseOr", line__, column__, position__);
         }
         internal static ParseNode ParseAndExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -7431,20 +7423,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.and == context.SymbolId))) {
-                    context.Error("Expecting and at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting and");
                 }
                 children.Add(new ParseNode(ExpressionParser.and, "and", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.BitwiseOrExpression == context.SymbolId))) {
-                    context.Error("Expecting BitwiseOrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting BitwiseOrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.BitwiseOrExpression, "BitwiseOrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseAndExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.AndExpressionList, "AndExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting and at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting and", line__, column__, position__);
         }
         internal static ParseNode ParseOrExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -7455,20 +7447,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.or == context.SymbolId))) {
-                    context.Error("Expecting or at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting or");
                 }
                 children.Add(new ParseNode(ExpressionParser.or, "or", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.AndExpression == context.SymbolId))) {
-                    context.Error("Expecting AndExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting AndExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.AndExpression, "AndExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseOrExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.OrExpressionList, "OrExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting or at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting or", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -7479,13 +7471,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.eq == context.SymbolId))) {
-                    context.Error("Expecting eq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eq");
                 }
                 children.Add(new ParseNode(ExpressionParser.eq, "eq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7501,13 +7493,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.addAssign == context.SymbolId))) {
-                    context.Error("Expecting addAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting addAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.addAssign, "addAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7523,13 +7515,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.subAssign == context.SymbolId))) {
-                    context.Error("Expecting subAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting subAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.subAssign, "subAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7545,13 +7537,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.mulAssign == context.SymbolId))) {
-                    context.Error("Expecting mulAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mulAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.mulAssign, "mulAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7567,13 +7559,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.divAssign == context.SymbolId))) {
-                    context.Error("Expecting divAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting divAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.divAssign, "divAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7589,13 +7581,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.modAssign == context.SymbolId))) {
-                    context.Error("Expecting modAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting modAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.modAssign, "modAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7611,13 +7603,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseAndAssign == context.SymbolId))) {
-                    context.Error("Expecting bitwiseAndAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseAndAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseAndAssign, "bitwiseAndAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7633,13 +7625,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseOrAssign == context.SymbolId))) {
-                    context.Error("Expecting bitwiseOrAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseOrAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseOrAssign, "bitwiseOrAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7650,8 +7642,8 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseAssignExpressionListRightAssoc5(context).Children);
                 return new ParseNode(ExpressionParser.AssignExpressionList, "AssignExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting eq, addAssign, subAssign, mulAssign, divAssign, modAssign, bitwiseAndAs" +
-                        "sign, or bitwiseOrAssign at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting eq, addAssign, subAssign, mulAssign, divAssign, modAssign, bitwiseAndAs" +
+                    "sign, or bitwiseOrAssign", line__, column__, position__);
         }
         internal static ParseNode ParseTermExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -7662,13 +7654,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.add == context.SymbolId))) {
-                    context.Error("Expecting add at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting add");
                 }
                 children.Add(new ParseNode(ExpressionParser.add, "add", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.FactorExpression == context.SymbolId))) {
-                    context.Error("Expecting FactorExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting FactorExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.FactorExpression, "FactorExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7681,13 +7673,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.sub == context.SymbolId))) {
-                    context.Error("Expecting sub at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting sub");
                 }
                 children.Add(new ParseNode(ExpressionParser.sub, "sub", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.FactorExpression == context.SymbolId))) {
-                    context.Error("Expecting FactorExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting FactorExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.FactorExpression, "FactorExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7695,7 +7687,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTermExpressionListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.TermExpressionList, "TermExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting add or sub at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting add or sub", line__, column__, position__);
         }
         internal static ParseNode ParseFactorExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -7706,13 +7698,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.mul == context.SymbolId))) {
-                    context.Error("Expecting mul at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mul");
                 }
                 children.Add(new ParseNode(ExpressionParser.mul, "mul", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.UnaryExpression == context.SymbolId))) {
-                    context.Error("Expecting UnaryExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting UnaryExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.UnaryExpression, "UnaryExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7726,13 +7718,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.div == context.SymbolId))) {
-                    context.Error("Expecting div at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting div");
                 }
                 children.Add(new ParseNode(ExpressionParser.div, "div", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.UnaryExpression == context.SymbolId))) {
-                    context.Error("Expecting UnaryExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting UnaryExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.UnaryExpression, "UnaryExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7746,13 +7738,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.mod == context.SymbolId))) {
-                    context.Error("Expecting mod at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mod");
                 }
                 children.Add(new ParseNode(ExpressionParser.mod, "mod", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.UnaryExpression == context.SymbolId))) {
-                    context.Error("Expecting UnaryExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting UnaryExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.UnaryExpression, "UnaryExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7761,7 +7753,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseFactorExpressionListRightAssoc3(context).Children);
                 return new ParseNode(ExpressionParser.FactorExpressionList, "FactorExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting mul, div, or mod at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting mul, div, or mod", line__, column__, position__);
         }
         internal static ParseNode ParseMemberInvokeRefList(ParserContext context) {
             int line__ = context.Line;
@@ -7772,20 +7764,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.MethodArg == context.SymbolId))) {
-                    context.Error("Expecting MethodArg at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MethodArg");
                 }
                 children.Add(new ParseNode(ExpressionParser.MethodArg, "MethodArg", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberInvokeRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberInvokeRefList, "MemberInvokeRefList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseMemberIndexerRefList(ParserContext context) {
             int line__ = context.Line;
@@ -7796,7 +7788,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7804,7 +7796,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberIndexerRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberIndexerRefList, "MemberIndexerRefList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeBaseList(ParserContext context) {
             int line__ = context.Line;
@@ -7815,20 +7807,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.dot == context.SymbolId))) {
-                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dot");
                 }
                 children.Add(new ParseNode(ExpressionParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.identifier2 == context.SymbolId))) {
-                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting identifier");
                 }
                 children.Add(new ParseNode(ExpressionParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeBaseListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeBaseList, "TypeBaseList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting dot at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting dot", line__, column__, position__);
         }
         internal static ParseNode ParseTypeArraySpecList(ParserContext context) {
             int line__ = context.Line;
@@ -7839,14 +7831,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.TypeArraySpec == context.SymbolId))) {
-                    context.Error("Expecting TypeArraySpec at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TypeArraySpec");
                 }
                 children.Add(new ParseNode(ExpressionParser.TypeArraySpec, "TypeArraySpec", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeArraySpecListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeArraySpecList, "TypeArraySpecList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeArraySpec at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeArraySpec", line__, column__, position__);
         }
         internal static ParseNode ParseTypeGenericPartList(ParserContext context) {
             int line__ = context.Line;
@@ -7857,7 +7849,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7865,7 +7857,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTypeGenericPartListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeGenericPartList, "TypeGenericPartList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeArraySpecRankList(ParserContext context) {
             int line__ = context.Line;
@@ -7876,14 +7868,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.TypeArraySpecRank == context.SymbolId))) {
-                    context.Error("Expecting TypeArraySpecRank at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TypeArraySpecRank");
                 }
                 children.Add(new ParseNode(ExpressionParser.TypeArraySpecRank, "TypeArraySpecRank", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeArraySpecRankListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeArraySpecRankList, "TypeArraySpecRankList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeArraySpecRank at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeArraySpecRank", line__, column__, position__);
         }
         internal static ParseNode ParseNewObjectPartList(ParserContext context) {
             int line__ = context.Line;
@@ -7894,7 +7886,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7902,7 +7894,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseNewObjectPartListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.NewObjectPartList, "NewObjectPartList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseArraySpecExpressionListList(ParserContext context) {
             int line__ = context.Line;
@@ -7913,7 +7905,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7921,7 +7913,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseArraySpecExpressionListListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.ArraySpecExpressionListList, "ArraySpecExpressionListList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseArrayInitializerList(ParserContext context) {
             int line__ = context.Line;
@@ -7932,7 +7924,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -7940,7 +7932,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseArrayInitializerListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.ArrayInitializerList, "ArrayInitializerList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList(ParserContext context) {
             int line__ = context.Line;
@@ -7951,13 +7943,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList, "MemberAnyRefList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList2(ParserContext context) {
             int line__ = context.Line;
@@ -7968,13 +7960,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList2RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList2, "MemberAnyRefList2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList3(ParserContext context) {
             int line__ = context.Line;
@@ -7985,13 +7977,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList3RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList3, "MemberAnyRefList3", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList4(ParserContext context) {
             int line__ = context.Line;
@@ -8002,13 +7994,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList4RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList4, "MemberAnyRefList4", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList5(ParserContext context) {
             int line__ = context.Line;
@@ -8019,13 +8011,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList5RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList5, "MemberAnyRefList5", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList6(ParserContext context) {
             int line__ = context.Line;
@@ -8036,13 +8028,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList6RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList6, "MemberAnyRefList6", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList7(ParserContext context) {
             int line__ = context.Line;
@@ -8053,13 +8045,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList7RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList7, "MemberAnyRefList7", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList8(ParserContext context) {
             int line__ = context.Line;
@@ -8070,13 +8062,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList8RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList8, "MemberAnyRefList8", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList9(ParserContext context) {
             int line__ = context.Line;
@@ -8087,13 +8079,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList9RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList9, "MemberAnyRefList9", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList10(ParserContext context) {
             int line__ = context.Line;
@@ -8104,13 +8096,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList10RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList10, "MemberAnyRefList10", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList11(ParserContext context) {
             int line__ = context.Line;
@@ -8121,13 +8113,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList11RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList11, "MemberAnyRefList11", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList12(ParserContext context) {
             int line__ = context.Line;
@@ -8138,13 +8130,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList12RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList12, "MemberAnyRefList12", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList13(ParserContext context) {
             int line__ = context.Line;
@@ -8155,13 +8147,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList13RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList13, "MemberAnyRefList13", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList14(ParserContext context) {
             int line__ = context.Line;
@@ -8172,13 +8164,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList14RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList14, "MemberAnyRefList14", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseCatchClauseList(ParserContext context) {
             int line__ = context.Line;
@@ -8191,7 +8183,7 @@ namespace CD {
                 children.AddRange(StatementParser.ParseCatchClauseListRightAssoc(context).Children);
                 return new ParseNode(StatementParser.CatchClauseList, "CatchClauseList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting CatchClause at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting CatchClause", line__, column__, position__);
         }
         internal static ParseNode ParseStatementList(ParserContext context) {
             int line__ = context.Line;
@@ -8247,7 +8239,7 @@ namespace CD {
                 children.AddRange(StatementParser.ParseStatementListRightAssoc(context).Children);
                 return new ParseNode(StatementParser.StatementList, "StatementList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Statement", line__, column__, position__);
         }
         internal static ParseNode ParseStatementList2(ParserContext context) {
             int line__ = context.Line;
@@ -8303,7 +8295,7 @@ namespace CD {
                 children.AddRange(StatementParser.ParseStatementList2RightAssoc(context).Children);
                 return new ParseNode(StatementParser.StatementList2, "StatementList2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Statement", line__, column__, position__);
         }
         internal static ParseNode ParseIfStatement(ParserContext context) {
             // IfStatement
@@ -8325,7 +8317,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.dot == context.SymbolId))) {
-                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dot");
                 }
                 children.Add(new ParseNode(ExpressionParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8333,7 +8325,7 @@ namespace CD {
                 children.AddRange(StatementParser.ParseNamespaceNameListRightAssoc(context).Children);
                 return new ParseNode(StatementParser.NamespaceNameListRightAssoc, "NamespaceNameListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting dot at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting dot", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8344,13 +8336,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lt == context.SymbolId))) {
-                    context.Error("Expecting lt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lt");
                 }
                 children.Add(new ParseNode(ExpressionParser.lt, "lt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8364,7 +8356,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.RelationalExpressionListRightAssoc, "RelationalExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lt at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lt", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -8375,13 +8367,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.gt == context.SymbolId))) {
-                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gt");
                 }
                 children.Add(new ParseNode(ExpressionParser.gt, "gt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8394,7 +8386,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.RelationalExpressionListRightAssoc2, "RelationalExpressionListRightAssoc2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting gt at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting gt", line__, column__, position__);
         }
         internal static ParseNode ParseEqualityExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8405,13 +8397,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.eqEq == context.SymbolId))) {
-                    context.Error("Expecting eqEq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eqEq");
                 }
                 children.Add(new ParseNode(ExpressionParser.eqEq, "eqEq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.RelationalExpression == context.SymbolId))) {
-                    context.Error("Expecting RelationalExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting RelationalExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.RelationalExpression, "RelationalExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8423,7 +8415,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.EqualityExpressionListRightAssoc, "EqualityExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting eqEq at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting eqEq", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseAndExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8434,20 +8426,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseAnd == context.SymbolId))) {
-                    context.Error("Expecting bitwiseAnd at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseAnd");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseAnd, "bitwiseAnd", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.EqualityExpression == context.SymbolId))) {
-                    context.Error("Expecting EqualityExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting EqualityExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.EqualityExpression, "EqualityExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseBitwiseAndExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.BitwiseAndExpressionListRightAssoc, "BitwiseAndExpressionListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting bitwiseAnd at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting bitwiseAnd", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseOrExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8458,20 +8450,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseOr == context.SymbolId))) {
-                    context.Error("Expecting bitwiseOr at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseOr");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseOr, "bitwiseOr", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.BitwiseAndExpression == context.SymbolId))) {
-                    context.Error("Expecting BitwiseAndExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting BitwiseAndExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.BitwiseAndExpression, "BitwiseAndExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseBitwiseOrExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.BitwiseOrExpressionListRightAssoc, "BitwiseOrExpressionListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting bitwiseOr at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting bitwiseOr", line__, column__, position__);
         }
         internal static ParseNode ParseAndExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8482,20 +8474,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.and == context.SymbolId))) {
-                    context.Error("Expecting and at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting and");
                 }
                 children.Add(new ParseNode(ExpressionParser.and, "and", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.BitwiseOrExpression == context.SymbolId))) {
-                    context.Error("Expecting BitwiseOrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting BitwiseOrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.BitwiseOrExpression, "BitwiseOrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseAndExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.AndExpressionListRightAssoc, "AndExpressionListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting and at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting and", line__, column__, position__);
         }
         internal static ParseNode ParseOrExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8506,20 +8498,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.or == context.SymbolId))) {
-                    context.Error("Expecting or at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting or");
                 }
                 children.Add(new ParseNode(ExpressionParser.or, "or", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.AndExpression == context.SymbolId))) {
-                    context.Error("Expecting AndExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting AndExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.AndExpression, "AndExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseOrExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.OrExpressionListRightAssoc, "OrExpressionListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting or at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting or", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8530,13 +8522,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.eq == context.SymbolId))) {
-                    context.Error("Expecting eq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eq");
                 }
                 children.Add(new ParseNode(ExpressionParser.eq, "eq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8554,7 +8546,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AssignExpressionListRightAssoc, "AssignExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting eq at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting eq", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -8565,13 +8557,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.subAssign == context.SymbolId))) {
-                    context.Error("Expecting subAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting subAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.subAssign, "subAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8588,7 +8580,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AssignExpressionListRightAssoc2, "AssignExpressionListRightAssoc2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting subAssign at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting subAssign", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListRightAssoc3(ParserContext context) {
             int line__ = context.Line;
@@ -8599,13 +8591,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.divAssign == context.SymbolId))) {
-                    context.Error("Expecting divAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting divAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.divAssign, "divAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8621,7 +8613,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AssignExpressionListRightAssoc3, "AssignExpressionListRightAssoc3", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting divAssign at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting divAssign", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListRightAssoc4(ParserContext context) {
             int line__ = context.Line;
@@ -8632,13 +8624,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseAndAssign == context.SymbolId))) {
-                    context.Error("Expecting bitwiseAndAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseAndAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseAndAssign, "bitwiseAndAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8653,7 +8645,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AssignExpressionListRightAssoc4, "AssignExpressionListRightAssoc4", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting bitwiseAndAssign at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting bitwiseAndAssign", line__, column__, position__);
         }
         internal static ParseNode ParseTermExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8664,13 +8656,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.add == context.SymbolId))) {
-                    context.Error("Expecting add at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting add");
                 }
                 children.Add(new ParseNode(ExpressionParser.add, "add", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.FactorExpression == context.SymbolId))) {
-                    context.Error("Expecting FactorExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting FactorExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.FactorExpression, "FactorExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8682,7 +8674,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TermExpressionListRightAssoc, "TermExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting add at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting add", line__, column__, position__);
         }
         internal static ParseNode ParseFactorExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8693,13 +8685,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.mul == context.SymbolId))) {
-                    context.Error("Expecting mul at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mul");
                 }
                 children.Add(new ParseNode(ExpressionParser.mul, "mul", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.UnaryExpression == context.SymbolId))) {
-                    context.Error("Expecting UnaryExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting UnaryExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.UnaryExpression, "UnaryExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8712,7 +8704,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.FactorExpressionListRightAssoc, "FactorExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting mul at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting mul", line__, column__, position__);
         }
         internal static ParseNode ParseFactorExpressionListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -8723,13 +8715,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.mod == context.SymbolId))) {
-                    context.Error("Expecting mod at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mod");
                 }
                 children.Add(new ParseNode(ExpressionParser.mod, "mod", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.UnaryExpression == context.SymbolId))) {
-                    context.Error("Expecting UnaryExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting UnaryExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.UnaryExpression, "UnaryExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8741,7 +8733,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.FactorExpressionListRightAssoc2, "FactorExpressionListRightAssoc2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting mod at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting mod", line__, column__, position__);
         }
         internal static ParseNode ParseMemberInvokeRefListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8752,20 +8744,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.MethodArg == context.SymbolId))) {
-                    context.Error("Expecting MethodArg at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MethodArg");
                 }
                 children.Add(new ParseNode(ExpressionParser.MethodArg, "MethodArg", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberInvokeRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberInvokeRefListRightAssoc, "MemberInvokeRefListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseMemberIndexerRefListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8776,7 +8768,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8784,7 +8776,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberIndexerRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberIndexerRefListRightAssoc, "MemberIndexerRefListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeBaseListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8795,20 +8787,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.dot == context.SymbolId))) {
-                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dot");
                 }
                 children.Add(new ParseNode(ExpressionParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.identifier2 == context.SymbolId))) {
-                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting identifier");
                 }
                 children.Add(new ParseNode(ExpressionParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeBaseListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeBaseListRightAssoc, "TypeBaseListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting dot at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting dot", line__, column__, position__);
         }
         internal static ParseNode ParseTypeArraySpecListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8819,14 +8811,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.TypeArraySpec == context.SymbolId))) {
-                    context.Error("Expecting TypeArraySpec at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TypeArraySpec");
                 }
                 children.Add(new ParseNode(ExpressionParser.TypeArraySpec, "TypeArraySpec", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeArraySpecListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeArraySpecListRightAssoc, "TypeArraySpecListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeArraySpec at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeArraySpec", line__, column__, position__);
         }
         internal static ParseNode ParseTypeGenericPartListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8837,7 +8829,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8845,7 +8837,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTypeGenericPartListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeGenericPartListRightAssoc, "TypeGenericPartListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeArraySpecRankListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8856,14 +8848,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.TypeArraySpecRank == context.SymbolId))) {
-                    context.Error("Expecting TypeArraySpecRank at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TypeArraySpecRank");
                 }
                 children.Add(new ParseNode(ExpressionParser.TypeArraySpecRank, "TypeArraySpecRank", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeArraySpecRankListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeArraySpecRankListRightAssoc, "TypeArraySpecRankListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeArraySpecRank at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeArraySpecRank", line__, column__, position__);
         }
         internal static ParseNode ParseNewObjectPartListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8874,7 +8866,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8882,7 +8874,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseNewObjectPartListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.NewObjectPartListRightAssoc, "NewObjectPartListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseArraySpecExpressionListListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8893,7 +8885,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8901,7 +8893,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseArraySpecExpressionListListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.ArraySpecExpressionListListRightAssoc, "ArraySpecExpressionListListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseArrayInitializerListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8912,7 +8904,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -8920,7 +8912,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseArrayInitializerListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.ArrayInitializerListRightAssoc, "ArrayInitializerListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8931,13 +8923,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefListRightAssoc, "MemberAnyRefListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList2RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8948,13 +8940,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList2RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList2RightAssoc, "MemberAnyRefList2RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList3RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8965,13 +8957,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList3RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList3RightAssoc, "MemberAnyRefList3RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList4RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8982,13 +8974,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList4RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList4RightAssoc, "MemberAnyRefList4RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList5RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -8999,13 +8991,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList5RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList5RightAssoc, "MemberAnyRefList5RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList6RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -9016,13 +9008,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList6RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList6RightAssoc, "MemberAnyRefList6RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList7RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -9033,13 +9025,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList7RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList7RightAssoc, "MemberAnyRefList7RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList8RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -9050,13 +9042,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList8RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList8RightAssoc, "MemberAnyRefList8RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList9RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -9067,13 +9059,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList9RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList9RightAssoc, "MemberAnyRefList9RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList10RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -9084,13 +9076,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList10RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList10RightAssoc, "MemberAnyRefList10RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList11RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -9101,13 +9093,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList11RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList11RightAssoc, "MemberAnyRefList11RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList12RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -9118,13 +9110,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList12RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList12RightAssoc, "MemberAnyRefList12RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList13RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -9135,13 +9127,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList13RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList13RightAssoc, "MemberAnyRefList13RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList14RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -9152,13 +9144,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList14RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList14RightAssoc, "MemberAnyRefList14RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseCatchClauseListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -9222,7 +9214,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(StatementParser.CatchClauseListRightAssoc, "CatchClauseListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting CatchClause at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting CatchClause", line__, column__, position__);
         }
         internal static ParseNode ParseStatementListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -9283,7 +9275,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(StatementParser.StatementListRightAssoc, "StatementListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Statement", line__, column__, position__);
         }
         internal static ParseNode ParseStatementList2RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -9344,7 +9336,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(StatementParser.StatementList2RightAssoc, "StatementList2RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Statement", line__, column__, position__);
         }
         internal static ParseNode ParseVariableDeclarationStatement(ParserContext context) {
             int line__ = context.Line;
@@ -9355,7 +9347,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (StatementParser.varType == context.SymbolId))) {
-                    context.Error("Expecting varType at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting varType");
                 }
                 children.Add(new ParseNode(StatementParser.varType, "varType", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -9386,7 +9378,7 @@ namespace CD {
                 children.AddRange(StatementParser.ParseVariableDeclarationStatementPart2(context).Children);
                 return new ParseNode(StatementParser.VariableDeclarationStatement, "VariableDeclarationStatement", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting varType or Type at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting varType or Type", line__, column__, position__);
         }
         internal static ParseNode ParseVariableDeclarationStatementPart(ParserContext context) {
             int line__ = context.Line;
@@ -9397,14 +9389,14 @@ namespace CD {
                 ParseNode[] children = new ParseNode[3];
                 if ((false 
                             == (ExpressionParser.eq == context.SymbolId))) {
-                    context.Error("Expecting eq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eq");
                 }
                 children[0] = new ParseNode(ExpressionParser.eq, "eq", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[1] = ExpressionParser.ParseExpression(context);
                 if ((false 
                             == (StatementParser.semi == context.SymbolId))) {
-                    context.Error("Expecting semi at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting semi");
                 }
                 children[2] = new ParseNode(StatementParser.semi, "semi", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -9415,13 +9407,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (StatementParser.semi == context.SymbolId))) {
-                    context.Error("Expecting semi at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting semi");
                 }
                 children[0] = new ParseNode(StatementParser.semi, "semi", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(StatementParser.VariableDeclarationStatementPart, "VariableDeclarationStatementPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting eq or semi at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting eq or semi", line__, column__, position__);
         }
         internal static ParseNode ParseVariableDeclarationStatementPart2(ParserContext context) {
             int line__ = context.Line;
@@ -9432,14 +9424,14 @@ namespace CD {
                 ParseNode[] children = new ParseNode[3];
                 if ((false 
                             == (ExpressionParser.eq == context.SymbolId))) {
-                    context.Error("Expecting eq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eq");
                 }
                 children[0] = new ParseNode(ExpressionParser.eq, "eq", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[1] = ExpressionParser.ParseExpression(context);
                 if ((false 
                             == (StatementParser.semi == context.SymbolId))) {
-                    context.Error("Expecting semi at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting semi");
                 }
                 children[2] = new ParseNode(StatementParser.semi, "semi", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -9450,13 +9442,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (StatementParser.semi == context.SymbolId))) {
-                    context.Error("Expecting semi at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting semi");
                 }
                 children[0] = new ParseNode(StatementParser.semi, "semi", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(StatementParser.VariableDeclarationStatementPart2, "VariableDeclarationStatementPart2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting eq or semi at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting eq or semi", line__, column__, position__);
         }
         internal static ParseNode ParseThrowStatement(ParserContext context) {
             int line__ = context.Line;
@@ -9467,14 +9459,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (StatementParser.throwKeyword == context.SymbolId))) {
-                    context.Error("Expecting throwKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting throwKeyword");
                 }
                 children.Add(new ParseNode(StatementParser.throwKeyword, "throwKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(StatementParser.ParseThrowStatementPart(context).Children);
                 return new ParseNode(StatementParser.ThrowStatement, "ThrowStatement", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting throwKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting throwKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseThrowStatementPart(ParserContext context) {
             int line__ = context.Line;
@@ -9521,7 +9513,7 @@ namespace CD {
                 children[0] = ExpressionParser.ParseExpression(context);
                 if ((false 
                             == (StatementParser.semi == context.SymbolId))) {
-                    context.Error("Expecting semi at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting semi");
                 }
                 children[1] = new ParseNode(StatementParser.semi, "semi", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -9532,13 +9524,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (StatementParser.semi == context.SymbolId))) {
-                    context.Error("Expecting semi at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting semi");
                 }
                 children[0] = new ParseNode(StatementParser.semi, "semi", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(StatementParser.ThrowStatementPart, "ThrowStatementPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Expression or semi at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Expression or semi", line__, column__, position__);
         }
         internal static ParseNode ParseTryStatementPart(ParserContext context) {
             int line__ = context.Line;
@@ -9600,7 +9592,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(StatementParser.TryStatementPart, "TryStatementPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting FinallyPart at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting FinallyPart", line__, column__, position__);
         }
         internal static ParseNode ParseCatchClause(ParserContext context) {
             int line__ = context.Line;
@@ -9611,13 +9603,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (StatementParser.catchKeyword == context.SymbolId))) {
-                    context.Error("Expecting catchKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting catchKeyword");
                 }
                 children.Add(new ParseNode(StatementParser.catchKeyword, "catchKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.lparen == context.SymbolId))) {
-                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lparen");
                 }
                 children.Add(new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -9625,7 +9617,7 @@ namespace CD {
                 children.AddRange(StatementParser.ParseCatchClausePart(context).Children);
                 return new ParseNode(StatementParser.CatchClause, "CatchClause", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting catchKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting catchKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseCatchClausePart(ParserContext context) {
             int line__ = context.Line;
@@ -9638,7 +9630,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseIdentifier(context).Children);
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children.Add(new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -9650,14 +9642,14 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[0] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[1] = StatementParser.ParseStatementBlock(context);
                 return new ParseNode(StatementParser.CatchClausePart, "CatchClausePart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Identifier or rparen at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Identifier or rparen", line__, column__, position__);
         }
         internal static ParseNode ParseStatementBlock(ParserContext context) {
             int line__ = context.Line;
@@ -9668,14 +9660,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lbrace == context.SymbolId))) {
-                    context.Error("Expecting lbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lbrace");
                 }
                 children.Add(new ParseNode(ExpressionParser.lbrace, "lbrace", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(StatementParser.ParseStatementBlockPart(context).Children);
                 return new ParseNode(StatementParser.StatementBlock, "StatementBlock", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lbrace at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lbrace", line__, column__, position__);
         }
         internal static ParseNode ParseStatementBlockPart(ParserContext context) {
             int line__ = context.Line;
@@ -9730,7 +9722,7 @@ namespace CD {
                 children.AddRange(StatementParser.ParseStatementList2(context).Children);
                 if ((false 
                             == (ExpressionParser.rbrace == context.SymbolId))) {
-                    context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbrace");
                 }
                 children.Add(new ParseNode(ExpressionParser.rbrace, "rbrace", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -9741,13 +9733,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.rbrace == context.SymbolId))) {
-                    context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbrace");
                 }
                 children[0] = new ParseNode(ExpressionParser.rbrace, "rbrace", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(StatementParser.StatementBlockPart, "StatementBlockPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting StatementList2 or rbrace at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting StatementList2 or rbrace", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionListPart(ParserContext context) {
             int line__ = context.Line;
@@ -9758,13 +9750,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.lte == context.SymbolId))) {
-                    context.Error("Expecting lte at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lte");
                 }
                 children[0] = new ParseNode(ExpressionParser.lte, "lte", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children[1] = new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -9775,19 +9767,19 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.gte == context.SymbolId))) {
-                    context.Error("Expecting gte at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gte");
                 }
                 children[0] = new ParseNode(ExpressionParser.gte, "gte", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children[1] = new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.RelationalExpressionListPart, "RelationalExpressionListPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lte or gte at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lte or gte", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListPart(ParserContext context) {
             int line__ = context.Line;
@@ -9798,13 +9790,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.addAssign == context.SymbolId))) {
-                    context.Error("Expecting addAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting addAssign");
                 }
                 children[0] = new ParseNode(ExpressionParser.addAssign, "addAssign", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children[1] = new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -9815,13 +9807,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.mulAssign == context.SymbolId))) {
-                    context.Error("Expecting mulAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mulAssign");
                 }
                 children[0] = new ParseNode(ExpressionParser.mulAssign, "mulAssign", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children[1] = new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -9832,13 +9824,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.modAssign == context.SymbolId))) {
-                    context.Error("Expecting modAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting modAssign");
                 }
                 children[0] = new ParseNode(ExpressionParser.modAssign, "modAssign", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children[1] = new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -9849,20 +9841,19 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.bitwiseOrAssign == context.SymbolId))) {
-                    context.Error("Expecting bitwiseOrAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseOrAssign");
                 }
                 children[0] = new ParseNode(ExpressionParser.bitwiseOrAssign, "bitwiseOrAssign", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children[1] = new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.AssignExpressionListPart, "AssignExpressionListPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting addAssign, mulAssign, modAssign, or bitwiseOrAssign at line {0}, column" +
-                        " {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting addAssign, mulAssign, modAssign, or bitwiseOrAssign", line__, column__, position__);
         }
         internal static ParseNode ParseEqualityExpressionListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -9873,20 +9864,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.notEq == context.SymbolId))) {
-                    context.Error("Expecting notEq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting notEq");
                 }
                 children.Add(new ParseNode(ExpressionParser.notEq, "notEq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.RelationalExpression == context.SymbolId))) {
-                    context.Error("Expecting RelationalExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting RelationalExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.RelationalExpression, "RelationalExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseEqualityExpressionListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.EqualityExpressionListRightAssoc2, "EqualityExpressionListRightAssoc2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting notEq at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting notEq", line__, column__, position__);
         }
         internal static ParseNode ParseTermExpressionListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -9897,20 +9888,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.sub == context.SymbolId))) {
-                    context.Error("Expecting sub at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting sub");
                 }
                 children.Add(new ParseNode(ExpressionParser.sub, "sub", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.FactorExpression == context.SymbolId))) {
-                    context.Error("Expecting FactorExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting FactorExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.FactorExpression, "FactorExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTermExpressionListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.TermExpressionListRightAssoc2, "TermExpressionListRightAssoc2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting sub at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting sub", line__, column__, position__);
         }
         internal static ParseNode ParseFactorExpressionListRightAssoc3(ParserContext context) {
             int line__ = context.Line;
@@ -9921,20 +9912,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.div == context.SymbolId))) {
-                    context.Error("Expecting div at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting div");
                 }
                 children.Add(new ParseNode(ExpressionParser.div, "div", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.UnaryExpression == context.SymbolId))) {
-                    context.Error("Expecting UnaryExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting UnaryExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.UnaryExpression, "UnaryExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseFactorExpressionListRightAssoc3(context).Children);
                 return new ParseNode(ExpressionParser.FactorExpressionListRightAssoc3, "FactorExpressionListRightAssoc3", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting div at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting div", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionListRightAssoc3(ParserContext context) {
             int line__ = context.Line;
@@ -9948,7 +9939,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseRelationalExpressionListRightAssoc3(context).Children);
                 return new ParseNode(ExpressionParser.RelationalExpressionListRightAssoc3, "RelationalExpressionListRightAssoc3", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting RelationalExpressionListPart at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting RelationalExpressionListPart", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListRightAssoc5(ParserContext context) {
             int line__ = context.Line;
@@ -9964,7 +9955,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseAssignExpressionListRightAssoc5(context).Children);
                 return new ParseNode(ExpressionParser.AssignExpressionListRightAssoc5, "AssignExpressionListRightAssoc5", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting AssignExpressionListPart at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting AssignExpressionListPart", line__, column__, position__);
         }
         internal static ParseNode ParseTryStatement(ParserContext context) {
             int line__ = context.Line;
@@ -9975,7 +9966,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (StatementParser.tryKeyword == context.SymbolId))) {
-                    context.Error("Expecting tryKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting tryKeyword");
                 }
                 children.Add(new ParseNode(StatementParser.tryKeyword, "tryKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -9983,7 +9974,7 @@ namespace CD {
                 children.AddRange(StatementParser.ParseTryStatementPart2(context).Children);
                 return new ParseNode(StatementParser.TryStatement, "TryStatement", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting tryKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting tryKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseTryStatementPart2(ParserContext context) {
             int line__ = context.Line;
@@ -10002,7 +9993,7 @@ namespace CD {
                 children.AddRange(StatementParser.ParseTryStatementPart(context).Children);
                 return new ParseNode(StatementParser.TryStatementPart2, "TryStatementPart2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting FinallyPart or CatchClauseList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting FinallyPart or CatchClauseList", line__, column__, position__);
         }
     }
     /// <summary>Parses the indicated grammar. Refer to C:\dev\BuildPack\Parsley\SlangType.xbnf</summary>
@@ -10310,7 +10301,7 @@ namespace CD {
                         children.AddRange(ExpressionParser.ParseIdentifier(context2__).Children);
                         if ((false 
                                     == (ExpressionParser.eq == context2__.SymbolId))) {
-                            context2__.Error("Expecting eq at line {0}, column {1}, position {2}", context2__.Line, context2__.Column, context2__.Position);
+                            context2__.Error("Expecting eq");
                         }
                         children.Add(new ParseNode(ExpressionParser.eq, "eq", context2__.Value, context2__.Line, context2__.Column, context2__.Position));
                         context2__.Advance();
@@ -10396,7 +10387,7 @@ namespace CD {
                 children[0] = ExpressionParser.ParseExpression(context);
                 return new ParseNode(TypeDeclParser.CustomAttributeArg, "CustomAttributeArg", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Identifier or Expression at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Identifier or Expression", line__, column__, position__);
         }
         internal static bool WhereCustomAttributeArg(ParserContext context) {
             return true;
@@ -10410,13 +10401,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (TypeDeclParser.assemblyKeyword == context.SymbolId))) {
-                    context.Error("Expecting assemblyKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting assemblyKeyword");
                 }
                 children[0] = new ParseNode(TypeDeclParser.assemblyKeyword, "assemblyKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (StatementParser.colon == context.SymbolId))) {
-                    context.Error("Expecting colon at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting colon");
                 }
                 children[1] = new ParseNode(StatementParser.colon, "colon", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -10427,19 +10418,19 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (StatementParser.returnKeyword == context.SymbolId))) {
-                    context.Error("Expecting returnKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting returnKeyword");
                 }
                 children[0] = new ParseNode(StatementParser.returnKeyword, "returnKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (StatementParser.colon == context.SymbolId))) {
-                    context.Error("Expecting colon at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting colon");
                 }
                 children[1] = new ParseNode(StatementParser.colon, "colon", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(TypeDeclParser.CustomAttributeTarget, "CustomAttributeTarget", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting assemblyKeyword or returnKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting assemblyKeyword or returnKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeGroups(ParserContext context) {
             int line__ = context.Line;
@@ -10451,7 +10442,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseCustomAttributeGroupList3(context).Children);
                 return new ParseNode(TypeDeclParser.CustomAttributeGroups, "CustomAttributeGroups", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting CustomAttributeGroupList3 at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting CustomAttributeGroupList3", line__, column__, position__);
         }
         internal static ParseNode ParseTypeAttributes(ParserContext context) {
             int line__ = context.Line;
@@ -10474,7 +10465,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.TypeAttributes, "TypeAttributes", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeAttributesList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeAttributesList", line__, column__, position__);
         }
         internal static ParseNode ParseEnumPart(ParserContext context) {
             int line__ = context.Line;
@@ -10485,14 +10476,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lbrace == context.SymbolId))) {
-                    context.Error("Expecting lbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lbrace");
                 }
                 children.Add(new ParseNode(ExpressionParser.lbrace, "lbrace", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(TypeDeclParser.ParseEnumFields(context).Children);
                 if ((false 
                             == (ExpressionParser.rbrace == context.SymbolId))) {
-                    context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbrace");
                 }
                 children.Add(new ParseNode(ExpressionParser.rbrace, "rbrace", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -10503,27 +10494,27 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (StatementParser.colon == context.SymbolId))) {
-                    context.Error("Expecting colon at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting colon");
                 }
                 children.Add(new ParseNode(StatementParser.colon, "colon", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.Add(ExpressionParser.ParseType(context));
                 if ((false 
                             == (ExpressionParser.lbrace == context.SymbolId))) {
-                    context.Error("Expecting lbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lbrace");
                 }
                 children.Add(new ParseNode(ExpressionParser.lbrace, "lbrace", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(TypeDeclParser.ParseEnumFields(context).Children);
                 if ((false 
                             == (ExpressionParser.rbrace == context.SymbolId))) {
-                    context.Error("Expecting rbrace at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbrace");
                 }
                 children.Add(new ParseNode(ExpressionParser.rbrace, "rbrace", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 return new ParseNode(TypeDeclParser.EnumPart, "EnumPart", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lbrace or colon at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lbrace or colon", line__, column__, position__);
         }
         internal static ParseNode ParseEnumFields(ParserContext context) {
             int line__ = context.Line;
@@ -10542,7 +10533,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseEnumFieldsPart(context).Children);
                 return new ParseNode(TypeDeclParser.EnumFields, "EnumFields", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting EnumField at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting EnumField", line__, column__, position__);
         }
         internal static ParseNode ParseEnumField(ParserContext context) {
             int line__ = context.Line;
@@ -10555,14 +10546,14 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseIdentifier(context).Children);
                 if ((false 
                             == (ExpressionParser.eq == context.SymbolId))) {
-                    context.Error("Expecting eq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eq");
                 }
                 children.Add(new ParseNode(ExpressionParser.eq, "eq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.Add(ExpressionParser.ParseExpression(context));
                 return new ParseNode(TypeDeclParser.EnumField, "EnumField", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Identifier at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Identifier", line__, column__, position__);
         }
         internal static ParseNode ParseWhere(ParserContext context) {
             int line__ = context.Line;
@@ -10573,14 +10564,14 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (TypeDeclParser.whereKeyword == context.SymbolId))) {
-                    context.Error("Expecting whereKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting whereKeyword");
                 }
                 children[0] = new ParseNode(TypeDeclParser.whereKeyword, "whereKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[1] = TypeDeclParser.ParseWhereClauses(context);
                 return new ParseNode(TypeDeclParser.Where, "Where", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting whereKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting whereKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseWhereClausePart(ParserContext context) {
             int line__ = context.Line;
@@ -10612,25 +10603,25 @@ namespace CD {
                 ParseNode[] children = new ParseNode[3];
                 if ((false 
                             == (ExpressionParser.newKeyword == context.SymbolId))) {
-                    context.Error("Expecting newKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting newKeyword");
                 }
                 children[0] = new ParseNode(ExpressionParser.newKeyword, "newKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.lparen == context.SymbolId))) {
-                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lparen");
                 }
                 children[1] = new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[2] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(TypeDeclParser.WhereClausePart, "WhereClausePart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Type or newKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Type or newKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseBaseType(ParserContext context) {
             int line__ = context.Line;
@@ -10657,7 +10648,7 @@ namespace CD {
                 children[0] = ExpressionParser.ParseType(context);
                 return new ParseNode(TypeDeclParser.BaseType, "BaseType", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Type at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Type", line__, column__, position__);
         }
         internal static ParseNode ParseTypeParams(ParserContext context) {
             int line__ = context.Line;
@@ -10676,14 +10667,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lt == context.SymbolId))) {
-                    context.Error("Expecting lt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lt");
                 }
                 children.Add(new ParseNode(ExpressionParser.lt, "lt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(TypeDeclParser.ParseTypeParamsPart3(context).Children);
                 return new ParseNode(TypeDeclParser.TypeParams, "TypeParams", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lt at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lt", line__, column__, position__);
         }
         internal static ParseNode ParseEnum(ParserContext context) {
             int line__ = context.Line;
@@ -10702,7 +10693,7 @@ namespace CD {
                 children.Add(TypeDeclParser.ParseMemberAttributes(context));
                 if ((false 
                             == (TypeDeclParser.enumKeyword == context.SymbolId))) {
-                    context.Error("Expecting enumKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting enumKeyword");
                 }
                 children.Add(new ParseNode(TypeDeclParser.enumKeyword, "enumKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -10710,7 +10701,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseEnumPart(context).Children);
                 return new ParseNode(TypeDeclParser.Enum, "Enum", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAttributes at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAttributes", line__, column__, position__);
         }
         internal static ParseNode ParseStruct(ParserContext context) {
             int line__ = context.Line;
@@ -10729,7 +10720,7 @@ namespace CD {
                 children.Add(TypeDeclParser.ParseMemberAttributes(context));
                 if ((false 
                             == (TypeDeclParser.structKeyword == context.SymbolId))) {
-                    context.Error("Expecting structKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting structKeyword");
                 }
                 children.Add(new ParseNode(TypeDeclParser.structKeyword, "structKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -10738,7 +10729,7 @@ namespace CD {
                 children.Add(TypeDeclParser.ParseTypeDeclPart(context));
                 return new ParseNode(TypeDeclParser.Struct, "Struct", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAttributes at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAttributes", line__, column__, position__);
         }
         internal static ParseNode ParseClass(ParserContext context) {
             int line__ = context.Line;
@@ -10757,7 +10748,7 @@ namespace CD {
                 children.Add(TypeDeclParser.ParseMemberAttributes(context));
                 if ((false 
                             == (TypeDeclParser.classKeyword == context.SymbolId))) {
-                    context.Error("Expecting classKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting classKeyword");
                 }
                 children.Add(new ParseNode(TypeDeclParser.classKeyword, "classKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -10766,7 +10757,7 @@ namespace CD {
                 children.Add(TypeDeclParser.ParseTypeDeclPart(context));
                 return new ParseNode(TypeDeclParser.Class, "Class", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAttributes at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAttributes", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAttribute(ParserContext context) {
             int line__ = context.Line;
@@ -10777,7 +10768,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.newKeyword == context.SymbolId))) {
-                    context.Error("Expecting newKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting newKeyword");
                 }
                 children[0] = new ParseNode(ExpressionParser.newKeyword, "newKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -10788,7 +10779,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (TypeDeclParser.constKeyword == context.SymbolId))) {
-                    context.Error("Expecting constKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting constKeyword");
                 }
                 children[0] = new ParseNode(TypeDeclParser.constKeyword, "constKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -10799,7 +10790,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (TypeDeclParser.publicKeyword == context.SymbolId))) {
-                    context.Error("Expecting publicKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting publicKeyword");
                 }
                 children[0] = new ParseNode(TypeDeclParser.publicKeyword, "publicKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -10810,7 +10801,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (TypeDeclParser.protectedKeyword == context.SymbolId))) {
-                    context.Error("Expecting protectedKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting protectedKeyword");
                 }
                 children[0] = new ParseNode(TypeDeclParser.protectedKeyword, "protectedKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -10821,7 +10812,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (TypeDeclParser.internalKeyword == context.SymbolId))) {
-                    context.Error("Expecting internalKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting internalKeyword");
                 }
                 children[0] = new ParseNode(TypeDeclParser.internalKeyword, "internalKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -10832,7 +10823,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (TypeDeclParser.privateKeyword == context.SymbolId))) {
-                    context.Error("Expecting privateKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting privateKeyword");
                 }
                 children[0] = new ParseNode(TypeDeclParser.privateKeyword, "privateKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -10843,7 +10834,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (TypeDeclParser.staticKeyword == context.SymbolId))) {
-                    context.Error("Expecting staticKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting staticKeyword");
                 }
                 children[0] = new ParseNode(TypeDeclParser.staticKeyword, "staticKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -10854,15 +10845,14 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (TypeDeclParser.overrideKeyword == context.SymbolId))) {
-                    context.Error("Expecting overrideKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting overrideKeyword");
                 }
                 children[0] = new ParseNode(TypeDeclParser.overrideKeyword, "overrideKeyword", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(TypeDeclParser.MemberAttribute, "MemberAttribute", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting newKeyword, constKeyword, publicKeyword, protectedKeyword, internalKeyw" +
-                        "ord, privateKeyword, staticKeyword, or overrideKeyword at line {0}, column {1}, " +
-                        "position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting newKeyword, constKeyword, publicKeyword, protectedKeyword, internalKeyw" +
+                    "ord, privateKeyword, staticKeyword, or overrideKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAttributes(ParserContext context) {
             int line__ = context.Line;
@@ -10889,7 +10879,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.MemberAttributes, "MemberAttributes", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAttributeList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAttributeList", line__, column__, position__);
         }
         internal static ParseNode ParseMethodParamList(ParserContext context) {
             int line__ = context.Line;
@@ -10924,7 +10914,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseMethodParamListPart(context).Children);
                 return new ParseNode(TypeDeclParser.MethodParamList, "MethodParamList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MethodParam at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MethodParam", line__, column__, position__);
         }
         internal static ParseNode ParseMethodParam(ParserContext context) {
             int line__ = context.Line;
@@ -10935,7 +10925,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.outKeyword == context.SymbolId))) {
-                    context.Error("Expecting outKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting outKeyword");
                 }
                 children.Add(new ParseNode(ExpressionParser.outKeyword, "outKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -10948,7 +10938,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.refKeyword == context.SymbolId))) {
-                    context.Error("Expecting refKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting refKeyword");
                 }
                 children.Add(new ParseNode(ExpressionParser.refKeyword, "refKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -10978,7 +10968,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseIdentifier(context).Children);
                 return new ParseNode(TypeDeclParser.MethodParam, "MethodParam", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting outKeyword, refKeyword, or Type at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting outKeyword, refKeyword, or Type", line__, column__, position__);
         }
         internal static ParseNode ParseParamList(ParserContext context) {
             int line__ = context.Line;
@@ -11012,7 +11002,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseParamListPart(context).Children);
                 return new ParseNode(TypeDeclParser.ParamList, "ParamList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Param at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Param", line__, column__, position__);
         }
         internal static ParseNode ParseParam(ParserContext context) {
             int line__ = context.Line;
@@ -11040,7 +11030,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseIdentifier(context).Children);
                 return new ParseNode(TypeDeclParser.Param, "Param", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Type at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Type", line__, column__, position__);
         }
         internal static ParseNode ParseConstructorChain(ParserContext context) {
             int line__ = context.Line;
@@ -11051,20 +11041,20 @@ namespace CD {
                 ParseNode[] children = new ParseNode[4];
                 if ((false 
                             == (ExpressionParser.baseRef == context.SymbolId))) {
-                    context.Error("Expecting baseRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting baseRef");
                 }
                 children[0] = new ParseNode(ExpressionParser.baseRef, "baseRef", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.lparen == context.SymbolId))) {
-                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lparen");
                 }
                 children[1] = new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[2] = TypeDeclParser.ParseParamList(context);
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[3] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -11075,26 +11065,26 @@ namespace CD {
                 ParseNode[] children = new ParseNode[4];
                 if ((false 
                             == (ExpressionParser.thisRef == context.SymbolId))) {
-                    context.Error("Expecting thisRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting thisRef");
                 }
                 children[0] = new ParseNode(ExpressionParser.thisRef, "thisRef", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.lparen == context.SymbolId))) {
-                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lparen");
                 }
                 children[1] = new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[2] = TypeDeclParser.ParseParamList(context);
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[3] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(TypeDeclParser.ConstructorChain, "ConstructorChain", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting baseRef or thisRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting baseRef or thisRef", line__, column__, position__);
         }
         internal static ParseNode ParseNamespaceNameList(ParserContext context) {
             int line__ = context.Line;
@@ -11105,7 +11095,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.dot == context.SymbolId))) {
-                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dot");
                 }
                 children.Add(new ParseNode(ExpressionParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11113,7 +11103,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseNamespaceNameListRightAssoc(context).Children);
                 return new ParseNode(TypeDeclParser.NamespaceNameList, "NamespaceNameList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting dot at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting dot", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -11124,13 +11114,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lt == context.SymbolId))) {
-                    context.Error("Expecting lt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lt");
                 }
                 children.Add(new ParseNode(ExpressionParser.lt, "lt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11144,13 +11134,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lte == context.SymbolId))) {
-                    context.Error("Expecting lte at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lte");
                 }
                 children.Add(new ParseNode(ExpressionParser.lte, "lte", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11164,13 +11154,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.gt == context.SymbolId))) {
-                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gt");
                 }
                 children.Add(new ParseNode(ExpressionParser.gt, "gt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11184,13 +11174,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.gte == context.SymbolId))) {
-                    context.Error("Expecting gte at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gte");
                 }
                 children.Add(new ParseNode(ExpressionParser.gte, "gte", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11199,7 +11189,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseRelationalExpressionListRightAssoc3(context).Children);
                 return new ParseNode(ExpressionParser.RelationalExpressionList, "RelationalExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lt, lte, gt, or gte at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lt, lte, gt, or gte", line__, column__, position__);
         }
         internal static ParseNode ParseEqualityExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -11210,13 +11200,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.eqEq == context.SymbolId))) {
-                    context.Error("Expecting eqEq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eqEq");
                 }
                 children.Add(new ParseNode(ExpressionParser.eqEq, "eqEq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.RelationalExpression == context.SymbolId))) {
-                    context.Error("Expecting RelationalExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting RelationalExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.RelationalExpression, "RelationalExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11229,13 +11219,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.notEq == context.SymbolId))) {
-                    context.Error("Expecting notEq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting notEq");
                 }
                 children.Add(new ParseNode(ExpressionParser.notEq, "notEq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.RelationalExpression == context.SymbolId))) {
-                    context.Error("Expecting RelationalExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting RelationalExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.RelationalExpression, "RelationalExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11243,7 +11233,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseEqualityExpressionListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.EqualityExpressionList, "EqualityExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting eqEq or notEq at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting eqEq or notEq", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseAndExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -11254,20 +11244,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseAnd == context.SymbolId))) {
-                    context.Error("Expecting bitwiseAnd at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseAnd");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseAnd, "bitwiseAnd", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.EqualityExpression == context.SymbolId))) {
-                    context.Error("Expecting EqualityExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting EqualityExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.EqualityExpression, "EqualityExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseBitwiseAndExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.BitwiseAndExpressionList, "BitwiseAndExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting bitwiseAnd at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting bitwiseAnd", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseOrExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -11278,20 +11268,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseOr == context.SymbolId))) {
-                    context.Error("Expecting bitwiseOr at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseOr");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseOr, "bitwiseOr", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.BitwiseAndExpression == context.SymbolId))) {
-                    context.Error("Expecting BitwiseAndExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting BitwiseAndExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.BitwiseAndExpression, "BitwiseAndExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseBitwiseOrExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.BitwiseOrExpressionList, "BitwiseOrExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting bitwiseOr at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting bitwiseOr", line__, column__, position__);
         }
         internal static ParseNode ParseAndExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -11302,20 +11292,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.and == context.SymbolId))) {
-                    context.Error("Expecting and at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting and");
                 }
                 children.Add(new ParseNode(ExpressionParser.and, "and", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.BitwiseOrExpression == context.SymbolId))) {
-                    context.Error("Expecting BitwiseOrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting BitwiseOrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.BitwiseOrExpression, "BitwiseOrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseAndExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.AndExpressionList, "AndExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting and at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting and", line__, column__, position__);
         }
         internal static ParseNode ParseOrExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -11326,20 +11316,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.or == context.SymbolId))) {
-                    context.Error("Expecting or at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting or");
                 }
                 children.Add(new ParseNode(ExpressionParser.or, "or", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.AndExpression == context.SymbolId))) {
-                    context.Error("Expecting AndExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting AndExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.AndExpression, "AndExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseOrExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.OrExpressionList, "OrExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting or at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting or", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -11350,13 +11340,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.eq == context.SymbolId))) {
-                    context.Error("Expecting eq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eq");
                 }
                 children.Add(new ParseNode(ExpressionParser.eq, "eq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11372,13 +11362,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.addAssign == context.SymbolId))) {
-                    context.Error("Expecting addAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting addAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.addAssign, "addAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11394,13 +11384,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.subAssign == context.SymbolId))) {
-                    context.Error("Expecting subAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting subAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.subAssign, "subAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11416,13 +11406,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.mulAssign == context.SymbolId))) {
-                    context.Error("Expecting mulAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mulAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.mulAssign, "mulAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11438,13 +11428,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.divAssign == context.SymbolId))) {
-                    context.Error("Expecting divAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting divAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.divAssign, "divAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11460,13 +11450,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.modAssign == context.SymbolId))) {
-                    context.Error("Expecting modAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting modAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.modAssign, "modAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11482,13 +11472,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseAndAssign == context.SymbolId))) {
-                    context.Error("Expecting bitwiseAndAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseAndAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseAndAssign, "bitwiseAndAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11504,13 +11494,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseOrAssign == context.SymbolId))) {
-                    context.Error("Expecting bitwiseOrAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseOrAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseOrAssign, "bitwiseOrAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11521,8 +11511,8 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseAssignExpressionListRightAssoc5(context).Children);
                 return new ParseNode(ExpressionParser.AssignExpressionList, "AssignExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting eq, addAssign, subAssign, mulAssign, divAssign, modAssign, bitwiseAndAs" +
-                        "sign, or bitwiseOrAssign at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting eq, addAssign, subAssign, mulAssign, divAssign, modAssign, bitwiseAndAs" +
+                    "sign, or bitwiseOrAssign", line__, column__, position__);
         }
         internal static ParseNode ParseTermExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -11533,13 +11523,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.add == context.SymbolId))) {
-                    context.Error("Expecting add at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting add");
                 }
                 children.Add(new ParseNode(ExpressionParser.add, "add", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.FactorExpression == context.SymbolId))) {
-                    context.Error("Expecting FactorExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting FactorExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.FactorExpression, "FactorExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11552,13 +11542,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.sub == context.SymbolId))) {
-                    context.Error("Expecting sub at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting sub");
                 }
                 children.Add(new ParseNode(ExpressionParser.sub, "sub", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.FactorExpression == context.SymbolId))) {
-                    context.Error("Expecting FactorExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting FactorExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.FactorExpression, "FactorExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11566,7 +11556,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTermExpressionListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.TermExpressionList, "TermExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting add or sub at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting add or sub", line__, column__, position__);
         }
         internal static ParseNode ParseFactorExpressionList(ParserContext context) {
             int line__ = context.Line;
@@ -11577,13 +11567,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.mul == context.SymbolId))) {
-                    context.Error("Expecting mul at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mul");
                 }
                 children.Add(new ParseNode(ExpressionParser.mul, "mul", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.UnaryExpression == context.SymbolId))) {
-                    context.Error("Expecting UnaryExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting UnaryExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.UnaryExpression, "UnaryExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11597,13 +11587,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.div == context.SymbolId))) {
-                    context.Error("Expecting div at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting div");
                 }
                 children.Add(new ParseNode(ExpressionParser.div, "div", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.UnaryExpression == context.SymbolId))) {
-                    context.Error("Expecting UnaryExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting UnaryExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.UnaryExpression, "UnaryExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11617,13 +11607,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.mod == context.SymbolId))) {
-                    context.Error("Expecting mod at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mod");
                 }
                 children.Add(new ParseNode(ExpressionParser.mod, "mod", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.UnaryExpression == context.SymbolId))) {
-                    context.Error("Expecting UnaryExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting UnaryExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.UnaryExpression, "UnaryExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11632,7 +11622,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseFactorExpressionListRightAssoc3(context).Children);
                 return new ParseNode(ExpressionParser.FactorExpressionList, "FactorExpressionList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting mul, div, or mod at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting mul, div, or mod", line__, column__, position__);
         }
         internal static ParseNode ParseMemberInvokeRefList(ParserContext context) {
             int line__ = context.Line;
@@ -11643,20 +11633,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.MethodArg == context.SymbolId))) {
-                    context.Error("Expecting MethodArg at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MethodArg");
                 }
                 children.Add(new ParseNode(ExpressionParser.MethodArg, "MethodArg", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberInvokeRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberInvokeRefList, "MemberInvokeRefList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseMemberIndexerRefList(ParserContext context) {
             int line__ = context.Line;
@@ -11667,7 +11657,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11675,7 +11665,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberIndexerRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberIndexerRefList, "MemberIndexerRefList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeBaseList(ParserContext context) {
             int line__ = context.Line;
@@ -11686,20 +11676,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.dot == context.SymbolId))) {
-                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dot");
                 }
                 children.Add(new ParseNode(ExpressionParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.identifier2 == context.SymbolId))) {
-                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting identifier");
                 }
                 children.Add(new ParseNode(ExpressionParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeBaseListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeBaseList, "TypeBaseList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting dot at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting dot", line__, column__, position__);
         }
         internal static ParseNode ParseTypeArraySpecList(ParserContext context) {
             int line__ = context.Line;
@@ -11710,14 +11700,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.TypeArraySpec == context.SymbolId))) {
-                    context.Error("Expecting TypeArraySpec at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TypeArraySpec");
                 }
                 children.Add(new ParseNode(ExpressionParser.TypeArraySpec, "TypeArraySpec", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeArraySpecListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeArraySpecList, "TypeArraySpecList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeArraySpec at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeArraySpec", line__, column__, position__);
         }
         internal static ParseNode ParseTypeGenericPartList(ParserContext context) {
             int line__ = context.Line;
@@ -11728,7 +11718,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11736,7 +11726,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTypeGenericPartListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeGenericPartList, "TypeGenericPartList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeArraySpecRankList(ParserContext context) {
             int line__ = context.Line;
@@ -11747,14 +11737,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.TypeArraySpecRank == context.SymbolId))) {
-                    context.Error("Expecting TypeArraySpecRank at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TypeArraySpecRank");
                 }
                 children.Add(new ParseNode(ExpressionParser.TypeArraySpecRank, "TypeArraySpecRank", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeArraySpecRankListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeArraySpecRankList, "TypeArraySpecRankList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeArraySpecRank at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeArraySpecRank", line__, column__, position__);
         }
         internal static ParseNode ParseNewObjectPartList(ParserContext context) {
             int line__ = context.Line;
@@ -11765,7 +11755,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11773,7 +11763,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseNewObjectPartListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.NewObjectPartList, "NewObjectPartList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseArraySpecExpressionListList(ParserContext context) {
             int line__ = context.Line;
@@ -11784,7 +11774,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11792,7 +11782,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseArraySpecExpressionListListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.ArraySpecExpressionListList, "ArraySpecExpressionListList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseArrayInitializerList(ParserContext context) {
             int line__ = context.Line;
@@ -11803,7 +11793,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -11811,7 +11801,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseArrayInitializerListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.ArrayInitializerList, "ArrayInitializerList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList(ParserContext context) {
             int line__ = context.Line;
@@ -11822,13 +11812,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList, "MemberAnyRefList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList2(ParserContext context) {
             int line__ = context.Line;
@@ -11839,13 +11829,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList2RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList2, "MemberAnyRefList2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList3(ParserContext context) {
             int line__ = context.Line;
@@ -11856,13 +11846,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList3RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList3, "MemberAnyRefList3", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList4(ParserContext context) {
             int line__ = context.Line;
@@ -11873,13 +11863,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList4RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList4, "MemberAnyRefList4", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList5(ParserContext context) {
             int line__ = context.Line;
@@ -11890,13 +11880,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList5RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList5, "MemberAnyRefList5", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList6(ParserContext context) {
             int line__ = context.Line;
@@ -11907,13 +11897,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList6RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList6, "MemberAnyRefList6", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList7(ParserContext context) {
             int line__ = context.Line;
@@ -11924,13 +11914,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList7RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList7, "MemberAnyRefList7", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList8(ParserContext context) {
             int line__ = context.Line;
@@ -11941,13 +11931,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList8RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList8, "MemberAnyRefList8", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList9(ParserContext context) {
             int line__ = context.Line;
@@ -11958,13 +11948,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList9RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList9, "MemberAnyRefList9", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList10(ParserContext context) {
             int line__ = context.Line;
@@ -11975,13 +11965,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList10RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList10, "MemberAnyRefList10", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList11(ParserContext context) {
             int line__ = context.Line;
@@ -11992,13 +11982,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList11RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList11, "MemberAnyRefList11", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList12(ParserContext context) {
             int line__ = context.Line;
@@ -12009,13 +11999,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList12RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList12, "MemberAnyRefList12", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList13(ParserContext context) {
             int line__ = context.Line;
@@ -12026,13 +12016,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList13RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList13, "MemberAnyRefList13", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList14(ParserContext context) {
             int line__ = context.Line;
@@ -12043,13 +12033,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList14RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList14, "MemberAnyRefList14", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseCatchClauseList(ParserContext context) {
             int line__ = context.Line;
@@ -12060,14 +12050,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (StatementParser.CatchClause == context.SymbolId))) {
-                    context.Error("Expecting CatchClause at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting CatchClause");
                 }
                 children.Add(new ParseNode(StatementParser.CatchClause, "CatchClause", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(StatementParser.ParseCatchClauseListRightAssoc(context).Children);
                 return new ParseNode(StatementParser.CatchClauseList, "CatchClauseList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting CatchClause at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting CatchClause", line__, column__, position__);
         }
         internal static ParseNode ParseStatementList(ParserContext context) {
             int line__ = context.Line;
@@ -12078,14 +12068,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (StatementParser.Statement == context.SymbolId))) {
-                    context.Error("Expecting Statement at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting Statement");
                 }
                 children.Add(new ParseNode(StatementParser.Statement, "Statement", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(StatementParser.ParseStatementListRightAssoc(context).Children);
                 return new ParseNode(StatementParser.StatementList, "StatementList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Statement", line__, column__, position__);
         }
         internal static ParseNode ParseStatementList2(ParserContext context) {
             int line__ = context.Line;
@@ -12096,14 +12086,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (StatementParser.Statement == context.SymbolId))) {
-                    context.Error("Expecting Statement at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting Statement");
                 }
                 children.Add(new ParseNode(StatementParser.Statement, "Statement", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(StatementParser.ParseStatementList2RightAssoc(context).Children);
                 return new ParseNode(StatementParser.StatementList2, "StatementList2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Statement", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeArgListList(ParserContext context) {
             int line__ = context.Line;
@@ -12114,7 +12104,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12122,7 +12112,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseCustomAttributeArgListListRightAssoc(context).Children);
                 return new ParseNode(TypeDeclParser.CustomAttributeArgListList, "CustomAttributeArgListList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeGroupList(ParserContext context) {
             int line__ = context.Line;
@@ -12133,7 +12123,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12141,7 +12131,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseCustomAttributeGroupListRightAssoc(context).Children);
                 return new ParseNode(TypeDeclParser.CustomAttributeGroupList, "CustomAttributeGroupList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeGroupList2(ParserContext context) {
             int line__ = context.Line;
@@ -12152,7 +12142,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12160,7 +12150,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseCustomAttributeGroupList2RightAssoc(context).Children);
                 return new ParseNode(TypeDeclParser.CustomAttributeGroupList2, "CustomAttributeGroupList2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeGroupList3(ParserContext context) {
             int line__ = context.Line;
@@ -12173,7 +12163,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseCustomAttributeGroupList3RightAssoc(context).Children);
                 return new ParseNode(TypeDeclParser.CustomAttributeGroupList3, "CustomAttributeGroupList3", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting CustomAttributeGroup at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting CustomAttributeGroup", line__, column__, position__);
         }
         internal static ParseNode ParseTypeAttributesList(ParserContext context) {
             int line__ = context.Line;
@@ -12184,7 +12174,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (TypeDeclParser.publicKeyword == context.SymbolId))) {
-                    context.Error("Expecting publicKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting publicKeyword");
                 }
                 children.Add(new ParseNode(TypeDeclParser.publicKeyword, "publicKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12198,7 +12188,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (TypeDeclParser.internalKeyword == context.SymbolId))) {
-                    context.Error("Expecting internalKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting internalKeyword");
                 }
                 children.Add(new ParseNode(TypeDeclParser.internalKeyword, "internalKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12212,7 +12202,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (TypeDeclParser.privateKeyword == context.SymbolId))) {
-                    context.Error("Expecting privateKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting privateKeyword");
                 }
                 children.Add(new ParseNode(TypeDeclParser.privateKeyword, "privateKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12221,8 +12211,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseTypeAttributesListRightAssoc3(context).Children);
                 return new ParseNode(TypeDeclParser.TypeAttributesList, "TypeAttributesList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting publicKeyword, internalKeyword, or privateKeyword at line {0}, column {" +
-                        "1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting publicKeyword, internalKeyword, or privateKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseEnumFieldsList(ParserContext context) {
             int line__ = context.Line;
@@ -12233,7 +12222,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12241,7 +12230,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseEnumFieldsListRightAssoc(context).Children);
                 return new ParseNode(TypeDeclParser.EnumFieldsList, "EnumFieldsList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseWhereClauseList(ParserContext context) {
             int line__ = context.Line;
@@ -12252,7 +12241,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12260,7 +12249,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseWhereClauseListRightAssoc(context).Children);
                 return new ParseNode(TypeDeclParser.WhereClauseList, "WhereClauseList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeParamsList(ParserContext context) {
             int line__ = context.Line;
@@ -12271,7 +12260,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12279,7 +12268,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseTypeParamsListRightAssoc(context).Children);
                 return new ParseNode(TypeDeclParser.TypeParamsList, "TypeParamsList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeParamsList2(ParserContext context) {
             int line__ = context.Line;
@@ -12290,7 +12279,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12298,7 +12287,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseTypeParamsList2RightAssoc(context).Children);
                 return new ParseNode(TypeDeclParser.TypeParamsList2, "TypeParamsList2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAttributeList(ParserContext context) {
             int line__ = context.Line;
@@ -12318,7 +12307,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseMemberAttributeListRightAssoc(context).Children);
                 return new ParseNode(TypeDeclParser.MemberAttributeList, "MemberAttributeList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAttribute at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAttribute", line__, column__, position__);
         }
         internal static ParseNode ParseMethodParamListList(ParserContext context) {
             int line__ = context.Line;
@@ -12329,7 +12318,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12337,7 +12326,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseMethodParamListListRightAssoc(context).Children);
                 return new ParseNode(TypeDeclParser.MethodParamListList, "MethodParamListList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseParamListList(ParserContext context) {
             int line__ = context.Line;
@@ -12348,7 +12337,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12356,7 +12345,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseParamListListRightAssoc(context).Children);
                 return new ParseNode(TypeDeclParser.ParamListList, "ParamListList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseWhereClauses(ParserContext context) {
             // WhereClauses
@@ -12459,7 +12448,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.dot == context.SymbolId))) {
-                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dot");
                 }
                 children.Add(new ParseNode(ExpressionParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12467,7 +12456,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseNamespaceNameListRightAssoc(context).Children);
                 return new ParseNode(TypeDeclParser.NamespaceNameListRightAssoc, "NamespaceNameListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting dot at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting dot", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -12478,13 +12467,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lt == context.SymbolId))) {
-                    context.Error("Expecting lt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lt");
                 }
                 children.Add(new ParseNode(ExpressionParser.lt, "lt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12498,7 +12487,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.RelationalExpressionListRightAssoc, "RelationalExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lt at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lt", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -12509,13 +12498,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.gt == context.SymbolId))) {
-                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gt");
                 }
                 children.Add(new ParseNode(ExpressionParser.gt, "gt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12528,7 +12517,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.RelationalExpressionListRightAssoc2, "RelationalExpressionListRightAssoc2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting gt at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting gt", line__, column__, position__);
         }
         internal static ParseNode ParseEqualityExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -12539,13 +12528,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.eqEq == context.SymbolId))) {
-                    context.Error("Expecting eqEq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eqEq");
                 }
                 children.Add(new ParseNode(ExpressionParser.eqEq, "eqEq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.RelationalExpression == context.SymbolId))) {
-                    context.Error("Expecting RelationalExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting RelationalExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.RelationalExpression, "RelationalExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12557,7 +12546,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.EqualityExpressionListRightAssoc, "EqualityExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting eqEq at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting eqEq", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseAndExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -12568,20 +12557,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseAnd == context.SymbolId))) {
-                    context.Error("Expecting bitwiseAnd at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseAnd");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseAnd, "bitwiseAnd", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.EqualityExpression == context.SymbolId))) {
-                    context.Error("Expecting EqualityExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting EqualityExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.EqualityExpression, "EqualityExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseBitwiseAndExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.BitwiseAndExpressionListRightAssoc, "BitwiseAndExpressionListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting bitwiseAnd at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting bitwiseAnd", line__, column__, position__);
         }
         internal static ParseNode ParseBitwiseOrExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -12592,20 +12581,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseOr == context.SymbolId))) {
-                    context.Error("Expecting bitwiseOr at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseOr");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseOr, "bitwiseOr", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.BitwiseAndExpression == context.SymbolId))) {
-                    context.Error("Expecting BitwiseAndExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting BitwiseAndExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.BitwiseAndExpression, "BitwiseAndExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseBitwiseOrExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.BitwiseOrExpressionListRightAssoc, "BitwiseOrExpressionListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting bitwiseOr at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting bitwiseOr", line__, column__, position__);
         }
         internal static ParseNode ParseAndExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -12616,20 +12605,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.and == context.SymbolId))) {
-                    context.Error("Expecting and at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting and");
                 }
                 children.Add(new ParseNode(ExpressionParser.and, "and", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.BitwiseOrExpression == context.SymbolId))) {
-                    context.Error("Expecting BitwiseOrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting BitwiseOrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.BitwiseOrExpression, "BitwiseOrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseAndExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.AndExpressionListRightAssoc, "AndExpressionListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting and at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting and", line__, column__, position__);
         }
         internal static ParseNode ParseOrExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -12640,20 +12629,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.or == context.SymbolId))) {
-                    context.Error("Expecting or at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting or");
                 }
                 children.Add(new ParseNode(ExpressionParser.or, "or", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.AndExpression == context.SymbolId))) {
-                    context.Error("Expecting AndExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting AndExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.AndExpression, "AndExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseOrExpressionListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.OrExpressionListRightAssoc, "OrExpressionListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting or at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting or", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -12664,13 +12653,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.eq == context.SymbolId))) {
-                    context.Error("Expecting eq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting eq");
                 }
                 children.Add(new ParseNode(ExpressionParser.eq, "eq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12688,7 +12677,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AssignExpressionListRightAssoc, "AssignExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting eq at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting eq", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -12699,13 +12688,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.subAssign == context.SymbolId))) {
-                    context.Error("Expecting subAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting subAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.subAssign, "subAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12722,7 +12711,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AssignExpressionListRightAssoc2, "AssignExpressionListRightAssoc2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting subAssign at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting subAssign", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListRightAssoc3(ParserContext context) {
             int line__ = context.Line;
@@ -12733,13 +12722,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.divAssign == context.SymbolId))) {
-                    context.Error("Expecting divAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting divAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.divAssign, "divAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12755,7 +12744,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AssignExpressionListRightAssoc3, "AssignExpressionListRightAssoc3", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting divAssign at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting divAssign", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListRightAssoc4(ParserContext context) {
             int line__ = context.Line;
@@ -12766,13 +12755,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.bitwiseAndAssign == context.SymbolId))) {
-                    context.Error("Expecting bitwiseAndAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseAndAssign");
                 }
                 children.Add(new ParseNode(ExpressionParser.bitwiseAndAssign, "bitwiseAndAssign", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12787,7 +12776,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.AssignExpressionListRightAssoc4, "AssignExpressionListRightAssoc4", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting bitwiseAndAssign at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting bitwiseAndAssign", line__, column__, position__);
         }
         internal static ParseNode ParseTermExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -12798,13 +12787,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.add == context.SymbolId))) {
-                    context.Error("Expecting add at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting add");
                 }
                 children.Add(new ParseNode(ExpressionParser.add, "add", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.FactorExpression == context.SymbolId))) {
-                    context.Error("Expecting FactorExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting FactorExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.FactorExpression, "FactorExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12816,7 +12805,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.TermExpressionListRightAssoc, "TermExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting add at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting add", line__, column__, position__);
         }
         internal static ParseNode ParseFactorExpressionListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -12827,13 +12816,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.mul == context.SymbolId))) {
-                    context.Error("Expecting mul at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mul");
                 }
                 children.Add(new ParseNode(ExpressionParser.mul, "mul", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.UnaryExpression == context.SymbolId))) {
-                    context.Error("Expecting UnaryExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting UnaryExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.UnaryExpression, "UnaryExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12846,7 +12835,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.FactorExpressionListRightAssoc, "FactorExpressionListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting mul at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting mul", line__, column__, position__);
         }
         internal static ParseNode ParseFactorExpressionListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -12857,13 +12846,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.mod == context.SymbolId))) {
-                    context.Error("Expecting mod at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mod");
                 }
                 children.Add(new ParseNode(ExpressionParser.mod, "mod", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.UnaryExpression == context.SymbolId))) {
-                    context.Error("Expecting UnaryExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting UnaryExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.UnaryExpression, "UnaryExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12875,7 +12864,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(ExpressionParser.FactorExpressionListRightAssoc2, "FactorExpressionListRightAssoc2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting mod at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting mod", line__, column__, position__);
         }
         internal static ParseNode ParseMemberInvokeRefListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -12886,20 +12875,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.MethodArg == context.SymbolId))) {
-                    context.Error("Expecting MethodArg at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MethodArg");
                 }
                 children.Add(new ParseNode(ExpressionParser.MethodArg, "MethodArg", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberInvokeRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberInvokeRefListRightAssoc, "MemberInvokeRefListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseMemberIndexerRefListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -12910,7 +12899,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12918,7 +12907,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseMemberIndexerRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberIndexerRefListRightAssoc, "MemberIndexerRefListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeBaseListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -12929,20 +12918,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.dot == context.SymbolId))) {
-                    context.Error("Expecting dot at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting dot");
                 }
                 children.Add(new ParseNode(ExpressionParser.dot, "dot", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.identifier2 == context.SymbolId))) {
-                    context.Error("Expecting identifier at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting identifier");
                 }
                 children.Add(new ParseNode(ExpressionParser.identifier2, "identifier", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeBaseListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeBaseListRightAssoc, "TypeBaseListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting dot at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting dot", line__, column__, position__);
         }
         internal static ParseNode ParseTypeArraySpecListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -12953,14 +12942,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.TypeArraySpec == context.SymbolId))) {
-                    context.Error("Expecting TypeArraySpec at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TypeArraySpec");
                 }
                 children.Add(new ParseNode(ExpressionParser.TypeArraySpec, "TypeArraySpec", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeArraySpecListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeArraySpecListRightAssoc, "TypeArraySpecListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeArraySpec at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeArraySpec", line__, column__, position__);
         }
         internal static ParseNode ParseTypeGenericPartListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -12971,7 +12960,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -12979,7 +12968,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseTypeGenericPartListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeGenericPartListRightAssoc, "TypeGenericPartListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeArraySpecRankListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -12990,14 +12979,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.TypeArraySpecRank == context.SymbolId))) {
-                    context.Error("Expecting TypeArraySpecRank at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TypeArraySpecRank");
                 }
                 children.Add(new ParseNode(ExpressionParser.TypeArraySpecRank, "TypeArraySpecRank", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTypeArraySpecRankListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.TypeArraySpecRankListRightAssoc, "TypeArraySpecRankListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeArraySpecRank at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeArraySpecRank", line__, column__, position__);
         }
         internal static ParseNode ParseNewObjectPartListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13008,7 +12997,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13016,7 +13005,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseNewObjectPartListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.NewObjectPartListRightAssoc, "NewObjectPartListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseArraySpecExpressionListListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13027,7 +13016,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13035,7 +13024,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseArraySpecExpressionListListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.ArraySpecExpressionListListRightAssoc, "ArraySpecExpressionListListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseArrayInitializerListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13046,7 +13035,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13054,7 +13043,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseArrayInitializerListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.ArrayInitializerListRightAssoc, "ArrayInitializerListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13065,13 +13054,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefListRightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefListRightAssoc, "MemberAnyRefListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList2RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13082,13 +13071,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList2RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList2RightAssoc, "MemberAnyRefList2RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList3RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13099,13 +13088,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList3RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList3RightAssoc, "MemberAnyRefList3RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList4RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13116,13 +13105,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList4RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList4RightAssoc, "MemberAnyRefList4RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList5RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13133,13 +13122,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList5RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList5RightAssoc, "MemberAnyRefList5RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList6RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13150,13 +13139,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList6RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList6RightAssoc, "MemberAnyRefList6RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList7RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13167,13 +13156,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList7RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList7RightAssoc, "MemberAnyRefList7RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList8RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13184,13 +13173,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList8RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList8RightAssoc, "MemberAnyRefList8RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList9RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13201,13 +13190,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList9RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList9RightAssoc, "MemberAnyRefList9RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList10RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13218,13 +13207,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList10RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList10RightAssoc, "MemberAnyRefList10RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList11RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13235,13 +13224,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList11RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList11RightAssoc, "MemberAnyRefList11RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList12RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13252,13 +13241,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList12RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList12RightAssoc, "MemberAnyRefList12RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList13RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13269,13 +13258,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList13RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList13RightAssoc, "MemberAnyRefList13RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAnyRefList14RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13286,13 +13275,13 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.MemberAnyRef == context.SymbolId))) {
-                    context.Error("Expecting MemberAnyRef at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting MemberAnyRef");
                 }
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseMemberAnyRefList14RightAssoc(context).Children);
                 return new ParseNode(ExpressionParser.MemberAnyRefList14RightAssoc, "MemberAnyRefList14RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAnyRef at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAnyRef", line__, column__, position__);
         }
         internal static ParseNode ParseCatchClauseListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13303,14 +13292,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (StatementParser.CatchClause == context.SymbolId))) {
-                    context.Error("Expecting CatchClause at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting CatchClause");
                 }
                 children.Add(new ParseNode(StatementParser.CatchClause, "CatchClause", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(StatementParser.ParseCatchClauseListRightAssoc(context).Children);
                 return new ParseNode(StatementParser.CatchClauseListRightAssoc, "CatchClauseListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting CatchClause at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting CatchClause", line__, column__, position__);
         }
         internal static ParseNode ParseStatementListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13321,14 +13310,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (StatementParser.Statement == context.SymbolId))) {
-                    context.Error("Expecting Statement at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting Statement");
                 }
                 children.Add(new ParseNode(StatementParser.Statement, "Statement", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(StatementParser.ParseStatementListRightAssoc(context).Children);
                 return new ParseNode(StatementParser.StatementListRightAssoc, "StatementListRightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Statement", line__, column__, position__);
         }
         internal static ParseNode ParseStatementList2RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13339,14 +13328,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (StatementParser.Statement == context.SymbolId))) {
-                    context.Error("Expecting Statement at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting Statement");
                 }
                 children.Add(new ParseNode(StatementParser.Statement, "Statement", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(StatementParser.ParseStatementList2RightAssoc(context).Children);
                 return new ParseNode(StatementParser.StatementList2RightAssoc, "StatementList2RightAssoc", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Statement at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Statement", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeArgListListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13357,7 +13346,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13370,7 +13359,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.CustomAttributeArgListListRightAssoc, "CustomAttributeArgListListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeGroupListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13381,7 +13370,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13394,7 +13383,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.CustomAttributeGroupListRightAssoc, "CustomAttributeGroupListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeGroupList2RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13405,7 +13394,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13418,7 +13407,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.CustomAttributeGroupList2RightAssoc, "CustomAttributeGroupList2RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeGroupList3RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13495,7 +13484,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.CustomAttributeGroupList3RightAssoc, "CustomAttributeGroupList3RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting CustomAttributeGroup at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting CustomAttributeGroup", line__, column__, position__);
         }
         internal static ParseNode ParseTypeAttributesListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13506,7 +13495,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (TypeDeclParser.publicKeyword == context.SymbolId))) {
-                    context.Error("Expecting publicKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting publicKeyword");
                 }
                 children.Add(new ParseNode(TypeDeclParser.publicKeyword, "publicKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13524,7 +13513,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.TypeAttributesListRightAssoc, "TypeAttributesListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting publicKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting publicKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseTypeAttributesListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -13535,7 +13524,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (TypeDeclParser.privateKeyword == context.SymbolId))) {
-                    context.Error("Expecting privateKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting privateKeyword");
                 }
                 children.Add(new ParseNode(TypeDeclParser.privateKeyword, "privateKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13552,7 +13541,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.TypeAttributesListRightAssoc2, "TypeAttributesListRightAssoc2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting privateKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting privateKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseEnumFieldsListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13563,7 +13552,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13576,7 +13565,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.EnumFieldsListRightAssoc, "EnumFieldsListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseWhereClauseListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13587,7 +13576,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13600,7 +13589,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.WhereClauseListRightAssoc, "WhereClauseListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeParamsListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13611,7 +13600,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13624,7 +13613,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.TypeParamsListRightAssoc, "TypeParamsListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseTypeParamsList2RightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13635,7 +13624,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13648,7 +13637,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.TypeParamsList2RightAssoc, "TypeParamsList2RightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseMemberAttributeListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13676,7 +13665,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.MemberAttributeListRightAssoc, "MemberAttributeListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAttribute at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAttribute", line__, column__, position__);
         }
         internal static ParseNode ParseMethodParamListListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13687,7 +13676,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13700,7 +13689,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.MethodParamListListRightAssoc, "MethodParamListListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseParamListListRightAssoc(ParserContext context) {
             int line__ = context.Line;
@@ -13711,7 +13700,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.comma == context.SymbolId))) {
-                    context.Error("Expecting comma at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting comma");
                 }
                 children.Add(new ParseNode(ExpressionParser.comma, "comma", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13725,7 +13714,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.ParamListListRightAssoc, "ParamListListRightAssoc", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting comma at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting comma", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributePart(ParserContext context) {
             int line__ = context.Line;
@@ -13772,7 +13761,7 @@ namespace CD {
                 children[0] = TypeDeclParser.ParseCustomAttributeArgList(context);
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[1] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -13783,13 +13772,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.rparen == context.SymbolId))) {
-                    context.Error("Expecting rparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rparen");
                 }
                 children[0] = new ParseNode(ExpressionParser.rparen, "rparen", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(TypeDeclParser.CustomAttributePart, "CustomAttributePart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting CustomAttributeArgList or rparen at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting CustomAttributeArgList or rparen", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeArgList(ParserContext context) {
             int line__ = context.Line;
@@ -13837,7 +13826,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseCustomAttributeArgListPart(context).Children);
                 return new ParseNode(TypeDeclParser.CustomAttributeArgList, "CustomAttributeArgList", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting CustomAttributeArg at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting CustomAttributeArg", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeArgListPart(ParserContext context) {
             int line__ = context.Line;
@@ -13854,7 +13843,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.CustomAttributeArgListPart, "CustomAttributeArgListPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting CustomAttributeArgListList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting CustomAttributeArgListList", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeGroupPart(ParserContext context) {
             int line__ = context.Line;
@@ -13866,7 +13855,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseCustomAttributeGroupList(context).Children);
                 if ((false 
                             == (ExpressionParser.rbracket == context.SymbolId))) {
-                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbracket");
                 }
                 children.Add(new ParseNode(ExpressionParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13877,14 +13866,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.rbracket == context.SymbolId))) {
-                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbracket");
                 }
                 children[0] = new ParseNode(ExpressionParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(TypeDeclParser.CustomAttributeGroupPart, "CustomAttributeGroupPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting CustomAttributeGroupList or rbracket at line {0}, column {1}, position " +
-                        "{2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting CustomAttributeGroupList or rbracket", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeGroupPart2(ParserContext context) {
             int line__ = context.Line;
@@ -13896,7 +13884,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseCustomAttributeGroupList2(context).Children);
                 if ((false 
                             == (ExpressionParser.rbracket == context.SymbolId))) {
-                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbracket");
                 }
                 children.Add(new ParseNode(ExpressionParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13907,14 +13895,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.rbracket == context.SymbolId))) {
-                    context.Error("Expecting rbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting rbracket");
                 }
                 children[0] = new ParseNode(ExpressionParser.rbracket, "rbracket", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(TypeDeclParser.CustomAttributeGroupPart2, "CustomAttributeGroupPart2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting CustomAttributeGroupList2 or rbracket at line {0}, column {1}, position" +
-                        " {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting CustomAttributeGroupList2 or rbracket", line__, column__, position__);
         }
         internal static ParseNode ParseEnumFieldsPart(ParserContext context) {
             int line__ = context.Line;
@@ -13931,7 +13918,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.EnumFieldsPart, "EnumFieldsPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting EnumFieldsList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting EnumFieldsList", line__, column__, position__);
         }
         internal static ParseNode ParseWhereClause(ParserContext context) {
             int line__ = context.Line;
@@ -13944,7 +13931,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseIdentifier(context).Children);
                 if ((false 
                             == (StatementParser.colon == context.SymbolId))) {
-                    context.Error("Expecting colon at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting colon");
                 }
                 children.Add(new ParseNode(StatementParser.colon, "colon", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13952,7 +13939,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseWhereClausePart2(context).Children);
                 return new ParseNode(TypeDeclParser.WhereClause, "WhereClause", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting Identifier at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting Identifier", line__, column__, position__);
         }
         internal static ParseNode ParseWhereClausePart2(ParserContext context) {
             int line__ = context.Line;
@@ -13969,7 +13956,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.WhereClausePart2, "WhereClausePart2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting WhereClauseList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting WhereClauseList", line__, column__, position__);
         }
         internal static ParseNode ParseTypeParamsPart(ParserContext context) {
             int line__ = context.Line;
@@ -13981,7 +13968,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseTypeParamsList(context).Children);
                 if ((false 
                             == (ExpressionParser.gt == context.SymbolId))) {
-                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gt");
                 }
                 children.Add(new ParseNode(ExpressionParser.gt, "gt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -13992,13 +13979,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.gt == context.SymbolId))) {
-                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gt");
                 }
                 children[0] = new ParseNode(ExpressionParser.gt, "gt", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(TypeDeclParser.TypeParamsPart, "TypeParamsPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeParamsList or gt at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeParamsList or gt", line__, column__, position__);
         }
         internal static ParseNode ParseTypeParamsPart2(ParserContext context) {
             int line__ = context.Line;
@@ -14010,7 +13997,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseTypeParamsList2(context).Children);
                 if ((false 
                             == (ExpressionParser.gt == context.SymbolId))) {
-                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gt");
                 }
                 children.Add(new ParseNode(ExpressionParser.gt, "gt", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -14021,13 +14008,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (ExpressionParser.gt == context.SymbolId))) {
-                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gt");
                 }
                 children[0] = new ParseNode(ExpressionParser.gt, "gt", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(TypeDeclParser.TypeParamsPart2, "TypeParamsPart2", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeParamsList2 or gt at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeParamsList2 or gt", line__, column__, position__);
         }
         internal static ParseNode ParseInterface(ParserContext context) {
             int line__ = context.Line;
@@ -14046,7 +14033,7 @@ namespace CD {
                 children.Add(TypeDeclParser.ParseMemberAttributes(context));
                 if ((false 
                             == (TypeDeclParser.interfaceKeyword == context.SymbolId))) {
-                    context.Error("Expecting interfaceKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting interfaceKeyword");
                 }
                 children.Add(new ParseNode(TypeDeclParser.interfaceKeyword, "interfaceKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -14054,7 +14041,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseInterfacePart(context).Children);
                 return new ParseNode(TypeDeclParser.Interface, "Interface", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MemberAttributes at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MemberAttributes", line__, column__, position__);
         }
         internal static ParseNode ParseInterfacePart(ParserContext context) {
             int line__ = context.Line;
@@ -14065,14 +14052,14 @@ namespace CD {
                 ParseNode[] children = new ParseNode[4];
                 if ((false 
                             == (ExpressionParser.lt == context.SymbolId))) {
-                    context.Error("Expecting lt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lt");
                 }
                 children[0] = new ParseNode(ExpressionParser.lt, "lt", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 children[1] = TypeDeclParser.ParseTypeParams(context);
                 if ((false 
                             == (ExpressionParser.gt == context.SymbolId))) {
-                    context.Error("Expecting gt at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gt");
                 }
                 children[2] = new ParseNode(ExpressionParser.gt, "gt", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -14087,7 +14074,7 @@ namespace CD {
                 children[0] = TypeDeclParser.ParseTypeDeclPart(context);
                 return new ParseNode(TypeDeclParser.InterfacePart, "InterfacePart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lt or TypeDeclPart at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lt or TypeDeclPart", line__, column__, position__);
         }
         internal static ParseNode ParseMethodParamListPart(ParserContext context) {
             int line__ = context.Line;
@@ -14104,7 +14091,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.MethodParamListPart, "MethodParamListPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting MethodParamListList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting MethodParamListList", line__, column__, position__);
         }
         internal static ParseNode ParseParamListPart(ParserContext context) {
             int line__ = context.Line;
@@ -14122,7 +14109,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.ParamListPart, "ParamListPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting ParamListList at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting ParamListList", line__, column__, position__);
         }
         internal static ParseNode ParsePropertyGet(ParserContext context) {
             int line__ = context.Line;
@@ -14133,14 +14120,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (TypeDeclParser.getKeyword == context.SymbolId))) {
-                    context.Error("Expecting getKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting getKeyword");
                 }
                 children.Add(new ParseNode(TypeDeclParser.getKeyword, "getKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(TypeDeclParser.ParsePropertyGetPart(context).Children);
                 return new ParseNode(TypeDeclParser.PropertyGet, "PropertyGet", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting getKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting getKeyword", line__, column__, position__);
         }
         internal static ParseNode ParsePropertyGetPart(ParserContext context) {
             int line__ = context.Line;
@@ -14157,13 +14144,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (StatementParser.semi == context.SymbolId))) {
-                    context.Error("Expecting semi at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting semi");
                 }
                 children[0] = new ParseNode(StatementParser.semi, "semi", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(TypeDeclParser.PropertyGetPart, "PropertyGetPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting StatementBlock or semi at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting StatementBlock or semi", line__, column__, position__);
         }
         internal static ParseNode ParsePropertySet(ParserContext context) {
             int line__ = context.Line;
@@ -14174,14 +14161,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (TypeDeclParser.setKeyword == context.SymbolId))) {
-                    context.Error("Expecting setKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting setKeyword");
                 }
                 children.Add(new ParseNode(TypeDeclParser.setKeyword, "setKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(TypeDeclParser.ParsePropertySetPart(context).Children);
                 return new ParseNode(TypeDeclParser.PropertySet, "PropertySet", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting setKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting setKeyword", line__, column__, position__);
         }
         internal static ParseNode ParsePropertySetPart(ParserContext context) {
             int line__ = context.Line;
@@ -14198,13 +14185,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[1];
                 if ((false 
                             == (StatementParser.semi == context.SymbolId))) {
-                    context.Error("Expecting semi at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting semi");
                 }
                 children[0] = new ParseNode(StatementParser.semi, "semi", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(TypeDeclParser.PropertySetPart, "PropertySetPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting StatementBlock or semi at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting StatementBlock or semi", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionListPart(ParserContext context) {
             int line__ = context.Line;
@@ -14215,13 +14202,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.lte == context.SymbolId))) {
-                    context.Error("Expecting lte at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lte");
                 }
                 children[0] = new ParseNode(ExpressionParser.lte, "lte", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children[1] = new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -14232,19 +14219,19 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.gte == context.SymbolId))) {
-                    context.Error("Expecting gte at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting gte");
                 }
                 children[0] = new ParseNode(ExpressionParser.gte, "gte", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.TermExpression == context.SymbolId))) {
-                    context.Error("Expecting TermExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting TermExpression");
                 }
                 children[1] = new ParseNode(ExpressionParser.TermExpression, "TermExpression", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.RelationalExpressionListPart, "RelationalExpressionListPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lte or gte at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lte or gte", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListPart(ParserContext context) {
             int line__ = context.Line;
@@ -14255,13 +14242,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.addAssign == context.SymbolId))) {
-                    context.Error("Expecting addAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting addAssign");
                 }
                 children[0] = new ParseNode(ExpressionParser.addAssign, "addAssign", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children[1] = new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -14272,13 +14259,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.mulAssign == context.SymbolId))) {
-                    context.Error("Expecting mulAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting mulAssign");
                 }
                 children[0] = new ParseNode(ExpressionParser.mulAssign, "mulAssign", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children[1] = new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -14289,13 +14276,13 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.modAssign == context.SymbolId))) {
-                    context.Error("Expecting modAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting modAssign");
                 }
                 children[0] = new ParseNode(ExpressionParser.modAssign, "modAssign", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children[1] = new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
@@ -14306,20 +14293,19 @@ namespace CD {
                 ParseNode[] children = new ParseNode[2];
                 if ((false 
                             == (ExpressionParser.bitwiseOrAssign == context.SymbolId))) {
-                    context.Error("Expecting bitwiseOrAssign at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting bitwiseOrAssign");
                 }
                 children[0] = new ParseNode(ExpressionParser.bitwiseOrAssign, "bitwiseOrAssign", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.OrExpression == context.SymbolId))) {
-                    context.Error("Expecting OrExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting OrExpression");
                 }
                 children[1] = new ParseNode(ExpressionParser.OrExpression, "OrExpression", context.Value, context.Line, context.Column, context.Position);
                 context.Advance();
                 return new ParseNode(ExpressionParser.AssignExpressionListPart, "AssignExpressionListPart", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting addAssign, mulAssign, modAssign, or bitwiseOrAssign at line {0}, column" +
-                        " {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting addAssign, mulAssign, modAssign, or bitwiseOrAssign", line__, column__, position__);
         }
         internal static ParseNode ParseEqualityExpressionListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -14330,20 +14316,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.notEq == context.SymbolId))) {
-                    context.Error("Expecting notEq at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting notEq");
                 }
                 children.Add(new ParseNode(ExpressionParser.notEq, "notEq", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.RelationalExpression == context.SymbolId))) {
-                    context.Error("Expecting RelationalExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting RelationalExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.RelationalExpression, "RelationalExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseEqualityExpressionListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.EqualityExpressionListRightAssoc2, "EqualityExpressionListRightAssoc2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting notEq at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting notEq", line__, column__, position__);
         }
         internal static ParseNode ParseTermExpressionListRightAssoc2(ParserContext context) {
             int line__ = context.Line;
@@ -14354,20 +14340,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.sub == context.SymbolId))) {
-                    context.Error("Expecting sub at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting sub");
                 }
                 children.Add(new ParseNode(ExpressionParser.sub, "sub", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.FactorExpression == context.SymbolId))) {
-                    context.Error("Expecting FactorExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting FactorExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.FactorExpression, "FactorExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseTermExpressionListRightAssoc2(context).Children);
                 return new ParseNode(ExpressionParser.TermExpressionListRightAssoc2, "TermExpressionListRightAssoc2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting sub at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting sub", line__, column__, position__);
         }
         internal static ParseNode ParseFactorExpressionListRightAssoc3(ParserContext context) {
             int line__ = context.Line;
@@ -14378,20 +14364,20 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.div == context.SymbolId))) {
-                    context.Error("Expecting div at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting div");
                 }
                 children.Add(new ParseNode(ExpressionParser.div, "div", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 if ((false 
                             == (ExpressionParser.UnaryExpression == context.SymbolId))) {
-                    context.Error("Expecting UnaryExpression at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting UnaryExpression");
                 }
                 children.Add(new ParseNode(ExpressionParser.UnaryExpression, "UnaryExpression", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(ExpressionParser.ParseFactorExpressionListRightAssoc3(context).Children);
                 return new ParseNode(ExpressionParser.FactorExpressionListRightAssoc3, "FactorExpressionListRightAssoc3", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting div at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting div", line__, column__, position__);
         }
         internal static ParseNode ParseTypeAttributesListRightAssoc3(ParserContext context) {
             int line__ = context.Line;
@@ -14402,7 +14388,7 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (TypeDeclParser.internalKeyword == context.SymbolId))) {
-                    context.Error("Expecting internalKeyword at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting internalKeyword");
                 }
                 children.Add(new ParseNode(TypeDeclParser.internalKeyword, "internalKeyword", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
@@ -14418,7 +14404,7 @@ namespace CD {
                 ParseNode[] children = new ParseNode[0];
                 return new ParseNode(TypeDeclParser.TypeAttributesListRightAssoc3, "TypeAttributesListRightAssoc3", children, line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting internalKeyword at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting internalKeyword", line__, column__, position__);
         }
         internal static ParseNode ParseRelationalExpressionListRightAssoc3(ParserContext context) {
             int line__ = context.Line;
@@ -14432,7 +14418,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseRelationalExpressionListRightAssoc3(context).Children);
                 return new ParseNode(ExpressionParser.RelationalExpressionListRightAssoc3, "RelationalExpressionListRightAssoc3", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting RelationalExpressionListPart at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting RelationalExpressionListPart", line__, column__, position__);
         }
         internal static ParseNode ParseAssignExpressionListRightAssoc5(ParserContext context) {
             int line__ = context.Line;
@@ -14448,7 +14434,7 @@ namespace CD {
                 children.AddRange(ExpressionParser.ParseAssignExpressionListRightAssoc5(context).Children);
                 return new ParseNode(ExpressionParser.AssignExpressionListRightAssoc5, "AssignExpressionListRightAssoc5", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting AssignExpressionListPart at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting AssignExpressionListPart", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttribute(ParserContext context) {
             int line__ = context.Line;
@@ -14476,7 +14462,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseCustomAttributePart2(context).Children);
                 return new ParseNode(TypeDeclParser.CustomAttribute, "CustomAttribute", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting TypeBase at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting TypeBase", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributePart2(ParserContext context) {
             int line__ = context.Line;
@@ -14493,14 +14479,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lparen == context.SymbolId))) {
-                    context.Error("Expecting lparen at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lparen");
                 }
                 children.Add(new ParseNode(ExpressionParser.lparen, "lparen", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(TypeDeclParser.ParseCustomAttributePart(context).Children);
                 return new ParseNode(TypeDeclParser.CustomAttributePart2, "CustomAttributePart2", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lparen at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lparen", line__, column__, position__);
         }
         internal static ParseNode ParseTypeParamsPart3(ParserContext context) {
             int line__ = context.Line;
@@ -14522,8 +14508,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseTypeParamsPart2(context).Children);
                 return new ParseNode(TypeDeclParser.TypeParamsPart3, "TypeParamsPart3", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting CustomAttributeGroup or Identifier at line {0}, column {1}, position {2" +
-                        "}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting CustomAttributeGroup or Identifier", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeGroup(ParserContext context) {
             int line__ = context.Line;
@@ -14534,14 +14519,14 @@ namespace CD {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
                 if ((false 
                             == (ExpressionParser.lbracket == context.SymbolId))) {
-                    context.Error("Expecting lbracket at line {0}, column {1}, position {2}", context.Line, context.Column, context.Position);
+                    context.Error("Expecting lbracket");
                 }
                 children.Add(new ParseNode(ExpressionParser.lbracket, "lbracket", context.Value, context.Line, context.Column, context.Position));
                 context.Advance();
                 children.AddRange(TypeDeclParser.ParseCustomAttributeGroupPart3(context).Children);
                 return new ParseNode(TypeDeclParser.CustomAttributeGroup, "CustomAttributeGroup", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting lbracket at line {0}, column {1}, position {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting lbracket", line__, column__, position__);
         }
         internal static ParseNode ParseCustomAttributeGroupPart3(ParserContext context) {
             int line__ = context.Line;
@@ -14578,8 +14563,7 @@ namespace CD {
                 children.AddRange(TypeDeclParser.ParseCustomAttributeGroupPart2(context).Children);
                 return new ParseNode(TypeDeclParser.CustomAttributeGroupPart3, "CustomAttributeGroupPart3", children.ToArray(), line__, column__, position__);
             }
-            throw new SyntaxException(string.Format("Expecting CustomAttributeTarget or CustomAttribute at line {0}, column {1}, posit" +
-                        "ion {2}", line__, column__, position__), line__, column__, position__);
+            throw new SyntaxException("Expecting CustomAttributeTarget or CustomAttribute", line__, column__, position__);
         }
     }
     /// <summary>
@@ -14699,10 +14683,61 @@ namespace CD {
             }
         }
         public override string ToString() {
+            return this.ToString(null);
+        }
+        public string ToString(string format) {
+            if (("t" == format)) {
+                StringBuilder sb = new StringBuilder();
+                ParseNode._AppendTree(this, sb);
+                return sb.ToString();
+            }
             if (this.IsNonTerminal) {
                 return string.Concat(this.Symbol, ": Count = ", this._children.Length.ToString());
             }
             return string.Concat(this.Symbol, ": ", this.Value);
+        }
+        static void _AppendTree(ParseNode node, System.Text.StringBuilder builder) {
+            // adapted from https://stackoverflow.com/questions/1649027/how-do-i-print-out-a-tree-structure
+            List<ParseNode> firstStack = new List<ParseNode>();
+            firstStack.Add(node);
+            List<List<ParseNode>> childListStack = new List<List<ParseNode>>();
+            childListStack.Add(firstStack);
+            for (
+            ; (childListStack.Count > 0); 
+            ) {
+                List<ParseNode> childStack = childListStack[(childListStack.Count - 1)];
+                if ((childStack.Count == 0)) {
+                    childListStack.RemoveAt((childListStack.Count - 1));
+                }
+                else {
+                    node = childStack[0];
+                    childStack.RemoveAt(0);
+                    string indent = "";
+                    for (int i = 0; (i 
+                                < (childListStack.Count - 1)); i = (i + 1)) {
+                        if ((0 < childListStack[i].Count)) {
+                            indent = (indent + "|  ");
+                        }
+                        else {
+                            indent = (indent + "   ");
+                        }
+                    }
+                    string s = node.Symbol;
+                    string ns = "";
+                    if ((null != node.Value)) {
+                        ns = node.Value;
+                    }
+                    string ss = string.Concat(indent, "+- ", string.Concat(s, " ", ns));
+                    ss = ss.TrimEnd();
+                    builder.Append(ss);
+                    builder.AppendLine();
+                    if ((node.IsNonTerminal 
+                                && (0 < node.Children.Length))) {
+                        List<ParseNode> pnl = new List<ParseNode>(node.Children);
+                        childListStack.Add(pnl);
+                    }
+                }
+            }
         }
     }
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
