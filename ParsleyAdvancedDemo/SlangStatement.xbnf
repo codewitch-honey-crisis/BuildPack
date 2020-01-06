@@ -21,8 +21,8 @@ VariableDeclarationOrLabelOrExpressionStatement<collapsed>=
 	: where { return true; }
 // trailing else conflict requires a conflict
 // override via a where constraint
-ElsePart<collapsed> = "else" StatementOrBlock;
-IfStatementPart<collapsed>= "if" "(" Expression ")" StatementOrBlock ;
+ElsePart<dependency,collapsed> = "else" StatementOrBlock;
+IfStatementPart<dependency,collapsed>= "if" "(" Expression ")" StatementOrBlock ;
 // backtracking seems to be choosing incorrectly on trailing else here
 // make it virtual
 //IfStatement=IfStatementPart [ ElsePart ]
@@ -50,7 +50,7 @@ LabelStatement= identifier ":" : where {
 StatementOrBlock<collapsed> = (Statement | StatementBlock);
 // use a virtual here. Primarily delegating to InnerStatement
 // but we need to grab comments
-Statement<start,virtual, firsts="InnerStatement",follows="InnerStatement rbrace #EOS"> { return _ParseStatement(context); } 
+Statement<dependency,start,virtual, firsts="InnerStatement",follows="InnerStatement rbrace #EOS"> { return _ParseStatement(context); } 
 	: where {return true;}
 InnerStatement<dependency,collapsed,follows="InnerStatement rbrace #EOS">=
 	EmptyStatement	|

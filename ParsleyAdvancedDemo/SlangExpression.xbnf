@@ -20,7 +20,7 @@ MemberInvokeRef = "(" MethodArgList ")";
 MemberIndexerRef = "[" ArgList "]";
 MemberAnyRef<collapsed> = MemberFieldRef | MemberInvokeRef | MemberIndexerRef ;
 MethodArg = [ outKeyword | refKeyword ] Expression;
-TypeRef = Type;
+TypeRef<dependency> = Type;
 IntrinsicType=	boolType	|
 				charType	|
 				stringType	|

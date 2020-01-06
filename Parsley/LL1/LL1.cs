@@ -353,7 +353,17 @@ namespace Parsley
 			var ic = cfg.Rules.Count;
 			if (0 == ic)
 				result.Add(new CfgMessage(ErrorLevel.Error, -1, "Grammar has no rules",0,0,0, cfg.Filename));
-
+			var deps = new List<string>();
+			var nts = cfg.FillNonTerminals();
+			for (int jc = nts.Count, j = 0; j < jc; ++j)
+			{
+				var nt = nts[j];
+				var o = cfg.GetAttribute(nt, "dependency", false);
+				if(o is bool && (bool)o)
+				{
+					cfg.FillClosure(nt, deps);
+				}
+			}
 			var dups = new HashSet<CfgRule>();
 			for (var i = 0; i < ic; ++i)
 			{
@@ -398,8 +408,15 @@ namespace Parsley
 							o = cfg.GetAttribute(sym, "nowarn");
 							if (o is bool && (bool)o)
 								continue;
+							o = cfg.GetAttribute(sym, "shared");
+							if (o is bool && (bool)o)
+								continue;
+							o = cfg.GetAttribute(sym, "start");
+							if (o is bool && (bool)o)
+								continue;
+
 							var rules = cfg.FillNonTerminalRules(sym);
-							if (0 < rules.Count)
+							if (0 < rules.Count && !deps.Contains(sym))
 							{
 								var r = rules[0];
 								result.Add(new CfgMessage(ErrorLevel.Warning, -1, string.Concat("Unreachable symbol \"", sym, "\""), r.Line, r.Column, r.Position, cfg.Filename));

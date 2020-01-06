@@ -56,7 +56,7 @@ Param= Type Identifier;
 PropertyAccessors<virtual,firsts="PropertyGet PropertySet"> { return _ParsePropertyAccessors(context); }
 PropertyGet<dependency>= "get" ( StatementBlock | ";" );
 PropertySet<dependency>= "set" ( StatementBlock | ";" );
-ConstructorChain = ( "base" | "this" ) "(" ParamList ")";
+ConstructorChain<dependency> = ( "base" | "this" ) "(" ParamList ")";
 // below we add rbrace to the follows sets for each to 
 // production below to allow member decls to be inside a 
 // { } block (for type decls)
@@ -70,12 +70,12 @@ Field<abstract>;
 // is just bad with it right now. Better to write a bunch of code because the
 // errors in the code inside methods and such were bubbling up here and 
 // interfering with error reporting
-Member<virtual,follows="rbrace", firsts="lbracket MemberAttributes Type eventKeyword Identifier">
+Member<virtual,shared,dependency,follows="rbrace", firsts="lbracket MemberAttributes Type eventKeyword Identifier">
 {
 	return _ParseMember(context);
 } : where { return true; } // ignore conflicts here. handled by the routine
 
-Members<virtual,firsts="Member"> { return _ParseMembers(context); } 
+Members<shared,virtual,firsts="Member"> { return _ParseMembers(context); } 
 	: where { return true; } // method handles first-first conflicts
 assemblyKeyword="assembly"; // for assembly targets
 voidType<terminal>="void"; // basically for methods

@@ -13,7 +13,7 @@ CustomAttributeGroups<dependency,follows="Member TypeDecl Identifier namespaceKe
 
 // Types
 // since it's only used in code, we need to give it follows
-TypeAttributes<follows="classKeyword enumKeyword structKeyword interfaceKeyword partialKeyword">= { publicKeyword | internalKeyword | privateKeyword };
+TypeAttributes<dependency,follows="classKeyword enumKeyword structKeyword interfaceKeyword partialKeyword">= { publicKeyword | internalKeyword | privateKeyword };
 EnumPart<collapsed> = "{" EnumFields "}" | ":" Type "{" EnumFields "}";
 EnumFields<collapsed>= [ EnumField { "," EnumField } ];
 EnumField= Identifier "=" Expression ;
@@ -45,7 +45,7 @@ MemberAttributes<dependency> = { MemberAttribute };
 // it's hard to know where the type ends and the identifier begins.
 // note that we restrict the Identifier below, 
 // by copying its where clause.
-PrivateImplementationType<virtual,firsts="Identifier"> 
+PrivateImplementationType<dependency,virtual,firsts="Identifier"> 
 	{ return _ParsePrivateImplementationType(context); } 
 	: where { return !ExpressionParser.Keywords.Contains(context.Value); } 
 // need the follows because it's only referenced by code
@@ -58,10 +58,10 @@ Param= Type Identifier;
 // property accessors are weird for the parser because one
 // can be optional, but only one of each may be specifed
 // and in any order. This is easier with a virtual
-PropertyAccessors<virtual,firsts="PropertyGet PropertySet"> { return _ParsePropertyAccessors(context); }
+PropertyAccessors<dependency,virtual,firsts="PropertyGet PropertySet"> { return _ParsePropertyAccessors(context); }
 PropertyGet<dependency>= "get" ( StatementBlock | ";" );
 PropertySet<dependency>= "set" ( StatementBlock | ";" );
-ConstructorChain = ( "base" | "this" ) "(" [ ArgList ] ")";
+ConstructorChain<dependency> = ( "base" | "this" ) "(" [ ArgList ] ")";
 // below we add rbrace to the follows sets for each to 
 // production below to allow member decls to be inside a 
 // { } block (for type decls)
@@ -80,7 +80,7 @@ Member<virtual,shared,follows="rbrace #EOS", firsts="lbracket MemberAttributes T
 	return _ParseMember(context);
 } : where { return true; } // ignore conflicts here. handled by the routine
 
-Members<virtual,firsts="Member"> { return _ParseMembers(context); } 
+Members<virtual,shared,firsts="Member"> { return _ParseMembers(context); } 
 	: where { return true; } // method handles first-first conflicts
 assemblyKeyword="assembly"; // for assembly targets
 voidType<terminal>="void"; // basically for methods

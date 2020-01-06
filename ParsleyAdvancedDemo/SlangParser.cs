@@ -11793,6 +11793,35 @@ namespace CD {
         internal static bool WhereMembers(ParserContext context) {
             return true;
         }
+        /// <summary>
+        /// Parses a production of the form:
+        /// Members
+        /// </summary>
+        /// <remarks>
+        /// The production rules are:
+        /// Members -> lbracket
+        /// Members -> newKeyword
+        /// Members -> constKeyword
+        /// Members -> publicKeyword
+        /// Members -> protectedKeyword
+        /// Members -> internalKeyword
+        /// Members -> privateKeyword
+        /// Members -> staticKeyword
+        /// Members -> overrideKeyword
+        /// Members -> Type
+        /// Members -> eventKeyword
+        /// Members -> Identifier
+        /// </remarks>
+        /// <param name="tokenizer">The tokenizer to parse with</param><returns>A <see cref="ParseNode" /> representing the parsed tokens</returns>
+        public static ParseNode ParseMembers(System.Collections.Generic.IEnumerable<Token> tokenizer) {
+            ParserContext context = new ParserContext(tokenizer);
+            context.EnsureStarted();
+            ParseNode result = TypeDeclParser.ParseMembers(context);
+            if ((false == context.IsEnded)) {
+                context.Error("Unexpected remainder in input.");
+            }
+            return result;
+        }
         internal static ParseNode ParseNamespaceNameListRightAssoc(ParserContext context) {
             int line__ = context.Line;
             int column__ = context.Column;
