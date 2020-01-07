@@ -153,6 +153,7 @@ namespace Parsley
 						consts[i] = "EosSymbol";
 					}
 				}
+				
 				// add the user code blocks
 				for (int ic = doc.Code.Count, i = 0; i < ic; ++i)
 				{
@@ -268,11 +269,12 @@ namespace Parsley
 					var ai = prod.Attributes.IndexOf("shared");
 					if (-1 < ai)
 					{
-						var o = prod.Attributes[ai].Value;
-						if (o is bool && (bool)o)
+						var oo = prod.Attributes[ai].Value;
+						if (oo is bool && (bool)oo)
 							isShared = true;
 					}
 				}
+				
 				var parseNtImpl = C.Method(C.Type("ParseNode"), string.Concat("Parse", nt),  MemberAttributes.FamilyAndAssembly | MemberAttributes.Static, C.Param(C.Type("ParserContext"), "context"));
 				parser.Members.Add(parseNtImpl);
 				if (null != prod && prod.IsVirtual)
@@ -285,12 +287,12 @@ namespace Parsley
 				}
 				else
 				{
-					parseNtImpl.Statements.Add(C.Var(typeof(int), "line__", C.PropRef(C.ArgRef("context"), "Line")));
-					parseNtImpl.Statements.Add(C.Var(typeof(int), "column__", C.PropRef(C.ArgRef("context"), "Column")));
-					parseNtImpl.Statements.Add(C.Var(typeof(long), "position__", C.PropRef(C.ArgRef("context"), "Position")));
-					var l = C.VarRef("line__");
-					var c = C.VarRef("column__");
-					var p = C.VarRef("position__");
+					parseNtImpl.Statements.Add(C.Var(typeof(int), "line", C.PropRef(C.ArgRef("context"), "Line")));
+					parseNtImpl.Statements.Add(C.Var(typeof(int), "column", C.PropRef(C.ArgRef("context"), "Column")));
+					parseNtImpl.Statements.Add(C.Var(typeof(long), "position", C.PropRef(C.ArgRef("context"), "Position")));
+					var l = C.VarRef("line");
+					var c = C.VarRef("column");
+					var p = C.VarRef("position");
 					foreach (var kvp in rmap)
 					{
 
@@ -316,12 +318,12 @@ namespace Parsley
 							else
 							{
 								
-								var pc = C.Var(C.Type("ParserContext"), "context2__");
+								var pc = C.Var(C.Type("ParserContext"), "context2");
 								// sort the conflicting rules by grammar priority.
 								/*rules.Sort((x,y) => {
 									return cfg.Rules.IndexOf(x) - cfg.Rules.IndexOf(y);
 								});*/
-								var ac = C.Var(typeof(int), "advanceCount__", C.Zero);
+								var ac = C.Var(typeof(int), "advanceCount", C.Zero);
 								var cnd = C.If(_BuildIfRuleExprsCnd(genInfo.Document,prod, syms,symtbl,consts, context, kvp.Value, codeclass,symmap));
 								cnd.TrueStatements.Add(pc);
 								cnd.TrueStatements.Add(ac);
@@ -329,8 +331,8 @@ namespace Parsley
 								var r = rules[0];
 								for (int jc = r.Right.Count, j = 0; j < jc; ++j)
 								{
-									var o = cfg.GetAttribute(r.Right[j], "collapsed");
-									if (o is bool && (bool)o)
+									var oo = cfg.GetAttribute(r.Right[j], "collapsed");
+									if (oo is bool && (bool)oo)
 										collapsed.Add(r.Right[j]);
 								}
 								var vex = C.Var(typeof(Exception), "lastExcept", C.Null);
@@ -348,19 +350,19 @@ namespace Parsley
 										hasEmpty = true;
 										continue;
 									}
-									cnd.TrueStatements.Add(C.Let(C.VarRef("context2__"), C.Invoke(context, "GetLookAhead")));
-									cnd.TrueStatements.Add(C.Invoke(C.VarRef("context2__"), "EnsureStarted"));
+									cnd.TrueStatements.Add(C.Let(C.VarRef("context2"), C.Invoke(context, "GetLookAhead")));
+									cnd.TrueStatements.Add(C.Invoke(C.VarRef("context2"), "EnsureStarted"));
 									var stmts = new CodeStatementCollection();
-									_BuildParseRule(primaryDoc,cfg, doc,prod, consts,symtbl, C.VarRef("context2__"), syms, nt, stmts, l, c, p, kvp, rule, context, codeclass,symmap,genInfo);
+									_BuildParseRule(primaryDoc,cfg, doc,prod, consts,symtbl, C.VarRef("context2"), syms, nt, stmts, l, c, p, kvp, rule, context, codeclass,symmap,genInfo);
 									// we use except. handing to process our alternatives so we don't 
 									// need to double the code size
 									var tcf = new CodeTryCatchFinallyStatement();
 									cnd.TrueStatements.Add(new CodeCommentStatement(rule.ToString()));
 									cnd.TrueStatements.Add(tcf);
 									var cc = new CodeCatchClause("ex", C.Type("SyntaxException"));
-									cc.Statements.Add(C.If(C.Gt(C.PropRef(C.VarRef("context2__"), "AdvanceCount"), C.VarRef("advanceCount__")),
+									cc.Statements.Add(C.If(C.Gt(C.PropRef(C.VarRef("context2"), "AdvanceCount"), C.VarRef("advanceCount")),
 										C.Let(C.VarRef(vex.Name), C.VarRef("ex")),
-										C.Let(C.VarRef("advanceCount__"), C.PropRef(C.VarRef("context2__"), "AdvanceCount")
+										C.Let(C.VarRef("advanceCount"), C.PropRef(C.VarRef("context2"), "AdvanceCount")
 										)));
 									tcf.CatchClauses.Add(cc);
 									tcf.TryStatements.AddRange(stmts);
