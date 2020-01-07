@@ -347,7 +347,7 @@ namespace Parsley
 						var sw = new StreamWriter(rolexfile);
 						sw.BaseStream.SetLength(0);
 						output = sw;
-						output.WriteLine(XbnfConvert.ToRolexSpec(doc, primaryCfg));
+						output.WriteLine(XbnfConvert.ToRolexSpec(genInfo));
 						output.Flush();
 						output.Close();
 						output = null;

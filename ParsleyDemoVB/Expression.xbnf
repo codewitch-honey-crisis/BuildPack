@@ -64,9 +64,13 @@ Leaf<type="int">= integer | identifier | "(" Term ")" => {
 // we only need to declare terminals explicitly if we want 
 // constant names for them or to apply attributes to them
 // in this case we don't need divide, subtract or 
-// parentheses to be declared
+// parentheses to be declared but we like good error messages
 add="+";
+sub="-";
 mul="*";
+div="/";
+lparen="(";
+rparen=")";
 integer='[0-9]+';
 identifier='[A-Z_a-z][0-9A-Z_a-z]*';
 whitespace<hidden>='\s+';

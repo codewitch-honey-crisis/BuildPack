@@ -251,54 +251,53 @@ namespace Parsley
 			lexSpec = lexSpec.Replace("Parsley_declarations", decls.ToString());
 			return lexSpec;
 		}
-		public static string ToRolexSpec(XbnfDocument document,CfgDocument cfg)
+		public static string ToRolexSpec(XbnfGenerationInfo genInfo)
 		{
-			
-			var syms = new HashSet<string>();
-			//writer.WriteLine();
-			// use a list dictionary to keep these in order
-			var tmap = new ListDictionary<XbnfExpression, string>();
-			var attrSets = new Dictionary<string, XbnfAttributeList>();
-			var rules = new List<KeyValuePair<string, IList<string>>>();
-			// below are scratch
-			var working = new HashSet<XbnfExpression>();
-			var done = new HashSet<XbnfExpression>();
 
-			// now get the terminals and their ids, declaring if necessary
-			for (int ic = document.Productions.Count, i = 0; i < ic; ++i)
+			var termStart = 0;
+			var stbl = GetMasterSymbolTable(genInfo.CfgMap, out termStart);
+			var stbli = new List<KeyValuePair<KeyValuePair<string, XbnfDocument>, int>>();
+			var id = 0;
+
+			// assign temp ids
+			foreach (var se in stbl)
 			{
-				var p = document.Productions[i];
-				if (p.IsTerminal)
+				if (id >= termStart)
 				{
-					tmap.Add(p.Expression, p.Name);
-					done.Add(p.Expression);
+					stbli.Add(new KeyValuePair<KeyValuePair<string, XbnfDocument>, int>(se, id));
 				}
-				else
-					_VisitFetchTerminals(p.Expression, working);
+				++id;
 			}
-			foreach (var term in working)
-			{
-				if (!done.Contains(term))
-				{
-					var newId = _GetImplicitTermId(syms);
-					tmap.Add(term, newId);
-				}
-			}
-			
+			stbli.Sort(new _TermPriorityComparer(genInfo.CfgMap.Values));
+
 			var sb = new StringBuilder();
-			for (int ic = tmap.Count, i = 0; i < ic; ++i)
+			for (int ic = stbli.Count, i = 0; i < ic; ++i)
 			{
-				var te = tmap[i];
-				var id = cfg.GetIdOfSymbol(te.Value);
+				var se = stbli[i].Key;
+				if ("#EOS" == se.Key || "#ERROR" == se.Key)
+					continue;
+				XbnfExpression e = null;
+				foreach (var k in genInfo.TerminalMap)
+				{
+					if (k.Value == se.Key)
+					{
+						e = k.Key;
+						break;
+					}
+				}
+				//var te = genInfo.TerminalMap[i];
+				//var sym = te.Value;
+				//var id = stbli.IndexOf(new KeyValuePair<string, XbnfDocument>(sym, d));
+				id = stbli[i].Value;
 				if (-1 < id) // some terminals might never be used.
 				{
 					// implicit terminals do not have productions and therefore attributes
-					var pi = document.Productions.IndexOf(te.Value);
+					var pi = se.Value.Productions.IndexOf(se.Key);
 					if (-1 < pi)
 					{
 						// explicit
-						var prod = document.Productions[pi];
-						sb.Append(te.Value);
+						var prod = se.Value.Productions[pi];
+						sb.Append(se.Key);
 						sb.Append("<id=");
 						sb.Append(id);
 						foreach (var attr in prod.Attributes)
@@ -310,10 +309,10 @@ namespace Parsley
 					} else 
 					{
 						// implicit
-						sb.Append(te.Value);
+						sb.Append(se.Key);
 						sb.Append(string.Concat("<id=", id, ">"));
 					}
-					sb.AppendLine(string.Concat("= \'", _ToRegex(document, te.Key, true), "\'"));
+					sb.AppendLine(string.Concat("= \'", _ToRegex( se.Value, e, true), "\'"));
 				}
 			}
 			return sb.ToString();
