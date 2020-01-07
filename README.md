@@ -32,7 +32,10 @@ This readme can't do it justice, so just visit the link
 
 ## Parsley
 
-A little recursive descent LL(1) parser generator in C#. Supports actions in the grammar. See my [Code Project article](https://www.codeproject.com/Articles/5254538/Parsley-A-Recursive-Descent-Parser-Generator-in-Csharp) for information on using it.
+A powerful recursive descent LL(1) parser generator in C#. Supports actions in the grammar. See my [Code Project article](https://www.codeproject.com/Articles/5254538/Parsley-A-Recursive-Descent-Parser-Generator-in-Csharp) for information on using it.
+
+Like my other parsers, this parser uses XBNF for its grammar format. It supports automatic backtracking, virtual productions, syntactic constraints/predicates, and syntax directed actions.
+
 
 ## Rolex
 
