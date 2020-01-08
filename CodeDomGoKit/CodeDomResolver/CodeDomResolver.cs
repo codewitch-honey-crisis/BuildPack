@@ -1325,6 +1325,7 @@ namespace CD
 		/// <summary>
 		/// Refreshes the code after the graphs have been changed, added to, or removed from.
 		/// </summary>
+		/// <param name="customAction">A visit action to execute along with the refresh. Provided for optimization purposes</param>
 		/// <param name="typesOnly">Only go as far as types and their members</param>
 		public void Refresh(CodeDomVisitAction customAction=null,bool typesOnly = false)
 		{
