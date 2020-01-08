@@ -20,7 +20,6 @@ namespace ParsleyAdvancedDemo
 		static void Main()
 		{
 			Stream stm = null;
-			// Slang doesn't understand the using directive
 			try
 			{
 				// open this file
