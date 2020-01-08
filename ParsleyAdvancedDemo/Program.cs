@@ -54,6 +54,10 @@ namespace ParsleyAdvancedDemo
 				} else
 				{
 					Console.WriteLine(CodeDomUtility.ToString(ccu));
+					Console.WriteLine("Press any key...");
+					Console.ReadKey();
+					Console.Clear();
+					Console.WriteLine(CodeDomUtility.ToString(ccu, "vb")); 
 				}
 			} 
 			finally

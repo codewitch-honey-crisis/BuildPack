@@ -994,6 +994,7 @@ result){_typeCache.Add(type,rt);return result;}}_typeCache.Add(type,null);}retur
 public void ClearCache(){_typeCache.Clear();}/// <summary>
 /// Refreshes the code after the graphs have been changed, added to, or removed from.
 /// </summary>
+/// <param name="customAction">A visit action to execute along with the refresh. Provided for optimization purposes</param>
 /// <param name="typesOnly">Only go as far as types and their members</param>
 public void Refresh(CodeDomVisitAction customAction=null,bool typesOnly=false){ for(int ic=CompileUnits.Count,i=0;i<ic;++i){var ccu=CompileUnits[i]; CodeDomVisitor.Visit(ccu,
 (ctx)=>{var co=ctx.Target as CodeObject;if(null!=co){if(null!=ctx.Parent)co.UserData[_parentKey]=new WeakReference<object>(ctx.Parent);if(null!=ctx.Root)

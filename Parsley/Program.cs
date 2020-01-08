@@ -10,12 +10,12 @@ using System.Reflection;
 namespace Parsley
 {
 	using C = CD.CodeDomUtility;
-	class Program
+	public class Program
 	{
 		internal static readonly string CodeBase = Assembly.GetEntryAssembly().GetModules()[0].FullyQualifiedName;
 		internal static readonly string FileName = Path.GetFileName(CodeBase);
 		internal static readonly string Name = _GetName();
-
+		// TODO: Start here and implement Run() method
 		static int Main(string[] args)
 		{
 			int result = 0;
