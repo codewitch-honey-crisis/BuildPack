@@ -10,6 +10,7 @@ using System.Xml;
 #pragma warning disable VSTHRD010
 namespace ParsleyDevstudio
 {
+    // adapted from Adam Langley's code at https://www.codeproject.com/Articles/16515/Creating-a-Custom-Tool-to-Generate-Multiple-Files
     public static class VSUtility
     {
         public static IVsHierarchy GetCurrentHierarchy(IServiceProvider provider)
