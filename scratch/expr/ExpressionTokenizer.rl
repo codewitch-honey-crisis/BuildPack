@@ -1,0 +1,10 @@
+whitespace<id=20, hidden>= '\s+'
+identifier<id=19, terminal>= '[A-Z_a-z][0-9A-Z_a-z]*'
+integer<id=18, terminal>= '[0-9]+'
+rparen<id=17, terminal>= '\)'
+lparen<id=16, terminal>= '\('
+div<id=15, terminal>= '/'
+mul<id=14, terminal>= '\*'
+sub<id=13, terminal>= '\-'
+add<id=12, terminal>= '\+'
+

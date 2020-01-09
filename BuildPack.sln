@@ -58,6 +58,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParsleyAdvancedDemo", "Pars
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParsleyDevstudio", "ParsleyDevstudio\ParsleyDevstudio.csproj", "{EDC65D71-2C29-4B25-9AD8-B1962648C58A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "scratch", "scratch\scratch.csproj", "{08E8CF61-5DA5-4808-9831-27CBC3D2984B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -128,6 +130,10 @@ Global
 		{EDC65D71-2C29-4B25-9AD8-B1962648C58A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDC65D71-2C29-4B25-9AD8-B1962648C58A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDC65D71-2C29-4B25-9AD8-B1962648C58A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08E8CF61-5DA5-4808-9831-27CBC3D2984B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08E8CF61-5DA5-4808-9831-27CBC3D2984B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08E8CF61-5DA5-4808-9831-27CBC3D2984B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08E8CF61-5DA5-4808-9831-27CBC3D2984B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

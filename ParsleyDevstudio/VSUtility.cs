@@ -18,7 +18,7 @@ namespace ParsleyDevstudio
             if (vs == null) throw new InvalidOperationException("DTE not found."); 
             return ToHierarchy(vs.SelectedItems.Item(1).ProjectItem.ContainingProject);
         }
-        public static IVsHierarchy ToHierarchy(EnvDTE.Project project)
+        /*public static IVsHierarchy ToHierarchy(EnvDTE.Project project)
         {
             if (project == null) throw new ArgumentNullException("project"); 
             string projectGuid = null;        // DTE does not expose the project GUID that exists at in the msbuild project file.        
@@ -39,6 +39,19 @@ namespace ParsleyDevstudio
             }
             Debug.Assert(!String.IsNullOrEmpty(projectGuid));
             IServiceProvider serviceProvider = new ServiceProvider(project.DTE as Microsoft.VisualStudio.OLE.Interop.IServiceProvider); return VsShellUtilities.GetHierarchy(serviceProvider, new Guid(projectGuid));
+        }*/
+        public static IVsHierarchy ToHierarchy(EnvDTE.Project project)
+        {
+            if (project == null) throw new ArgumentNullException("project");
+
+            string uniqueName = project.UniqueName;
+            IVsSolution solution = (IVsSolution)Package.GetGlobalService(typeof(SVsSolution));
+
+            IVsHierarchy hierarchy;
+
+            solution.GetProjectOfUniqueName(uniqueName, out hierarchy);
+
+            return hierarchy;
         }
         public static IVsProject ToVsProject(EnvDTE.Project project)
         {

@@ -1,0 +1,78 @@
+﻿@options codeclass="ExpressionParser", rolexfile="ExpressionTokenizer.rl";
+
+Term<start,type="int">= Factor { ("+"|"-") Factor } => {
+	int result = Factor1;
+	int i = 2;
+	while (i<Length) 
+	{
+		if(SymbolId[i-1]==add)
+			result += Factor[i];
+		else // sub
+			result -= Factor[i];
+		i+=2;
+	}
+	return result;
+}
+
+Factor<type="int">= Unary { ("*"|"/") Unary } => { 
+	int result = Unary1;
+	int i = 2;
+	// Because of the way the grammar is 
+	// factored, this can end up being 
+	// Factors when collapsed. We use
+	// Child[n] which is a "smart"
+	// macro that evaluates the symbol
+	// at runtime and calls the right
+	// EvaluateXXXX method
+	while (i<Length) 
+	{
+		// Child always returns an object type so 
+		// be sure to cast as necessary
+		if(SymbolId[i-1]==mul) 
+			result *= (int)Child[i];
+		else // div
+			result /= (int)Child[i];
+		i+=2;
+	}
+	return result;
+}
+Unary<type="int">= ("+"|"-") Unary | Leaf => {
+	if(Length==1)
+		return Leaf1;
+	if(SymbolId[0]==add)
+		return Unary2;
+	else
+		return -Unary2;
+}
+Leaf<type="int">= integer | identifier | "(" Term ")" => {
+	if(Length==1) // integer | identifer
+	{
+		if(SymbolId[0]==integer)
+			return integer1;
+		else // identifier
+		{
+			if(state!=null) 
+			{
+				int val;
+				var d = (IDictionary<string,int>)state;
+				if(d.TryGetValue(identifier1,out val))
+					return val;
+			}	
+			throw new SyntaxException(string.Format("Reference to undefined variable {0}",identifier1),node.Line,node.Column,node.Position);
+		}
+	} else // Term
+		return Term2;
+}
+// we only need to declare terminals explicitly if we want 
+// constant names for them or to apply attributes to them
+// in this case we don't need divide, subtract or 
+// parentheses to be declared but we like good error messages
+add="+";
+sub="-";
+mul="*";
+div="/";
+lparen="(";
+rparen=")";
+integer='[0-9]+';
+identifier='[A-Z_a-z][0-9A-Z_a-z]*';
+whitespace<hidden>='\s+';
