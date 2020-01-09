@@ -17,12 +17,17 @@ using System.IO;
 using System.Reflection;
 namespace Rolex
 {
-	class Program
+	public class Program
 	{
-		static readonly string _CodeBase = Assembly.GetEntryAssembly().GetModules()[0].FullyQualifiedName;
-		static readonly string _File = Path.GetFileName(_CodeBase);
-		static readonly string _Name = _GetName();
+		static readonly string CodeBase = _GetCodeBase();
+		static readonly string FileName = Path.GetFileName(CodeBase);
+		static readonly string Name = _GetName();
 		static int Main(string[] args)
+		{
+			return Run(args, Console.In, Console.Out, Console.Error);
+		}
+
+		public static int Run(string[] args, TextReader stdin, TextWriter stdout, TextWriter stderr)
 		{
 			// our return code
 			var result = 0;
@@ -42,7 +47,7 @@ namespace Rolex
 			{
 				if (0 == args.Length)
 				{
-					_PrintUsage();
+					_PrintUsage(stderr);
 					result = -1;
 				}
 				else if(args[0].StartsWith("/"))
@@ -119,17 +124,17 @@ namespace Rolex
 					{
 						stale=_IsStale(inputfile, outputfile);
 						if (!stale)
-							stale = _IsStale(_CodeBase, outputfile);
+							stale = _IsStale(CodeBase, outputfile);
 					}
 					if (!stale)
 					{
-						Console.Error.WriteLine("{0} skipped building {1} because it was not stale.",_Name, outputfile);
+						stderr.WriteLine("{0} skipped building {1} because it was not stale.",Name, outputfile);
 					} else
 					{
 						if (null != outputfile)
-							Console.Error.Write("{0} is building {1}.", _Name, outputfile);
+							stderr.Write("{0} is building file: {1}", Name, outputfile);
 						else
-							Console.Error.Write("{0} is building tokenizer.", _Name);
+							stderr.Write("{0} is building tokenizer.", Name);
 						input = new StreamReader(inputfile);
 						var rules = _ParseRules(input);
 						input.Close();
@@ -145,7 +150,7 @@ namespace Rolex
 						var symbolTable = _BuildSymbolTable(rules);
 						var blockEnds = _BuildBlockEnds(rules);
 						var nodeFlags = _BuildNodeFlags(rules);
-						var dfaTable = _ToDfaStateTable(fa,symbolTable);
+						var dfaTable = _ToDfaStateTable(stderr,fa,symbolTable);
 						if (!noshared)
 						{
 							// import our Shared/Token.cs into the library
@@ -166,18 +171,21 @@ namespace Rolex
 							CodeTypeDeclaration td = null;
 							CodeDomVisitor.Visit(Shared.TableTokenizerTemplate, (ctx) => {
 								td = ctx.Target as CodeTypeDeclaration;
-								if (null != td && td.Name.EndsWith("Template"))
+								if (null != td)
 								{
-									origName += td.Name;
-									td.Name = name;
-									var f = CodeDomUtility.GetByName("DfaTable", td.Members) as CodeMemberField;
-									f.InitExpression = CodeGenerator.GenerateDfaTableInitializer(dfaTable);
-									f = CodeDomUtility.GetByName("NodeFlags", td.Members) as CodeMemberField;
-									f.InitExpression = CodeDomUtility.Literal(nodeFlags);
-									f = CodeDomUtility.GetByName("BlockEnds", td.Members) as CodeMemberField;
-									f.InitExpression = CodeDomUtility.Literal(blockEnds);
-									CodeGenerator.GenerateSymbolConstants(td, symbolTable);
-									ctx.Cancel = true;
+									if (td.Name.EndsWith("Template"))
+									{
+										origName += td.Name;
+										td.Name = name;
+										var f = CodeDomUtility.GetByName("DfaTable", td.Members) as CodeMemberField;
+										f.InitExpression = CodeGenerator.GenerateDfaTableInitializer(dfaTable);
+										f = CodeDomUtility.GetByName("NodeFlags", td.Members) as CodeMemberField;
+										f.InitExpression = CodeDomUtility.Literal(nodeFlags);
+										f = CodeDomUtility.GetByName("BlockEnds", td.Members) as CodeMemberField;
+										f.InitExpression = CodeDomUtility.Literal(blockEnds);
+										CodeGenerator.GenerateSymbolConstants(td, symbolTable);
+										ctx.Cancel = true;
+									}
 								}
 							});
 							CodeDomVisitor.Visit(Shared.TableTokenizerTemplate, (ctx) => {
@@ -228,13 +236,13 @@ namespace Rolex
 						}
 						if (!hasColNS)
 							cns.Imports.Add(new CodeNamespaceImport("System.Collections.Generic"));
-						Console.Error.WriteLine();
+						stderr.WriteLine();
 						var prov = CodeDomProvider.CreateProvider(codelanguage);
 						var opts = new CodeGeneratorOptions();
 						opts.BlankLinesBetweenMembers = false;
 						opts.VerbatimOrder = true;
 						if (null == outputfile)
-							output = Console.Out;
+							output = stdout;
 						else
 						{
 							// open the file and truncate it if necessary
@@ -250,7 +258,7 @@ namespace Rolex
 #if !DEBUG
 		    catch(Exception ex)
 			{
-				result = _ReportError(ex);
+				result = _ReportError(ex,stderr);
 			}
 #endif
 			finally
@@ -527,21 +535,21 @@ namespace Rolex
 		}
 
 		// do our error handling here (release builds)
-		static int _ReportError(Exception ex)
+		static int _ReportError(Exception ex,TextWriter stderr)
 		{
-			_PrintUsage();
-			Console.Error.WriteLine("Error: {0}", ex.Message);
+			_PrintUsage(stderr);
+			stderr.WriteLine("Error: {0}", ex.Message);
 			return -1;
 		}
-		static void _PrintUsage()
+		static void _PrintUsage(TextWriter stderr)
 		{
-			var t = Console.Error;
+			var t = stderr;
 			// write the name of our app. this actually uses the 
 			// name of the executable so it will always be correct
 			// even if the executable file was renamed.
-			t.WriteLine("{0} generates a lexer/tokenizer", _Name);
+			t.WriteLine("{0} generates a lexer/tokenizer", Name);
 			t.WriteLine();
-			t.Write(_File);
+			t.Write(FileName);
 			t.WriteLine(" <inputfile> [/output <outputfile>] [/name <name>]");
 			t.WriteLine("   [/namespace <codenamespace>] [/language <codelanguage>]");
 			t.WriteLine("   [/noshared] [/compiled] [/ifstale]");
@@ -558,22 +566,37 @@ namespace Rolex
 			t.WriteLine("Any other switch displays this screen and exits.");
 			t.WriteLine();
 		}
+		static string _GetCodeBase()
+		{
+			try
+			{
+				return Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName;
+			}
+			catch
+			{
+				return "rolex.exe";
+			}
+		}
 		static string _GetName()
 		{
-			foreach (var attr in Assembly.GetEntryAssembly().CustomAttributes)
+			try
 			{
-				if (typeof(AssemblyTitleAttribute) == attr.AttributeType)
+				foreach (var attr in Assembly.GetExecutingAssembly().CustomAttributes)
 				{
-					return attr.ConstructorArguments[0].Value as string;
+					if (typeof(AssemblyTitleAttribute) == attr.AttributeType)
+					{
+						return attr.ConstructorArguments[0].Value as string;
+					}
 				}
 			}
-			return Path.GetFileNameWithoutExtension(_File);
+			catch { }
+			return Path.GetFileNameWithoutExtension(FileName);
 		}
-		static DfaEntry[] _ToDfaStateTable<TAccept>(CharFA<TAccept> fsm,IList<TAccept> symbolTable = null, IProgress<CharFAProgress> progress = null)
+		static DfaEntry[] _ToDfaStateTable<TAccept>(TextWriter stderr, CharFA<TAccept> fsm,IList<TAccept> symbolTable = null, IProgress<CharFAProgress> progress = null)
 		{
 			
 			
-			var dfa = fsm.ToDfa(new _ConsoleProgress());
+			var dfa = fsm.ToDfa(new _ConsoleProgress(stderr));
 			//dfa.TrimDuplicates(new _ConsoleProgress());
 			var closure = dfa.FillClosure();
 			var symbolLookup = new ListDictionary<TAccept, int>();
@@ -691,9 +714,14 @@ namespace Rolex
 	}
 	class _ConsoleProgress : IProgress<CharFAProgress>
 	{
+		TextWriter _stderr;
+		public _ConsoleProgress(TextWriter stderr)
+		{
+			_stderr = stderr;
+		}
 		public void Report(CharFAProgress progress)
 		{
-			Console.Error.Write(".");
+			_stderr.Write(".");
 		}
 	}
 }

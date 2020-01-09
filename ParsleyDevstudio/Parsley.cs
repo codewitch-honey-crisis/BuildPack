@@ -9,26 +9,26 @@ using System.IO;
 using System.ComponentModel;
 using EnvDTE;
 using Microsoft.VisualStudio.OLE.Interop;
+using System.Collections.Generic;
 #pragma warning disable VSTHRD010
 namespace ParsleyDevstudio
 {
     using Process = System.Diagnostics.Process;
 
     [PackageRegistration(UseManagedResourcesOnly = true)]
-    [InstalledProductRegistration("Gplex", "Generate C# lexers", "1.2")]
-    [Guid("B1D25618-1FCF-42FB-B785-F097A8EF5DB6")]
+    [InstalledProductRegistration("Parsley", "Generate Composable Recursive Descent Parsers", "0.1.5.0")]
+    [Guid("1A9FE6C2-6287-49DE-A277-F8BA92959492")]
     [ComVisible(true)]
-    [ProvideObject(typeof(Gplex))]
-    [CodeGeneratorRegistration(typeof(Gplex), "Gplex", "{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}", GeneratesDesignTimeSource = true)]
-    // if we supported VB for this we'd add the following, but Gplex only emits C#
-    //[CodeGeneratorRegistration(typeof(Gplex),"Gplex", "{164b10b9-b200-11d0-8c61-00a0c91e29d5}",GeneratesDesignTimeSource =true)]
-    public sealed class Gplex : IVsSingleFileGenerator, IObjectWithSite
+    [ProvideObject(typeof(Parsley))]
+    [CodeGeneratorRegistration(typeof(Parsley), "Parsley", "{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}", GeneratesDesignTimeSource = true)]
+    [CodeGeneratorRegistration(typeof(Parsley),"Parsley", "{164b10b9-b200-11d0-8c61-00a0c91e29d5}",GeneratesDesignTimeSource =true)]
+    public sealed class Parsley : IVsSingleFileGenerator, IObjectWithSite
     {
         object _site;
         Array _projects;
         ServiceProvider _serviceProvider;
 
-        public Gplex()
+        public Parsley()
         {
             EnvDTE.DTE dte;
             try
@@ -95,75 +95,115 @@ namespace ParsleyDevstudio
           string wszDefaultNamespace, IntPtr[] rgbOutputFileContents,
           out uint pcbOutput, IVsGeneratorProgress pGenerateProgress)
         {
+            string outputfile = null;
+            string gplexfile = null;
+            string gplexshared = null;
+            string gplexcode = null;
+            string rolexfile = null;
             string log="";
             try
             {
                 if (null == _site)
-                    throw new InvalidOperationException("The Gplex custom tool can only be used in a design time environment. Consider using Gplex as a pre-build step instead.");
+                    throw new InvalidOperationException("The Parsley custom tool can only be used in a design time environment. Consider using Parsley as a pre-build step instead.");
                 wszInputFilePath = Path.GetFullPath(wszInputFilePath);
                 var item = _FindItem(wszInputFilePath);
                 if (null == item)
                     throw new ApplicationException("Design time environment project item fetch failed.");
-                if (0 != string.Compare("cs", VSUtility.GetProjectLanguageFromItem(item), StringComparison.InvariantCultureIgnoreCase))
-                    throw new NotSupportedException("The Gplex generator only supports C# projects");
-                var dir = Path.GetDirectoryName(wszInputFilePath);
-                var scannerFile = Path.GetFileNameWithoutExtension(wszInputFilePath) + ".cs";
                 foreach (EnvDTE.ProjectItem childItem in item.ProjectItems)
                     childItem.Delete();
-                // we don't add it to our generated files if it already exists
-                // TODO: see if we can check if it's part of the project instead (more robust)
-                var addGplexBuffers = !File.Exists(Path.Combine(dir, "GplexBuffers.cs"));
-                pGenerateProgress.Progress(0, 2);
-                ProcessStartInfo psi = new ProcessStartInfo();
-                psi.FileName = "gplex";
-                psi.CreateNoWindow = true;
-                psi.UseShellExecute = false;
-                psi.Arguments = "/out:\"" + Path.Combine(dir, scannerFile).Replace("\"", "\"\"") + "\"";
-                psi.Arguments += " \"" + wszInputFilePath.Replace("\"", "\"\"") + "\"";
-                // HACK: Have to do this so Gplex spits out GplexBuffers.cs in the correct place:
-                psi.WorkingDirectory = dir;
-                psi.RedirectStandardOutput = true;
 
-                using (var proc = new Process())
+                var dir = Path.GetDirectoryName(wszInputFilePath);
+                var lang = VSUtility.GetProjectLanguageFromItem(item);
+                if (null == lang)
+                    lang = "cs";
+                var parserFile = Path.GetFileNameWithoutExtension(wszInputFilePath) +"."+lang;
+                // we don't add it to our generated files if it already exists
+                var addShared = null==_FindItem(Path.Combine(dir, "GplexShared.cs"));
+                var args = new List<string>();
+                args.Add(wszInputFilePath);
+                args.Add("/output");
+                args.Add(Path.Combine(dir, parserFile));
+                if (0 != string.Compare("cs", lang, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    proc.StartInfo = psi;
-                    proc.Start();
-                    log = proc.StandardOutput.ReadToEnd().TrimEnd();
+                    args.Add("/language");
+                    args.Add(lang);
                 }
-                var isSuccess = log.EndsWith("Completed successfully", StringComparison.InvariantCulture);
-                var outputPath = Path.Combine(dir, scannerFile);
-                pGenerateProgress.Progress(1, 2);
+                if (!string.IsNullOrWhiteSpace(wszDefaultNamespace))
+                {
+                    args.Add("/namespace");
+                    args.Add(wszDefaultNamespace);
+                }
+                if (!addShared)
+                    args.Add("/noshared");
+                var sw = new StringWriter();
+                var ec = global::Parsley.Program.Run(args.ToArray(), TextReader.Null, TextWriter.Null, sw);
+                log = sw.ToString();
+                var isSuccess = 0 == ec;
+                var outputPath = Path.Combine(dir, parserFile);
                 if (isSuccess)
                 {
-                    var idx = log.IndexOf("GPLEX: opened output file <");
-                    if (-1 < idx)
+                    var files = new List<string>();
+                    var sr = new StringReader(log);
+                    string line = sr.ReadLine();
+                    while (null != (line = sr.ReadLine()))
                     {
-                        idx += 27; // len of above str
-                        var len = log.IndexOfAny(new char[] { '\r', '\n' }, idx);
-                        var p = log.Substring(idx, len - idx - 1);
-                        outputPath = Path.GetFullPath(p);
-                    }
-                    if (addGplexBuffers)
-                    {
-                        idx = log.IndexOf("GPLEX: created file <GplexBuffers.cs>");
+                        var idx = line.IndexOf("file: ", StringComparison.InvariantCulture);
                         if (0 > idx)
-                            addGplexBuffers = false;
+                            break;
+                        var key = line.Substring(0, idx - 1);
+                        var file = Path.GetFullPath(line.Substring(idx + 6));
+                        if (0 == string.Compare("Output", key, StringComparison.InvariantCulture))
+                            outputfile = file;
+                        if (0 == string.Compare("Rolex", key, StringComparison.InvariantCulture))
+                            rolexfile = file;
+                        if (0 == string.Compare("Gplex", key, StringComparison.InvariantCulture))
+                            gplexfile = file;
+                        if (0 == string.Compare("Gplex shared code", key, StringComparison.InvariantCulture))
+                            gplexshared = file;
+                        if (0 == string.Compare("Gplex tokenizer code", key, StringComparison.InvariantCulture))
+                            gplexcode = file;
+                        files.Add(line.Substring(idx + 6));
                     }
-                    EnvDTE.ProjectItem outitm = item.ProjectItems.AddFromFile(outputPath);
-                    EnvDTE.ProjectItem gpbufitm = null;
-                    if (addGplexBuffers)
-                        gpbufitm = item.ProjectItems.AddFromFile(Path.Combine(dir,"GplexBuffers.cs"));
-
+                    if (addShared)
+                    {
+                        if (null == gplexshared)
+                            addShared = false;
+                    }
+                    for (int ic = files.Count, i = 0; i < ic; ++i)
+                    {
+                        var file = Path.GetFullPath(files[i]);
+                        EnvDTE.ProjectItem outitm = item.ProjectItems.AddFromFile(file);
+                    }
+                    // attempt to set the custom tool for the gplex lexer file
+                    if (null != gplexfile)
+                    {
+                        var itm = _FindItem(gplexfile);
+                        if (null != itm)
+                        {
+                            EnvDTE.Property prop = itm.Properties.Item("CustomTool");
+                            prop.Value = typeof(Gplex).Name;
+                        }
+                    }
+                    // now set the tool for the rolex file
+                    if (null != rolexfile)
+                    {
+                        var itm = _FindItem(rolexfile);
+                        if (null != itm)
+                        {
+                            EnvDTE.Property prop = itm.Properties.Item("CustomTool");
+                            prop.Value = typeof(Rolex).Name;
+                        }
+                    }
+                } else
+                {
+                   pGenerateProgress.GeneratorError(0,0,"Parsley returned error code: " + ec.ToString(), unchecked((uint)-1), unchecked((uint)-1));
                 }
-                else
-                    pGenerateProgress.GeneratorError(0, 0, "Gplex failed. See log for details", unchecked((uint)-1), unchecked((uint)-1));
-
 
             }
             catch (Exception ex)
             {
-                pGenerateProgress.GeneratorError(0, 0, "Gplex custom tool failed with: " + ex.Message, unchecked((uint)-1), unchecked((uint)-1));
-                log += "Gplex custom tool failed with: " + ex.Message;
+                pGenerateProgress.GeneratorError(0, 0, "Parsley custom tool failed with: " + ex.Message, unchecked((uint)-1), unchecked((uint)-1));
+                log += "Parsley custom tool failed with: " + ex.Message;
             }
             finally
             {

@@ -2,7 +2,7 @@
 @import "SlangStatement.xbnf";
 @import "SlangType.xbnf";
 
-NamespaceName<dependency,follows="lbrace">= Identifier { "." Identifier };
+NamespaceName<follows="lbrace">= Identifier { "." Identifier };
 UsingDirective<dependency>= "using" NamespaceName ";";
 // this is what we want, but it's really ambiguous
 // so use a virtual
@@ -12,7 +12,7 @@ CompileUnit<start,virtual> { return _ParseCompileUnit(context); }
 // work so we make it virtual instead
 // Namespace= "namespace" NamespaceName "{" {UsingDirective } {TypeDecl} "}"
 // rbrace is enforced in code but we specify it here for readability
-Namespace<dependency, virtual,firsts="namespaceKeyword", follows="rbrace"> { return _ParseNamespace(context);}
+Namespace<dependency,virtual,firsts="namespaceKeyword", follows="rbrace"> { return _ParseNamespace(context);}
 // make sure this gets a constant as it's only used in code
 namespaceKeyword<terminal>= "namespace";
 usingKeyword= "using";

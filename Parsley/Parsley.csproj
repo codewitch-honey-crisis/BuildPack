@@ -90,7 +90,9 @@
     <Compile Include="Xbnf\XbnfLiteralExpression.cs" />
     <Compile Include="Xbnf\XbnfMessage.cs" />
     <Compile Include="Xbnf\XbnfNode.cs" />
+    <Compile Include="Xbnf\XbnfOption.cs" />
     <Compile Include="Xbnf\XbnfOptionalExpression.cs" />
+    <Compile Include="Xbnf\XbnfOptionList.cs" />
     <Compile Include="Xbnf\XbnfOrExpression.cs" />
     <Compile Include="Xbnf\XbnfProduction.cs" />
     <Compile Include="Xbnf\XbnfProductionList.cs" />

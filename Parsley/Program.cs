@@ -12,11 +12,16 @@ namespace Parsley
 	using C = CD.CodeDomUtility;
 	public class Program
 	{
-		internal static readonly string CodeBase = Assembly.GetEntryAssembly().GetModules()[0].FullyQualifiedName;
+		internal static readonly string CodeBase = _GetCodeBase();
 		internal static readonly string FileName = Path.GetFileName(CodeBase);
 		internal static readonly string Name = _GetName();
-		// TODO: Start here and implement Run() method
+		
 		static int Main(string[] args)
+		{
+			return Run(args, Console.In, Console.Out, Console.Error);
+		}
+		
+		public static int Run(string[] args,TextReader stdin,TextWriter stdout,TextWriter stderr)
 		{
 			int result = 0;
 			TextWriter output = null;
@@ -39,7 +44,7 @@ namespace Parsley
 			{
 				if (0 == args.Length)
 				{
-					_PrintUsage();
+					_PrintUsage(stderr);
 					return -1;
 				}
 				if (args[0].StartsWith("/"))
@@ -110,6 +115,8 @@ namespace Parsley
 							throw new ArgumentException(string.Format("Unknown switch {0}", args[i]));
 					}
 				}
+				
+				
 				if (null == codeclass)
 				{
 					if (null != outputfile)
@@ -124,7 +131,7 @@ namespace Parsley
 				{
 					if (null == gplexcodeclass)
 					{
-						gplexcodeclass = Path.GetFileNameWithoutExtension(gplexfile);
+						gplexcodeclass = Path.GetFileNameWithoutExtension(inputfile);
 					}
 					var dir = Path.GetDirectoryName(gplexfile);
 					if (!noshared)
@@ -133,6 +140,155 @@ namespace Parsley
 					}
 					gplexcode = Path.Combine(dir, string.Concat(gplexcodeclass, "Tokenizer.cs"));
 				}
+				// override the options with our document's options
+				var doc = XbnfDocument.ReadFrom(inputfile);
+				var oi = -1;
+				oi = doc.Options.IndexOf("outputfile");
+				if (-1 < oi)
+				{
+					var o = doc.Options[oi].Value;
+					var s = o as string;
+					if (null!=s)
+					{
+						outputfile = s;
+						if ("" == outputfile)
+							outputfile = null;
+					}
+					// if it's specified in the doc we need to make it doc relative
+					if (null != outputfile)
+					{
+						if (!Path.IsPathRooted(outputfile))
+						{
+							var dir = Path.GetDirectoryName(Path.GetFullPath(inputfile));
+							outputfile = Path.GetFullPath(Path.Combine(dir, outputfile));
+						}
+					}
+				}
+				oi = doc.Options.IndexOf("rolexfile");
+				if (-1 < oi)
+				{
+					var o = doc.Options[oi].Value;
+					var s = o as string;
+					if (null != s)
+					{
+						rolexfile= s;
+						if ("" == rolexfile)
+							rolexfile= null;
+					}
+					// if it's specified in the doc we need to make it doc relative
+					if (null != rolexfile)
+					{
+						if (!Path.IsPathRooted(rolexfile))
+						{
+							var dir = Path.GetDirectoryName(Path.GetFullPath(inputfile));
+							rolexfile = Path.GetFullPath(Path.Combine(dir, rolexfile));
+						}
+					}
+				}
+				oi = doc.Options.IndexOf("gplexfile");
+				if (-1 < oi)
+				{
+					var o = doc.Options[oi].Value;
+					var s = o as string;
+					if (null != s)
+					{
+						gplexfile= s;
+						if ("" == gplexfile)
+							gplexfile = null;
+					}
+					// if it's specified in the doc we need to make it doc relative
+					if(null!=gplexfile)
+					{
+						var dir = Path.GetDirectoryName(Path.GetFullPath(inputfile));
+						if (!Path.IsPathRooted(gplexfile))
+						{
+							gplexfile = Path.GetFullPath(Path.Combine(dir, gplexfile));
+						}
+						dir = Path.GetDirectoryName(gplexfile);
+						if (!noshared)
+						{
+							gplexshared = Path.Combine(dir, "GplexShared.cs");
+						}
+					}
+				}
+				
+				oi = doc.Options.IndexOf("gplexcodeclass");
+				if (-1 < oi)
+				{
+					var o = doc.Options[oi].Value;
+					var s = o as string;
+					if (null != s)
+					{
+						gplexcodeclass = s;
+						if ("" == gplexcodeclass)
+							gplexcodeclass = null;
+					}
+				}
+				if (null!=gplexfile)
+				{
+					if(null == gplexcodeclass)
+						gplexcodeclass = Path.GetFileNameWithoutExtension(inputfile);
+					gplexcode = Path.Combine(Path.GetDirectoryName(gplexfile), string.Concat(gplexcodeclass, "Tokenizer.cs"));
+				}
+				
+				oi = doc.Options.IndexOf("codenamespace");
+				if (-1 < oi)
+				{
+					var o = doc.Options[oi].Value;
+					var s = o as string;
+					if (null != s)
+					{
+						codenamespace = s;
+					}
+				}
+				oi = doc.Options.IndexOf("codelanguage");
+				if (-1 < oi)
+				{
+					var o = doc.Options[oi].Value;
+					var s = o as string;
+					if (!string.IsNullOrEmpty(s))
+					{
+						codelanguage = s;
+					}
+				}
+				oi = doc.Options.IndexOf("codeclass");
+				if (-1 < oi)
+				{
+					var o = doc.Options[oi].Value;
+					var s = o as string;
+					if (null != s)
+					{
+						codeclass = s;
+						if ("" == codeclass)
+						{
+							if (null != outputfile)
+								codeclass = Path.GetFileNameWithoutExtension(outputfile);
+							else
+								codeclass = Path.GetFileNameWithoutExtension(inputfile);
+						}
+					}
+				}
+				oi = doc.Options.IndexOf("verbose");
+				if (-1 < oi)
+				{
+					var o = doc.Options[oi].Value;
+					if (o is bool)
+					{
+						verbose = (bool)o;
+					}
+				}
+				oi = doc.Options.IndexOf("fast");
+				if (-1 < oi)
+				{
+					var o = doc.Options[oi].Value;
+					if (o is bool)
+					{
+						fast = (bool)o;
+					}
+				}
+				if (fast && null != codelanguage)
+					throw new ArgumentException("<codelanguage> and <fast> cannot both be specified. The <fast> option is C# only.");
+
 				var stale = true;
 				if (ifstale && null != outputfile)
 				{
@@ -164,33 +320,31 @@ namespace Parsley
 
 				if (!stale)
 				{
-					Console.WriteLine("Skipped building of the following because they were not stale:");
+					stderr.WriteLine("Skipped building of the following because they were not stale:");
 					if (null != outputfile)
-						Console.Error.WriteLine(outputfile);
+						stderr.WriteLine("Output file: " + outputfile);
 					if (null != rolexfile)
-						Console.Error.WriteLine(rolexfile);
+						stderr.WriteLine("Rolex file: " + rolexfile);
 					if (null != gplexfile)
-						Console.Error.WriteLine(gplexfile);
+						stderr.WriteLine("Gplex file: " + gplexfile);
 					if (null != gplexshared)
-						Console.Error.WriteLine(gplexshared);
+						stderr.WriteLine("Gplex shared code file: " + gplexshared);
 					if (null != gplexcode)
-						Console.Error.WriteLine(gplexcode);
+						stderr.WriteLine("Gplex tokenizer code file: " + gplexcode);
 				}
 				else
 				{
-					Console.Error.WriteLine("{0} is building the following:", Name);
+					stderr.WriteLine("{0} is building the following:", Name);
 					if (null != outputfile)
-						Console.Error.WriteLine(outputfile);
+						stderr.WriteLine("Output file: " + outputfile);
 					if (null != rolexfile)
-						Console.Error.WriteLine(rolexfile);
+						stderr.WriteLine("Rolex file: " + rolexfile);
 					if (null != gplexfile)
-						Console.Error.WriteLine(gplexfile);
+						stderr.WriteLine("Gplex file: " + gplexfile);
 					if (null != gplexshared)
-						Console.Error.WriteLine(gplexshared);
+						stderr.WriteLine("Gplex shared code file: " + gplexshared);
 					if (null != gplexcode)
-						Console.Error.WriteLine(gplexcode);
-					if (fast && null != codelanguage)
-						throw new ArgumentException("<codelanguage> and <fast> cannot both be specified. The <fast> option is C# only.");
+						stderr.WriteLine("Gplex tokenizer code file: " + gplexcode);
 					if (string.IsNullOrEmpty(codelanguage))
 					{
 						if (!string.IsNullOrEmpty(outputfile))
@@ -205,9 +359,8 @@ namespace Parsley
 					}
 					var s = codelanguage.ToUpperInvariant();
 					if (null != gplexfile && s != "CS" && s != "C#" && s != "CSHARP")
-						Console.Error.WriteLine("Warning: Gplex only targets C# but the langauge specified was {0}. This will require the C# code to be compiled separately and referenced from the main project.", codelanguage);
+						stderr.WriteLine("Warning: Gplex only targets C# but the langauge specified was {0}. This will require the C# code to be compiled separately and referenced from the main project.", codelanguage);
 
-					var doc = XbnfDocument.ReadFrom(inputfile);
 					var isLexerOnly = true;
 					if (doc.HasNonTerminalProductions)
 						isLexerOnly = false;
@@ -241,7 +394,7 @@ namespace Parsley
 					foreach (var msg in msgs)
 					{
 						if (verbose || ErrorLevel.Message != msg.ErrorLevel)
-							Console.Error.WriteLine(msg);
+							stderr.WriteLine(msg);
 
 					}
 					CfgException.ThrowIfErrors(msgs);
@@ -252,11 +405,11 @@ namespace Parsley
 
 						if (verbose)
 						{
-							Console.Error.WriteLine("Final grammars:");
+							stderr.WriteLine("Final grammars:");
 							foreach (var cfg in genInfo.CfgMap)
 							{
-								Console.Error.WriteLine(cfg.ToString());
-								Console.WriteLine();
+								stderr.WriteLine(cfg.ToString());
+								stderr.WriteLine();
 							}
 						}
 						CfgException.ThrowIfErrors(msgs);
@@ -293,8 +446,8 @@ namespace Parsley
 							var co = CD.SlangPatcher.GetNextUnresolvedElement(ccu);
 							if (null != co)
 							{
-								Console.Error.WriteLine("Warning: Not all of the elements could be resolved. The generated code may not be correct in all languages.");
-								Console.Error.WriteLine("  Next unresolved: {0}", C.ToString(co).Trim());
+								stderr.WriteLine("Warning: Not all of the elements could be resolved. The generated code may not be correct in all languages.");
+								stderr.WriteLine("  Next unresolved: {0}", C.ToString(co).Trim());
 							}
 						}
 						if (noshared)
@@ -330,7 +483,7 @@ namespace Parsley
 							output = sw;
 						}
 						else
-							output = Console.Out;
+							output = stdout;
 						var opts = new CodeGeneratorOptions();
 						opts.VerbatimOrder = true;
 						opts.BlankLinesBetweenMembers = false;
@@ -340,7 +493,7 @@ namespace Parsley
 						output = null;
 					}
 					else
-						Console.Error.WriteLine("{0} skipped parser generation because there are no non-terminals and no imports defined.", Name);
+						stderr.WriteLine("{0} skipped parser generation because there are no non-terminals and no imports defined.", Name);
 
 					if (null != rolexfile)
 					{
@@ -397,11 +550,13 @@ namespace Parsley
 #if !DEBUG
 			catch (Exception ex)
 			{
-				result = _ReportError(ex);
+				result = _ReportError(ex,stderr);
 			}
 #endif
 			finally
 			{
+				stderr.Close();
+				stdout.Close();
 				if (outputfile != null && null != output)
 				{
 					output.Close();
@@ -412,27 +567,42 @@ namespace Parsley
 
 
 		}
+		static string _GetCodeBase()
+		{
+			try
+			{
+				return Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName;
+			}
+			catch
+			{
+				return "parsley.exe";
+			}
+		}
 		static string _GetName()
 		{
-			foreach (var attr in Assembly.GetEntryAssembly().CustomAttributes)
+			try
 			{
-				if (typeof(AssemblyTitleAttribute) == attr.AttributeType)
+				foreach (var attr in Assembly.GetExecutingAssembly().CustomAttributes)
 				{
-					return attr.ConstructorArguments[0].Value as string;
+					if (typeof(AssemblyTitleAttribute) == attr.AttributeType)
+					{
+						return attr.ConstructorArguments[0].Value as string;
+					}
 				}
 			}
+			catch { }
 			return Path.GetFileNameWithoutExtension(FileName);
 		}
 		// do our error handling here (release builds)
-		static int _ReportError(Exception ex)
+		static int _ReportError(Exception ex,TextWriter stderr)
 		{
-			_PrintUsage();
-			Console.Error.WriteLine("Error: {0}", ex.Message);
+			_PrintUsage(stderr);
+			stderr.WriteLine("Error: {0}", ex.Message);
 			return -1;
 		}
-		static void _PrintUsage()
+		static void _PrintUsage(TextWriter stderr)
 		{
-			var t = Console.Error;
+			var t = stderr;
 			// write the name of our app. this actually uses the 
 			// name of the executable so it will always be correct
 			// even if the executable file was renamed.

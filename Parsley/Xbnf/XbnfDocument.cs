@@ -11,6 +11,7 @@ namespace Parsley
 		public string Filename { get { return _filename; } }
 		public void SetFilename(string filename) { _filename = filename; }
 		public XbnfImportList Imports { get; } = new XbnfImportList();
+		public XbnfOptionList Options { get; } = new XbnfOptionList();
 		public XbnfProduction StartProduction {
 			get {
 				var ic = Productions.Count;
@@ -209,6 +210,24 @@ namespace Parsley
 		public string ToString(string fmt)
 		{
 			var sb = new StringBuilder();
+			for(int ic=Imports.Count,i=0;i<ic;++i)
+			{
+				sb.Append("@import ");
+				sb.Append("\""+XbnfNode.Escape(Imports[i].Document.Filename)+"\"");
+				sb.AppendLine(";");
+			}
+			var oc = Options.Count;
+			if(0<oc)
+			{
+				sb.Append("@options ");
+				for (var i = 0; i < oc; ++i)
+				{
+					if (0 != i)
+						sb.Append(", ");
+					sb.Append(Options[i]);					
+				}
+				sb.AppendLine(";");
+			}
 			if ("gnc" == fmt)
 				for (int ic = Productions.Count, i = 0; i < ic; ++i)
 					sb.AppendLine(Productions[i].ToString("pnc"));
@@ -233,9 +252,61 @@ namespace Parsley
 			while (-1 != pc.Current && '}'!=pc.Current)
 			{
 				pc.TrySkipCCommentsAndWhiteSpace();
-				while ('@' == pc.Current) // imports
+				while ('@' == pc.Current) // directives
 				{
-					result.Imports.Add(_ParseImport(result, pc));
+					pc.Advance();
+					var l = pc.Line;
+					var c = pc.Column;
+					var p = pc.Position;
+					var str = XbnfNode.ParseIdentifier(pc);
+					if (0 == string.Compare("import", str, StringComparison.InvariantCulture))
+					{
+						result.Imports.Add(_ParseImportPart(result, pc));
+					} else if(0==string.Compare("options",str,StringComparison.InvariantCulture))
+					{
+						if(0<result.Options.Count)
+						{
+							var ee = new ExpectingException(string.Format("Duplicate directive \"options\" specified at line {0}, column {1}, position {2}", l, c, p));
+							ee.Expecting = new string[] { };
+							ee.Line = l;
+							ee.Column = c;
+							ee.Position = p;
+							throw ee;
+						}
+						while (-1 != pc.Current && ';' != pc.Current)
+						{
+							l = pc.Line;
+							c = pc.Column;
+							p = pc.Position;
+							var opt = XbnfOption.Parse(pc);
+							opt.SetLocation(l, c, p);
+							result.Options.Add(opt);
+							pc.TrySkipCCommentsAndWhiteSpace();
+							pc.Expecting(';', ',');
+							if (',' == pc.Current)
+								pc.Advance();
+						}
+						pc.Expecting(';');
+						pc.Advance();
+						if(0==result.Options.Count)
+						{
+							var ee = new ExpectingException(string.Format("Expection options but \"options\" directive was empty at line {0}, column {1}, position {2}", l, c, p));
+							ee.Expecting = new string[] { };
+							ee.Line = l;
+							ee.Column = c;
+							ee.Position = p;
+							throw ee;
+						}
+					}
+					else
+					{
+						var ee = new ExpectingException(string.Format("Expecting \"import\" or \"options\" at line {0}, column {1}, position {2}", l, c, p));
+						ee.Expecting = new string[] { "import","options" };
+						ee.Line = l;
+						ee.Column = c;
+						ee.Position = p;
+					}
+					
 
 					pc.TrySkipCCommentsAndWhiteSpace();
 				}
@@ -457,27 +528,12 @@ namespace Parsley
 			}
 			return null;
 		}
-		static XbnfImport _ParseImport(XbnfDocument doc, ParseContext pc)
+		static XbnfImport _ParseImportPart(XbnfDocument doc, ParseContext pc)
 		{
 			pc.TrySkipCCommentsAndWhiteSpace();
-			pc.Expecting('@');
-			pc.Advance();
 			var l = pc.Line;
 			var c = pc.Column;
 			var p = pc.Position;
-			var str = XbnfNode.ParseIdentifier(pc);
-			if (0 != string.Compare("import", str, StringComparison.InvariantCulture))
-			{
-				var ee = new ExpectingException(string.Format("Expecting \"import\" at line {0}, column {1}, position {2}", l, c, p));
-				ee.Expecting = new string[] { "import" };
-				ee.Line = l;
-				ee.Column = c;
-				ee.Position = p;
-			}
-			pc.TrySkipCCommentsAndWhiteSpace();
-			l = pc.Line;
-			c = pc.Column;
-			p = pc.Position;
 			pc.Expecting('\"');
 			// borrow the parsing from XbnfExpression for this.
 			var le = XbnfExpression.Parse(pc) as XbnfLiteralExpression;

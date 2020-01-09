@@ -3,36 +3,40 @@
 
 // Custom Attributes
 
-CustomAttribute= TypeBase [ "(" [ CustomAttributeArgList ] ")"];
+CustomAttribute= TypeBase CustomAttributeArgList ;
 //CustomAttributeArgList<virtual, firsts="Identifier Expression"> { return _ParseCustomAttributeArgList(context); }
-CustomAttributeArgList = CustomAttributeArg { "," CustomAttributeArg };
+CustomAttributeArgList = "(" CustomAttributeArg { "," CustomAttributeArg } ")"|;
 CustomAttributeArg = Identifier "=" Expression | Expression : where { return true; }
-CustomAttributeTarget= (assemblyKeyword | returnKeyword) ":"; 
-CustomAttributeGroup<follows="Member TypeDecl">= "[" [ CustomAttributeTarget ] CustomAttribute { "," CustomAttribute } "]";
-CustomAttributeGroups<dependency,follows="Member TypeDecl Identifier namespaceKeyword">= { CustomAttributeGroup }+;
+CustomAttributeTarget= (assemblyKeyword | returnKeyword) ":"|; 
+CustomAttributeGroup<follows="Member TypeDecl">= "[" CustomAttributeTarget CustomAttribute { "," CustomAttribute } "]";
+CustomAttributeGroups<dependency,follows="Member TypeDecl Identifier namespaceKeyword Type">= { CustomAttributeGroup }+;
 
 // Types
 // since it's only used in code, we need to give it follows
-TypeAttributes<follows="classKeyword enumKeyword structKeyword interfaceKeyword partialKeyword">= { publicKeyword | internalKeyword | privateKeyword };
+TypeAttributes<dependency,follows="classKeyword enumKeyword structKeyword interfaceKeyword partialKeyword">= { publicKeyword | internalKeyword | privateKeyword };
 EnumPart<collapsed> = "{" EnumFields "}" | ":" Type "{" EnumFields "}";
 EnumFields<collapsed>= [ EnumField { "," EnumField } ];
 EnumField= Identifier "=" Expression ;
-Where<dependency,follows="lbrace">= "where" WhereClauses;
-WhereClauses<dependency,virtual,firsts="Identifier"> { return _ParseWhereClauses(context);} 
-	: where { return !ExpressionParser.Keywords.Contains(context.Value); }
-WhereClause<dependency,follows="lbrace">= Identifier ":" WhereClausePart { "," WhereClausePart };
-WhereClausePart= (Type | newKeyword "(" ")" );
+//Where<dependency,follows="lbrace">= "where" WhereClauses;
+//WhereClauses<dependency,virtual,firsts="Identifier"> { return _ParseWhereClauses(context);} 
+//	: where { return !ExpressionParser.Keywords.Contains(context.Value); }
+//WhereClause<dependency,follows="lbrace">= Identifier ":" WhereClausePart { "," WhereClausePart };
+//WhereClausePart= (Type | newKeyword "(" ")" );
+WhereClauses<dependency, follows="lbrace">= { "where" WhereConstraints };
+WhereConstraints= Identifier ":" WhereConstraintParts;
+WhereConstraintParts= WhereConstraintPart { "," WhereConstraintPart };
+WhereConstraintPart= (Type | newKeyword "(" ")" );
 BaseType<dependency,collapsed,follows="comma whereKeyword lbrace">= Type;
 BaseTypes<abstract>;
 TypeDeclPart<virtual,firsts="colon whereKeyword lbrace", follows="rbrace"> { return _ParseTypeDeclPart(context);}
-TypeParams<follows="colon whereKeyword lbrace"> = [ "<" [ CustomAttributeGroup ] Identifier { "," Identifier } ">" ];
-			
+TypeParams<follows="colon whereKeyword lbrace"> = "<" TypeParam { "," TypeParam } ">"|;
+TypeParam=CustomAttributeGroups Identifier|Identifier;	
 // we narrow the attributes this accepts as a base in our parse routine for parse member
 Enum<dependency>= MemberAttributes "enum" Identifier EnumPart;
 Struct<dependency>= MemberAttributes "struct" Identifier TypeParams TypeDeclPart;
 Class<dependency>= MemberAttributes "class" Identifier TypeParams TypeDeclPart;
 Interface<dependency>= MemberAttributes "interface" Identifier [ "<" TypeParams ">" ] TypeDeclPart;
-TypeDecl<start,shared,virtual,follows="TypeDecl usingKeyword namespaceKeyword rbrace lbracket",firsts="TypeAttributes structKeyword classKeyword enumKeyword interfaceKeyword partialKeyword lbracket"> { return _ParseTypeDecl(context,false,null,context.Line,context.Column,context.Position,null); }
+TypeDecl<start,shared,virtual,follows="TypeDecl usingKeyword namespaceKeyword rbrace lbracket",firsts="TypeAttributes structKeyword classKeyword enumKeyword interfaceKeyword partialKeyword lbracket"> { return ParseTypeDecl(context,false,null,null,context.Line,context.Column,context.Position,null); }
 // Members
 MemberAttribute<collapsed>= newKeyword | constKeyword | publicKeyword | protectedKeyword | internalKeyword | privateKeyword | staticKeyword | overrideKeyword;
 MemberAttributes<dependency> = { MemberAttribute };
@@ -41,22 +45,23 @@ MemberAttributes<dependency> = { MemberAttribute };
 // it's hard to know where the type ends and the identifier begins.
 // note that we restrict the Identifier below, 
 // by copying its where clause.
-PrivateImplementationType<virtual,firsts="Identifier"> 
+PrivateImplementationType<dependency,virtual,firsts="Identifier"> 
 	{ return _ParsePrivateImplementationType(context); } 
 	: where { return !ExpressionParser.Keywords.Contains(context.Value); } 
 // need the follows because it's only referenced by code
 // the grammar can't trace it
 MethodParamList<dependency,follows="rparen">= [ MethodParam { "," MethodParam } ];
 MethodParam= [ outKeyword | refKeyword ] Type Identifier;
+Partial<dependency,follows="classKeyword interfaceKeyword enumKeyword structKeyword"> = partialKeyword|;
 ParamList<dependency,follows="rparen rbracket">= [ Param { "," Param } ];
 Param= Type Identifier;
 // property accessors are weird for the parser because one
 // can be optional, but only one of each may be specifed
 // and in any order. This is easier with a virtual
-PropertyAccessors<virtual,firsts="PropertyGet PropertySet"> { return _ParsePropertyAccessors(context); }
+PropertyAccessors<dependency,virtual,firsts="PropertyGet PropertySet"> { return _ParsePropertyAccessors(context); }
 PropertyGet<dependency>= "get" ( StatementBlock | ";" );
 PropertySet<dependency>= "set" ( StatementBlock | ";" );
-ConstructorChain<dependency> = ( "base" | "this" ) "(" ParamList ")";
+ConstructorChain<dependency> = ( "base" | "this" ) "(" [ ArgList ] ")";
 // below we add rbrace to the follows sets for each to 
 // production below to allow member decls to be inside a 
 // { } block (for type decls)
@@ -70,12 +75,12 @@ Field<abstract>;
 // is just bad with it right now. Better to write a bunch of code because the
 // errors in the code inside methods and such were bubbling up here and 
 // interfering with error reporting
-Member<virtual,shared,dependency,follows="rbrace", firsts="lbracket MemberAttributes Type eventKeyword Identifier">
+Member<virtual,shared,follows="rbrace #EOS", firsts="lbracket MemberAttributes Type eventKeyword Identifier">
 {
 	return _ParseMember(context);
 } : where { return true; } // ignore conflicts here. handled by the routine
 
-Members<shared,virtual,firsts="Member"> { return _ParseMembers(context); } 
+Members<virtual,shared,firsts="Member"> { return _ParseMembers(context); } 
 	: where { return true; } // method handles first-first conflicts
 assemblyKeyword="assembly"; // for assembly targets
 voidType<terminal>="void"; // basically for methods

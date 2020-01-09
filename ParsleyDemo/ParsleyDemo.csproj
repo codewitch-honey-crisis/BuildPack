@@ -53,6 +53,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="data.json" />
+    <None Include="Expression.rl" />
     <None Include="Expression.xbnf" />
     <None Include="json.rl" />
     <None Include="json.xbnf" />
