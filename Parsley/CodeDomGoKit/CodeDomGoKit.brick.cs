@@ -4052,13 +4052,13 @@ dfaTable,string[]blockEnds,int[]nodeFlags,IEnumerator<char>input){ this._dfaTabl
 ==(TableTokenizerEnumerator._BeforeBegin==this._state))){this._input.Reset();}this._state=TableTokenizerEnumerator._BeforeBegin;this._line=1;this._column
 =1;this._position=0;}bool System.Collections.IEnumerator.MoveNext(){ if((TableTokenizerEnumerator._Enumerating>this._state)){if((TableTokenizerEnumerator._Disposed
 ==this._state)){TableTokenizerEnumerator._ThrowDisposed();}if((TableTokenizerEnumerator._AfterEnd==this._state)){return false;}}this._current=default(Token);
-this._current.Line=this._line;this._current.Column=this._column;this._current.Position=this._position;this._buffer.Clear(); this._current.SymbolId=this._Lex();
- bool done=false;for(;(false==done);){done=true; if((TableTokenizerEnumerator.ErrorSymbol<this._current.SymbolId)){ string be=this._blockEnds[this._current.SymbolId];
-if(((null!=be)&&(false==(0==be.Length)))){ if((false==this._TryReadUntilBlockEnd(be))){this._current.SymbolId=TableTokenizerEnumerator.ErrorSymbol;}}if
-(((TableTokenizerEnumerator.ErrorSymbol<this._current.SymbolId)&&(false==(0==(this._nodeFlags[this._current.SymbolId]&1))))){ done=false;this._current.Line
-=this._line;this._current.Column=this._column;this._current.Position=this._position;this._buffer.Clear();this._current.SymbolId=this._Lex();}}}this._current.Value
-=this._buffer.ToString(); if((TableTokenizerEnumerator._EosSymbol==this._current.SymbolId)){this._state=TableTokenizerEnumerator._AfterEnd;}return(false
-==(TableTokenizerEnumerator._AfterEnd==this._state));}void IDisposable.Dispose(){this._input.Dispose();this._state=TableTokenizerEnumerator._Disposed;
+this._current.Line=this._line;this._current.Column=this._column;this._current.Position=this._position;this._current.Skipped=null;this._buffer.Clear();
+ this._current.SymbolId=this._Lex(); bool done=false;for(;(false==done);){done=true; if((TableTokenizerEnumerator.ErrorSymbol<this._current.SymbolId))
+{ string be=this._blockEnds[this._current.SymbolId];if(((null!=be)&&(false==(0==be.Length)))){ if((false==this._TryReadUntilBlockEnd(be))){this._current.SymbolId
+=TableTokenizerEnumerator.ErrorSymbol;}}if(((TableTokenizerEnumerator.ErrorSymbol<this._current.SymbolId)&&(false==(0==(this._nodeFlags[this._current.SymbolId]
+&1))))){ done=false;this._current.Line=this._line;this._current.Column=this._column;this._current.Position=this._position;this._buffer.Clear();this._current.SymbolId
+=this._Lex();}}}this._current.Value=this._buffer.ToString(); if((TableTokenizerEnumerator._EosSymbol==this._current.SymbolId)){this._state=TableTokenizerEnumerator._AfterEnd;
+}return(false==(TableTokenizerEnumerator._AfterEnd==this._state));}void IDisposable.Dispose(){this._input.Dispose();this._state=TableTokenizerEnumerator._Disposed;
 } bool _MoveNextInput(){if(this._input.MoveNext()){if((false==(TableTokenizerEnumerator._BeforeBegin==this._state))){this._position=(this._position+1);
 if(('\n'==this._input.Current)){this._column=1;this._line=(this._line+1);}else{if(('\t'==this._input.Current)){this._column=(this._column+TableTokenizerEnumerator._TabWidth);
 }else{this._column=(this._column+1);}}}else{ if(('\n'==this._input.Current)){this._column=1;this._line=(this._line+1);}else{if(('\t'==this._input.Current))

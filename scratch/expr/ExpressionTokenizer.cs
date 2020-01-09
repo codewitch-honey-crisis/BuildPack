@@ -236,6 +236,7 @@ namespace scratch.expr {
             this._current.Line = this._line;
             this._current.Column = this._column;
             this._current.Position = this._position;
+            this._current.Skipped = null;
             this._buffer.Clear();
             // lex the next input
             this._current.SymbolId = this._Lex();

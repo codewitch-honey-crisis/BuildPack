@@ -164,6 +164,7 @@ namespace Rolex
 						_current.Line = _line;
 						_current.Column = _column;
 						_current.Position = _position;
+						_current.Skipped = null;
 						ValueBuffer.Clear();
 						_current.SymbolId = Lex();
 					}
