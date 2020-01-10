@@ -645,7 +645,7 @@ namespace Parsley
 					{
 						var rule = conflict.Rule1.IsNil ? conflict.Rule1 : conflict.Rule2;
 						// we might be able to do something about this.
-						var refs = cfg.FillReferencesToSymbol(rule.Left);
+						var refs = cfg.FillReferencesTo(rule.Left);
 						var ntr = cfg.FillNonTerminalRules(rule.Left);
 						for (int jc = refs.Count, j = 0; j < jc; ++j)
 						{

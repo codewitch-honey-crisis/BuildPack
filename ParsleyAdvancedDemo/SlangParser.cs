@@ -11409,9 +11409,14 @@ namespace CD {
             int column = context.Column;
             long position = context.Position;
             // StatementList -> Statement StatementListRightAssoc
-            if ((StatementParser.InnerStatement == context.SymbolId)) {
+            if ((StatementParser.Statement == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(StatementParser.ParseStatement(context));
+                if ((false 
+                            == (StatementParser.Statement == context.SymbolId))) {
+                    context.Error("Expecting Statement");
+                }
+                children.Add(new ParseNode(StatementParser.Statement, "Statement", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
                 children.AddRange(StatementParser.ParseStatementListRightAssoc(context).Children);
                 return new ParseNode(180, "StatementList", children.ToArray(), line, column, position);
             }
@@ -11422,9 +11427,14 @@ namespace CD {
             int column = context.Column;
             long position = context.Position;
             // StatementList2 -> Statement StatementList2RightAssoc
-            if ((StatementParser.InnerStatement == context.SymbolId)) {
+            if ((StatementParser.Statement == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(StatementParser.ParseStatement(context));
+                if ((false 
+                            == (StatementParser.Statement == context.SymbolId))) {
+                    context.Error("Expecting Statement");
+                }
+                children.Add(new ParseNode(StatementParser.Statement, "Statement", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
                 children.AddRange(StatementParser.ParseStatementList2RightAssoc(context).Children);
                 return new ParseNode(181, "StatementList2", children.ToArray(), line, column, position);
             }
@@ -11662,22 +11672,6 @@ namespace CD {
                 return new ParseNode(266, "ParamListList", children.ToArray(), line, column, position);
             }
             throw new SyntaxException("Expecting comma", line, column, position);
-        }
-        internal static ParseNode ParseStatement(ParserContext context) {
-            int line = context.Line;
-            int column = context.Column;
-            long position = context.Position;
-            // Statement -> InnerStatement
-            if ((StatementParser.InnerStatement == context.SymbolId)) {
-                System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                if ((false 
-                            == (StatementParser.InnerStatement == context.SymbolId))) {
-                    context.Error("Expecting InnerStatement");
-                }
-                context.Advance();
-                return new ParseNode(184, "Statement", children.ToArray(), line, column, position);
-            }
-            throw new SyntaxException("Expecting InnerStatement", line, column, position);
         }
         internal static ParseNode ParseTypeDeclPart(ParserContext context) {
             // TypeDeclPart
@@ -12629,9 +12623,14 @@ namespace CD {
             int column = context.Column;
             long position = context.Position;
             // StatementListRightAssoc -> Statement StatementListRightAssoc
-            if ((StatementParser.InnerStatement == context.SymbolId)) {
+            if ((StatementParser.Statement == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(StatementParser.ParseStatement(context));
+                if ((false 
+                            == (StatementParser.Statement == context.SymbolId))) {
+                    context.Error("Expecting Statement");
+                }
+                children.Add(new ParseNode(StatementParser.Statement, "Statement", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
                 children.AddRange(StatementParser.ParseStatementListRightAssoc(context).Children);
                 return new ParseNode(215, "StatementListRightAssoc", children.ToArray(), line, column, position);
             }
@@ -12642,9 +12641,14 @@ namespace CD {
             int column = context.Column;
             long position = context.Position;
             // StatementList2RightAssoc -> Statement StatementList2RightAssoc
-            if ((StatementParser.InnerStatement == context.SymbolId)) {
+            if ((StatementParser.Statement == context.SymbolId)) {
                 System.Collections.Generic.List<ParseNode> children = new System.Collections.Generic.List<ParseNode>();
-                children.Add(StatementParser.ParseStatement(context));
+                if ((false 
+                            == (StatementParser.Statement == context.SymbolId))) {
+                    context.Error("Expecting Statement");
+                }
+                children.Add(new ParseNode(StatementParser.Statement, "Statement", context.Value, context.Line, context.Column, context.Position));
+                context.Advance();
                 children.AddRange(StatementParser.ParseStatementList2RightAssoc(context).Children);
                 return new ParseNode(216, "StatementList2RightAssoc", children.ToArray(), line, column, position);
             }

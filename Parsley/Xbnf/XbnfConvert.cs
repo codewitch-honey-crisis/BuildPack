@@ -621,6 +621,7 @@ namespace Parsley
 				// now write our main rules
 				foreach (var nt in ntd)
 				{
+					if (cfg.StartSymbol == "TypeDecl" && nt.Key == "Statement") System.Diagnostics.Debugger.Break();
 					foreach (var l in nt.Value)
 					{
 						cfg.Rules.Add(new CfgRule(nt.Key, l));
@@ -630,7 +631,7 @@ namespace Parsley
 				// build our secondary rules
 				foreach (var rule in rules)
 				{
-
+					if (cfg.StartSymbol == "TypeDecl" && rule.Key == "Statement") System.Diagnostics.Debugger.Break();
 					cfg.Rules.Add(new CfgRule(rule.Key, rule.Value));
 
 				}
@@ -746,10 +747,35 @@ namespace Parsley
 										cfg.Rules.Add(new CfgRule(fl.Key, p.Symbol));
 									}
 								}
-							} else
+							} else if(cfg.IsSymbol(sa[i]))
 							{
 								// it's a terminal, we can simply add it.
 								cfg.Rules.Add(new CfgRule(fl.Key, sa[i]));
+							} else
+							{
+								/*
+								// we must look this up in a foreign cfg.
+								// (should be nonterm)
+								foreach(var ccfg in cfgMap.Values)
+								{
+									if(!ReferenceEquals(ccfg,cfg))
+									{
+										if (ccfg.IsSymbol(sa[i]))
+										{
+											ICollection<(CfgRule Rule, string Symbol)> col;
+											predict = ccfg.FillPredict();
+											if (predict.TryGetValue(sa[i], out col))
+											{
+												foreach(var p in col)
+												{
+													cfg.Rules.Add(new CfgRule(fl.Key, p.Symbol));
+												}
+											}
+											else
+												throw new ApplicationException("Invalid CFG. Predict value for " + sa[i] + " should have been in the grammar but it was not.");
+										}
+									}
+								}*/
 							}
 							
 						}
@@ -862,6 +888,7 @@ namespace Parsley
 							firsts = cfgTarget.FillFirsts();
 							firstMap.Add(refTarget.Key, firsts);
 						}
+						if (cfg.StartSymbol == "TypeDecl" && s == "Statement") System.Diagnostics.Debugger.Break();
 						// manufacure some firsts
 						foreach(var term in firsts[s])
 						{

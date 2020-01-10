@@ -29,8 +29,11 @@ namespace Parsley
 			_sCache = new HashSet<string>(EnumSymbols());
 		}
 		public IDictionary<string, CfgAttributeList> AttributeSets { get; } = new ListDictionary<string, CfgAttributeList>();
-		public IList<CfgRule> Rules { get; } = new List<CfgRule>();
-
+		public CfgRuleList Rules { get; } 
+		public CfgDocument()
+		{
+			Rules = new CfgRuleList(this);
+		}
 		/// <summary>
 		/// The start symbol. If not set, the first non-terminal is used.
 		/// </summary>
@@ -735,19 +738,7 @@ namespace Parsley
 			}
 			return result;
 		}
-		public IList<CfgRule> FillReferencesToSymbol(string symbol, IList<CfgRule> result = null)
-		{
-			if (null == result)
-				result = new List<CfgRule>();
-			for (int ic = Rules.Count, i = 0; i < ic; ++i)
-			{
-				var rule = Rules[i];
-				if (rule.Right.Contains(symbol))
-					if (!result.Contains(rule))
-						result.Add(rule);
-			}
-			return result;
-		}
+		
 		public IList<string> FillClosure(string symbol, IList<string> result = null)
 		{
 			if (null == result)
@@ -771,6 +762,22 @@ namespace Parsley
 				// make sure this is a terminal
 				if (!result.Contains(symbol))
 					result.Add(symbol);
+			}
+			return result;
+		}
+		public IList<CfgRule> FillReferencesTo(string sym, IList<CfgRule> result = null)
+		{
+			if (null == result)
+				result = new List<CfgRule>();
+			for(int ic = Rules.Count,i=0;i<ic;++i)
+			{
+				var rule = Rules[i];
+				for(int jc=rule.Right.Count,j=0;j<jc;++j)
+				{
+					var right = rule.Right[j];
+					if (right == sym)
+						result.Add(rule);
+				}
 			}
 			return result;
 		}

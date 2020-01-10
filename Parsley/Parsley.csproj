@@ -50,6 +50,7 @@
     <Compile Include="Cfg\CfgMessage.cs" />
     <Compile Include="Cfg\CfgNode.cs" />
     <Compile Include="Cfg\CfgRule.cs" />
+    <Compile Include="Cfg\CfgRuleList.cs" />
     <Compile Include="CodeDomGoKit\CodeDomGoKit.brick.cs" />
     <Compile Include="CodeGenerator.cs" />
     <Compile Include="Collections\CollectionUtility.cs" />
