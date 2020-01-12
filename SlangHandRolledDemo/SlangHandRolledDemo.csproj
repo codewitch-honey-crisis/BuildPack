@@ -36,8 +36,41 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.BindTo.cs">
+      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.BindTo.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.cs">
+      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.FindMostSpecific.cs">
+      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.FindMostSpecific.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.GetMembers.cs">
+      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.GetMembers.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomBinder\CodeDomBinder.Select.cs">
+      <Link>CodeDomGoKit\CodeDomBinder\CodeDomBinder.Select.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomResolver\CodeDomResolver.cs">
+      <Link>CodeDomGoKit\CodeDomResolver\CodeDomResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomResolver\CodeDomResolver.Evaluate.cs">
+      <Link>CodeDomGoKit\CodeDomResolver\CodeDomResolver.Evaluate.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomResolver\CodeDomResolver.GetTypeOfExpression.cs">
+      <Link>CodeDomGoKit\CodeDomResolver\CodeDomResolver.GetTypeOfExpression.cs</Link>
+    </Compile>
     <Compile Include="..\CodeDomGoKit\CodeDomUtility.cs">
-      <Link>CodeDomUtility.cs</Link>
+      <Link>CodeDomGoKit\CodeDomUtility.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomVariableTracer.cs">
+      <Link>CodeDomGoKit\CodeDomVariableTracer.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeDomVisitor.cs">
+      <Link>CodeDomGoKit\CodeDomVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\CodeDomGoKit\CodeTypeReferenceEqualityComparer.cs">
+      <Link>CodeDomGoKit\CodeTypeReferenceEqualityComparer.cs</Link>
     </Compile>
     <Compile Include="GplexShared.cs" />
     <Compile Include="LookAheadEnumerator.cs" />
@@ -47,9 +80,11 @@
     <Compile Include="SlangParser.Expression.cs" />
     <Compile Include="SlangParser.Statement.cs" />
     <Compile Include="SlangParser.Type.cs" />
+    <Compile Include="SlangPatcher.cs" />
     <Compile Include="SlangScanner.cs" />
     <Compile Include="SlangSyntaxException.cs" />
     <Compile Include="SlangTokenizer.cs" />
+    <Content Include="Test\PatchTest.cs" />
     <Content Include="Test\CompiledTokenizer.cs" />
     <Content Include="Test\CompiledTokenizerTemplate.cs" />
     <Content Include="Test\TableTokenizer.cs" />

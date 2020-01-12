@@ -74,6 +74,7 @@
     </Compile>
     <Compile Include="GplexBuffers.cs" />
     <Compile Include="GplexShared.cs" />
+    <Content Include="Test\PatchTest.cs" />
     <Content Include="Test\Token.cs" />
     <Content Include="Test\TableTokenizerTemplate.cs" />
     <Content Include="Test\TableTokenizer.cs" />

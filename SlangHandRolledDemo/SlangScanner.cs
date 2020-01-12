@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  DESKTOP-EC2OMEU
-//  DateTime: 1/12/2020 1:54:53 AM
+//  DateTime: 1/12/2020 7:48:15 AM
 //  UserName: honey
-//  GPLEX input file <C:\Users\honey\Source\Repos\BuildPack\SlangHandRolledDemo\SlangScanner.lex - 1/12/2020 1:54:53 AM>
+//  GPLEX input file <C:\Users\honey\Source\Repos\BuildPack\SlangHandRolledDemo\SlangScanner.lex - 1/12/2020 7:48:15 AM>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: unicode, verbose, noParser, stack, minimize

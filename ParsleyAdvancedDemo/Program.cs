@@ -21,11 +21,43 @@ namespace ParsleyAdvancedDemo
 	
 		static void Main()
 		{
-			foreach (var file in Directory.GetFiles(@"..\..\Test", "*.cs"))
+			Demo3();
+		}
+		static void Demo3()
+		{
+			Stream stm = null;
+			CodeCompileUnit ccu = null;
+			try
 			{
-				_Test(file);
+				stm = File.OpenRead(@"..\..\Test\PatchTest.cs");
+				var tok = new SlangTokenizer(stm);
+				ccu = SlangParser.ToCompileUnit(SlangParser.Parse(tok));
+			}
+			finally
+			{
+				stm.Close();
+			}
+			SlangPatcher.Patch(ccu);
+			var co = SlangPatcher.GetNextUnresolvedElement(ccu);
+			if (null != co)
+			{
+				Console.WriteLine("Next unresolved element is:");
+				Console.WriteLine(CodeDomUtility.ToString(co).TrimEnd());
+			}
+			else
+			{
+				Console.WriteLine(CodeDomUtility.ToString(ccu));
 			}
 		}
+		static void Demo2()
+		{
+			var files = Directory.GetFiles(@"..\..\Test", "*.cs");
+			for(var i = 0;i<files.Length;++i)
+			{
+				_Test(files[i]);
+			}
+		}
+		
 		static void _Test(string file)
 		{
 			Console.WriteLine("Parsing file: " + file);

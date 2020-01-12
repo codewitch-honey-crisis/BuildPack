@@ -364,6 +364,7 @@ namespace CD
 				pc.Advance(false);
 				while (ST.directive == pc.SymbolId && pc.Value.StartsWith("#end", StringComparison.InvariantCulture))
 					result.EndDirectives.Add(_ParseDirective(pc) as CodeDirective);
+				return result;
 
 			}
 			if (ST.classKeyword == pc.SymbolId ||

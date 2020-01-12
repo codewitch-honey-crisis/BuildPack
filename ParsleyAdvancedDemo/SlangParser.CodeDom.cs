@@ -629,7 +629,10 @@ namespace CD
 			// for compat with more languages, turn assign expressions
 			// into assign statements where possible
 			if (null != bo && CodeBinaryOperatorType.Assign == bo.Operator)
-				return new CodeAssignStatement(bo.Left, bo.Right).Mark(node);
+			{
+				var ur = bo.UserData.Contains("slang:unresolved");
+				return new CodeAssignStatement(bo.Left, bo.Right).Mark(node,ur);
+			}
 			return new CodeExpressionStatement(_BuildExpression(node.C(0))).Mark(node);
 		}
 		static CodeExpression _BuildForTest(ParseNode node)
@@ -670,8 +673,12 @@ namespace CD
 						var expr = _BuildExpression(c.C(4));
 						var bo = expr as CodeBinaryOperatorExpression;
 						// turn assign exprs into assign stmts
+						
 						if (null != bo && CodeBinaryOperatorType.Assign == bo.Operator)
-							iter.IncrementStatement = new CodeAssignStatement(bo.Left, bo.Right).Mark(c.C(5));
+						{
+							var ur = bo.UserData.Contains("slang:unresolved");
+							iter.IncrementStatement = new CodeAssignStatement(bo.Left, bo.Right).Mark(c.C(5),ur);
+						}
 						else
 							iter.IncrementStatement = new CodeExpressionStatement(_BuildExpression(c.C(5))).Mark(node);
 					}
@@ -875,11 +882,14 @@ namespace CD
 				} else
 				{
 					CodeBinaryOperatorType op = CodeBinaryOperatorType.Add;
+					var unresolved = false;
 					switch (id)
 					{
 						case ExpressionParser.addAssign:
+							unresolved = true;
 							break;
 						case ExpressionParser.subAssign:
+							unresolved = true;
 							op = CodeBinaryOperatorType.Subtract;
 							break;
 						case ExpressionParser.mulAssign:
@@ -899,7 +909,7 @@ namespace CD
 							break;
 					}
 					return Mark(new CodeBinaryOperatorExpression(lhs, CodeBinaryOperatorType.Assign,
-						Mark(new CodeBinaryOperatorExpression(lhs,op,rhs),node)),node);
+						Mark(new CodeBinaryOperatorExpression(lhs,op,rhs),node)),node,unresolved);
 				}
 			}
 			return lhs;

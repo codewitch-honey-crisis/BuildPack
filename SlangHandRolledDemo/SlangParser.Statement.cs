@@ -139,12 +139,18 @@ namespace CD
 						}
 						pc2 = null;
 						pc2 = pc.GetLookAhead(true);
+						pc2.ResetAdvanceCount();
 						var advc = 0;
 						try
 						{
 							// possibly a var decl
-							_ParseVariableDeclarationStatement(pc2);
-							stmt = _ParseVariableDeclarationStatement(pc);
+							stmt = _ParseVariableDeclarationStatement(pc2);
+							advc = pc2.AdvanceCount;
+							while(advc>0)
+							{
+								pc.Advance(false) ;
+								--advc;
+							}
 							break;
 						}
 						catch(SlangSyntaxException sx)
