@@ -331,10 +331,7 @@ namespace CD
 					return new CodePrimitiveExpression(null).SetLoc(l,c,p);
 				case ST.identifier:
 				case ST.verbatimIdentifier:
-					if (Keywords.Contains(pc.Value))
-						goto default;
-					result = new CodeVariableReferenceExpression(pc.Value).Mark(l,c,p,true);
-					pc.Advance();
+					result = new CodeVariableReferenceExpression(_ParseIdentifier(pc)).Mark(l,c,p,true);
 					break;
 				case ST.typeOf:
 					result = _ParseTypeOf(pc);
