@@ -38,6 +38,17 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="Test\Token.cs" />
+    <Content Include="Test\TableTokenizerTemplate.cs" />
+    <Content Include="Test\TableTokenizer.cs" />
+    <Content Include="Test\SyntaxException.cs" />
+    <Content Include="Test\ParserContext.cs" />
+    <Content Include="Test\Parser.cs" />
+    <Content Include="Test\ParseNode.cs" />
+    <Content Include="Test\LookAheadEnumerator.cs" />
+    <Content Include="Test\GplexShared.Prototype.cs" />
+    <Content Include="Test\CompiledTokenizerTemplate.cs" />
+    <Content Include="Test\CompiledTokenizer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

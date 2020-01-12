@@ -203,6 +203,7 @@ namespace RolexDemo {
                         this._current.Line = this._line;
                         this._current.Column = this._column;
                         this._current.Position = this._position;
+                        this._current.Skipped = null;
                         this.ValueBuffer.Clear();
                         this._current.SymbolId = this.Lex();
                     }

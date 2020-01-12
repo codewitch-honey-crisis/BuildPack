@@ -1,11 +1,18 @@
 ﻿using System;
 using System.CodeDom;
+using System.Diagnostics;
+using System.IO;
 using CD;
 namespace SlangDemo
 {
 	class Program
 	{
-		static void Main(string[] args)
+		static void Main()
+		{
+			Demo();
+			//ParsePerf();
+		}
+		static void Demo()
 		{
 			// note that in the real world cases, you'd need to use SlangPatcher.Patch()
 			// on whole compile units to get proper codedom objects back. This method is
@@ -75,6 +82,41 @@ namespace SlangDemo
 					}
 				}
 			}
+		}
+		static void ParsePerf()
+		{
+			foreach (var file in Directory.GetFiles(@"..\..\Test", "*.cs"))
+			{
+				_Test(file);
+			}
+		}
+		static void _Test(string file)
+		{
+			Console.WriteLine("Parsing file: " + file);
+
+			// don't read directly from the file for perf testing.
+			StreamReader sr = null;
+			string text = null;
+			try
+			{
+				sr = new StreamReader(file);
+				text = sr.ReadToEnd();
+			}
+			finally
+			{
+				if (null != sr)
+					sr.Close();
+			}
+			var sw = new Stopwatch();
+			sw.Start();
+			for (var i = 0; i < 100; ++i)
+			{
+				CodeObject co = SlangParser.ParseCompileUnit(text);
+			}
+			sw.Stop();
+			Console.WriteLine("Parsed " + Path.GetFileName(file) + " in " + (sw.ElapsedMilliseconds / 100d) + " msec");
+
+			//Console.WriteLine(CodeDomUtility.ToString(co).TrimEnd());
 		}
 		static CodeCompileUnit _RootCode(CodeObject obj)
 		{

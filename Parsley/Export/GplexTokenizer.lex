@@ -2,9 +2,9 @@
 
 %visibility internal
 
-%option stack, classes, minimize, noparser, verbose, persistbuffer, noembedbuffers
+%option stack, classes, minimize, noparser, verbose, persistbuffer
 
-/* , out:Parsley_codeclassScanner.cs
+/* , out:Parsley_codeclassScanner.cs, noembedbuffers
  * Expected file format is Unicode. In the event that no 
  * byte order mark prefix is found, revert to raw bytes.
  */

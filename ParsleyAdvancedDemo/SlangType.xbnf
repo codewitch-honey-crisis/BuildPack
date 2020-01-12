@@ -13,7 +13,7 @@ CustomAttributeGroups<dependency,follows="Member TypeDecl Identifier namespaceKe
 
 // Types
 // since it's only used in code, we need to give it follows
-TypeAttributes<dependency,follows="classKeyword enumKeyword structKeyword interfaceKeyword partialKeyword">= { publicKeyword | internalKeyword | privateKeyword };
+TypeAttributes<dependency,follows="classKeyword enumKeyword structKeyword interfaceKeyword partialKeyword">= { publicKeyword | internalKeyword | privateKeyword | abstractKeyword };
 EnumPart<collapsed> = "{" EnumFields "}" | ":" Type "{" EnumFields "}";
 EnumFields<collapsed>= [ EnumField { "," EnumField } ];
 EnumField= Identifier "=" Expression ;

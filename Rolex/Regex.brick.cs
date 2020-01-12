@@ -1168,11 +1168,15 @@ public static bool operator<=(CharRange lhs,CharRange rhs){if(lhs.First==rhs.Fir
 /// <param name="lhs">The left hand range</param>
 /// <param name="rhs">The right hand range</param>
 /// <returns>True if <paramref name="lhs"/> is greater than or equal to <paramref name="rhs"/>, otherwise false</returns>
-public static bool operator>=(CharRange lhs,CharRange rhs){if(lhs.First==rhs.First)return lhs.Last>=rhs.Last;return lhs.First>=rhs.First;}static void _Sort(IList<CharRange>
-arr,int left,int right){if(left<right){int pivot=_Partition(arr,left,right);if(1<pivot){_Sort(arr,left,pivot-1);}if(pivot+1<right){_Sort(arr,pivot+1,right);
-}}}static int _Partition(IList<CharRange>arr,int left,int right){CharRange pivot=arr[left];while(true){while(arr[left]<pivot){left++;}while(arr[right]
->pivot){right--;}if(left<right){if(arr[left]==arr[right])return right;CharRange swap=arr[left];arr[left]=arr[right];arr[right]=swap;}else{return right;
-}}}public int CompareTo(CharRange other){var c=First.CompareTo(other.First);if(0==c)c=Last.CompareTo(other.Last);return c;}}}namespace RE{/// <summary>
+public static bool operator>=(CharRange lhs,CharRange rhs){if(lhs.First==rhs.First)return lhs.Last>=rhs.Last;return lhs.First>=rhs.First;}public int CompareTo(CharRange
+ other){var c=First.CompareTo(other.First);if(0==c)c=Last.CompareTo(other.Last);return c;}
+#region Sorting
+static void _Sort(IList<CharRange>arr,int left,int right){if(left<right){int pivot=_Partition(arr,left,right);if(1<pivot){_Sort(arr,left,pivot-1);}if(pivot
++1<right){_Sort(arr,pivot+1,right);}}}static int _Partition(IList<CharRange>arr,int left,int right){CharRange pivot=arr[left];while(true){while(arr[left]
+<pivot){left++;}while(arr[right]>pivot){right--;}if(left<right){if(arr[left]==arr[right])return right;CharRange swap=arr[left];arr[left]=arr[right];arr[right]
+=swap;}else{return right;}}}
+#endregion
+}}namespace RE{/// <summary>
 /// This is an internal class that helps the code serializer know how to serialize DFA entries
 /// </summary>
 class CharDfaEntryConverter:TypeConverter{ public override bool CanConvertTo(ITypeDescriptorContext context,Type destinationType){if(typeof(InstanceDescriptor)

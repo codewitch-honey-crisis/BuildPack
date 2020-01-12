@@ -60,6 +60,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParsleyDevstudio", "Parsley
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "scratch", "scratch\scratch.csproj", "{08E8CF61-5DA5-4808-9831-27CBC3D2984B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlangHandRolledDemo", "SlangHandRolledDemo\SlangHandRolledDemo.csproj", "{1AF26F7D-9D30-4B9B-8956-682A18A63C07}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -134,6 +136,10 @@ Global
 		{08E8CF61-5DA5-4808-9831-27CBC3D2984B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08E8CF61-5DA5-4808-9831-27CBC3D2984B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08E8CF61-5DA5-4808-9831-27CBC3D2984B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AF26F7D-9D30-4B9B-8956-682A18A63C07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AF26F7D-9D30-4B9B-8956-682A18A63C07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AF26F7D-9D30-4B9B-8956-682A18A63C07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AF26F7D-9D30-4B9B-8956-682A18A63C07}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using CD;
 [assembly: Foo]
@@ -19,51 +21,41 @@ namespace ParsleyAdvancedDemo
 	
 		static void Main()
 		{
-			Stream stm = null;
+			foreach (var file in Directory.GetFiles(@"..\..\Test", "*.cs"))
+			{
+				_Test(file);
+			}
+		}
+		static void _Test(string file)
+		{
+			Console.WriteLine("Parsing file: " + file);
+
+			// don't read directly from the file for perf testing.
+			StreamReader sr = null;
+			string text = null;
 			try
 			{
-				// open this file
-				stm = File.OpenRead(@"..\..\ParseNode.export.cs");
-				// parse it
-				var tokenizer = new SlangTokenizer(stm);
-				var pn = SlangParser.Parse(tokenizer);
-				// write the AST to the console
-				var ccu = SlangParser.ToCompileUnit(pn);
-				// patch it
-				SlangPatcher.Patch(ccu);
-				var co = SlangPatcher.GetNextUnresolvedElement(ccu);
-				if(null!=co)
-				{
-					Console.WriteLine("Next unresolved code element:");
-					Console.WriteLine(CodeDomUtility.ToString(co));
-					var line = 0;
-					var column = 0;
-					var position = 0L;
-					var o = co.UserData["slang:line"];
-					if (null != o)
-						line = (int)o;
-					o = co.UserData["slang:column"];
-					if (null != o)
-						column = (int)o;
-					o = co.UserData["slang:position"];
-					if (null != o)
-						position = (long)o;
-					Console.WriteLine("at line {0}, column {1}, position {2}", line, column, position);
-					
-				} else
-				{
-					Console.WriteLine(CodeDomUtility.ToString(ccu));
-					Console.WriteLine("Press any key...");
-					Console.ReadKey();
-					Console.Clear();
-					Console.WriteLine(CodeDomUtility.ToString(ccu, "vb")); 
-				}
-			} 
+				sr = new StreamReader(file);
+				text = sr.ReadToEnd();
+			}
 			finally
 			{
-				if (null != stm)
-					stm.Close();
+				if (null != sr)
+					sr.Close();
 			}
+			var sw = new Stopwatch();
+			sw.Start();
+			for (var i = 0; i < 100; ++i)
+			{
+				var tok = new SlangTokenizer(text);
+				var pc = new ParserContext(tok);
+				pc.EnsureStarted();
+				CodeObject co = SlangParser.ToCompileUnit(SlangParser.ParseCompileUnit(pc));
+			}
+			sw.Stop();
+			Console.WriteLine("Parsed " + Path.GetFileName(file) + " in " + (sw.ElapsedMilliseconds / 100d) + " msec");
+
+			//Console.WriteLine(CodeDomUtility.ToString(co).TrimEnd());
 		}
 		static void Demo1()
 		{

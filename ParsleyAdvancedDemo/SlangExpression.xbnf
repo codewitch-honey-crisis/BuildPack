@@ -36,7 +36,7 @@ IntrinsicType=	boolType	|
 				longType	|
 				ulongType	|
 				objectType	;
-TypeBase = (Identifier { "."  Identifier }) | IntrinsicType;
+TypeBase = ([ "global" "::" ] Identifier { "."  Identifier }) | IntrinsicType;
 // the first follows is for fields and methods, second two 
 // are for base types and custom attributes, respectively
 Type<shared,follows="Identifier lbrace rbracket thisRef whereKeyword #EOS">=TypeElement { TypeArraySpec };
@@ -64,7 +64,7 @@ ArraySpecExpressionList<dependency,collapsed>= ArgList "]";
 ArrayInitializer<dependency>= "{" [ Expression { "," Expression } ] "}";
 SubExpression<collapsed> = "(" Expression ")" : where { return !_IsCastExpression(context);}
 // use the where clause to override first first conflict.
-UnaryExpression= ("+"|"-"|"!"|"++"|"--") UnaryExpression | SubExpression | PrimaryExpression : where { return true;}
+UnaryExpression= ("+"|"-"|"!"|"++"|"--") UnaryExpression | CastExpression | PrimaryExpression : where { return true;}
 FieldRef<dependency>= Identifier { MemberAnyRef };
 // This is a virtual but here's the basic description
 //TypeOrFieldRef = ( Identifier | IntrinsicType )	{ MemberAnyRef } | (TypeRef) {MemberAnyRef}+ : where {return true;}
@@ -78,7 +78,7 @@ PrimaryExpression=
 		stringLiteral  { MemberAnyRef }						|
 		boolLiteral { MemberAnyRef }						|
 		nullLiteral											|
-		CastExpression										|
+		SubExpression { MemberAnyRef }						|
 		typeOf "(" Type ")"	{ MemberAnyRef }				|
 		defaultOf "(" Type ")" { MemberAnyRef }				|
 		NewExpression { MemberAnyRef }						|
@@ -120,6 +120,7 @@ boolLiteral = 'true|false';
 nullLiteral = "null";
 thisRef = "this";
 baseRef = "base";
+globalKeyword="global";
 verbatimStringLiteral='@"([^"|""])*"';
 // bury this
 identifier<priority=-100>='(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';

@@ -417,13 +417,23 @@ namespace RE
 				return lhs.Last >= rhs.Last;
 			return lhs.First >= rhs.First;
 		}
+		
+		public int CompareTo(CharRange other)
+		{
+			var c = First.CompareTo(other.First);
+			if (0 == c)
+				c = Last.CompareTo(other.Last);
+			return c;
+		}
+
+		#region Sorting
 		static void _Sort(IList<CharRange> arr, int left, int right)
 		{
 			if (left < right)
 			{
 				int pivot = _Partition(arr, left, right);
 
-				if (1< pivot)
+				if (1 < pivot)
 				{
 					_Sort(arr, left, pivot - 1);
 				}
@@ -467,13 +477,6 @@ namespace RE
 				}
 			}
 		}
-
-		public int CompareTo(CharRange other)
-		{
-			var c = First.CompareTo(other.First);
-			if (0 == c)
-				c = Last.CompareTo(other.Last);
-			return c;
-		}
+		#endregion
 	}
 }

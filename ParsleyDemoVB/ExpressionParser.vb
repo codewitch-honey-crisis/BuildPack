@@ -16,7 +16,7 @@ Imports System.Collections.Generic
 Imports System.Text
 
 Namespace ParsleyDemo
-    '''<summary>Parses the indicated grammar. Refer to C:\Users\honey\source\repos\BuildPack\ParsleyDemoVB\Expression.xbnf</summary>
+    '''<summary>Parses the indicated grammar. Refer to C:\Users\honey\Source\Repos\BuildPack\ParsleyDemoVB\Expression.xbnf</summary>
     <System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")>  _
     Partial Friend Class ExpressionParser
         Friend Const ErrorSymbol As Integer = -1

@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1AF26F7D-9D30-4B9B-8956-682A18A63C07}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>CD</RootNamespace>
+    <AssemblyName>SlangHandRolledDemo</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CodeDomGoKit\CodeDomUtility.cs">
+      <Link>CodeDomUtility.cs</Link>
+    </Compile>
+    <Compile Include="GplexShared.cs" />
+    <Compile Include="LookAheadEnumerator.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SlangParser.cs" />
+    <Compile Include="SlangParser.Expression.cs" />
+    <Compile Include="SlangParser.Statement.cs" />
+    <Compile Include="SlangParser.Type.cs" />
+    <Compile Include="SlangScanner.cs" />
+    <Compile Include="SlangSyntaxException.cs" />
+    <Compile Include="SlangTokenizer.cs" />
+    <Content Include="Test\CompiledTokenizer.cs" />
+    <Content Include="Test\CompiledTokenizerTemplate.cs" />
+    <Content Include="Test\TableTokenizer.cs" />
+    <Content Include="Test\TableTokenizerTemplate.cs" />
+    <Content Include="Test\Token.cs" />
+    <Content Include="Test\SyntaxException.cs" />
+    <Content Include="Test\ParserContext.cs" />
+    <Content Include="Test\Parser.cs" />
+    <Content Include="Test\ParseNode.cs" />
+    <Content Include="Test\LookAheadEnumerator.cs" />
+    <Content Include="Test\GplexShared.Prototype.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <Content Include="SlangStatement.xbnf" />
+    <None Include="Slang.xbnf" />
+    <None Include="SlangExpression.xbnf" />
+    <None Include="SlangScanner.lex" />
+    <None Include="SlangType.xbnf" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>"$(SolutionDir)Parsley\bin\Release\parsley.exe" "$(ProjectDir)Slang.xbnf" /noparser /gplex "$(ProjectDir)Slang.lex" /namespace CD /fast /ifstale
+"$(SolutionDir)Gplex\bin\Release\gplex.exe" /out:"$(ProjectDir)SlangScanner.cs" "$(ProjectDir)SlangScanner.lex"</PreBuildEvent>
+  </PropertyGroup>
+</Project>

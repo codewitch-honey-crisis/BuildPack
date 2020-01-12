@@ -245,6 +245,7 @@ Namespace ParsleyDemo
             Me._current.Line = Me._line
             Me._current.Column = Me._column
             Me._current.Position = Me._position
+            Me._current.Skipped = Nothing
             Me._buffer.Clear
             'lex the next input
             Me._current.SymbolId = Me._Lex

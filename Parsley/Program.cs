@@ -38,7 +38,7 @@ namespace Parsley
 			bool noshared = false;
 			bool ifstale = false;
 			bool fast = false;
-
+			bool noparser = false;
 
 			try
 			{
@@ -86,6 +86,9 @@ namespace Parsley
 						case "/fast":
 							fast = true;
 							break;
+						case "/noparser":
+							noparser= true;
+							break;
 						case "/noshared":
 							noshared = true;
 							break;
@@ -115,7 +118,8 @@ namespace Parsley
 							throw new ArgumentException(string.Format("Unknown switch {0}", args[i]));
 					}
 				}
-				
+				if (null != outputfile && noparser)
+					throw new ArgumentException("<noparser> and <ouputfile> cannot both be specified.", "outputfile");
 				
 				if (null == codeclass)
 				{
@@ -290,7 +294,7 @@ namespace Parsley
 					throw new ArgumentException("<codelanguage> and <fast> cannot both be specified. The <fast> option is C# only.");
 
 				var stale = true;
-				if (ifstale && null != outputfile)
+				if (ifstale)
 				{
 					stale = false;
 					if (!stale && null != rolexfile)
@@ -299,12 +303,12 @@ namespace Parsley
 					if (!stale && null != gplexfile)
 						if (_IsStale(inputfile, gplexfile))
 							stale = true;
-					if(!stale)
+					if (!stale)
 					{
 						var files = XbnfDocument.GetResources(inputfile);
 						foreach (var s in files)
 						{
-							if(_IsStale(s,outputfile))
+							if (_IsStale(s, outputfile))
 							{
 								stale = true;
 								break;
@@ -313,7 +317,7 @@ namespace Parsley
 
 					}
 					// see if our exe has changed
-					if (!stale && _IsStale(CodeBase, outputfile))
+					if (!stale && null!=outputfile && _IsStale(CodeBase, outputfile))
 						stale = true;
 
 				}
@@ -413,84 +417,88 @@ namespace Parsley
 							}
 						}
 						CfgException.ThrowIfErrors(msgs);
-						var ccu = CodeGenerator.GenerateCompileUnit(doc, genInfo, codeclass, codenamespace, fast);
-						var ccuNS = ccu.Namespaces[ccu.Namespaces.Count - 1];
-						var ccuShared = CodeGenerator.GenerateSharedCompileUnit(codenamespace);
-						var sNS = ccuShared.Namespaces[ccuShared.Namespaces.Count - 1];
-						var parserContext = C.GetByName("ParserContext", sNS.Types);
-						var parseNode = C.GetByName("ParseNode", sNS.Types);
-						var syntaxException = C.GetByName("SyntaxException", sNS.Types);
-						var lookAheadEnumerator = C.GetByName("LookAheadEnumerator", sNS.Types);
-						var lookAheadEnumeratorEnumerable = C.GetByName("LookAheadEnumeratorEnumerable", sNS.Types);
-						var lookAheadEnumeratorEnumerator = C.GetByName("LookAheadEnumeratorEnumerator", sNS.Types);
-						ccuNS.Types.Add(syntaxException);
-						ccuNS.Types.Add(parseNode);
-						ccuNS.Types.Add(parserContext);
-						ccuNS.Types.Add(lookAheadEnumerator);
-						ccuNS.Types.Add(lookAheadEnumeratorEnumerable);
-						ccuNS.Types.Add(lookAheadEnumeratorEnumerator);
-						ccu.ReferencedAssemblies.Add(typeof(TypeConverter).Assembly.GetName().ToString());
+						if (!noparser)
+						{
+							var ccu = CodeGenerator.GenerateCompileUnit(doc, genInfo, codeclass, codenamespace, fast);
+							var ccuNS = ccu.Namespaces[ccu.Namespaces.Count - 1];
+							var ccuShared = CodeGenerator.GenerateSharedCompileUnit(codenamespace);
+							var sNS = ccuShared.Namespaces[ccuShared.Namespaces.Count - 1];
+							var parserContext = C.GetByName("ParserContext", sNS.Types);
+							var parseNode = C.GetByName("ParseNode", sNS.Types);
+							var syntaxException = C.GetByName("SyntaxException", sNS.Types);
+							var lookAheadEnumerator = C.GetByName("LookAheadEnumerator", sNS.Types);
+							var lookAheadEnumeratorEnumerable = C.GetByName("LookAheadEnumeratorEnumerable", sNS.Types);
+							var lookAheadEnumeratorEnumerator = C.GetByName("LookAheadEnumeratorEnumerator", sNS.Types);
+							ccuNS.Types.Add(syntaxException);
+							ccuNS.Types.Add(parseNode);
+							ccuNS.Types.Add(parserContext);
+							ccuNS.Types.Add(lookAheadEnumerator);
+							ccuNS.Types.Add(lookAheadEnumeratorEnumerable);
+							ccuNS.Types.Add(lookAheadEnumeratorEnumerator);
+							ccu.ReferencedAssemblies.Add(typeof(TypeConverter).Assembly.GetName().ToString());
 
-						if (fast)
-						{
-							CD.CodeDomVisitor.Visit(ccu, (ctx) =>
+							if (fast)
 							{
-								var vd = ctx.Target as CodeVariableDeclarationStatement;
-								if (null != vd && CD.CodeDomResolver.IsNullOrVoidType(vd.Type))
-									vd.Type = C.Type("var");
-							}, CD.CodeDomVisitTargets.All & ~(CD.CodeDomVisitTargets.Expressions | CD.CodeDomVisitTargets.Comments | CD.CodeDomVisitTargets.Attributes | CD.CodeDomVisitTargets.Directives | CD.CodeDomVisitTargets.Types | CD.CodeDomVisitTargets.TypeRefs));
-						}
-						else
-						{
-							CD.SlangPatcher.Patch(ccu, ccuShared);
-							var co = CD.SlangPatcher.GetNextUnresolvedElement(ccu);
-							if (null != co)
-							{
-								stderr.WriteLine("Warning: Not all of the elements could be resolved. The generated code may not be correct in all languages.");
-								stderr.WriteLine("  Next unresolved: {0}", C.ToString(co).Trim());
-							}
-						}
-						if (noshared)
-						{
-							// we just needed these for slang resolution
-							ccuNS.Types.Remove(syntaxException);
-							ccuNS.Types.Remove(parseNode);
-							ccuNS.Types.Remove(parserContext);
-							ccuNS.Types.Remove(lookAheadEnumerator);
-							ccuNS.Types.Remove(lookAheadEnumeratorEnumerable);
-							ccuNS.Types.Remove(lookAheadEnumeratorEnumerator);
-						}
-						foreach (CodeNamespace ns in ccu.Namespaces)
-						{
-							var hasColNS = false;
-							foreach (CodeNamespaceImport nsi in ns.Imports)
-							{
-								if (0 == string.Compare(nsi.Namespace, "System.Collections.Generic", StringComparison.InvariantCulture))
+								CD.CodeDomVisitor.Visit(ccu, (ctx) =>
 								{
-									hasColNS = true;
-									break;
+									var vd = ctx.Target as CodeVariableDeclarationStatement;
+									if (null != vd && CD.CodeDomResolver.IsNullOrVoidType(vd.Type))
+										vd.Type = C.Type("var");
+								}, CD.CodeDomVisitTargets.All & ~(CD.CodeDomVisitTargets.Expressions | CD.CodeDomVisitTargets.Comments | CD.CodeDomVisitTargets.Attributes | CD.CodeDomVisitTargets.Directives | CD.CodeDomVisitTargets.Types | CD.CodeDomVisitTargets.TypeRefs));
+							}
+							else
+							{
+								CD.SlangPatcher.Patch(ccu, ccuShared);
+								var co = CD.SlangPatcher.GetNextUnresolvedElement(ccu);
+								if (null != co)
+								{
+									stderr.WriteLine("Warning: Not all of the elements could be resolved. The generated code may not be correct in all languages.");
+									stderr.WriteLine("  Next unresolved: {0}", C.ToString(co).Trim());
 								}
 							}
-							if (!hasColNS)
-								ns.Imports.Add(new CodeNamespaceImport("System.Collections.Generic"));
-						}
-						var prov = CodeDomProvider.CreateProvider(codelanguage);
+							if (noshared)
+							{
+								// we just needed these for slang resolution
+								ccuNS.Types.Remove(syntaxException);
+								ccuNS.Types.Remove(parseNode);
+								ccuNS.Types.Remove(parserContext);
+								ccuNS.Types.Remove(lookAheadEnumerator);
+								ccuNS.Types.Remove(lookAheadEnumeratorEnumerable);
+								ccuNS.Types.Remove(lookAheadEnumeratorEnumerator);
+							}
+							foreach (CodeNamespace ns in ccu.Namespaces)
+							{
+								var hasColNS = false;
+								foreach (CodeNamespaceImport nsi in ns.Imports)
+								{
+									if (0 == string.Compare(nsi.Namespace, "System.Collections.Generic", StringComparison.InvariantCulture))
+									{
+										hasColNS = true;
+										break;
+									}
+								}
+								if (!hasColNS)
+									ns.Imports.Add(new CodeNamespaceImport("System.Collections.Generic"));
+							}
+							var prov = CodeDomProvider.CreateProvider(codelanguage);
 
-						if (null != outputfile)
-						{
-							var sw = new StreamWriter(outputfile);
-							sw.BaseStream.SetLength(0);
-							output = sw;
+							if (null != outputfile)
+							{
+								var sw = new StreamWriter(outputfile);
+								sw.BaseStream.SetLength(0);
+								output = sw;
+							}
+							else
+								output = stdout;
+							var opts = new CodeGeneratorOptions();
+							opts.VerbatimOrder = true;
+							opts.BlankLinesBetweenMembers = false;
+							prov.GenerateCodeFromCompileUnit(ccu, output, opts);
+							output.Flush();
+							output.Close();
+							output = null;
 						}
-						else
-							output = stdout;
-						var opts = new CodeGeneratorOptions();
-						opts.VerbatimOrder = true;
-						opts.BlankLinesBetweenMembers = false;
-						prov.GenerateCodeFromCompileUnit(ccu, output, opts);
-						output.Flush();
-						output.Close();
-						output = null;
+						
 					}
 					else
 						stderr.WriteLine("{0} skipped parser generation because there are no non-terminals and no imports defined.", Name);
@@ -612,8 +620,8 @@ namespace Parsley
 			t.WriteLine(" <inputfile> [/output <outputfile>] [/rolex <rolexfile>]");
 			t.WriteLine("	[/gplex <gplexfile>] [/gplexclass <gplexcodeclass>]");
 			t.WriteLine("	[/namespace <codenamespace>] [/class <codeclass>]");
-			t.WriteLine("	[/langage <codelanguage>] [/fast]");
-			t.WriteLine("	[/noshared] [/verbose] [/ifstale]");
+			t.WriteLine("	[/langage <codelanguage>] [/fast] [/noshared]");
+			t.WriteLine("	[/verbose] [/ifstale] [/noparser]");
 			t.WriteLine();
 			t.WriteLine("	<inputfile>		The XBNF input file to use.");
 			t.WriteLine("	<outputfile>		The output file to use - default stdout.");
@@ -627,6 +635,7 @@ namespace Parsley
 			t.WriteLine("	<noshared>		Do not include shared library prerequisites");
 			t.WriteLine("	<verbose>		Output all messages from the generation process");
 			t.WriteLine("	<ifstale>		Do not generate unless output files are older than the input files.");
+			t.WriteLine("	<noparser>		Generate any specified lexers with the appropriate symbol table, and factor the grammar(s), but do not generate the parser output.");
 			t.WriteLine();
 			t.WriteLine("Any other switch displays this screen and exits.");
 			t.WriteLine();

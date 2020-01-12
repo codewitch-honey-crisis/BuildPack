@@ -1062,10 +1062,10 @@ namespace CD
 						rhs = _BuildUnaryExpression(node.C(1));
 						return Mark(new CodeBinaryOperatorExpression(rhs, CodeBinaryOperatorType.Assign, new CodeBinaryOperatorExpression(rhs, CodeBinaryOperatorType.Subtract, new CodePrimitiveExpression(1))),node);
 				}
-			} else if(3==node.CL())
+			} else if (ExpressionParser.CastExpression == node.C(0).SymbolId)
 			{
-				// subexpression
-				return _BuildExpression(node.C(1));
+				// cast expression
+				return _BuildCastExpression(node.C(0));
 			}
 			return _BuildPrimaryExpression(node.C(0));
 		}
@@ -1111,8 +1111,9 @@ namespace CD
 					result = new CodeDefaultValueExpression(_BuildType(node.C(2))).SetLoc(node);
 					i = 4; // advance past default part
 					break;
-				case ExpressionParser.CastExpression:
-					return _BuildCastExpression(node.C(0));
+				case ExpressionParser.lparen:
+					return _BuildExpression(node.C(1));
+				
 				case ExpressionParser.FieldRef:
 					// we treat these as variable refs in the codedom
 					result = new CodeVariableReferenceExpression(node.C(0).C(0).Value).Mark(node,true);
