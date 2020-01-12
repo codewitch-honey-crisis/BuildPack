@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  DESKTOP-EC2OMEU
-//  DateTime: 1/12/2020 9:14:24 AM
+//  DateTime: 1/12/2020 10:43:01 AM
 //  UserName: honey
-//  GPLEX input file <C:\Users\honey\Source\Repos\BuildPack\SlangHandRolledDemo\SlangScanner.lex - 1/12/2020 9:14:23 AM>
+//  GPLEX input file <C:\Users\honey\Source\Repos\BuildPack\Slang\SlangScanner.lex - 1/12/2020 10:43:01 AM>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: unicode, verbose, noParser, stack, minimize
@@ -35,7 +35,7 @@ using System.Runtime.Serialization;
 using System.Diagnostics.CodeAnalysis;
 
 
-namespace CD
+namespace Slang
 {   
     /// <summary>
     /// Summary Canonical example of GPLEX automaton
