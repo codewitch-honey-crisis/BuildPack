@@ -40,6 +40,7 @@ namespace ParsleyAdvancedDemo
 							++working;
 							_Patch(ctx.Target as CodeFieldReferenceExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeVariableDeclarationStatement, ctx, resolver);
+							_Patch(ctx.Target as CodeAssignStatement, ctx, resolver);
 							_Patch(ctx.Target as CodeVariableReferenceExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeDelegateInvokeExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeObjectCreateExpression, ctx, resolver);
@@ -49,6 +50,7 @@ namespace ParsleyAdvancedDemo
 							_Patch(ctx.Target as CodeMemberProperty, ctx, resolver);
 							_Patch(ctx.Target as CodeTypeReferenceExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeTypeReference, ctx, resolver);
+							
 						}
 					});
 				}
@@ -69,6 +71,7 @@ namespace ParsleyAdvancedDemo
 							++working;
 							_Patch(ctx.Target as CodeFieldReferenceExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeVariableDeclarationStatement, ctx, resolver);
+							_Patch(ctx.Target as CodeAssignStatement, ctx, resolver);
 							_Patch(ctx.Target as CodeVariableReferenceExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeDelegateInvokeExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeObjectCreateExpression, ctx, resolver);
@@ -161,6 +164,30 @@ namespace ParsleyAdvancedDemo
 				// this is probably a nested type but with . instead of +
 				// so now we need to crack it apart and hunt it down
 				throw new NotImplementedException();
+			}
+		}
+		static void _Patch(CodeAssignStatement ast, CodeDomVisitContext ctx, CodeDomResolver res)
+		{
+			if (null != ast)
+			{
+				var eventRef = ast.Left as CodeEventReferenceExpression;
+				if (null != eventRef)
+				{
+					var bo = ast.Right as CodeBinaryOperatorExpression;
+					if (null != bo)
+					{
+						var trg = bo.Right;
+						if (CodeBinaryOperatorType.Add == bo.Operator)
+						{
+							CodeDomVisitor.ReplaceTarget(ctx, new CodeAttachEventStatement(eventRef, trg));
+						}
+						else if (CodeBinaryOperatorType.Subtract == bo.Operator)
+						{
+							CodeDomVisitor.ReplaceTarget(ctx, new CodeRemoveEventStatement(eventRef, trg));
+						}
+					}
+				}
+
 			}
 		}
 		static void _Patch(CodeTypeReferenceExpression tr,CodeDomVisitContext ctx,CodeDomResolver res)

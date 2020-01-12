@@ -39,7 +39,8 @@ namespace SlangHandRolledDemo
 			var co = SlangPatcher.GetNextUnresolvedElement(ccu);
 			if (null != co)
 			{
-				Console.WriteLine("Next unresolved element is:");
+				Console.Write("Next unresolved element is: ");
+				Console.WriteLine(co.GetType().Name);
 				Console.WriteLine(CodeDomUtility.ToString(co).TrimEnd());
 			}
 			else

@@ -40,6 +40,7 @@ namespace CD
 							++working;
 							_Patch(ctx.Target as CodeFieldReferenceExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeVariableDeclarationStatement, ctx, resolver);
+							_Patch(ctx.Target as CodeAssignStatement, ctx, resolver);
 							_Patch(ctx.Target as CodeVariableReferenceExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeDelegateInvokeExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeObjectCreateExpression, ctx, resolver);
@@ -69,6 +70,7 @@ namespace CD
 							++working;
 							_Patch(ctx.Target as CodeFieldReferenceExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeVariableDeclarationStatement, ctx, resolver);
+							_Patch(ctx.Target as CodeAssignStatement, ctx, resolver);
 							_Patch(ctx.Target as CodeVariableReferenceExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeDelegateInvokeExpression, ctx, resolver);
 							_Patch(ctx.Target as CodeObjectCreateExpression, ctx, resolver);
@@ -138,6 +140,29 @@ namespace CD
 				msg += string.Format(" at line {0}, column {1}, position {2}", l, c, p);
 			}
 			return msg;
+		}
+		static void _Patch(CodeAssignStatement ast, CodeDomVisitContext ctx, CodeDomResolver res)
+		{
+			if (null != ast)
+			{
+				var eventRef = ast.Left as CodeEventReferenceExpression;
+				if(null!=eventRef)
+				{
+					var bo = ast.Right as CodeBinaryOperatorExpression;
+					if(null!=bo)
+					{
+						var trg = bo.Right;
+						if(CodeBinaryOperatorType.Add==bo.Operator)
+						{
+							CodeDomVisitor.ReplaceTarget(ctx, new CodeAttachEventStatement(eventRef, trg));
+						} else if (CodeBinaryOperatorType.Subtract == bo.Operator)
+						{
+							CodeDomVisitor.ReplaceTarget(ctx, new CodeRemoveEventStatement(eventRef, trg));
+						}
+					} 
+				}
+
+			}
 		}
 		static void _Patch(CodeTypeReference tr, CodeDomVisitContext ctx, CodeDomResolver res)
 		{
