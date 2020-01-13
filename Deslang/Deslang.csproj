@@ -43,11 +43,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Slang.brick.cs" />
-    <None Include="Export\ParserContext.cs" />
-    <Content Include="Export\LookAheadEnumerator.cs" />
-    <Content Include="Export\ParseNode.cs" />
-    <Content Include="Export\Token.cs" />
-    <Content Include="Export\SyntaxException.cs" />
     <Compile Include="CodeDomGoKit.brick.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
