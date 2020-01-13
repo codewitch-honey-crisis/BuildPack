@@ -149,21 +149,24 @@ namespace Slang
 			if (null != ast)
 			{
 				var eventRef = ast.Left as CodeEventReferenceExpression;
-				if(null!=eventRef)
+				if (null != eventRef)
 				{
 					var bo = ast.Right as CodeBinaryOperatorExpression;
-					if(null!=bo)
+					if (null != bo)
 					{
 						var trg = bo.Right;
-						if(CodeBinaryOperatorType.Add==bo.Operator)
+						if (CodeBinaryOperatorType.Add == bo.Operator)
 						{
 							CodeDomVisitor.ReplaceTarget(ctx, new CodeAttachEventStatement(eventRef, trg));
-						} else if (CodeBinaryOperatorType.Subtract == bo.Operator)
+						}
+						else if (CodeBinaryOperatorType.Subtract == bo.Operator)
 						{
 							CodeDomVisitor.ReplaceTarget(ctx, new CodeRemoveEventStatement(eventRef, trg));
 						}
-					} 
+					}
 				}
+				else if (!ast.Left.UserData.Contains("slang:unresolved"))
+					ast.UserData.Remove("slang:unresolved");
 
 			}
 		}
@@ -602,7 +605,7 @@ namespace Slang
 					var tre = fr.TargetObject as CodeTypeReferenceExpression;
 					if (null != tre)
 						isStatic = true;
-					var tt = resolver.TryResolveType(isStatic ? tre.Type : t, scope);
+					var tt = resolver.TryResolveType(isStatic ? tre.Type : t, scope,true);
 					if (null==tt)
 						throw new InvalidOperationException(_AppendLineInfo(string.Format("The type {0} could not be resolved", t.BaseType),t));
 					var td = tt as CodeTypeDeclaration;

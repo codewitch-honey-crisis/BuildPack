@@ -87,15 +87,15 @@ namespace Parsley
 		static void _AppendTree(ParseNode node, System.Text.StringBuilder builder)
 		{
 			// adapted from https://stackoverflow.com/questions/1649027/how-do-i-print-out-a-tree-structure
-			var firstStack = new List<ParseNode>();
+			List<ParseNode> firstStack = new List<ParseNode>();
 			firstStack.Add(node);
 
-			var childListStack = new List<List<ParseNode>>();
+			List<List<ParseNode>> childListStack = new List<List<ParseNode>>();
 			childListStack.Add(firstStack);
 
 			while (childListStack.Count > 0)
 			{
-				var childStack = childListStack[childListStack.Count - 1];
+				List<ParseNode> childStack = childListStack[childListStack.Count - 1];
 
 				if (childStack.Count == 0)
 				{
@@ -122,7 +122,10 @@ namespace Parsley
 					builder.Append(ss);
 					builder.AppendLine();
 					if (node.IsNonTerminal && 0 < node.Children.Length)
-						childListStack.Add(new List<ParseNode>(node.Children));
+					{
+						var pnl = new List<ParseNode>(node.Children);
+						childListStack.Add(pnl);
+					}
 				}
 			}
 		}

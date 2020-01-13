@@ -1,7 +1,7 @@
-﻿namespace Rolex
+﻿namespace Parsley
 {
 	/// <summary>
-	/// Reference implementation for generated shared code
+	/// Represents a lexeme/token
 	/// </summary>
 	struct Token
 	{
@@ -25,5 +25,10 @@
 		/// Indicates the value of the token
 		/// </summary>
 		public string Value;
+		/// <summary>
+		/// If supported, indicates the tokens that were 
+		/// skipped between here and the last read
+		/// </summary>
+		public Token[] Skipped;
 	}
 }

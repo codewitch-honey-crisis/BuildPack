@@ -2,6 +2,7 @@
 using System.CodeDom;
 using System.IO;
 using CD;
+using Slang;
 namespace CodeDomDemo
 {
 	partial class Program

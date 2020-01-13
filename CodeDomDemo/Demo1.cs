@@ -1,7 +1,8 @@
 ﻿using CD;
 using System;
 using System.CodeDom;
-
+using Slang;
+using System.IO;
 
 namespace CodeDomDemo
 {
@@ -14,7 +15,18 @@ namespace CodeDomDemo
 			Console.WriteLine(res.Evaluate(SlangParser.ParseExpression("5*4-7")));
 
 			// takes this file and get a codedom from it
-			var ccu = SlangParser.ReadCompileUnitFrom("..\\..\\Demo1.cs");
+			Stream stm = null;
+			CodeCompileUnit ccu = null;
+			try
+			{
+				stm = File.OpenRead(@"..\..\Demo1.cs");
+				ccu = SlangParser.ReadCompileUnitFrom(stm);
+			}
+			finally
+			{
+				if (null != stm)
+					stm.Close();
+			}
 			ccu.ReferencedAssemblies.Add("CodeDomGoKit.dll");
 			ccu.ReferencedAssemblies.Add(typeof(CodeObject).Assembly.GetName().ToString());
 			// now patch the parsed codedom so it's correct

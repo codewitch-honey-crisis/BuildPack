@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Slang
@@ -8,11 +9,70 @@ namespace Slang
 	using ST = SlangTokenizer;
 	partial class SlangParser
 	{
+		public static CodeStatement ParseStatement(string text,bool includeComments = false)
+		{
+			var tokenizer = new SlangTokenizer(text);
+			return ParseStatement(tokenizer,includeComments);
+		}
+		public static CodeStatement ReadStatementFrom(Stream stream,bool includeComments = false)
+		{
+			var tokenizer = new SlangTokenizer(stream);
+			return ParseStatement(tokenizer,includeComments);
+		}
+		public static CodeStatement ParseStatement(string text, int line, int column, long position,bool includeComments = false)
+		{
+			var tokenizer = new SlangTokenizer(text);
+			var pc = new _PC(tokenizer);
+			pc.SetLocation(line, column, position);
+			return _ParseStatement(pc,includeComments);
+		}
+		public static CodeStatement ReadStatementFrom(Stream stream, int line, int column, long position,bool includeComments = false)
+		{
+			var tokenizer = new SlangTokenizer(stream);
+			var pc = new _PC(tokenizer);
+			pc.SetLocation(line, column, position);
+			return _ParseStatement(pc,includeComments);
+		}
+
+		public static CodeStatementCollection ParseStatements(string text, bool includeComments = false)
+		{
+			var tokenizer = new SlangTokenizer(text);
+			return ParseStatements(tokenizer, includeComments);
+		}
+		public static CodeStatementCollection ReadStatementsFrom(Stream stream, bool includeComments = false)
+		{
+			var tokenizer = new SlangTokenizer(stream);
+			return ParseStatements(tokenizer, includeComments);
+		}
+		public static CodeStatementCollection ParseStatements(string text, int line, int column, long position, bool includeComments = false)
+		{
+			var tokenizer = new SlangTokenizer(text);
+			var pc = new _PC(tokenizer);
+			pc.SetLocation(line, column, position);
+			return _ParseStatements(pc, includeComments);
+		}
+		public static CodeStatementCollection ReadStatementsFrom(Stream stream, int line, int column, long position, bool includeComments = false)
+		{
+			var tokenizer = new SlangTokenizer(stream);
+			var pc = new _PC(tokenizer);
+			pc.SetLocation(line, column, position);
+			return _ParseStatements(pc, includeComments);
+		}
+
 		internal static CodeStatement ParseStatement(IEnumerable<Token> tokenizer,bool includeComments=false)
 		{
 			var pc = new _PC(tokenizer);
 			pc.Advance(false);
 			return _ParseStatement(pc,includeComments);
+		}
+		internal static CodeStatementCollection ParseStatements(IEnumerable<Token> tokenizer, bool includeComments = false)
+		{
+			var pc = new _PC(tokenizer);
+			pc.Advance(false);
+			var result = new CodeStatementCollection();
+			while(!pc.IsEnded && ST.rbrace!=pc.SymbolId)
+				result.Add(_ParseStatement(pc, includeComments));
+			return result;
 		}
 		static CodeStatement _ParseVariableDeclarationStatement(_PC pc)
 		{
@@ -36,7 +96,7 @@ namespace Slang
 			if (ST.semi != pc.SymbolId)
 				pc.Error("Expecting ; in variable declaration statement");
 			pc.Advance();
-			return new CodeVariableDeclarationStatement(ctr, id, init).Mark(l,c,p,null==init);
+			return new CodeVariableDeclarationStatement(ctr, id, init).Mark(l,c,p,null==ctr);
 		}
 		static CodeStatement _ParseStatement(_PC pc, bool includeComments = false)
 		{

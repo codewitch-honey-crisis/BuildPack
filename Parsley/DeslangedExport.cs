@@ -82,7 +82,7 @@ internal partial class Deslanged {
                         Deslanged._Namespace("", new CodeNamespaceImport[] {
                                     new CodeNamespaceImport("System.Collections.Generic")}, new CodeTypeDeclaration[0], new CodeCommentStatement[0]),
                         Deslanged._Namespace("Parsley", new CodeNamespaceImport[0], new CodeTypeDeclaration[] {
-                                    Deslanged._TypeDeclaration("Parser", true, false, false, false, true, ((MemberAttributes)(0)), TypeAttributes.NotPublic, new CodeTypeParameter[0], new CodeTypeReference[0], new CodeTypeMember[] {
+                                    Deslanged._TypeDeclaration("Parser", true, false, false, false, true, (MemberAttributes.Final | MemberAttributes. Private), TypeAttributes.NotPublic, new CodeTypeParameter[0], new CodeTypeReference[0], new CodeTypeMember[] {
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "ErrorSymbol", new CodePrimitiveExpression(-1), (MemberAttributes.Const | MemberAttributes. FamilyAndAssembly), new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "EosSymbol", new CodePrimitiveExpression(-2), (MemberAttributes.Const | MemberAttributes. FamilyAndAssembly), new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0])}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0]);
         }
@@ -90,36 +90,37 @@ internal partial class Deslanged {
     public static System.CodeDom.CodeCompileUnit Token {
         get {
             return Deslanged._CompileUnit(new string[0], new CodeNamespace[] {
+                        Deslanged._Namespace("", new CodeNamespaceImport[0], new CodeTypeDeclaration[0], new CodeCommentStatement[0]),
                         Deslanged._Namespace("Parsley", new CodeNamespaceImport[0], new CodeTypeDeclaration[] {
-                                    Deslanged._TypeDeclaration("Token", false, false, false, true, false, ((MemberAttributes)(0)), TypeAttributes.NotPublic, new CodeTypeParameter[0], new CodeTypeReference[0], new CodeTypeMember[] {
+                                    Deslanged._TypeDeclaration("Token", false, false, false, true, false, (MemberAttributes.Final | MemberAttributes. Private), TypeAttributes.NotPublic, new CodeTypeParameter[0], new CodeTypeReference[0], new CodeTypeMember[] {
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "Line", null, (MemberAttributes.Final | MemberAttributes. Public), new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("Indicates the line where the token occurs", true),
-                                                            new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" Indicates the line where the token occurs", true),
+                                                            new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "Column", null, (MemberAttributes.Final | MemberAttributes. Public), new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("Indicates the column where the token occurs", true),
-                                                            new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" Indicates the column where the token occurs", true),
+                                                            new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(long)), "Position", null, (MemberAttributes.Final | MemberAttributes. Public), new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("Indicates the position where the token occurs", true),
-                                                            new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" Indicates the position where the token occurs", true),
+                                                            new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "SymbolId", null, (MemberAttributes.Final | MemberAttributes. Public), new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("Indicates the symbol id or -1 for the error symbol", true),
-                                                            new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" Indicates the symbol id or -1 for the error symbol", true),
+                                                            new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(string)), "Value", null, (MemberAttributes.Final | MemberAttributes. Public), new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("Indicates the value of the token", true),
-                                                            new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" Indicates the value of the token", true),
+                                                            new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(new CodeTypeReference("Token"), 1), "Skipped", null, (MemberAttributes.Final | MemberAttributes. Public), new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("If supported, indicates the tokens that were", true),
-                                                            new CodeCommentStatement("skipped between here and the last read", true),
-                                                            new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[] {
-                                                new CodeCommentStatement("<summary>", true),
-                                                new CodeCommentStatement("Represents a lexeme/token", true),
-                                                new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0])}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0]);
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" If supported, indicates the tokens that were ", true),
+                                                            new CodeCommentStatement(" skipped between here and the last read", true),
+                                                            new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[] {
+                                                new CodeCommentStatement(" <summary>", true),
+                                                new CodeCommentStatement(" Represents a lexeme/token", true),
+                                                new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0])}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0]);
         }
     }
     private static CodeConstructor _Constructor(MemberAttributes attributes, CodeParameterDeclarationExpression[] parameters, CodeExpression[] chainedConstructorArgs, CodeExpression[] baseConstructorArgs, CodeStatement[] statements, CodeCommentStatement[] comments, CodeAttributeDeclaration[] customAttributes, CodeDirective[] startDirectives, CodeDirective[] endDirectives, CodeLinePragma linePragma) {
@@ -177,44 +178,43 @@ internal partial class Deslanged {
                                     new CodeNamespaceImport("System"),
                                     new CodeNamespaceImport("System.Collections.Generic")}, new CodeTypeDeclaration[0], new CodeCommentStatement[0]),
                         Deslanged._Namespace("Parsley", new CodeNamespaceImport[0], new CodeTypeDeclaration[] {
-                                    Deslanged._TypeDeclaration("ParserContext", true, false, false, false, true, ((MemberAttributes)(0)), TypeAttributes.NotPublic, new CodeTypeParameter[0], new CodeTypeReference[] {
+                                    Deslanged._TypeDeclaration("ParserContext", true, false, false, false, true, (MemberAttributes.Final | MemberAttributes. Private), TypeAttributes.NotPublic, new CodeTypeParameter[0], new CodeTypeReference[] {
                                                 new CodeTypeReference("Object"),
                                                 new CodeTypeReference("IDisposable")}, new CodeTypeMember[] {
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_state", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference("IEnumerator`1", new CodeTypeReference[] {
-                                                                new CodeTypeReference("System.Object", CodeTypeReferenceOptions.GenericTypeParameter)}), "_e", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                                new CodeTypeReference(typeof(object))}), "_e", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference("LookAheadEnumerator`1", new CodeTypeReference[] {
-                                                                new CodeTypeReference("System.Object", CodeTypeReferenceOptions.GenericTypeParameter)}), "_el", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                                new CodeTypeReference(typeof(object))}), "_el", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference("Token"), "_t", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_advanceCount", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_line", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_column", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(long)), "_position", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference("List`1", new CodeTypeReference[] {
-                                                                new CodeTypeReference("System.Object", CodeTypeReferenceOptions.GenericTypeParameter)}), "_skipped", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                                new CodeTypeReference(typeof(object))}), "_skipped", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._Constructor((MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[] {
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference("IEnumerable`1", new CodeTypeReference[] {
-                                                                            new CodeTypeReference("System.Object", CodeTypeReferenceOptions.GenericTypeParameter)}), "tokenizer")}, new CodeExpression[] {
+                                                                            new CodeTypeReference(typeof(object))}), "tokenizer")}, new CodeExpression[] {
                                                             new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeArgumentReferenceExpression("tokenizer"), "GetEnumerator"), new CodeExpression[0]),
                                                             new CodePrimitiveExpression(true)}, new CodeExpression[0], new CodeStatement[0], new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._Constructor(MemberAttributes.Private, new CodeParameterDeclarationExpression[] {
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference("IEnumerator`1", new CodeTypeReference[] {
-                                                                            new CodeTypeReference("System.Object", CodeTypeReferenceOptions.GenericTypeParameter)}), "enumerator"),
+                                                                            new CodeTypeReference(typeof(object))}), "enumerator"),
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(bool)), "wrap")}, new CodeExpression[0], new CodeExpression[0], new CodeStatement[] {
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_e"), new CodeArgumentReferenceExpression("enumerator")),
                                                             new CodeConditionStatement(new CodeArgumentReferenceExpression("wrap"), new CodeStatement[] {
                                                                         new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_el"), new CodeObjectCreateExpression(new CodeTypeReference("LookAheadEnumerator`1", new CodeTypeReference[] {
-                                                                                            new CodeTypeReference("System.Object", CodeTypeReferenceOptions.GenericTypeParameter)}), new CodeExpression[] {
+                                                                                            new CodeTypeReference(typeof(object))}), new CodeExpression[] {
                                                                                         new CodeArgumentReferenceExpression("enumerator")})),
-                                                                        new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_e"), new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_el")),
-                                                                        new CodeCommentStatement("we need both pointers to point to the lookahead")}, new CodeStatement[0]),
+                                                                        new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_e"), new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_el"))}, new CodeStatement[0]),
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state"), new CodePrimitiveExpression(-1)),
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_t"), "SymbolId"), new CodePrimitiveExpression(-1)),
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_advanceCount"), new CodePrimitiveExpression(0)),
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_skipped"), new CodeObjectCreateExpression(new CodeTypeReference("List`1", new CodeTypeReference[] {
-                                                                                new CodeTypeReference("System.Object", CodeTypeReferenceOptions.GenericTypeParameter)}), new CodeExpression[0]))}, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                                                new CodeTypeReference(typeof(object))}), new CodeExpression[0]))}, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberProperty(new CodeTypeReference("List`1", new CodeTypeReference[] {
-                                                                new CodeTypeReference("System.Object", CodeTypeReferenceOptions.GenericTypeParameter)}), "Skipped", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
+                                                                new CodeTypeReference(typeof(object))}), "Skipped", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_skipped"))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(void)), "SetLocation", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[] {
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(int)), "line"),
@@ -262,7 +262,6 @@ internal partial class Deslanged {
                                                             new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodePrimitiveExpression(false), CodeBinaryOperatorType.ValueEquality, new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_e"), "MoveNext"), new CodeExpression[0])), new CodeStatement[] {
                                                                         new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_t"), "SymbolId"), new CodePrimitiveExpression(-2)),
                                                                         new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state"), new CodePrimitiveExpression(-2))}, new CodeStatement[] {
-                                                                        new CodeCommentStatement("sanity check. should never happen"),
                                                                         new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(int))), "MaxValue"), CodeBinaryOperatorType.ValueEquality, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_advanceCount")), new CodeStatement[] {
                                                                                     new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_advanceCount"), new CodePrimitiveExpression(-1))}, new CodeStatement[0]),
                                                                         new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_advanceCount"), new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_advanceCount"), CodeBinaryOperatorType.Add, new CodePrimitiveExpression(1))),
@@ -303,13 +302,6 @@ internal partial class Deslanged {
                                                             new CodeTypeReference("IDisposable")}, null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0])}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0]);
         }
     }
-    private static CodeTypeReference _TypeReference(string baseType, CodeTypeReferenceOptions options, CodeTypeReference[] typeArguments, CodeTypeReference arrayElementType, int arrayRank) {
-        CodeTypeReference result = new CodeTypeReference(baseType, options);
-        result.ArrayElementType = arrayElementType;
-        result.ArrayRank = arrayRank;
-        result.TypeArguments.AddRange(typeArguments);
-        return result;
-    }
     public static System.CodeDom.CodeCompileUnit ParseNode {
         get {
             return Deslanged._CompileUnit(new string[0], new CodeNamespace[] {
@@ -317,7 +309,7 @@ internal partial class Deslanged {
                                     new CodeNamespaceImport("System.Collections.Generic"),
                                     new CodeNamespaceImport("System.Text")}, new CodeTypeDeclaration[0], new CodeCommentStatement[0]),
                         Deslanged._Namespace("Parsley", new CodeNamespaceImport[0], new CodeTypeDeclaration[] {
-                                    Deslanged._TypeDeclaration("ParseNode", true, false, false, false, true, ((MemberAttributes)(0)), TypeAttributes.NotPublic, new CodeTypeParameter[0], new CodeTypeReference[0], new CodeTypeMember[] {
+                                    Deslanged._TypeDeclaration("ParseNode", true, false, false, false, true, (MemberAttributes.Final | MemberAttributes. Private), TypeAttributes.NotPublic, new CodeTypeParameter[0], new CodeTypeReference[0], new CodeTypeMember[] {
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_symbolId", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(string)), "_symbol", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(string)), "_value", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
@@ -392,23 +384,21 @@ internal partial class Deslanged {
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(void)), "_AppendTree", MemberAttributes.Static, new CodeParameterDeclarationExpression[] {
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference("ParseNode"), "node"),
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(System.Text.StringBuilder)), "builder")}, new CodeStatement[] {
-                                                            new CodeCommentStatement("adapted from https://stackoverflow.com/questions/1649027/how-do-i-print-out-a-tre" +
-                                                                    "e-structure"),
                                                             new CodeVariableDeclarationStatement(new CodeTypeReference("List`1", new CodeTypeReference[] {
-                                                                            new CodeTypeReference("ParseNode", CodeTypeReferenceOptions.GenericTypeParameter)}), "firstStack", new CodeObjectCreateExpression(new CodeTypeReference("List`1", new CodeTypeReference[] {
-                                                                                new CodeTypeReference("ParseNode", CodeTypeReferenceOptions.GenericTypeParameter)}), new CodeExpression[0])),
+                                                                            new CodeTypeReference("ParseNode")}), "firstStack", new CodeObjectCreateExpression(new CodeTypeReference("List`1", new CodeTypeReference[] {
+                                                                                new CodeTypeReference("ParseNode")}), new CodeExpression[0])),
                                                             new CodeExpressionStatement(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeVariableReferenceExpression("firstStack"), "Add"), new CodeExpression[] {
                                                                             new CodeArgumentReferenceExpression("node")})),
                                                             new CodeVariableDeclarationStatement(new CodeTypeReference("List`1", new CodeTypeReference[] {
-                                                                            Deslanged._TypeReference("List`1", CodeTypeReferenceOptions.GenericTypeParameter, new CodeTypeReference[] {
-                                                                                        new CodeTypeReference("ParseNode", CodeTypeReferenceOptions.GenericTypeParameter)}, null, 0)}), "childListStack", new CodeObjectCreateExpression(new CodeTypeReference("List`1", new CodeTypeReference[] {
-                                                                                Deslanged._TypeReference("List`1", CodeTypeReferenceOptions.GenericTypeParameter, new CodeTypeReference[] {
-                                                                                            new CodeTypeReference("ParseNode", CodeTypeReferenceOptions.GenericTypeParameter)}, null, 0)}), new CodeExpression[0])),
+                                                                            new CodeTypeReference("List`1", new CodeTypeReference[] {
+                                                                                        new CodeTypeReference("ParseNode")})}), "childListStack", new CodeObjectCreateExpression(new CodeTypeReference("List`1", new CodeTypeReference[] {
+                                                                                new CodeTypeReference("List`1", new CodeTypeReference[] {
+                                                                                            new CodeTypeReference("ParseNode")})}), new CodeExpression[0])),
                                                             new CodeExpressionStatement(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeVariableReferenceExpression("childListStack"), "Add"), new CodeExpression[] {
                                                                             new CodeVariableReferenceExpression("firstStack")})),
                                                             new CodeIterationStatement(new CodeSnippetStatement(""), new CodeBinaryOperatorExpression(new CodePropertyReferenceExpression(new CodeVariableReferenceExpression("childListStack"), "Count"), CodeBinaryOperatorType.GreaterThan, new CodePrimitiveExpression(0)), new CodeSnippetStatement(""), new CodeStatement[] {
                                                                         new CodeVariableDeclarationStatement(new CodeTypeReference("List`1", new CodeTypeReference[] {
-                                                                                        new CodeTypeReference("ParseNode", CodeTypeReferenceOptions.GenericTypeParameter)}), "childStack", new CodeIndexerExpression(new CodeVariableReferenceExpression("childListStack"), new CodeExpression[] {
+                                                                                        new CodeTypeReference("ParseNode")}), "childStack", new CodeIndexerExpression(new CodeVariableReferenceExpression("childListStack"), new CodeExpression[] {
                                                                                         new CodeBinaryOperatorExpression(new CodePropertyReferenceExpression(new CodeVariableReferenceExpression("childListStack"), "Count"), CodeBinaryOperatorType.Subtract, new CodePrimitiveExpression(1))})),
                                                                         new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodePropertyReferenceExpression(new CodeVariableReferenceExpression("childStack"), "Count"), CodeBinaryOperatorType.ValueEquality, new CodePrimitiveExpression(0)), new CodeStatement[] {
                                                                                     new CodeExpressionStatement(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeVariableReferenceExpression("childListStack"), "RemoveAt"), new CodeExpression[] {
@@ -440,8 +430,8 @@ internal partial class Deslanged {
                                                                                     new CodeExpressionStatement(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeArgumentReferenceExpression("builder"), "AppendLine"), new CodeExpression[0])),
                                                                                     new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodePropertyReferenceExpression(new CodeArgumentReferenceExpression("node"), "IsNonTerminal"), CodeBinaryOperatorType.BooleanAnd, new CodeBinaryOperatorExpression(new CodePrimitiveExpression(0), CodeBinaryOperatorType.LessThan, new CodePropertyReferenceExpression(new CodePropertyReferenceExpression(new CodeArgumentReferenceExpression("node"), "Children"), "Length"))), new CodeStatement[] {
                                                                                                 new CodeVariableDeclarationStatement(new CodeTypeReference("List`1", new CodeTypeReference[] {
-                                                                                                                new CodeTypeReference("ParseNode", CodeTypeReferenceOptions.GenericTypeParameter)}), "pnl", new CodeObjectCreateExpression(new CodeTypeReference("List`1", new CodeTypeReference[] {
-                                                                                                                    new CodeTypeReference("ParseNode", CodeTypeReferenceOptions.GenericTypeParameter)}), new CodeExpression[] {
+                                                                                                                new CodeTypeReference("ParseNode")}), "pnl", new CodeObjectCreateExpression(new CodeTypeReference("List`1", new CodeTypeReference[] {
+                                                                                                                    new CodeTypeReference("ParseNode")}), new CodeExpression[] {
                                                                                                                 new CodePropertyReferenceExpression(new CodeArgumentReferenceExpression("node"), "Children")})),
                                                                                                 new CodeExpressionStatement(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeVariableReferenceExpression("childListStack"), "Add"), new CodeExpression[] {
                                                                                                                 new CodeVariableReferenceExpression("pnl")}))}, new CodeStatement[0])})})}, new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0])}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0]);
@@ -453,7 +443,7 @@ internal partial class Deslanged {
                         Deslanged._Namespace("", new CodeNamespaceImport[] {
                                     new CodeNamespaceImport("System")}, new CodeTypeDeclaration[0], new CodeCommentStatement[0]),
                         Deslanged._Namespace("Parsley", new CodeNamespaceImport[0], new CodeTypeDeclaration[] {
-                                    Deslanged._TypeDeclaration("SyntaxException", true, false, false, false, false, ((MemberAttributes)(0)), TypeAttributes.NotPublic, new CodeTypeParameter[0], new CodeTypeReference[] {
+                                    Deslanged._TypeDeclaration("SyntaxException", true, false, false, false, false, (MemberAttributes.Final | MemberAttributes. Private), TypeAttributes.NotPublic, new CodeTypeParameter[0], new CodeTypeReference[] {
                                                 new CodeTypeReference("Exception")}, new CodeTypeMember[] {
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_line", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_column", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
@@ -471,28 +461,28 @@ internal partial class Deslanged {
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_line"), new CodeArgumentReferenceExpression("line")),
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_column"), new CodeArgumentReferenceExpression("column")),
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_position"), new CodeArgumentReferenceExpression("position"))}, new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("Creates a syntax exception with the specified arguments", true),
-                                                            new CodeCommentStatement("</summary>", true),
-                                                            new CodeCommentStatement("<param name=\"message\">The error message</param>", true),
-                                                            new CodeCommentStatement("<param name=\"line\">The line where the error occurred</param>", true),
-                                                            new CodeCommentStatement("<param name=\"column\">The column where the error occured</param>", true),
-                                                            new CodeCommentStatement("<param name=\"position\">The position where the error occured</param>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" Creates a syntax exception with the specified arguments", true),
+                                                            new CodeCommentStatement(" </summary>", true),
+                                                            new CodeCommentStatement(" <param name=\"message\">The error message</param>", true),
+                                                            new CodeCommentStatement(" <param name=\"line\">The line where the error occurred</param>", true),
+                                                            new CodeCommentStatement(" <param name=\"column\">The column where the error occured</param>", true),
+                                                            new CodeCommentStatement(" <param name=\"position\">The position where the error occured</param>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberProperty(new CodeTypeReference(typeof(int)), "Line", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_line"))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("The line where the error occurred", true),
-                                                            new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" The line where the error occurred", true),
+                                                            new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberProperty(new CodeTypeReference(typeof(int)), "Column", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_column"))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("The column where the error occurred", true),
-                                                            new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" The column where the error occurred", true),
+                                                            new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberProperty(new CodeTypeReference(typeof(long)), "Position", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_position"))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("The position where the error occurred", true),
-                                                            new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" The position where the error occurred", true),
+                                                            new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(string)), "_GetMessage", MemberAttributes.Static, new CodeParameterDeclarationExpression[] {
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(string)), "message"),
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(int)), "line"),
@@ -504,9 +494,9 @@ internal partial class Deslanged {
                                                                             new CodeArgumentReferenceExpression("line"),
                                                                             new CodeArgumentReferenceExpression("column"),
                                                                             new CodeArgumentReferenceExpression("position")}))}, new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[] {
-                                                new CodeCommentStatement("<summary>", true),
-                                                new CodeCommentStatement("", true),
-                                                new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0])}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0]);
+                                                new CodeCommentStatement(" <summary>", true),
+                                                new CodeCommentStatement(" ", true),
+                                                new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0])}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0]);
         }
     }
     private static CodeParameterDeclarationExpression _ParameterDeclarationExpression(CodeTypeReference type, string name, FieldDirection direction, CodeAttributeDeclaration[] customAttributes) {
@@ -522,27 +512,27 @@ internal partial class Deslanged {
                                     new CodeNamespaceImport("System"),
                                     new CodeNamespaceImport("System.Collections.Generic")}, new CodeTypeDeclaration[0], new CodeCommentStatement[0]),
                         Deslanged._Namespace("Parsley", new CodeNamespaceImport[0], new CodeTypeDeclaration[] {
-                                    Deslanged._TypeDeclaration("LookAheadEnumerator", true, false, false, false, false, ((MemberAttributes)(0)), TypeAttributes.NotPublic, new CodeTypeParameter[] {
+                                    Deslanged._TypeDeclaration("LookAheadEnumerator", true, false, false, false, false, (MemberAttributes.Final | MemberAttributes. Private), TypeAttributes.NotPublic, new CodeTypeParameter[] {
                                                 new CodeTypeParameter("T")}, new CodeTypeReference[] {
                                                 new CodeTypeReference(typeof(object)),
                                                 new CodeTypeReference("IEnumerator`1", new CodeTypeReference[] {
-                                                            new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})}, new CodeTypeMember[] {
+                                                            new CodeTypeReference("T")})}, new CodeTypeMember[] {
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_Enumerating", new CodePrimitiveExpression(0), (MemberAttributes.Const | MemberAttributes. Private), new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_NotStarted", new CodePrimitiveExpression(-2), (MemberAttributes.Const | MemberAttributes. Private), new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_Ended", new CodePrimitiveExpression(-1), (MemberAttributes.Const | MemberAttributes. Private), new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_Disposed", new CodePrimitiveExpression(-3), (MemberAttributes.Const | MemberAttributes. Private), new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference("IEnumerator`1", new CodeTypeReference[] {
-                                                                new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)}), "_inner", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                                new CodeTypeReference("T")}), "_inner", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_state", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_DefaultCapacity", new CodePrimitiveExpression(16), (MemberAttributes.Const | MemberAttributes. Private), new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("for the lookahead queue")}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" for the lookahead queue")}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(float)), "_GrowthFactor", new CodePrimitiveExpression(0.9F), (MemberAttributes.Const | MemberAttributes. Private), new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(new CodeTypeReference("T"), 1), "_queue", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_queueHead", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_queueCount", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._Constructor((MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[] {
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference("IEnumerator`1", new CodeTypeReference[] {
-                                                                            new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)}), "inner")}, new CodeExpression[0], new CodeExpression[0], new CodeStatement[] {
+                                                                            new CodeTypeReference("T")}), "inner")}, new CodeExpression[0], new CodeExpression[0], new CodeStatement[] {
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_inner"), new CodeArgumentReferenceExpression("inner")),
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state"), new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference("Parsley.LookAheadEnumerator`1", new CodeTypeReference[] {
                                                                                     new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "_NotStarted")),
@@ -550,17 +540,17 @@ internal partial class Deslanged {
                                                                                         new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "_DefaultCapacity"))),
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_queueHead"), new CodePrimitiveExpression(0)),
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_queueCount"), new CodePrimitiveExpression(0))}, new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("Creates a new instance. Once this is created, the inner/wrapped enumerator must n" +
-                                                                    "ot be touched.", true),
-                                                            new CodeCommentStatement("</summary>", true),
-                                                            new CodeCommentStatement("<param name=\"inner\"></param>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" Creates a new instance. Once this is created, the inner/wrapped enumerator must " +
+                                                                    "not be touched.", true),
+                                                            new CodeCommentStatement(" </summary>", true),
+                                                            new CodeCommentStatement(" <param name=\"inner\"></param>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(void)), "DiscardLookAhead", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeIterationStatement(new CodeSnippetStatement(""), new CodeBinaryOperatorExpression(new CodePrimitiveExpression(1), CodeBinaryOperatorType.LessThan, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_queueCount")), new CodeSnippetStatement(""), new CodeStatement[] {
                                                                         new CodeExpressionStatement(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeThisReferenceExpression(), "_Dequeue"), new CodeExpression[0]))})}, new CodeTypeReference[0], null, new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("Discards the lookahead and advances the cursor to the physical position.", true),
-                                                            new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" Discards the lookahead and advances the cursor to the physical position.", true),
+                                                            new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberProperty(new CodeTypeReference("T"), "Current", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodePrimitiveExpression(0), CodeBinaryOperatorType.GreaterThan, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state")), new CodeStatement[] {
                                                                         new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference("Parsley.LookAheadEnumerator`1", new CodeTypeReference[] {
@@ -573,17 +563,15 @@ internal partial class Deslanged {
                                                                                                     new CodePrimitiveExpression("The cursor is after the end of the enumeration.")}))}, new CodeStatement[0]),
                                                                         new CodeThrowExceptionStatement(new CodeObjectCreateExpression(new CodeTypeReference("ObjectDisposedException"), new CodeExpression[] {
                                                                                         new CodePropertyReferenceExpression(new CodeTypeOfExpression(new CodeTypeReference("LookAheadEnumerator`1", new CodeTypeReference[] {
-                                                                                                            new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "Name")}))}, new CodeStatement[0]),
+                                                                                                            new CodeTypeReference("T")})), "Name")}))}, new CodeStatement[0]),
                                                             new CodeMethodReturnStatement(new CodeArrayIndexerExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_queue"), new CodeExpression[] {
-                                                                            new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_queueHead")}))}, new CodeStatement[0], new CodeTypeReference[] {
-                                                            new CodeTypeReference("IEnumerator`1", new CodeTypeReference[] {
-                                                                        new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})}, null, new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("Retrieves the value under the cursor", true),
-                                                            new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                                            new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_queueHead")}))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[] {
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" Retrieves the value under the cursor", true),
+                                                            new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberProperty(new CodeTypeReference(typeof(object)), "Current", ((MemberAttributes)(0)), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeMethodReturnStatement(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Current"))}, new CodeStatement[0], new CodeTypeReference[0], new CodeTypeReference(typeof(System.Collections.IEnumerator)), new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("legacy enum support (required)")}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" legacy enum support (required)")}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberProperty(new CodeTypeReference(typeof(int)), "QueueCount", MemberAttributes.FamilyAndAssembly, new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_queueCount"))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(bool)), "TryPeek", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[] {
@@ -593,7 +581,7 @@ internal partial class Deslanged {
                                                                                         new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "_Disposed"), CodeBinaryOperatorType.ValueEquality, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state")), new CodeStatement[] {
                                                                         new CodeThrowExceptionStatement(new CodeObjectCreateExpression(new CodeTypeReference("ObjectDisposedException"), new CodeExpression[] {
                                                                                         new CodePropertyReferenceExpression(new CodeTypeOfExpression(new CodeTypeReference("LookAheadEnumerator`1", new CodeTypeReference[] {
-                                                                                                            new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "Name")}))}, new CodeStatement[0]),
+                                                                                                            new CodeTypeReference("T")})), "Name")}))}, new CodeStatement[0]),
                                                             new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodePrimitiveExpression(0), CodeBinaryOperatorType.GreaterThan, new CodeArgumentReferenceExpression("lookahead")), new CodeStatement[] {
                                                                         new CodeThrowExceptionStatement(new CodeObjectCreateExpression(new CodeTypeReference("ArgumentOutOfRangeException"), new CodeExpression[] {
                                                                                         new CodePrimitiveExpression("lookahead")}))}, new CodeStatement[0]),
@@ -618,13 +606,13 @@ internal partial class Deslanged {
                                                                                         new CodeArgumentReferenceExpression("value")})),
                                                                         new CodeAssignStatement(new CodeArgumentReferenceExpression("lookahead"), new CodeBinaryOperatorExpression(new CodeArgumentReferenceExpression("lookahead"), CodeBinaryOperatorType.Subtract, new CodePrimitiveExpression(1)))}),
                                                             new CodeMethodReturnStatement(new CodeBinaryOperatorExpression(new CodePrimitiveExpression(-1), CodeBinaryOperatorType.ValueEquality, new CodeArgumentReferenceExpression("lookahead")))}, new CodeTypeReference[0], null, new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("Attempts to peek the specified number of positions from the current position with" +
-                                                                    "out advancing", true),
-                                                            new CodeCommentStatement("</summary>", true),
-                                                            new CodeCommentStatement("<param name=\"lookahead\">The offset from the current position to peek at</param>", true),
-                                                            new CodeCommentStatement("<param name=\"value\">The value returned</param>", true),
-                                                            new CodeCommentStatement("<returns>True if the peek could be satisfied, otherwise false</returns>", true)}, new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" Attempts to peek the specified number of positions from the current position wit" +
+                                                                    "hout advancing", true),
+                                                            new CodeCommentStatement(" </summary>", true),
+                                                            new CodeCommentStatement(" <param name=\"lookahead\">The offset from the current position to peek at</param>", true),
+                                                            new CodeCommentStatement(" <param name=\"value\">The value returned</param>", true),
+                                                            new CodeCommentStatement(" <returns>True if the peek could be satisfied, otherwise false</returns>", true)}, new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference("T"), "Peek", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[] {
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(int)), "lookahead")}, new CodeStatement[] {
                                                             new CodeVariableDeclarationStatement(new CodeTypeReference("T"), "value", null),
@@ -634,19 +622,19 @@ internal partial class Deslanged {
                                                                         new CodeThrowExceptionStatement(new CodeObjectCreateExpression(new CodeTypeReference("InvalidOperationException"), new CodeExpression[] {
                                                                                         new CodePrimitiveExpression("There were not enough values in the enumeration to satisfy the request")}))}, new CodeStatement[0]),
                                                             new CodeMethodReturnStatement(new CodeVariableReferenceExpression("value"))}, new CodeTypeReference[0], null, new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("Peek the specified number of positions from the current position without advancin" +
-                                                                    "g", true),
-                                                            new CodeCommentStatement("</summary>", true),
-                                                            new CodeCommentStatement("<param name=\"lookahead\">The offset from the current position to peek at</param>", true),
-                                                            new CodeCommentStatement("<returns>The value at the specified position</returns>", true)}, new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" Peek the specified number of positions from the current position without advanci" +
+                                                                    "ng", true),
+                                                            new CodeCommentStatement(" </summary>", true),
+                                                            new CodeCommentStatement(" <param name=\"lookahead\">The offset from the current position to peek at</param>", true),
+                                                            new CodeCommentStatement(" <returns>The value at the specified position</returns>", true)}, new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberProperty(new CodeTypeReference(typeof(bool)), "IsEnumerating", MemberAttributes.FamilyAndAssembly, new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeMethodReturnStatement(new CodeBinaryOperatorExpression(new CodePrimitiveExpression(-1), CodeBinaryOperatorType.LessThan, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state")))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberProperty(new CodeTypeReference(typeof(bool)), "IsEnded", MemberAttributes.FamilyAndAssembly, new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeMethodReturnStatement(new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference("Parsley.LookAheadEnumerator`1", new CodeTypeReference[] {
                                                                                         new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "_Ended"), CodeBinaryOperatorType.ValueEquality, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state")))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberProperty(new CodeTypeReference("IEnumerable`1", new CodeTypeReference[] {
-                                                                new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)}), "LookAhead", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
+                                                                new CodeTypeReference("T")}), "LookAhead", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodePrimitiveExpression(0), CodeBinaryOperatorType.GreaterThan, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state")), new CodeStatement[] {
                                                                         new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state"), CodeBinaryOperatorType.ValueEquality, new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference("Parsley.LookAheadEnumerator`1", new CodeTypeReference[] {
                                                                                                     new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "_NotStarted")), new CodeStatement[] {
@@ -658,21 +646,21 @@ internal partial class Deslanged {
                                                                                                     new CodePrimitiveExpression("The cursor is after the end of the enumeration.")}))}, new CodeStatement[0]),
                                                                         new CodeThrowExceptionStatement(new CodeObjectCreateExpression(new CodeTypeReference("ObjectDisposedException"), new CodeExpression[] {
                                                                                         new CodePropertyReferenceExpression(new CodeTypeOfExpression(new CodeTypeReference("LookAheadEnumerator`1", new CodeTypeReference[] {
-                                                                                                            new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "Name")}))}, new CodeStatement[0]),
+                                                                                                            new CodeTypeReference("T")})), "Name")}))}, new CodeStatement[0]),
                                                             new CodeMethodReturnStatement(new CodeObjectCreateExpression(new CodeTypeReference("LookAheadEnumeratorEnumerable`1", new CodeTypeReference[] {
-                                                                                new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)}), new CodeExpression[] {
+                                                                                new CodeTypeReference("T")}), new CodeExpression[] {
                                                                             new CodeThisReferenceExpression()}))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("Retrieves a lookahead cursor from the current cursor that can be navigated withou" +
-                                                                    "t moving the main cursor", true),
-                                                            new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" Retrieves a lookahead cursor from the current cursor that can be navigated witho" +
+                                                                    "ut moving the main cursor", true),
+                                                            new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(bool)), "MoveNext", ((MemberAttributes)(0)), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodePrimitiveExpression(0), CodeBinaryOperatorType.GreaterThan, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state")), new CodeStatement[] {
                                                                         new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference("Parsley.LookAheadEnumerator`1", new CodeTypeReference[] {
                                                                                                     new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "_Disposed"), CodeBinaryOperatorType.ValueEquality, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state")), new CodeStatement[] {
                                                                                     new CodeThrowExceptionStatement(new CodeObjectCreateExpression(new CodeTypeReference("ObjectDisposedException"), new CodeExpression[] {
                                                                                                     new CodePropertyReferenceExpression(new CodeTypeOfExpression(new CodeTypeReference("LookAheadEnumerator`1", new CodeTypeReference[] {
-                                                                                                                        new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "Name")}))}, new CodeStatement[0]),
+                                                                                                                        new CodeTypeReference("T")})), "Name")}))}, new CodeStatement[0]),
                                                                         new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference("Parsley.LookAheadEnumerator`1", new CodeTypeReference[] {
                                                                                                     new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "_Ended"), CodeBinaryOperatorType.ValueEquality, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state")), new CodeStatement[] {
                                                                                     new CodeMethodReturnStatement(new CodePrimitiveExpression(false))}, new CodeStatement[0]),
@@ -700,10 +688,10 @@ internal partial class Deslanged {
                                                                         new CodeExpressionStatement(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeThisReferenceExpression(), "_Enqueue"), new CodeExpression[] {
                                                                                         new CodePropertyReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_inner"), "Current")}))}, new CodeStatement[0]),
                                                             new CodeMethodReturnStatement(new CodePrimitiveExpression(true))}, new CodeTypeReference[0], new CodeTypeReference(typeof(System.Collections.IEnumerator)), new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("Advances the cursor", true),
-                                                            new CodeCommentStatement("</summary>", true),
-                                                            new CodeCommentStatement("<returns>True if more input was read, otherwise false</returns>", true)}, new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" Advances the cursor", true),
+                                                            new CodeCommentStatement(" </summary>", true),
+                                                            new CodeCommentStatement(" <returns>True if more input was read, otherwise false</returns>", true)}, new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(void)), "Reset", ((MemberAttributes)(0)), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeExpressionStatement(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_inner"), "Reset"), new CodeExpression[0])),
                                                             new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodeBinaryOperatorExpression(new CodePrimitiveExpression(0), CodeBinaryOperatorType.LessThan, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_queueCount")), CodeBinaryOperatorType.BooleanAnd, new CodeBinaryOperatorExpression(new CodePrimitiveExpression(null), CodeBinaryOperatorType.IdentityEquality, new CodeDefaultValueExpression(new CodeTypeReference("T")))), new CodeStatement[] {
@@ -720,18 +708,18 @@ internal partial class Deslanged {
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_queueCount"), new CodePrimitiveExpression(0)),
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state"), new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference("Parsley.LookAheadEnumerator`1", new CodeTypeReference[] {
                                                                                     new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "_NotStarted"))}, new CodeTypeReference[0], new CodeTypeReference(typeof(System.Collections.IEnumerator)), new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("Resets the cursor, and clears the queue.", true),
-                                                            new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" Resets the cursor, and clears the queue.", true),
+                                                            new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(void)), "Dispose", ((MemberAttributes)(0)), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodePrimitiveExpression(false), CodeBinaryOperatorType.ValueEquality, new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference("Parsley.LookAheadEnumerator`1", new CodeTypeReference[] {
                                                                                             new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "_Disposed"), CodeBinaryOperatorType.ValueEquality, new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state"))), new CodeStatement[] {
                                                                         new CodeExpressionStatement(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_inner"), "Dispose"), new CodeExpression[0])),
                                                                         new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_state"), new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference("Parsley.LookAheadEnumerator`1", new CodeTypeReference[] {
                                                                                                 new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "_Disposed"))}, new CodeStatement[0])}, new CodeTypeReference[0], new CodeTypeReference(typeof(System.IDisposable)), new CodeCommentStatement[] {
-                                                            new CodeCommentStatement("<summary>", true),
-                                                            new CodeCommentStatement("Disposes of this instance", true),
-                                                            new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[] {
+                                                            new CodeCommentStatement(" <summary>", true),
+                                                            new CodeCommentStatement(" Disposes of this instance", true),
+                                                            new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[] {
                                                             new CodeRegionDirective(CodeRegionMode.Start, "IDisposable Support")}, new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(void)), "_Enqueue", ((MemberAttributes)(0)), new CodeParameterDeclarationExpression[] {
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference("T"), "item")}, new CodeStatement[] {
@@ -781,50 +769,49 @@ internal partial class Deslanged {
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_queueCount"), new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_queueCount"), CodeBinaryOperatorType.Subtract, new CodePrimitiveExpression(1))),
                                                             new CodeMethodReturnStatement(new CodeVariableReferenceExpression("result"))}, new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[] {
                                                             new CodeRegionDirective(CodeRegionMode.End, "")}, null)}, new CodeCommentStatement[] {
-                                                new CodeCommentStatement("<summary>", true),
-                                                new CodeCommentStatement("An enumerator that provides lookahead without advancing the cursor", true),
-                                                new CodeCommentStatement("</summary>", true),
-                                                new CodeCommentStatement("<typeparam name=\"T\">The type to enumerate</typeparam>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
-                                    Deslanged._TypeDeclaration("LookAheadEnumeratorEnumerable", true, false, false, false, false, ((MemberAttributes)(0)), TypeAttributes.NotPublic, new CodeTypeParameter[] {
+                                                new CodeCommentStatement(" <summary>", true),
+                                                new CodeCommentStatement(" An enumerator that provides lookahead without advancing the cursor", true),
+                                                new CodeCommentStatement(" </summary>", true),
+                                                new CodeCommentStatement(" <typeparam name=\"T\">The type to enumerate</typeparam>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                    Deslanged._TypeDeclaration("LookAheadEnumeratorEnumerable", true, false, false, false, false, (MemberAttributes.Final | MemberAttributes. Private), TypeAttributes.NotPublic, new CodeTypeParameter[] {
                                                 new CodeTypeParameter("T")}, new CodeTypeReference[] {
                                                 new CodeTypeReference(typeof(object)),
                                                 new CodeTypeReference("IEnumerable`1", new CodeTypeReference[] {
-                                                            new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})}, new CodeTypeMember[] {
+                                                            new CodeTypeReference("T")})}, new CodeTypeMember[] {
                                                 Deslanged._MemberField(new CodeTypeReference("LookAheadEnumerator`1", new CodeTypeReference[] {
-                                                                new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)}), "_outer", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                                new CodeTypeReference("T")}), "_outer", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._Constructor((MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[] {
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference("LookAheadEnumerator`1", new CodeTypeReference[] {
-                                                                            new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)}), "outer")}, new CodeExpression[0], new CodeExpression[0], new CodeStatement[] {
+                                                                            new CodeTypeReference("T")}), "outer")}, new CodeExpression[0], new CodeExpression[0], new CodeStatement[] {
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_outer"), new CodeArgumentReferenceExpression("outer"))}, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference("IEnumerator`1", new CodeTypeReference[] {
-                                                                new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)}), "GetEnumerator", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
-                                                            new CodeCommentStatement("for some reason VB was resolving new as AddressOf, so use this."),
+                                                                new CodeTypeReference("T")}), "GetEnumerator", (MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeVariableDeclarationStatement(new CodeTypeReference("LookAheadEnumeratorEnumerator`1", new CodeTypeReference[] {
-                                                                            new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)}), "result", new CodeCastExpression(new CodeTypeReference("LookAheadEnumeratorEnumerator`1", new CodeTypeReference[] {
-                                                                                new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)}), new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(System.Activator))), "CreateInstance"), new CodeExpression[] {
+                                                                            new CodeTypeReference("T")}), "result", new CodeCastExpression(new CodeTypeReference("LookAheadEnumeratorEnumerator`1", new CodeTypeReference[] {
+                                                                                new CodeTypeReference("T")}), new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(System.Activator))), "CreateInstance"), new CodeExpression[] {
                                                                                 new CodeTypeOfExpression(new CodeTypeReference("LookAheadEnumeratorEnumerator`1", new CodeTypeReference[] {
-                                                                                                new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})),
+                                                                                                new CodeTypeReference("T")})),
                                                                                 new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_outer")}))),
                                                             new CodeMethodReturnStatement(new CodeVariableReferenceExpression("result"))}, new CodeTypeReference[] {
                                                             new CodeTypeReference("IEnumerable`1", new CodeTypeReference[] {
-                                                                        new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})}, null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                                        new CodeTypeReference("T")})}, null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(System.Collections.IEnumerator)), "GetEnumerator", ((MemberAttributes)(0)), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeMethodReturnStatement(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeThisReferenceExpression(), "GetEnumerator"), new CodeExpression[0]))}, new CodeTypeReference[0], new CodeTypeReference(typeof(System.Collections.IEnumerable)), new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
-                                    Deslanged._TypeDeclaration("LookAheadEnumeratorEnumerator", true, false, false, false, false, ((MemberAttributes)(0)), TypeAttributes.NotPublic, new CodeTypeParameter[] {
+                                    Deslanged._TypeDeclaration("LookAheadEnumeratorEnumerator", true, false, false, false, false, (MemberAttributes.Final | MemberAttributes. Private), TypeAttributes.NotPublic, new CodeTypeParameter[] {
                                                 new CodeTypeParameter("T")}, new CodeTypeReference[] {
                                                 new CodeTypeReference(typeof(object)),
                                                 new CodeTypeReference("IEnumerator`1", new CodeTypeReference[] {
-                                                            new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})}, new CodeTypeMember[] {
+                                                            new CodeTypeReference("T")})}, new CodeTypeMember[] {
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_NotStarted", new CodePrimitiveExpression(-2), (MemberAttributes.Const | MemberAttributes. Private), new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_Ended", new CodePrimitiveExpression(-1), (MemberAttributes.Const | MemberAttributes. Private), new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_Disposed", new CodePrimitiveExpression(-3), (MemberAttributes.Const | MemberAttributes. Private), new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference("LookAheadEnumerator`1", new CodeTypeReference[] {
-                                                                new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)}), "_outer", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                                new CodeTypeReference("T")}), "_outer", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference(typeof(int)), "_index", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberField(new CodeTypeReference("T"), "_current", null, MemberAttributes.Private, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._Constructor((MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[] {
                                                             new CodeParameterDeclarationExpression(new CodeTypeReference("LookAheadEnumerator`1", new CodeTypeReference[] {
-                                                                            new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)}), "outer")}, new CodeExpression[0], new CodeExpression[0], new CodeStatement[] {
+                                                                            new CodeTypeReference("T")}), "outer")}, new CodeExpression[0], new CodeExpression[0], new CodeStatement[] {
                                                             new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_outer"), new CodeArgumentReferenceExpression("outer")),
                                                             new CodeConditionStatement(new CodePropertyReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_outer"), "IsEnumerating"), new CodeStatement[] {
                                                                         new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_current"), new CodePropertyReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_outer"), "Current"))}, new CodeStatement[0]),
@@ -842,10 +829,8 @@ internal partial class Deslanged {
                                                                                                     new CodePrimitiveExpression("The cursor is after the end of the enumeration.")}))}, new CodeStatement[0]),
                                                                         new CodeThrowExceptionStatement(new CodeObjectCreateExpression(new CodeTypeReference("ObjectDisposedException"), new CodeExpression[] {
                                                                                         new CodePropertyReferenceExpression(new CodeTypeOfExpression(new CodeTypeReference("LookAheadEnumeratorEnumerator`1", new CodeTypeReference[] {
-                                                                                                            new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "Name")}))}, new CodeStatement[0]),
-                                                            new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_current"))}, new CodeStatement[0], new CodeTypeReference[] {
-                                                            new CodeTypeReference("IEnumerator`1", new CodeTypeReference[] {
-                                                                        new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})}, null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                                                                            new CodeTypeReference("T")})), "Name")}))}, new CodeStatement[0]),
+                                                            new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_current"))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberProperty(new CodeTypeReference(typeof(object)), "Current", ((MemberAttributes)(0)), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeMethodReturnStatement(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Current"))}, new CodeStatement[0], new CodeTypeReference[0], new CodeTypeReference(typeof(System.Collections.IEnumerator)), new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(void)), "Dispose", ((MemberAttributes)(0)), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
@@ -858,7 +843,7 @@ internal partial class Deslanged {
                                                                                                     new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "_Disposed")), new CodeStatement[] {
                                                                                     new CodeThrowExceptionStatement(new CodeObjectCreateExpression(new CodeTypeReference("ObjectDisposedException"), new CodeExpression[] {
                                                                                                     new CodePropertyReferenceExpression(new CodeTypeOfExpression(new CodeTypeReference("LookAheadEnumeratorEnumerator`1", new CodeTypeReference[] {
-                                                                                                                        new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "Name")}))}, new CodeStatement[0]),
+                                                                                                                        new CodeTypeReference("T")})), "Name")}))}, new CodeStatement[0]),
                                                                         new CodeConditionStatement(new CodeBinaryOperatorExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_index"), CodeBinaryOperatorType.ValueEquality, new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference("Parsley.LookAheadEnumeratorEnumerator`1", new CodeTypeReference[] {
                                                                                                     new CodeTypeReference("T", CodeTypeReferenceOptions.GenericTypeParameter)})), "_Ended")), new CodeStatement[] {
                                                                                     new CodeMethodReturnStatement(new CodePrimitiveExpression(false))}, new CodeStatement[0]),

@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Text;
-
+using Slang;
 namespace Parsley
 {
 	using C = CD.CodeDomUtility;
@@ -160,7 +160,7 @@ namespace Parsley
 					var code = doc.Code[i];
 					if (null != code && !string.IsNullOrWhiteSpace(code.Value))
 					{
-						parser.Members.AddRange(CD.SlangParser.ParseMembers(code.Value, sname));
+						parser.Members.AddRange(SlangParser.ParseMembers(code.Value));
 					}
 				}
 				CfgLL1ParseTable tbl = null;
@@ -279,7 +279,7 @@ namespace Parsley
 				parser.Members.Add(parseNtImpl);
 				if (null != prod && prod.IsVirtual)
 				{
-					var body = CD.SlangParser.ParseStatements(prod.Body.Value, true);
+					var body = SlangParser.ParseStatements(prod.Body.Value, true);
 					foreach (CodeCommentStatement comment in C.ToComments(prod.Name))
 						parseNtImpl.Statements.Add(comment);
 
@@ -395,7 +395,7 @@ namespace Parsley
 				{
 					if (null != prod.Where && null != prod.Where.Value)
 					{
-						var stmts = CD.SlangParser.ParseStatements(prod.Where.Value, true);
+						var stmts = SlangParser.ParseStatements(prod.Where.Value, true);
 						var whereImpl = C.Method(typeof(bool), string.Concat("Where", nt), MemberAttributes.Static | MemberAttributes.FamilyAndAssembly, C.Param(C.Type("ParserContext"), "context"));
 						whereImpl.Statements.AddRange(stmts);
 						var hasReturn = false;
@@ -522,7 +522,7 @@ namespace Parsley
 			var cnd = C.If(_BuildIfRuleExprsCnd(primaryDoc, prod, syms,symtbl, consts,context, rmapEntry.Value,codeclass,symmap));
 			if (null!=prod && prod.IsVirtual)
 			{
-				cnd.TrueStatements.AddRange(CD.SlangParser.ParseStatements(prod.Body.Value, true));
+				cnd.TrueStatements.AddRange(SlangParser.ParseStatements(prod.Body.Value, true));
 			}
 			else
 			{
@@ -707,7 +707,7 @@ namespace Parsley
 					var cnst = consts[symmap[prod.Name]];
 					var fr = C.FieldRef(C.TypeRef("Parser"), cnst);
 					var cnd = C.If(C.Eq(fr, C.PropRef(node, "SymbolId")));
-					var stmts = CD.SlangParser.ParseStatements(prod.Action.Value, true);
+					var stmts = SlangParser.ParseStatements(prod.Action.Value, true);
 					cnd.TrueStatements.AddRange(stmts);
 					m.Statements.Add(cnd);
 					m.Statements.Add(C.Throw(C.New(C.Type("SyntaxException"), C.Literal(string.Concat("Expecting ", prod.Name)), C.PropRef(node, "Line"), C.PropRef(node, "Column"), C.PropRef(node, "Position"))));

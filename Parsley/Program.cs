@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
-
+using Slang;
 namespace Parsley
 {
 	using C = CD.CodeDomUtility;
@@ -448,8 +448,8 @@ namespace Parsley
 							}
 							else
 							{
-								CD.SlangPatcher.Patch(ccu, ccuShared);
-								var co = CD.SlangPatcher.GetNextUnresolvedElement(ccu);
+								SlangPatcher.Patch(ccu, ccuShared);
+								var co = SlangPatcher.GetNextUnresolvedElement(ccu);
 								if (null != co)
 								{
 									stderr.WriteLine("Warning: Not all of the elements could be resolved. The generated code may not be correct in all languages.");

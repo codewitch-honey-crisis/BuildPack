@@ -34,6 +34,57 @@ namespace Slang
 			pc.SetLocation(line, column, position);
 			return _ParseTypeDecl(pc, false,line,column,position,null) ;
 		}
+
+		public static CodeTypeMember ParseMember(string text)
+		{
+			var tokenizer = new SlangTokenizer(text);
+			return ParseMember(tokenizer);
+		}
+		public static CodeTypeMember ReadMemberFrom(Stream stream)
+		{
+			var tokenizer = new SlangTokenizer(stream);
+			return ParseMember(tokenizer);
+		}
+		public static CodeTypeMember ParseMember(string text, int line, int column, long position)
+		{
+			var tokenizer = new SlangTokenizer(text);
+			var pc = new _PC(tokenizer);
+			pc.SetLocation(line, column, position);
+			return _ParseMember(pc);
+		}
+		public static CodeTypeMember ReadMemberFrom(Stream stream, int line, int column, long position)
+		{
+			var tokenizer = new SlangTokenizer(stream);
+			var pc = new _PC(tokenizer);
+			pc.SetLocation(line, column, position);
+			return _ParseMember(pc);
+		}
+
+		public static CodeTypeMemberCollection ParseMembers(string text)
+		{
+			var tokenizer = new SlangTokenizer(text);
+			return ParseMembers(tokenizer);
+		}
+		public static CodeTypeMemberCollection ReadMembersFrom(Stream stream)
+		{
+			var tokenizer = new SlangTokenizer(stream);
+			return ParseMembers(tokenizer);
+		}
+		public static CodeTypeMemberCollection ParseMembers(string text, int line, int column, long position)
+		{
+			var tokenizer = new SlangTokenizer(text);
+			var pc = new _PC(tokenizer);
+			pc.SetLocation(line, column, position);
+			return _ParseMembers(pc);
+		}
+		public static CodeTypeMemberCollection ReadMembersFrom(Stream stream, int line, int column, long position)
+		{
+			var tokenizer = new SlangTokenizer(stream);
+			var pc = new _PC(tokenizer);
+			pc.SetLocation(line, column, position);
+			return _ParseMembers(pc);
+		}
+
 		internal static CodeTypeDeclaration ParseTypeDecl(IEnumerable<Token> tokenizer)
 		{
 			var pc = new _PC(tokenizer);
@@ -287,6 +338,19 @@ namespace Slang
 			var pc = new _PC(tokenizer);
 			pc.Advance(false);
 			return _ParseMember(pc);
+		}
+		internal static CodeTypeMemberCollection ParseMembers(IEnumerable<Token> tokenizer)
+		{
+			var pc = new _PC(tokenizer);
+			pc.Advance(false);
+			return _ParseMembers(pc);
+		}
+		static CodeTypeMemberCollection _ParseMembers(_PC pc)
+		{
+			var result = new CodeTypeMemberCollection();
+			while (!pc.IsEnded && ST.rbrace != pc.SymbolId)
+				result.Add(_ParseMember(pc));
+			return result;
 		}
 		static CodeTypeMember _ParseMember(_PC pc, bool isInterfaceMember=false)
 		{

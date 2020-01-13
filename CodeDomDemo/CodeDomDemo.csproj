@@ -61,6 +61,10 @@
       <Project>{f1935a78-6eca-4aa9-9be2-0c64be4297c7}</Project>
       <Name>CodeDomGoKit</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Slang\Slang.csproj">
+      <Project>{ea7f976b-7f3f-4935-9e77-2f8deaa80678}</Project>
+      <Name>Slang</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

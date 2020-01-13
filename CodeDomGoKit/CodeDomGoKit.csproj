@@ -57,31 +57,13 @@
     <Compile Include="CodeDomVisitor.cs" />
     <Compile Include="CodeTypeReferenceEqualityComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Slang\ConcatEnumerator.cs" />
-    <Compile Include="Slang\IndexedQueue.Collection.cs" />
-    <Compile Include="Slang\IndexedQueue.cs" />
-    <Compile Include="Slang\IndexedQueue.Enumerable.cs" />
-    <Compile Include="Slang\LookAheadEnumerator.cs" />
-    <Compile Include="Slang\SlangParser.CompileUnit.cs" />
-    <Compile Include="Slang\SlangParser.cs" />
-    <Compile Include="Slang\SlangParser.Expression.cs" />
-    <Compile Include="Slang\SlangParser.Member.cs" />
-    <Compile Include="Slang\SlangParser.Namespace.cs" />
-    <Compile Include="Slang\SlangParser.Statement.cs" />
-    <Compile Include="Slang\SlangParser.Type.cs" />
-    <Compile Include="Slang\SlangParser.TypeRef.cs" />
-    <Compile Include="Slang\SlangPatcher.cs" />
-    <Compile Include="Slang\SlangPreprocessor.cs" />
-    <Compile Include="Slang\SlangSyntaxException.cs" />
-    <Compile Include="Slang\SlangTokenizer.cs" />
-    <Compile Include="Slang\TextReaderEnumerable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />
-    <None Include="Slang\SlangTokenizer.rl" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(SolutionDir)\Rolex\bin\Release\rolex.exe" "$(ProjectDir)Slang\SlangTokenizer.rl" /output "$(ProjectDir)Slang\SlangTokenizer.cs" /namespace CD /ifstale</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
 </Project>

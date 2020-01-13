@@ -185,6 +185,8 @@ namespace Slang
             var result = "";
             while (!pc.IsEnded && ST.lbrace != pc.SymbolId && ST.semi != pc.SymbolId)
             {
+                if (0 < result.Length)
+                    result += ".";
                 result += _ParseIdentifier(pc);
                 if (ST.lbrace == pc.SymbolId || ST.semi == pc.SymbolId)
                     break;

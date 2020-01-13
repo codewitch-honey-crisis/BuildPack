@@ -865,10 +865,11 @@ namespace CD
 		/// </summary>
 		/// <param name="type">The type to resolve</param>
 		/// <param name="scope">The scope at which the resolution occurs</param>
+		/// <param name="allowPartial">True if uninstantiated generics should be returned</param>
 		/// <returns>Either a runtime <see cref="Type"/> or a <see cref="CodeTypeDeclaration"/> representing the given type, or null if the type could not be resolved</returns>
 		/// <remarks>This routine cannot instantiate reified generic types of declared types, nor will it resolve types with declared types as generic arguments</remarks>
-		public object TryResolveType(CodeTypeReference type,CodeDomResolverScope scope=null)
-			=> _ResolveType(type,scope);
+		public object TryResolveType(CodeTypeReference type,CodeDomResolverScope scope=null,bool allowPartial=false)
+			=> _ResolveType(type,scope,allowPartial);
 		/// <summary>
 		/// Attempts to retrieve the fully qualified type for a given type, at the given scope
 		/// </summary>
@@ -1040,9 +1041,11 @@ namespace CD
 					}
 				}
 			}
+			if (result.StartsWith("SystemCollections"))
+				System.Diagnostics.Debugger.Break();
 			return result;
 		}
-		object _ResolveType(CodeTypeReference type,CodeDomResolverScope scope)
+		object _ResolveType(CodeTypeReference type,CodeDomResolverScope scope,bool allowPartial = false)
 		{
 			if (null == type)
 				return null;

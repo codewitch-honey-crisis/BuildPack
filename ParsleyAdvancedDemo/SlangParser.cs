@@ -13,7 +13,7 @@ namespace CD {
     using System.Text;
     using System.Collections.Generic;
     
-    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\Source\Repos\BuildPack\ParsleyAdvancedDemo\Slang.xbnf</summary>
+    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\source\repos\BuildPack\ParsleyAdvancedDemo\Slang.xbnf</summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal partial class SlangParser {
         internal const int ErrorSymbol = -1;
@@ -158,7 +158,7 @@ namespace CD {
             throw new SyntaxException("Expecting NamespaceNameList", line, column, position);
         }
     }
-    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\Source\Repos\BuildPack\ParsleyAdvancedDemo\SlangExpression.xbnf</summary>
+    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\source\repos\BuildPack\ParsleyAdvancedDemo\SlangExpression.xbnf</summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal partial class ExpressionParser {
         internal const int ErrorSymbol = -1;
@@ -5886,7 +5886,7 @@ namespace CD {
             throw new SyntaxException("Expecting rbrace or Expression", line, column, position);
         }
     }
-    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\Source\Repos\BuildPack\ParsleyAdvancedDemo\SlangStatement.xbnf</summary>
+    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\source\repos\BuildPack\ParsleyAdvancedDemo\SlangStatement.xbnf</summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal partial class StatementParser {
         internal const int ErrorSymbol = -1;
@@ -9740,7 +9740,7 @@ namespace CD {
             throw new SyntaxException("Expecting FinallyClause or CatchClauseList", line, column, position);
         }
     }
-    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\Source\Repos\BuildPack\ParsleyAdvancedDemo\SlangType.xbnf</summary>
+    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\source\repos\BuildPack\ParsleyAdvancedDemo\SlangType.xbnf</summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal partial class TypeDeclParser {
         internal const int ErrorSymbol = -1;
@@ -14205,46 +14205,46 @@ namespace CD {
             throw new SyntaxException("Expecting TypeAttributesListPart", line, column, position);
         }
     }
-    /// <summary>
-    /// 
-    /// </summary>
+    ///  <summary>
+    ///  
+    ///  </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal class SyntaxException : Exception {
         private int _line;
         private int _column;
         private long _position;
-        /// <summary>
-        /// Creates a syntax exception with the specified arguments
-        /// </summary>
-        /// <param name="message">The error message</param>
-        /// <param name="line">The line where the error occurred</param>
-        /// <param name="column">The column where the error occured</param>
-        /// <param name="position">The position where the error occured</param>
+        ///  <summary>
+        ///  Creates a syntax exception with the specified arguments
+        ///  </summary>
+        ///  <param name="message">The error message</param>
+        ///  <param name="line">The line where the error occurred</param>
+        ///  <param name="column">The column where the error occured</param>
+        ///  <param name="position">The position where the error occured</param>
         public SyntaxException(string message, int line, int column, long position) : 
                 base(SyntaxException._GetMessage(message, line, column, position)) {
             this._line = line;
             this._column = column;
             this._position = position;
         }
-        /// <summary>
-        /// The line where the error occurred
-        /// </summary>
+        ///  <summary>
+        ///  The line where the error occurred
+        ///  </summary>
         public int Line {
             get {
                 return this._line;
             }
         }
-        /// <summary>
-        /// The column where the error occurred
-        /// </summary>
+        ///  <summary>
+        ///  The column where the error occurred
+        ///  </summary>
         public int Column {
             get {
                 return this._column;
             }
         }
-        /// <summary>
-        /// The position where the error occurred
-        /// </summary>
+        ///  <summary>
+        ///  The position where the error occurred
+        ///  </summary>
         public long Position {
             get {
                 return this._position;
@@ -14336,7 +14336,6 @@ namespace CD {
             return string.Concat(this.Symbol, ": ", this.Value);
         }
         static void _AppendTree(ParseNode node, System.Text.StringBuilder builder) {
-            // adapted from https://stackoverflow.com/questions/1649027/how-do-i-print-out-a-tree-structure
             List<ParseNode> firstStack = new List<ParseNode>();
             firstStack.Add(node);
             List<List<ParseNode>> childListStack = new List<List<ParseNode>>();
@@ -14398,7 +14397,6 @@ namespace CD {
             if (wrap) {
                 this._el = new LookAheadEnumerator<Token>(enumerator);
                 this._e = this._el;
-                // we need both pointers to point to the lookahead
             }
             this._state = -1;
             this._t.SymbolId = -1;
@@ -14483,7 +14481,6 @@ namespace CD {
                 this._state = -2;
             }
             else {
-                // sanity check. should never happen
                 if ((int.MaxValue == this._advanceCount)) {
                     this._advanceCount = -1;
                 }
@@ -14511,10 +14508,10 @@ namespace CD {
             this._state = -3;
         }
     }
-    /// <summary>
-    /// An enumerator that provides lookahead without advancing the cursor
-    /// </summary>
-    /// <typeparam name="T">The type to enumerate</typeparam>
+    ///  <summary>
+    ///  An enumerator that provides lookahead without advancing the cursor
+    ///  </summary>
+    ///  <typeparam name="T">The type to enumerate</typeparam>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal class LookAheadEnumerator<T> : object, IEnumerator<T>
      {
@@ -14524,16 +14521,16 @@ namespace CD {
         private const int _Disposed = -3;
         private IEnumerator<T> _inner;
         private int _state;
-        // for the lookahead queue
+        //  for the lookahead queue
         private const int _DefaultCapacity = 16;
         private const float _GrowthFactor = 0.9F;
         private T[] _queue;
         private int _queueHead;
         private int _queueCount;
-        /// <summary>
-        /// Creates a new instance. Once this is created, the inner/wrapped enumerator must not be touched.
-        /// </summary>
-        /// <param name="inner"></param>
+        ///  <summary>
+        ///  Creates a new instance. Once this is created, the inner/wrapped enumerator must not be touched.
+        ///  </summary>
+        ///  <param name="inner"></param>
         public LookAheadEnumerator(IEnumerator<T> inner) {
             this._inner = inner;
             this._state = LookAheadEnumerator<T>._NotStarted;
@@ -14541,9 +14538,9 @@ namespace CD {
             this._queueHead = 0;
             this._queueCount = 0;
         }
-        /// <summary>
-        /// Discards the lookahead and advances the cursor to the physical position.
-        /// </summary>
+        ///  <summary>
+        ///  Discards the lookahead and advances the cursor to the physical position.
+        ///  </summary>
         public void DiscardLookAhead() {
             for (
             ; (1 < this._queueCount); 
@@ -14551,9 +14548,9 @@ namespace CD {
                 this._Dequeue();
             }
         }
-        /// <summary>
-        /// Retrieves the value under the cursor
-        /// </summary>
+        ///  <summary>
+        ///  Retrieves the value under the cursor
+        ///  </summary>
         public T Current {
             get {
                 if ((0 > this._state)) {
@@ -14568,7 +14565,7 @@ namespace CD {
                 return this._queue[this._queueHead];
             }
         }
-        // legacy enum support (required)
+        //  legacy enum support (required)
         object System.Collections.IEnumerator.Current {
             get {
                 return this.Current;
@@ -14579,12 +14576,12 @@ namespace CD {
                 return this._queueCount;
             }
         }
-        /// <summary>
-        /// Attempts to peek the specified number of positions from the current position without advancing
-        /// </summary>
-        /// <param name="lookahead">The offset from the current position to peek at</param>
-        /// <param name="value">The value returned</param>
-        /// <returns>True if the peek could be satisfied, otherwise false</returns>
+        ///  <summary>
+        ///  Attempts to peek the specified number of positions from the current position without advancing
+        ///  </summary>
+        ///  <param name="lookahead">The offset from the current position to peek at</param>
+        ///  <param name="value">The value returned</param>
+        ///  <returns>True if the peek could be satisfied, otherwise false</returns>
         public bool TryPeek(int lookahead, out T value) {
             if ((LookAheadEnumerator<T>._Disposed == this._state)) {
                 throw new ObjectDisposedException(typeof(LookAheadEnumerator<T>).Name);
@@ -14619,11 +14616,11 @@ namespace CD {
             }
             return (-1 == lookahead);
         }
-        /// <summary>
-        /// Peek the specified number of positions from the current position without advancing
-        /// </summary>
-        /// <param name="lookahead">The offset from the current position to peek at</param>
-        /// <returns>The value at the specified position</returns>
+        ///  <summary>
+        ///  Peek the specified number of positions from the current position without advancing
+        ///  </summary>
+        ///  <param name="lookahead">The offset from the current position to peek at</param>
+        ///  <returns>The value at the specified position</returns>
         public T Peek(int lookahead) {
             T value;
             if ((false == this.TryPeek(lookahead, out value))) {
@@ -14641,9 +14638,9 @@ namespace CD {
                 return (LookAheadEnumerator<T>._Ended == this._state);
             }
         }
-        /// <summary>
-        /// Retrieves a lookahead cursor from the current cursor that can be navigated without moving the main cursor
-        /// </summary>
+        ///  <summary>
+        ///  Retrieves a lookahead cursor from the current cursor that can be navigated without moving the main cursor
+        ///  </summary>
         public IEnumerable<T> LookAhead {
             get {
                 if ((0 > this._state)) {
@@ -14658,10 +14655,10 @@ namespace CD {
                 return new LookAheadEnumeratorEnumerable<T>(this);
             }
         }
-        /// <summary>
-        /// Advances the cursor
-        /// </summary>
-        /// <returns>True if more input was read, otherwise false</returns>
+        ///  <summary>
+        ///  Advances the cursor
+        ///  </summary>
+        ///  <returns>True if more input was read, otherwise false</returns>
         bool System.Collections.IEnumerator.MoveNext() {
             if ((0 > this._state)) {
                 if ((LookAheadEnumerator<T>._Disposed == this._state)) {
@@ -14694,9 +14691,9 @@ namespace CD {
             }
             return true;
         }
-        /// <summary>
-        /// Resets the cursor, and clears the queue.
-        /// </summary>
+        ///  <summary>
+        ///  Resets the cursor, and clears the queue.
+        ///  </summary>
         void System.Collections.IEnumerator.Reset() {
             this._inner.Reset();
             if (((0 < this._queueCount) 
@@ -14713,9 +14710,9 @@ namespace CD {
             this._state = LookAheadEnumerator<T>._NotStarted;
         }
         #region IDisposable Support
-        /// <summary>
-        /// Disposes of this instance
-        /// </summary>
+        ///  <summary>
+        ///  Disposes of this instance
+        ///  </summary>
         void System.IDisposable.Dispose() {
             if ((false 
                         == (LookAheadEnumerator<T>._Disposed == this._state))) {
@@ -14771,7 +14768,6 @@ namespace CD {
             this._outer = outer;
         }
         public IEnumerator<T> GetEnumerator() {
-            // for some reason VB was resolving new as AddressOf, so use this.
             LookAheadEnumeratorEnumerator<T> result = ((LookAheadEnumeratorEnumerator<T>)(System.Activator.CreateInstance(typeof(LookAheadEnumeratorEnumerator<T>), this._outer)));
             return result;
         }

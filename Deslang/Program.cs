@@ -13,7 +13,7 @@ using CD;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Text;
-
+using Slang;
 namespace Deslang
 {
 	using C = CodeDomUtility;
@@ -160,8 +160,7 @@ namespace Deslang
 					CodeCompileUnit builderCcu = null;
 					using (var stm = typeof(Program).Assembly.GetManifestResourceStream("Deslang.Shared.CodeDomBuilder.cs"))
 					{
-						var sr = new StreamReader(stm);
-						builderCcu = SlangParser.ReadCompileUnitFrom(sr);
+						builderCcu = SlangParser.ReadCompileUnitFrom(stm);
 					}
 					builderCcu.ReferencedAssemblies.Add(typeof(CodeObject).Assembly.GetName().ToString());
 					SlangPatcher.Patch(builderCcu);
@@ -178,7 +177,8 @@ namespace Deslang
 						var f = inputs[i];
 						sb.Clear();
 						input = new StreamReader(f);
-						SlangPreprocessor.Preprocess(input, sw, t4language);
+						// TODO: make a way to propagate template arguments from the command line
+						SlangPreprocessor.Preprocess(input, sw, null,t4language);
 						input.Close();
 						input = null;
 						var ccu = SlangParser.ParseCompileUnit(sw.ToString());

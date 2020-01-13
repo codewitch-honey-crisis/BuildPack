@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.Diagnostics;
 using System.IO;
 using CD;
+using Slang;
 namespace SlangDemo
 {
 	class Program
