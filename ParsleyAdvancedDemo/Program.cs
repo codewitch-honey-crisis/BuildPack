@@ -21,7 +21,7 @@ namespace ParsleyAdvancedDemo
 	
 		static void Main()
 		{
-			Demo3();
+			Demo2();
 		}
 		static void Demo3()
 		{
@@ -130,8 +130,6 @@ namespace ParsleyAdvancedDemo
 				if (null != stm)
 					stm.Close();
 			}
-
-
 		}
 		
 		static void _WriteTree(ParseNode node, TextWriter writer)

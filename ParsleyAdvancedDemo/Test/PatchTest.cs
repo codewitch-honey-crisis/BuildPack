@@ -6,6 +6,7 @@ namespace ParsleyAdvancedDemo
 	{
 		public event EventHandler Test;
 
+		// this won't come out right unless it's patched
 		public PatchTest()
 		{
 			Test += PatchTest_Test;
