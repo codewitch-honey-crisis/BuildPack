@@ -565,7 +565,9 @@ internal partial class Deslanged {
                                                                                         new CodePropertyReferenceExpression(new CodeTypeOfExpression(new CodeTypeReference("LookAheadEnumerator`1", new CodeTypeReference[] {
                                                                                                             new CodeTypeReference("T")})), "Name")}))}, new CodeStatement[0]),
                                                             new CodeMethodReturnStatement(new CodeArrayIndexerExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_queue"), new CodeExpression[] {
-                                                                            new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_queueHead")}))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[] {
+                                                                            new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_queueHead")}))}, new CodeStatement[0], new CodeTypeReference[] {
+                                                            new CodeTypeReference("IEnumerator`1", new CodeTypeReference[] {
+                                                                        new CodeTypeReference("T")})}, null, new CodeCommentStatement[] {
                                                             new CodeCommentStatement(" <summary>", true),
                                                             new CodeCommentStatement(" Retrieves the value under the cursor", true),
                                                             new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
@@ -830,7 +832,9 @@ internal partial class Deslanged {
                                                                         new CodeThrowExceptionStatement(new CodeObjectCreateExpression(new CodeTypeReference("ObjectDisposedException"), new CodeExpression[] {
                                                                                         new CodePropertyReferenceExpression(new CodeTypeOfExpression(new CodeTypeReference("LookAheadEnumeratorEnumerator`1", new CodeTypeReference[] {
                                                                                                             new CodeTypeReference("T")})), "Name")}))}, new CodeStatement[0]),
-                                                            new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_current"))}, new CodeStatement[0], new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                            new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_current"))}, new CodeStatement[0], new CodeTypeReference[] {
+                                                            new CodeTypeReference("IEnumerator`1", new CodeTypeReference[] {
+                                                                        new CodeTypeReference("T")})}, null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberProperty(new CodeTypeReference(typeof(object)), "Current", ((MemberAttributes)(0)), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                             new CodeMethodReturnStatement(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "Current"))}, new CodeStatement[0], new CodeTypeReference[0], new CodeTypeReference(typeof(System.Collections.IEnumerator)), new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                 Deslanged._MemberMethod(new CodeTypeReference(typeof(void)), "Dispose", ((MemberAttributes)(0)), new CodeParameterDeclarationExpression[0], new CodeStatement[] {

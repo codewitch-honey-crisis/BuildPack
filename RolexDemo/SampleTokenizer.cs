@@ -13,64 +13,64 @@ namespace RolexDemo {
     using System.Collections.Generic;
     using System.Text;
     
-    /// <summary>
-    /// Reference implementation for generated shared code
-    /// </summary>
+    ///  <summary>
+    ///  Reference implementation for generated shared code
+    ///  </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal struct Token {
-        /// <summary>
-        /// Indicates the line where the token occurs
-        /// </summary>
+        ///  <summary>
+        ///  Indicates the line where the token occurs
+        ///  </summary>
         public int Line;
-        /// <summary>
-        /// Indicates the column where the token occurs
-        /// </summary>
+        ///  <summary>
+        ///  Indicates the column where the token occurs
+        ///  </summary>
         public int Column;
-        /// <summary>
-        /// Indicates the position where the token occurs
-        /// </summary>
+        ///  <summary>
+        ///  Indicates the position where the token occurs
+        ///  </summary>
         public long Position;
-        /// <summary>
-        /// Indicates the symbol id or -1 for the error symbol
-        /// </summary>
+        ///  <summary>
+        ///  Indicates the symbol id or -1 for the error symbol
+        ///  </summary>
         public int SymbolId;
-        /// <summary>
-        /// Indicates the value of the token
-        /// </summary>
+        ///  <summary>
+        ///  Indicates the value of the token
+        ///  </summary>
         public string Value;
-        /// <summary>
-        /// Always null in Rolex
-        /// </summary>
+        ///  <summary>
+        ///  Always null in Rolex
+        ///  </summary>
         public Token[] Skipped;
     }
-    /// <summary>
-    /// Reference Implementation for generated shared code
-    /// </summary>
+    ///  <summary>
+    ///  Reference Implementation for generated shared code
+    ///  </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal abstract class CompiledTokenizer : IEnumerable<Token> {
-        // the input cursor. We can get this from a string, a char array, or some other source.
+        //  the input cursor. We can get this from a string, a char array, or some other source.
         protected IEnumerable<char> Input;
-        // just create our table tokenizer's enumerator, passing all of the relevant stuff
-        // it's the real workhorse.
-        /// <summary>
-        /// Retrieves an enumerator that can be used to iterate over the tokens
-        /// </summary>
-        /// <returns>An enumerator that can be used to iterate over the tokens</returns>
+        //  just create our table tokenizer's enumerator, passing all of the relevant stuff
+        //  it's the real workhorse.
+        ///  <summary>
+        ///  Retrieves an enumerator that can be used to iterate over the tokens
+        ///  </summary>
+        ///  <returns>An enumerator that can be used to iterate over the tokens</returns>
         public abstract IEnumerator<Token> GetEnumerator();
-        // we have to implement this explicitly for language independence because Slang
-        // will not set PublicImplementationTypes on public methods which some languages
-        // require
+        //  we have to implement this explicitly for language independence because Slang
+        //  will not set PublicImplementationTypes on public methods which some languages
+        //  require
         IEnumerator<Token> IEnumerable<Token>.GetEnumerator() {
             return this.GetEnumerator();
         }
-        // legacy collection support (required)
+        //  legacy collection support (required)
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
             return this.GetEnumerator();
         }
-        /// <summary>
-        /// Constructs a new instance
-        /// </summary>
-        /// <param name="input">The input character sequence</param>
+        ///  <summary>
+        ///  Constructs a new instance
+        ///  </summary>
+        ///  <param name="input">The input character sequence</param>
         public CompiledTokenizer(IEnumerable<char> input) {
             if ((null == input)) {
                 throw new ArgumentNullException("input");
@@ -80,38 +80,37 @@ namespace RolexDemo {
     }
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal abstract class CompiledTokenizerEnumerator : IEnumerator<Token> {
-        // our error symbol. Always -1
+        //  our error symbol. Always -1
         public const int ErrorSymbol = -1;
-        // our end of stream symbol - returned by Lex() and used internally but not reported
+        //  our end of stream symbol - returned by Lex() and used internally but not reported
         protected const int EosSymbol = -2;
-        // our disposed state indicator
+        //  our disposed state indicator
         protected const int Disposed = -4;
-        // the state indicates the cursor is before the beginning (initial state)
+        //  the state indicates the cursor is before the beginning (initial state)
         protected const int BeforeBegin = -3;
-        // the state indicates the cursor is after the end
+        //  the state indicates the cursor is after the end
         protected const int AfterEnd = -2;
-        // the state indicates that the inner input enumeration has finished (we still have one more token to report)
+        //  the state indicates that the inner input enumeration has finished (we still have one more token to report)
         protected const int InnerFinished = -1;
-        // indicates we're currently enumerating. We spend most of our time and effort in this state
+        //  indicates we're currently enumerating. We spend most of our time and effort in this state
         protected const int Enumerating = 0;
-        // indicates the tab width, used for updating the Column property when we encounter a tab
+        //  indicates the tab width, used for updating the Column property when we encounter a tab
         private const int _TabWidth = 4;
-        // the input cursor
+        //  the input cursor
         private IEnumerator<char> _input;
-        // our state
+        //  our state 
         protected int State;
-        // the current token
+        //  the current token
         private Token _current;
-        // a buffer used primarily by Lex() to capture matched input
+        //  a buffer used primarily by Lex() to capture matched input
         protected StringBuilder ValueBuffer;
-        // the one based line
+        //  the one based line
         private int _line;
-        // the one based column
+        //  the one based column
         private int _column;
-        // the zero based position
+        //  the zero based position
         private long _position;
         protected CompiledTokenizerEnumerator(IEnumerator<char> input) {
-            // just set up our initial values
             this._input = input;
             this.State = CompiledTokenizerEnumerator.BeforeBegin;
             this.ValueBuffer = new StringBuilder();
@@ -126,9 +125,7 @@ namespace RolexDemo {
         }
         public Token Current {
             get {
-                // if we're not enumerating, find out what's going on
                 if ((CompiledTokenizerEnumerator.Enumerating > this.State)) {
-                    // check which state we're in, and throw accordingly
                     if ((CompiledTokenizerEnumerator.BeforeBegin == this.State)) {
                         throw new InvalidOperationException("The cursor is before the start of the enumeration");
                     }
@@ -163,7 +160,6 @@ namespace RolexDemo {
         protected abstract bool IsHidden(int symbolId);
         protected abstract string GetBlockEnd(int symbolId);
         bool System.Collections.IEnumerator.MoveNext() {
-            // if we're not enumerating
             if ((CompiledTokenizerEnumerator.Enumerating > this.State)) {
                 if ((CompiledTokenizerEnumerator.Disposed == this.State)) {
                     CompiledTokenizerEnumerator._ThrowDisposed();
@@ -177,28 +173,22 @@ namespace RolexDemo {
             this._current.Column = this._column;
             this._current.Position = this._position;
             this.ValueBuffer.Clear();
-            // lex the next input
             this._current.SymbolId = this.Lex();
-            // now look for hiddens and block ends
             bool done = false;
             for (
             ; (false == done); 
             ) {
                 done = true;
-                // if we're on a valid symbol
                 if ((CompiledTokenizerEnumerator.ErrorSymbol < this._current.SymbolId)) {
-                    // get the block end for our symbol
                     string be = this.GetBlockEnd(this._current.SymbolId);
                     if (((null != be) 
                                 && (false 
                                 == (0 == be.Length)))) {
-                        // read until we find it or end of input
                         if ((false == this._TryReadUntilBlockEnd(be))) {
                             this._current.SymbolId = CompiledTokenizerEnumerator.ErrorSymbol;
                         }
                     }
                     if (this.IsHidden(this.Current.SymbolId)) {
-                        // update the cursor position and lex the next input, skipping this one
                         done = false;
                         this._current.Line = this._line;
                         this._current.Column = this._column;
@@ -210,7 +200,6 @@ namespace RolexDemo {
                 }
             }
             this._current.Value = this.ValueBuffer.ToString();
-            // update our state if we hit the end
             if ((CompiledTokenizerEnumerator.EosSymbol == this._current.SymbolId)) {
                 this.State = CompiledTokenizerEnumerator.AfterEnd;
             }
@@ -221,7 +210,7 @@ namespace RolexDemo {
             this._input.Dispose();
             this.State = CompiledTokenizerEnumerator.Disposed;
         }
-        // moves to the next position, updates the state accordingly, and tracks the cursor position
+        //  moves to the next position, updates the state accordingly, and tracks the cursor position
         protected virtual bool MoveNextInput() {
             if (this._input.MoveNext()) {
                 if ((false 
@@ -241,7 +230,6 @@ namespace RolexDemo {
                     }
                 }
                 else {
-                    // corner case for first move
                     if (('\n' == this._input.Current)) {
                         this._column = 1;
                         this._line = (this._line + 1);
@@ -258,7 +246,7 @@ namespace RolexDemo {
             this.State = CompiledTokenizerEnumerator.InnerFinished;
             return false;
         }
-        // reads until the specified character, consuming it, returning false if it wasn't found
+        //  reads until the specified character, consuming it, returning false if it wasn't found
         bool _TryReadUntil(char character) {
             char ch = this._input.Current;
             this.ValueBuffer.Append(ch);
@@ -279,7 +267,7 @@ namespace RolexDemo {
             }
             return false;
         }
-        // reads until the string is encountered, capturing it.
+        //  reads until the string is encountered, capturing it.
         bool _TryReadUntilBlockEnd(string blockEnd) {
             for (
             ; ((false 
@@ -289,10 +277,9 @@ namespace RolexDemo {
                 bool found = true;
                 for (int i = 1; (found 
                             && (i < blockEnd.Length)); i = (i + 1)) {
-                    if ((false 
-                                == (this.MoveNextInput() 
+                    if (((false == this.MoveNextInput()) 
                                 || (false 
-                                == (this._input.Current == blockEnd[i]))))) {
+                                == (this._input.Current == blockEnd[i])))) {
                         found = false;
                     }
                     else {
@@ -309,7 +296,7 @@ namespace RolexDemo {
             }
             return false;
         }
-        // lex the next token
+        //  lex the next token
         protected abstract int Lex();
         static void _ThrowDisposed() {
             throw new ObjectDisposedException("CompiledTokenizerEnumerator");

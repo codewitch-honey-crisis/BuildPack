@@ -701,7 +701,7 @@ namespace Slang
 					pc.Error("Properties must have a type",line, column, position);
 				if (seen.Contains("const"))
 					pc.Error("Properties cannot be const",line, column, position);
-				var prop = new CodeMemberProperty().Mark(line, column, position);
+				var prop = new CodeMemberProperty().Mark(line, column, position,seen.Contains("public"));
 				result = prop;
 				result.Comments.AddRange(comments);
 				if (null != lp) result.LinePragma = lp;

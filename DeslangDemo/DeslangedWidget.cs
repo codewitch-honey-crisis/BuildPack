@@ -99,15 +99,18 @@ namespace DeslangDemo {
                             Deslanged._Namespace("", new CodeNamespaceImport[] {
                                         new CodeNamespaceImport("System")}, new CodeTypeDeclaration[0], new CodeCommentStatement[0]),
                             Deslanged._Namespace("CorporateHellscape", new CodeNamespaceImport[0], new CodeTypeDeclaration[] {
-                                        Deslanged._TypeDeclaration("Widget", true, false, false, false, true, ((MemberAttributes)(0)), TypeAttributes.NotPublic, new CodeTypeParameter[0], new CodeTypeReference[0], new CodeTypeMember[] {
+                                        Deslanged._TypeDeclaration("Widget", true, false, false, false, true, (MemberAttributes.Final | MemberAttributes. Private), TypeAttributes.NotPublic, new CodeTypeParameter[0], new CodeTypeReference[0], new CodeTypeMember[] {
                                                     Deslanged._MemberField(new CodeTypeReference(new CodeTypeReference(typeof(byte)), 1), "_payload", null, ((MemberAttributes)(0)), new CodeCommentStatement[] {
-                                                                new CodeCommentStatement("our payload - to be filled")}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                                new CodeCommentStatement(" our payload - to be filled")}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                                     Deslanged._MemberMethod(new CodeTypeReference(typeof(string)), "ToString", (MemberAttributes.Override | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
-                                                                new CodeMethodReturnStatement(new CodeBinaryOperatorExpression(new CodeBinaryOperatorExpression(new CodePrimitiveExpression("[Widget - "), CodeBinaryOperatorType.Add, new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(System.Convert))), "ToBase64String"), new CodeExpression[] {
-                                                                                        new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_payload")})), CodeBinaryOperatorType.Add, new CodePrimitiveExpression("]")))}, new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[] {
-                                                    new CodeCommentStatement("<summary>", true),
-                                                    new CodeCommentStatement("Base widget implementation", true),
-                                                    new CodeCommentStatement("</summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0])}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0]);
+                                                                new CodeMethodReturnStatement(new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(string))), "Concat"), new CodeExpression[] {
+                                                                                new CodePrimitiveExpression("[Widget - "),
+                                                                                new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(System.Convert))), "ToBase64String"), new CodeExpression[] {
+                                                                                            new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_payload")}),
+                                                                                new CodePrimitiveExpression("]")}))}, new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[] {
+                                                    new CodeCommentStatement(" <summary>", true),
+                                                    new CodeCommentStatement(" Base widget implementation", true),
+                                                    new CodeCommentStatement(" </summary>", true)}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null)}, new CodeCommentStatement[0])}, new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0]);
             }
         }
     }

@@ -153,15 +153,20 @@ namespace Slang
 						break;
 					case ST.returnKeyword:
 						pc.Advance();
-						var expr = _ParseExpression(pc);
-						stmt = new CodeMethodReturnStatement(expr).Mark(l, c, p);
+						if (ST.semi != pc.SymbolId)
+						{
+							stmt = new CodeMethodReturnStatement(_ParseExpression(pc)).Mark(l, c, p);
+						} else
+						{
+							stmt = new CodeMethodReturnStatement().SetLoc(l, c, p);
+						}
 						if (ST.semi != pc.SymbolId)
 							pc.Error("Expecting ; in return statement");
 						pc.Advance();
 						break;
 					case ST.throwKeyword:
 						pc.Advance();
-						expr = _ParseExpression(pc);
+						var expr = _ParseExpression(pc);
 						stmt = new CodeThrowExceptionStatement(expr).Mark(l, c, p);
 						if (ST.semi != pc.SymbolId)
 							pc.Error("Expecting ; in throw statement");

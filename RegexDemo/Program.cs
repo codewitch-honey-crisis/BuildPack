@@ -2,6 +2,7 @@
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Diagnostics;
 using RE;
 namespace RegexDemo
 {
@@ -17,6 +18,47 @@ namespace RegexDemo
 		}
 		static void Main()
 		{
+			var id = RegexExpression.Parse(@"[A-Z_a-z][0-9A-Z_a-z]*").ToFA("Id");
+			var @int = RegexExpression.Parse(@"0|(\-?[1-9][0-9]*)").ToFA("Int");
+			var space = RegexExpression.Parse(@"[ \t\r\n\v\f]").ToFA("Space");
+			var l = CharFA<string>.ToLexer(id, @int, space);
+			var dfaTable = l.ToDfaStateTable();
+			var text = "fubar bar 123 1foo bar -243 @#*! 0";
+			Console.WriteLine("Lex: " + text);
+			var pc = ParseContext.Create(text);
+			while (-1 != pc.Current)
+			{
+				pc.ClearCapture();
+				// Lex using our DFA table. This is a little different
+				// because it's a static method that takes CharDfaEntry[]
+				// as its first parameter. It also uses symbol ids instead
+				// of the actual symbol. You must map them back using the
+				// symbol table you created earlier.
+				var acc = CharFA<string>.LexDfa(dfaTable, pc, -1);
+				// when we write this, we map our symbol id back to the
+				// symbol using our symbol table
+				Console.WriteLine("{0}: {1}", acc, pc.GetCapture());
+			}
+			var sw = new Stopwatch();
+			const int ITER = 1000;
+			for(var i = 0;i<ITER;++i)
+			{
+				pc = ParseContext.Create(text);
+				while (-1 != pc.Current)
+				{
+					pc.ClearCapture();
+					// Lex using our DFA table. This is a little different
+					// because it's a static method that takes CharDfaEntry[]
+					// as its first parameter. It also uses symbol ids instead
+					// of the actual symbol. You must map them back using the
+					// symbol table you created earlier.
+					sw.Start();
+					var acc = CharFA<string>.LexDfa(dfaTable, pc, -1);
+					sw.Stop();
+				}
+			}
+			Console.WriteLine("Lexed in " + sw.ElapsedMilliseconds / (float)ITER + " msec");
+			return;
 			// _BuildArticleImages() // requires GraphViz
 			// _RunCompiledLexCodeGen()
 			_RunLexer();

@@ -11,7 +11,7 @@ namespace CorporateHellscape
 	
 		public override string ToString()
 		{
-			return "[Widget - " + Convert.ToBase64String(_payload) +"]";
+			return string.Concat("[Widget - " , Convert.ToBase64String(_payload) , "]");
 		}
 	}
 }

@@ -564,25 +564,25 @@ pc.Advance(false);}else{if(ST.lbrace!=pc.SymbolId)pc.Error("Expecting body in me
 meth.Statements.Add(_ParseStatement(pc,true));if(ST.rbrace!=pc.SymbolId)pc.Error("Unterminated method body",l,c,p);pc.Advance(false);}while(ST.directive
 ==pc.SymbolId&&pc.Value.StartsWith("#end",StringComparison.InvariantCulture))result.EndDirectives.Add(_ParseDirective(pc)as CodeDirective);return result;
 } if(isVoid)pc.Error("Properties must have a type",line,column,position);if(seen.Contains("const"))pc.Error("Properties cannot be const",line,column,position);
-var prop=new CodeMemberProperty().Mark(line,column,position);result=prop;result.Comments.AddRange(comments);if(null!=lp)result.LinePragma=lp;_AddCustomAttributes(customAttributes,
-"",result.CustomAttributes);_CheckCustomAttributes(customAttributes,pc);result.StartDirectives.AddRange(startDirs);result.Attributes=_BuildMemberAttributes(seen);
-prop.PrivateImplementationType=piType;prop.Name=name;prop.Type=type;if(ST.lbracket==pc.SymbolId){if(!isThis)pc.Error("Only \"this\" properties may have indexers.",line,column,position);
-pc.Advance();prop.Parameters.AddRange(_ParseParamList(pc));if(ST.rbracket!=pc.SymbolId)pc.Error("Expecting ] in property definition");pc.Advance();}else
- if(isThis)pc.Error("\"this\" properties must have indexers.",line,column,position);if(ST.lbrace!=pc.SymbolId)pc.Error("Expecting { in property definition");
-pc.Advance();_ParsePropertyAccessors(pc,prop,seen.Contains("abstract")||isInterfaceMember);if(ST.rbrace!=pc.SymbolId)pc.Error("Expecting } in property definition");
-pc.Advance(false);while(ST.directive==pc.SymbolId&&pc.Value.StartsWith("#end",StringComparison.InvariantCulture))result.EndDirectives.Add(_ParseDirective(pc)
-as CodeDirective);return result;}}static void _ParsePropertyAccessors(_PC pc,CodeMemberProperty prop,bool isAbstractOrInterface=false){var sawGet=false;
-var sawSet=false;while(ST.getKeyword==pc.SymbolId||ST.setKeyword==pc.SymbolId){if(ST.getKeyword==pc.SymbolId){if(sawGet)pc.Error("Only one get accessor may be specified");
-sawGet=true;prop.HasGet=true;pc.Advance();if(ST.semi==pc.SymbolId){if(!isAbstractOrInterface)pc.Error("Non abstract property gets must declare a body");
-pc.Advance();}else if(ST.lbrace==pc.SymbolId){if(isAbstractOrInterface)pc.Error("Abstract and interface property gets must not declare a body");prop.GetStatements.AddRange(_ParseStatementOrBlock(pc));
-}else pc.Error("Unexpected token found in property get declaration");}else if(ST.setKeyword==pc.SymbolId){if(sawSet)pc.Error("Only one set accessor may be specified");
-sawSet=true;prop.HasSet=true;pc.Advance();if(ST.semi==pc.SymbolId){if(!isAbstractOrInterface)pc.Error("Non abstract property sets must declare a body");
-pc.Advance();}else if(ST.lbrace==pc.SymbolId){if(isAbstractOrInterface)pc.Error("Abstract and interface property sets must not declare a body");prop.SetStatements.AddRange(_ParseStatementOrBlock(pc));
-}else pc.Error("Unexpected token found in property set declaration");}else pc.Error("Expecting a get or set accessor");}}static CodeParameterDeclarationExpressionCollection
- _ParseParamList(_PC pc){var result=new CodeParameterDeclarationExpressionCollection();while(!pc.IsEnded&&ST.rparen!=pc.SymbolId&&ST.rbracket!=pc.SymbolId)
-{result.Add(new CodeParameterDeclarationExpression(_ParseType(pc),_ParseIdentifier(pc)));if(ST.rparen==pc.SymbolId||ST.rbracket==pc.SymbolId)break;var
- l2=pc.Line;var c2=pc.Column;var p2=pc.Position;if(ST.comma!=pc.SymbolId)pc.Error("Expecting , in parameter list");pc.Advance();if(ST.rbracket==pc.SymbolId
-||ST.rparen==pc.SymbolId)pc.Error("Expecting parameter in parameter list",l2,c2,p2);}return result;}static CodeParameterDeclarationExpressionCollection
+var prop=new CodeMemberProperty().Mark(line,column,position,seen.Contains("public"));result=prop;result.Comments.AddRange(comments);if(null!=lp)result.LinePragma
+=lp;_AddCustomAttributes(customAttributes,"",result.CustomAttributes);_CheckCustomAttributes(customAttributes,pc);result.StartDirectives.AddRange(startDirs);
+result.Attributes=_BuildMemberAttributes(seen);prop.PrivateImplementationType=piType;prop.Name=name;prop.Type=type;if(ST.lbracket==pc.SymbolId){if(!isThis)
+pc.Error("Only \"this\" properties may have indexers.",line,column,position);pc.Advance();prop.Parameters.AddRange(_ParseParamList(pc));if(ST.rbracket
+!=pc.SymbolId)pc.Error("Expecting ] in property definition");pc.Advance();}else if(isThis)pc.Error("\"this\" properties must have indexers.",line,column,position);
+if(ST.lbrace!=pc.SymbolId)pc.Error("Expecting { in property definition");pc.Advance();_ParsePropertyAccessors(pc,prop,seen.Contains("abstract")||isInterfaceMember);
+if(ST.rbrace!=pc.SymbolId)pc.Error("Expecting } in property definition");pc.Advance(false);while(ST.directive==pc.SymbolId&&pc.Value.StartsWith("#end",
+StringComparison.InvariantCulture))result.EndDirectives.Add(_ParseDirective(pc)as CodeDirective);return result;}}static void _ParsePropertyAccessors(_PC
+ pc,CodeMemberProperty prop,bool isAbstractOrInterface=false){var sawGet=false;var sawSet=false;while(ST.getKeyword==pc.SymbolId||ST.setKeyword==pc.SymbolId)
+{if(ST.getKeyword==pc.SymbolId){if(sawGet)pc.Error("Only one get accessor may be specified");sawGet=true;prop.HasGet=true;pc.Advance();if(ST.semi==pc.SymbolId)
+{if(!isAbstractOrInterface)pc.Error("Non abstract property gets must declare a body");pc.Advance();}else if(ST.lbrace==pc.SymbolId){if(isAbstractOrInterface)
+pc.Error("Abstract and interface property gets must not declare a body");prop.GetStatements.AddRange(_ParseStatementOrBlock(pc));}else pc.Error("Unexpected token found in property get declaration");
+}else if(ST.setKeyword==pc.SymbolId){if(sawSet)pc.Error("Only one set accessor may be specified");sawSet=true;prop.HasSet=true;pc.Advance();if(ST.semi
+==pc.SymbolId){if(!isAbstractOrInterface)pc.Error("Non abstract property sets must declare a body");pc.Advance();}else if(ST.lbrace==pc.SymbolId){if(isAbstractOrInterface)
+pc.Error("Abstract and interface property sets must not declare a body");prop.SetStatements.AddRange(_ParseStatementOrBlock(pc));}else pc.Error("Unexpected token found in property set declaration");
+}else pc.Error("Expecting a get or set accessor");}}static CodeParameterDeclarationExpressionCollection _ParseParamList(_PC pc){var result=new CodeParameterDeclarationExpressionCollection();
+while(!pc.IsEnded&&ST.rparen!=pc.SymbolId&&ST.rbracket!=pc.SymbolId){result.Add(new CodeParameterDeclarationExpression(_ParseType(pc),_ParseIdentifier(pc)));
+if(ST.rparen==pc.SymbolId||ST.rbracket==pc.SymbolId)break;var l2=pc.Line;var c2=pc.Column;var p2=pc.Position;if(ST.comma!=pc.SymbolId)pc.Error("Expecting , in parameter list");
+pc.Advance();if(ST.rbracket==pc.SymbolId||ST.rparen==pc.SymbolId)pc.Error("Expecting parameter in parameter list",l2,c2,p2);}return result;}static CodeParameterDeclarationExpressionCollection
  _ParseMethodParamList(_PC pc){var result=new CodeParameterDeclarationExpressionCollection();while(ST.rparen!=pc.SymbolId&&ST.rbracket!=pc.SymbolId){var
  fd=FieldDirection.In;if(ST.refKeyword==pc.SymbolId){fd=FieldDirection.Ref;pc.Advance();}else if(ST.outKeyword==pc.SymbolId){fd=FieldDirection.Out;pc.Advance();
 }var pd=new CodeParameterDeclarationExpression(_ParseType(pc),_ParseIdentifier(pc));pd.Direction=fd;result.Add(pd);if(ST.rparen==pc.SymbolId||ST.rbracket

@@ -112,5 +112,11 @@
     </None>
     <None Include="SlangType.xbnf" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CodeDomGoKit\CodeDomGoKit.csproj">
+      <Project>{f1935a78-6eca-4aa9-9be2-0c64be4297c7}</Project>
+      <Name>CodeDomGoKit</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

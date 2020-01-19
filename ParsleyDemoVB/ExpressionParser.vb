@@ -469,8 +469,6 @@ Namespace ParsleyDemo
                 Dim i As Integer = 2
 
                 Do While (i < node.Children.Length)
-                    'Child always returns an object type so
-                    'be sure to cast as necessary
                     If (node.Children((i - 1)).SymbolId = ParsleyDemo.ExpressionParser.mul) Then
                         result = (result * CType(ExpressionParser._EvaluateAny(node.Children(i), state),Integer))
                     Else
@@ -634,47 +632,47 @@ Namespace ParsleyDemo
             Return Nothing
         End Function
     End Class
-    '''<summary>
-    '''
-    '''</summary>
+    ''' <summary>
+    ''' 
+    ''' </summary>
     <System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")>  _
     Friend Class SyntaxException
         Inherits Exception
         Private _line As Integer
         Private _column As Integer
         Private _position As Long
-        '''<summary>
-        '''Creates a syntax exception with the specified arguments
-        '''</summary>
-        '''<param name="message">The error message</param>
-        '''<param name="line">The line where the error occurred</param>
-        '''<param name="column">The column where the error occured</param>
-        '''<param name="position">The position where the error occured</param>
+        ''' <summary>
+        ''' Creates a syntax exception with the specified arguments
+        ''' </summary>
+        ''' <param name="message">The error message</param>
+        ''' <param name="line">The line where the error occurred</param>
+        ''' <param name="column">The column where the error occured</param>
+        ''' <param name="position">The position where the error occured</param>
         Public Sub New(ByVal message As String, ByVal line As Integer, ByVal column As Integer, ByVal position As Long)
             MyBase.New(SyntaxException._GetMessage(message, line, column, position))
             Me._line = line
             Me._column = column
             Me._position = position
         End Sub
-        '''<summary>
-        '''The line where the error occurred
-        '''</summary>
+        ''' <summary>
+        ''' The line where the error occurred
+        ''' </summary>
         Public ReadOnly Property Line() As Integer
             Get
                 Return Me._line
             End Get
         End Property
-        '''<summary>
-        '''The column where the error occurred
-        '''</summary>
+        ''' <summary>
+        ''' The column where the error occurred
+        ''' </summary>
         Public ReadOnly Property Column() As Integer
             Get
                 Return Me._column
             End Get
         End Property
-        '''<summary>
-        '''The position where the error occurred
-        '''</summary>
+        ''' <summary>
+        ''' The position where the error occurred
+        ''' </summary>
         Public ReadOnly Property Position() As Long
             Get
                 Return Me._position
@@ -768,7 +766,6 @@ Namespace ParsleyDemo
             Return String.Concat(Me.Symbol, ": ", Me.Value)
         End Function
         Shared Sub _AppendTree(ByVal node As ParseNode, ByVal builder As System.Text.StringBuilder)
-            'adapted from https://stackoverflow.com/questions/1649027/how-do-i-print-out-a-tree-structure
             Dim firstStack As List(Of ParseNode) = New List(Of ParseNode)()
             firstStack.Add(node)
             Dim childListStack As List(Of List(Of ParseNode)) = New List(Of List(Of ParseNode))()
@@ -833,7 +830,6 @@ Namespace ParsleyDemo
             If wrap Then
                 Me._el = New LookAheadEnumerator(Of Token)(enumerator)
                 Me._e = Me._el
-                'we need both pointers to point to the lookahead
             End If
             Me._state = -1
             Me._t.SymbolId = -1
@@ -917,7 +913,6 @@ Namespace ParsleyDemo
                 Me._t.SymbolId = -2
                 Me._state = -2
             Else
-                'sanity check. should never happen
                 If (Integer.MaxValue = Me._advanceCount) Then
                     Me._advanceCount = -1
                 End If
@@ -945,10 +940,10 @@ Namespace ParsleyDemo
             Me._state = -3
         End Sub
     End Class
-    '''<summary>
-    '''An enumerator that provides lookahead without advancing the cursor
-    '''</summary>
-    '''<typeparam name="T">The type to enumerate</typeparam>
+    ''' <summary>
+    ''' An enumerator that provides lookahead without advancing the cursor
+    ''' </summary>
+    ''' <typeparam name="T">The type to enumerate</typeparam>
     <System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")>  _
     Friend Class LookAheadEnumerator(Of T)
         Inherits Object
@@ -959,16 +954,16 @@ Namespace ParsleyDemo
         Private Const _Disposed As Integer = -3
         Private _inner As IEnumerator(Of T)
         Private _state As Integer
-        'for the lookahead queue
+        ' for the lookahead queue
         Private Const _DefaultCapacity As Integer = 16
         Private Const _GrowthFactor As Single = 0.9!
         Private _queue() As T
         Private _queueHead As Integer
         Private _queueCount As Integer
-        '''<summary>
-        '''Creates a new instance. Once this is created, the inner/wrapped enumerator must not be touched.
-        '''</summary>
-        '''<param name="inner"></param>
+        ''' <summary>
+        ''' Creates a new instance. Once this is created, the inner/wrapped enumerator must not be touched.
+        ''' </summary>
+        ''' <param name="inner"></param>
         Public Sub New(ByVal inner As IEnumerator(Of T))
             MyBase.New
             Me._inner = inner
@@ -977,9 +972,9 @@ Namespace ParsleyDemo
             Me._queueHead = 0
             Me._queueCount = 0
         End Sub
-        '''<summary>
-        '''Discards the lookahead and advances the cursor to the physical position.
-        '''</summary>
+        ''' <summary>
+        ''' Discards the lookahead and advances the cursor to the physical position.
+        ''' </summary>
         Public Sub DiscardLookAhead()
 
             Do While (1 < Me._queueCount)
@@ -987,9 +982,9 @@ Namespace ParsleyDemo
 
             Loop
         End Sub
-        '''<summary>
-        '''Retrieves the value under the cursor
-        '''</summary>
+        ''' <summary>
+        ''' Retrieves the value under the cursor
+        ''' </summary>
         Public ReadOnly Property Current() As T Implements IEnumerator(Of T).Current
             Get
                 If (0 > Me._state) Then
@@ -1004,7 +999,7 @@ Namespace ParsleyDemo
                 Return Me._queue(Me._queueHead)
             End Get
         End Property
-        'legacy enum support (required)
+        ' legacy enum support (required)
         ReadOnly Property System_Collections_IEnumerator_Current() As Object Implements System.Collections.IEnumerator.Current
             Get
                 Return Me.Current
@@ -1015,12 +1010,12 @@ Namespace ParsleyDemo
                 Return Me._queueCount
             End Get
         End Property
-        '''<summary>
-        '''Attempts to peek the specified number of positions from the current position without advancing
-        '''</summary>
-        '''<param name="lookahead">The offset from the current position to peek at</param>
-        '''<param name="value">The value returned</param>
-        '''<returns>True if the peek could be satisfied, otherwise false</returns>
+        ''' <summary>
+        ''' Attempts to peek the specified number of positions from the current position without advancing
+        ''' </summary>
+        ''' <param name="lookahead">The offset from the current position to peek at</param>
+        ''' <param name="value">The value returned</param>
+        ''' <returns>True if the peek could be satisfied, otherwise false</returns>
         Public Function TryPeek(ByVal lookahead As Integer, ByRef value As T) As Boolean
             If (LookAheadEnumerator(Of T)._Disposed = Me._state) Then
                 Throw New ObjectDisposedException(GetType(LookAheadEnumerator(Of T)).Name)
@@ -1055,11 +1050,11 @@ Namespace ParsleyDemo
             Loop
             Return (-1 = lookahead)
         End Function
-        '''<summary>
-        '''Peek the specified number of positions from the current position without advancing
-        '''</summary>
-        '''<param name="lookahead">The offset from the current position to peek at</param>
-        '''<returns>The value at the specified position</returns>
+        ''' <summary>
+        ''' Peek the specified number of positions from the current position without advancing
+        ''' </summary>
+        ''' <param name="lookahead">The offset from the current position to peek at</param>
+        ''' <returns>The value at the specified position</returns>
         Public Function Peek(ByVal lookahead As Integer) As T
             Dim value As T
             If (false = Me.TryPeek(lookahead, value)) Then
@@ -1077,9 +1072,9 @@ Namespace ParsleyDemo
                 Return (LookAheadEnumerator(Of T)._Ended = Me._state)
             End Get
         End Property
-        '''<summary>
-        '''Retrieves a lookahead cursor from the current cursor that can be navigated without moving the main cursor
-        '''</summary>
+        ''' <summary>
+        ''' Retrieves a lookahead cursor from the current cursor that can be navigated without moving the main cursor
+        ''' </summary>
         Public ReadOnly Property LookAhead() As IEnumerable(Of T)
             Get
                 If (0 > Me._state) Then
@@ -1094,10 +1089,10 @@ Namespace ParsleyDemo
                 Return New LookAheadEnumeratorEnumerable(Of T)(Me)
             End Get
         End Property
-        '''<summary>
-        '''Advances the cursor
-        '''</summary>
-        '''<returns>True if more input was read, otherwise false</returns>
+        ''' <summary>
+        ''' Advances the cursor
+        ''' </summary>
+        ''' <returns>True if more input was read, otherwise false</returns>
         Function System_Collections_IEnumerator_MoveNext() As Boolean Implements System.Collections.IEnumerator.MoveNext
             If (0 > Me._state) Then
                 If (LookAheadEnumerator(Of T)._Disposed = Me._state) Then
@@ -1130,9 +1125,9 @@ Namespace ParsleyDemo
             End If
             Return true
         End Function
-        '''<summary>
-        '''Resets the cursor, and clears the queue.
-        '''</summary>
+        ''' <summary>
+        ''' Resets the cursor, and clears the queue.
+        ''' </summary>
         Sub System_Collections_IEnumerator_Reset() Implements System.Collections.IEnumerator.Reset
             Me._inner.Reset
             If ((0 < Me._queueCount)  _
@@ -1149,9 +1144,9 @@ Namespace ParsleyDemo
             Me._state = LookAheadEnumerator(Of T)._NotStarted
         End Sub
         #Region "IDisposable Support"
-        '''<summary>
-        '''Disposes of this instance
-        '''</summary>
+        ''' <summary>
+        ''' Disposes of this instance
+        ''' </summary>
         Sub System_IDisposable_Dispose() Implements System.IDisposable.Dispose
             If (false  _
                         = (LookAheadEnumerator(Of T)._Disposed = Me._state)) Then
@@ -1207,7 +1202,6 @@ Namespace ParsleyDemo
             Me._outer = outer
         End Sub
         Public Function GetEnumerator() As IEnumerator(Of T) Implements IEnumerable(Of T).GetEnumerator
-            'for some reason VB was resolving new as AddressOf, so use this.
             Dim result As LookAheadEnumeratorEnumerator(Of T) = CType(System.Activator.CreateInstance(GetType(LookAheadEnumeratorEnumerator(Of T)), Me._outer),LookAheadEnumeratorEnumerator(Of T))
             Return result
         End Function

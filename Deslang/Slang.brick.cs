@@ -386,18 +386,18 @@ stmt.StartDirectives.AddRange(startDirs);if(null!=lp)stmt.LinePragma=lp;}else wh
 #endregion Preamble
 var l=pc.Line;var c=pc.Column;var p=pc.Position; if(null==stmt){_PC pc2=null;switch(pc.SymbolId){case ST.semi: pc.Advance();stmt=new CodeSnippetStatement().SetLoc(l,
 c,p);break;case ST.gotoKeyword:pc.Advance();if(ST.identifier!=pc.SymbolId)pc.Error("Expecting label identifier in goto statement");stmt=new CodeGotoStatement(pc.Value).SetLoc(l,
-c,p);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in goto statement");pc.Advance();break;case ST.returnKeyword:pc.Advance();var expr=_ParseExpression(pc);
-stmt=new CodeMethodReturnStatement(expr).Mark(l,c,p);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in return statement");pc.Advance();break;case ST.throwKeyword:
-pc.Advance();expr=_ParseExpression(pc);stmt=new CodeThrowExceptionStatement(expr).Mark(l,c,p);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in throw statement");
-pc.Advance();break;case ST.ifKeyword:stmt=_ParseIfStatement(pc);break;case ST.whileKeyword:stmt=_ParseWhileStatement(pc);break;case ST.forKeyword:stmt
-=_ParseForStatement(pc);break;case ST.tryKeyword:stmt=_ParseTryCatchFinallyStatement(pc);break;case ST.varType:stmt=_ParseVariableDeclarationStatement(pc);
-break;default: if(ST.identifier==pc.SymbolId){pc2=pc.GetLookAhead(true);pc2.Advance();if(ST.colon==pc2.SymbolId){var lbl=pc2.Value;pc.Advance();stmt=new
- CodeLabeledStatement(lbl,new CodeSnippetStatement().SetLoc(l,c,p)).SetLoc(l,c,p);pc2=null;break;}}pc2=null;pc2=pc.GetLookAhead(true);pc2.ResetAdvanceCount();
-var advc=0;try{ stmt=_ParseVariableDeclarationStatement(pc2);advc=pc2.AdvanceCount;while(advc>0){pc.Advance(false);--advc;}break;}catch(SlangSyntaxException
- sx){try{pc.ResetAdvanceCount();expr=_ParseExpression(pc);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in expression statement");pc.Advance();var bo=
-expr as CodeBinaryOperatorExpression;if(null!=bo&&CodeBinaryOperatorType.Assign==bo.Operator){var ur=bo.UserData.Contains("slang:unresolved");stmt=new
- CodeAssignStatement(bo.Left,bo.Right).Mark(l,c,p,ur);}else stmt=new CodeExpressionStatement(expr).Mark(l,c,p);break;}catch(SlangSyntaxException sx2){
-if(pc.AdvanceCount>advc)throw sx2;throw sx;}}}}
+c,p);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in goto statement");pc.Advance();break;case ST.returnKeyword:pc.Advance();if(ST.semi!=pc.SymbolId){
+stmt=new CodeMethodReturnStatement(_ParseExpression(pc)).Mark(l,c,p);}else{stmt=new CodeMethodReturnStatement().SetLoc(l,c,p);}if(ST.semi!=pc.SymbolId)
+pc.Error("Expecting ; in return statement");pc.Advance();break;case ST.throwKeyword:pc.Advance();var expr=_ParseExpression(pc);stmt=new CodeThrowExceptionStatement(expr).Mark(l,
+c,p);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in throw statement");pc.Advance();break;case ST.ifKeyword:stmt=_ParseIfStatement(pc);break;case ST.whileKeyword:
+stmt=_ParseWhileStatement(pc);break;case ST.forKeyword:stmt=_ParseForStatement(pc);break;case ST.tryKeyword:stmt=_ParseTryCatchFinallyStatement(pc);break;
+case ST.varType:stmt=_ParseVariableDeclarationStatement(pc);break;default: if(ST.identifier==pc.SymbolId){pc2=pc.GetLookAhead(true);pc2.Advance();if(ST.colon
+==pc2.SymbolId){var lbl=pc2.Value;pc.Advance();stmt=new CodeLabeledStatement(lbl,new CodeSnippetStatement().SetLoc(l,c,p)).SetLoc(l,c,p);pc2=null;break;
+}}pc2=null;pc2=pc.GetLookAhead(true);pc2.ResetAdvanceCount();var advc=0;try{ stmt=_ParseVariableDeclarationStatement(pc2);advc=pc2.AdvanceCount;while(advc>0)
+{pc.Advance(false);--advc;}break;}catch(SlangSyntaxException sx){try{pc.ResetAdvanceCount();expr=_ParseExpression(pc);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in expression statement");
+pc.Advance();var bo=expr as CodeBinaryOperatorExpression;if(null!=bo&&CodeBinaryOperatorType.Assign==bo.Operator){var ur=bo.UserData.Contains("slang:unresolved");
+stmt=new CodeAssignStatement(bo.Left,bo.Right).Mark(l,c,p,ur);}else stmt=new CodeExpressionStatement(expr).Mark(l,c,p);break;}catch(SlangSyntaxException
+ sx2){if(pc.AdvanceCount>advc)throw sx2;throw sx;}}}}
 #region Post
 stmt.StartDirectives.AddRange(startDirs);if(null!=lp)stmt.LinePragma=lp;while(!includeComments&&ST.lineComment==pc.SymbolId||ST.blockComment==pc.SymbolId)
 pc.Advance(false);while(ST.directive==pc.SymbolId&&pc.Value.StartsWith("#end",StringComparison.InvariantCulture)){stmt.EndDirectives.Add(_ParseDirective(pc)
@@ -564,25 +564,25 @@ pc.Advance(false);}else{if(ST.lbrace!=pc.SymbolId)pc.Error("Expecting body in me
 meth.Statements.Add(_ParseStatement(pc,true));if(ST.rbrace!=pc.SymbolId)pc.Error("Unterminated method body",l,c,p);pc.Advance(false);}while(ST.directive
 ==pc.SymbolId&&pc.Value.StartsWith("#end",StringComparison.InvariantCulture))result.EndDirectives.Add(_ParseDirective(pc)as CodeDirective);return result;
 } if(isVoid)pc.Error("Properties must have a type",line,column,position);if(seen.Contains("const"))pc.Error("Properties cannot be const",line,column,position);
-var prop=new CodeMemberProperty().Mark(line,column,position);result=prop;result.Comments.AddRange(comments);if(null!=lp)result.LinePragma=lp;_AddCustomAttributes(customAttributes,
-"",result.CustomAttributes);_CheckCustomAttributes(customAttributes,pc);result.StartDirectives.AddRange(startDirs);result.Attributes=_BuildMemberAttributes(seen);
-prop.PrivateImplementationType=piType;prop.Name=name;prop.Type=type;if(ST.lbracket==pc.SymbolId){if(!isThis)pc.Error("Only \"this\" properties may have indexers.",line,column,position);
-pc.Advance();prop.Parameters.AddRange(_ParseParamList(pc));if(ST.rbracket!=pc.SymbolId)pc.Error("Expecting ] in property definition");pc.Advance();}else
- if(isThis)pc.Error("\"this\" properties must have indexers.",line,column,position);if(ST.lbrace!=pc.SymbolId)pc.Error("Expecting { in property definition");
-pc.Advance();_ParsePropertyAccessors(pc,prop,seen.Contains("abstract")||isInterfaceMember);if(ST.rbrace!=pc.SymbolId)pc.Error("Expecting } in property definition");
-pc.Advance(false);while(ST.directive==pc.SymbolId&&pc.Value.StartsWith("#end",StringComparison.InvariantCulture))result.EndDirectives.Add(_ParseDirective(pc)
-as CodeDirective);return result;}}static void _ParsePropertyAccessors(_PC pc,CodeMemberProperty prop,bool isAbstractOrInterface=false){var sawGet=false;
-var sawSet=false;while(ST.getKeyword==pc.SymbolId||ST.setKeyword==pc.SymbolId){if(ST.getKeyword==pc.SymbolId){if(sawGet)pc.Error("Only one get accessor may be specified");
-sawGet=true;prop.HasGet=true;pc.Advance();if(ST.semi==pc.SymbolId){if(!isAbstractOrInterface)pc.Error("Non abstract property gets must declare a body");
-pc.Advance();}else if(ST.lbrace==pc.SymbolId){if(isAbstractOrInterface)pc.Error("Abstract and interface property gets must not declare a body");prop.GetStatements.AddRange(_ParseStatementOrBlock(pc));
-}else pc.Error("Unexpected token found in property get declaration");}else if(ST.setKeyword==pc.SymbolId){if(sawSet)pc.Error("Only one set accessor may be specified");
-sawSet=true;prop.HasSet=true;pc.Advance();if(ST.semi==pc.SymbolId){if(!isAbstractOrInterface)pc.Error("Non abstract property sets must declare a body");
-pc.Advance();}else if(ST.lbrace==pc.SymbolId){if(isAbstractOrInterface)pc.Error("Abstract and interface property sets must not declare a body");prop.SetStatements.AddRange(_ParseStatementOrBlock(pc));
-}else pc.Error("Unexpected token found in property set declaration");}else pc.Error("Expecting a get or set accessor");}}static CodeParameterDeclarationExpressionCollection
- _ParseParamList(_PC pc){var result=new CodeParameterDeclarationExpressionCollection();while(!pc.IsEnded&&ST.rparen!=pc.SymbolId&&ST.rbracket!=pc.SymbolId)
-{result.Add(new CodeParameterDeclarationExpression(_ParseType(pc),_ParseIdentifier(pc)));if(ST.rparen==pc.SymbolId||ST.rbracket==pc.SymbolId)break;var
- l2=pc.Line;var c2=pc.Column;var p2=pc.Position;if(ST.comma!=pc.SymbolId)pc.Error("Expecting , in parameter list");pc.Advance();if(ST.rbracket==pc.SymbolId
-||ST.rparen==pc.SymbolId)pc.Error("Expecting parameter in parameter list",l2,c2,p2);}return result;}static CodeParameterDeclarationExpressionCollection
+var prop=new CodeMemberProperty().Mark(line,column,position,seen.Contains("public"));result=prop;result.Comments.AddRange(comments);if(null!=lp)result.LinePragma
+=lp;_AddCustomAttributes(customAttributes,"",result.CustomAttributes);_CheckCustomAttributes(customAttributes,pc);result.StartDirectives.AddRange(startDirs);
+result.Attributes=_BuildMemberAttributes(seen);prop.PrivateImplementationType=piType;prop.Name=name;prop.Type=type;if(ST.lbracket==pc.SymbolId){if(!isThis)
+pc.Error("Only \"this\" properties may have indexers.",line,column,position);pc.Advance();prop.Parameters.AddRange(_ParseParamList(pc));if(ST.rbracket
+!=pc.SymbolId)pc.Error("Expecting ] in property definition");pc.Advance();}else if(isThis)pc.Error("\"this\" properties must have indexers.",line,column,position);
+if(ST.lbrace!=pc.SymbolId)pc.Error("Expecting { in property definition");pc.Advance();_ParsePropertyAccessors(pc,prop,seen.Contains("abstract")||isInterfaceMember);
+if(ST.rbrace!=pc.SymbolId)pc.Error("Expecting } in property definition");pc.Advance(false);while(ST.directive==pc.SymbolId&&pc.Value.StartsWith("#end",
+StringComparison.InvariantCulture))result.EndDirectives.Add(_ParseDirective(pc)as CodeDirective);return result;}}static void _ParsePropertyAccessors(_PC
+ pc,CodeMemberProperty prop,bool isAbstractOrInterface=false){var sawGet=false;var sawSet=false;while(ST.getKeyword==pc.SymbolId||ST.setKeyword==pc.SymbolId)
+{if(ST.getKeyword==pc.SymbolId){if(sawGet)pc.Error("Only one get accessor may be specified");sawGet=true;prop.HasGet=true;pc.Advance();if(ST.semi==pc.SymbolId)
+{if(!isAbstractOrInterface)pc.Error("Non abstract property gets must declare a body");pc.Advance();}else if(ST.lbrace==pc.SymbolId){if(isAbstractOrInterface)
+pc.Error("Abstract and interface property gets must not declare a body");prop.GetStatements.AddRange(_ParseStatementOrBlock(pc));}else pc.Error("Unexpected token found in property get declaration");
+}else if(ST.setKeyword==pc.SymbolId){if(sawSet)pc.Error("Only one set accessor may be specified");sawSet=true;prop.HasSet=true;pc.Advance();if(ST.semi
+==pc.SymbolId){if(!isAbstractOrInterface)pc.Error("Non abstract property sets must declare a body");pc.Advance();}else if(ST.lbrace==pc.SymbolId){if(isAbstractOrInterface)
+pc.Error("Abstract and interface property sets must not declare a body");prop.SetStatements.AddRange(_ParseStatementOrBlock(pc));}else pc.Error("Unexpected token found in property set declaration");
+}else pc.Error("Expecting a get or set accessor");}}static CodeParameterDeclarationExpressionCollection _ParseParamList(_PC pc){var result=new CodeParameterDeclarationExpressionCollection();
+while(!pc.IsEnded&&ST.rparen!=pc.SymbolId&&ST.rbracket!=pc.SymbolId){result.Add(new CodeParameterDeclarationExpression(_ParseType(pc),_ParseIdentifier(pc)));
+if(ST.rparen==pc.SymbolId||ST.rbracket==pc.SymbolId)break;var l2=pc.Line;var c2=pc.Column;var p2=pc.Position;if(ST.comma!=pc.SymbolId)pc.Error("Expecting , in parameter list");
+pc.Advance();if(ST.rbracket==pc.SymbolId||ST.rparen==pc.SymbolId)pc.Error("Expecting parameter in parameter list",l2,c2,p2);}return result;}static CodeParameterDeclarationExpressionCollection
  _ParseMethodParamList(_PC pc){var result=new CodeParameterDeclarationExpressionCollection();while(ST.rparen!=pc.SymbolId&&ST.rbracket!=pc.SymbolId){var
  fd=FieldDirection.In;if(ST.refKeyword==pc.SymbolId){fd=FieldDirection.Ref;pc.Advance();}else if(ST.outKeyword==pc.SymbolId){fd=FieldDirection.Out;pc.Advance();
 }var pd=new CodeParameterDeclarationExpression(_ParseType(pc),_ParseIdentifier(pc));pd.Direction=fd;result.Add(pd);if(ST.rparen==pc.SymbolId||ST.rbracket

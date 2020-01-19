@@ -16,112 +16,116 @@ Imports System.Collections.Generic
 Imports System.Text
 
 Namespace ParsleyDemo
-    '''<summary>
-    '''Reference implementation for generated shared code
-    '''</summary>
+    ''' <summary>
+    ''' Reference implementation for generated shared code
+    ''' </summary>
     <System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")>  _
     Friend Structure Token
-        '''<summary>
-        '''Indicates the line where the token occurs
-        '''</summary>
+        ''' <summary>
+        ''' Indicates the line where the token occurs
+        ''' </summary>
         Public Line As Integer
-        '''<summary>
-        '''Indicates the column where the token occurs
-        '''</summary>
+        ''' <summary>
+        ''' Indicates the column where the token occurs
+        ''' </summary>
         Public Column As Integer
-        '''<summary>
-        '''Indicates the position where the token occurs
-        '''</summary>
+        ''' <summary>
+        ''' Indicates the position where the token occurs
+        ''' </summary>
         Public Position As Long
-        '''<summary>
-        '''Indicates the symbol id or -1 for the error symbol
-        '''</summary>
+        ''' <summary>
+        ''' Indicates the symbol id or -1 for the error symbol
+        ''' </summary>
         Public SymbolId As Integer
-        '''<summary>
-        '''Indicates the value of the token
-        '''</summary>
+        ''' <summary>
+        ''' Indicates the value of the token
+        ''' </summary>
         Public Value As String
-        '''<summary>
-        '''Always null in Rolex
-        '''</summary>
+        ''' <summary>
+        ''' Always null in Rolex
+        ''' </summary>
         Public Skipped() As Token
     End Structure
-    '''<summary>
-    '''Reference implementation for a DfaEntry
-    '''</summary>
+    ''' <summary>
+    ''' Reference implementation for a DfaEntry
+    ''' </summary>
     <System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")>  _
     Friend Structure DfaEntry
-        '''<summary>
-        '''The state transitions
-        '''</summary>
+        ''' <summary>
+        ''' The state transitions
+        ''' </summary>
         Public Transitions() As DfaTransitionEntry
-        '''<summary>
-        '''The accept symbol id or -1 for non-accepting
-        '''</summary>
+        ''' <summary>
+        ''' The accept symbol id or -1 for non-accepting
+        ''' </summary>
         Public AcceptSymbolId As Integer
-        '''<summary>
-        '''Constructs a new instance
-        '''</summary>
-        '''<param name="transitions">The state transitions</param>
-        '''<param name="acceptSymbolId">The accept symbol id</param>
+        ''' <summary>
+        ''' Constructs a new instance
+        ''' </summary>
+        ''' <param name="transitions">The state transitions</param>
+        ''' <param name="acceptSymbolId">The accept symbol id</param>
         Public Sub New(ByVal transitions() As DfaTransitionEntry, ByVal acceptSymbolId As Integer)
             Me.Transitions = transitions
             Me.AcceptSymbolId = acceptSymbolId
         End Sub
     End Structure
+    ''' <summary>
+    ''' The state transition entry
+    ''' </summary>
     <System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")>  _
     Friend Structure DfaTransitionEntry
-        '''<summary>
-        '''The character ranges, packed as adjacent pairs.
-        '''</summary>
+        ''' <summary>
+        ''' The character ranges, packed as adjacent pairs.
+        ''' </summary>
         Public PackedRanges() As Char
-        '''<summary>
-        '''The destination state
-        '''</summary>
+        ''' <summary>
+        ''' The destination state
+        ''' </summary>
         Public Destination As Integer
-        '''<summary>
-        '''Constructs a new instance
-        '''</summary>
-        '''<param name="packedRanges">The packed character ranges</param>
-        '''<param name="destination">The destination state</param>
+        ''' <summary>
+        ''' Constructs a new instance
+        ''' </summary>
+        ''' <param name="packedRanges">The packed character ranges</param>
+        ''' <param name="destination">The destination state</param>
         Public Sub New(ByVal packedRanges() As Char, ByVal destination As Integer)
             Me.PackedRanges = packedRanges
             Me.Destination = destination
         End Sub
     End Structure
+    ''' <summary>
+    ''' Reference Implementation for generated shared code
+    ''' </summary>
     <System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")>  _
     Friend Class TableTokenizer
         Inherits Object
         Implements IEnumerable(Of Token)
         Public Const ErrorSymbol As Integer = -1
-        'our state table
+        ' our state table
         Private _dfaTable() As DfaEntry
-        'our block ends (specified like comment<blockEnd="*/">="/*" in a rolex spec file)
+        ' our block ends (specified like comment<blockEnd="*/">="/*" in a rolex spec file)
         Private _blockEnds() As String
-        'our node flags. Currently only used for the hidden attribute
+        ' our node flags. Currently only used for the hidden attribute
         Private _nodeFlags() As Integer
-        'the input cursor. We can get this from a string, a char array, or some other source.
+        ' the input cursor. We can get this from a string, a char array, or some other source.
         Private _input As IEnumerable(Of Char)
-        '''<summary>
-        '''Retrieves an enumerator that can be used to iterate over the tokens
-        '''</summary>
-        '''<returns>An enumerator that can be used to iterate over the tokens</returns>
+        ''' <summary>
+        ''' Retrieves an enumerator that can be used to iterate over the tokens
+        ''' </summary>
+        ''' <returns>An enumerator that can be used to iterate over the tokens</returns>
         Public Function GetEnumerator() As IEnumerator(Of Token) Implements IEnumerable(Of Token).GetEnumerator
-            'just create our table tokenizer's enumerator, passing all of the relevant stuff
-            'it's the real workhorse.
             Return New TableTokenizerEnumerator(Me._dfaTable, Me._blockEnds, Me._nodeFlags, Me._input.GetEnumerator)
         End Function
-        'legacy collection support (required)
+        ' legacy collection support (required)
         Function System_Collections_IEnumerable_GetEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
             Return Me.GetEnumerator
         End Function
-        '''<summary>
-        '''Constructs a new instance
-        '''</summary>
-        '''<param name="dfaTable">The DFA state table to use</param>
-        '''<param name="blockEnds">The block ends table</param>
-        '''<param name="nodeFlags">The node flags table</param>
-        '''<param name="input">The input character sequence</param>
+        ''' <summary>
+        ''' Constructs a new instance
+        ''' </summary>
+        ''' <param name="dfaTable">The DFA state table to use</param>
+        ''' <param name="blockEnds">The block ends table</param>
+        ''' <param name="nodeFlags">The node flags table</param>
+        ''' <param name="input">The input character sequence</param>
         Public Sub New(ByVal dfaTable() As DfaEntry, ByVal blockEnds() As String, ByVal nodeFlags() As Integer, ByVal input As IEnumerable(Of Char))
             MyBase.New
             If (Nothing Is dfaTable) Then
@@ -146,45 +150,44 @@ Namespace ParsleyDemo
     Friend Class TableTokenizerEnumerator
         Inherits Object
         Implements IEnumerator(Of Token)
-        'our error symbol. Always -1
+        ' our error symbol. Always -1
         Public Const ErrorSymbol As Integer = -1
-        'our end of stream symbol - returned by _Lex() and used internally but not reported
+        ' our end of stream symbol - returned by _Lex() and used internally but not reported
         Private Const _EosSymbol As Integer = -2
-        'our disposed state indicator
+        ' our disposed state indicator
         Private Const _Disposed As Integer = -4
-        'the state indicates the cursor is before the beginning (initial state)
+        ' the state indicates the cursor is before the beginning (initial state)
         Private Const _BeforeBegin As Integer = -3
-        'the state indicates the cursor is after the end
+        ' the state indicates the cursor is after the end
         Private Const _AfterEnd As Integer = -2
-        'the state indicates that the inner input enumeration has finished (we still have one more token to report)
+        ' the state indicates that the inner input enumeration has finished (we still have one more token to report)
         Private Const _InnerFinished As Integer = -1
-        'indicates we're currently enumerating. We spend most of our time and effort in this state
+        ' indicates we're currently enumerating. We spend most of our time and effort in this state
         Private Const _Enumerating As Integer = 0
-        'indicates the tab width, used for updating the Column property when we encounter a tab
+        ' indicates the tab width, used for updating the Column property when we encounter a tab
         Private Const _TabWidth As Integer = 4
-        'the DFA state table to use.
+        ' the DFA state table to use.
         Private _dfaTable() As DfaEntry
-        'the blockEnds to use
+        ' the blockEnds to use
         Private _blockEnds() As String
-        'the nodeFlags to use
+        ' the nodeFlags to use
         Private _nodeFlags() As Integer
-        'the input cursor
+        ' the input cursor
         Private _input As IEnumerator(Of Char)
-        'our state
+        ' our state 
         Private _state As Integer
-        'the current token
+        ' the current token
         Private _current As Token
-        'a buffer used primarily by _Lex() to capture matched input
+        ' a buffer used primarily by _Lex() to capture matched input
         Private _buffer As StringBuilder
-        'the one based line
+        ' the one based line
         Private _line As Integer
-        'the one based column
+        ' the one based column
         Private _column As Integer
-        'the zero based position
+        ' the zero based position
         Private _position As Long
         Public Sub New(ByVal dfaTable() As DfaEntry, ByVal blockEnds() As String, ByVal nodeFlags() As Integer, ByVal input As IEnumerator(Of Char))
             MyBase.New
-            'just set up our initial values
             Me._dfaTable = dfaTable
             Me._blockEnds = blockEnds
             Me._nodeFlags = nodeFlags
@@ -197,9 +200,7 @@ Namespace ParsleyDemo
         End Sub
         Public ReadOnly Property Current() As Token Implements IEnumerator(Of Token).Current
             Get
-                'if we're not enumerating, find out what's going on
                 If (TableTokenizerEnumerator._Enumerating > Me._state) Then
-                    'check which state we're in, and throw accordingly
                     If (TableTokenizerEnumerator._BeforeBegin = Me._state) Then
                         Throw New InvalidOperationException("The cursor is before the start of the enumeration")
                     End If
@@ -207,7 +208,7 @@ Namespace ParsleyDemo
                         Throw New InvalidOperationException("The cursor is after the end of the enumeration")
                     End If
                     If (TableTokenizerEnumerator._Disposed = Me._state) Then
-                        TableTokenizerEnumerator._ThrowDisposed
+                        TableTokenizerEnumerator._ThrowDisposed()
                     End If
                 End If
                 Return Me._current
@@ -232,7 +233,6 @@ Namespace ParsleyDemo
             Me._position = 0
         End Sub
         Function System_Collections_IEnumerator_MoveNext() As Boolean Implements System.Collections.IEnumerator.MoveNext
-            'if we're not enumerating
             If (TableTokenizerEnumerator._Enumerating > Me._state) Then
                 If (TableTokenizerEnumerator._Disposed = Me._state) Then
                     TableTokenizerEnumerator._ThrowDisposed
@@ -247,21 +247,16 @@ Namespace ParsleyDemo
             Me._current.Position = Me._position
             Me._current.Skipped = Nothing
             Me._buffer.Clear
-            'lex the next input
             Me._current.SymbolId = Me._Lex
-            'now look for hiddens and block ends
             Dim done As Boolean = false
 
             Do While (false = done)
                 done = true
-                'if we're on a valid symbol
                 If (TableTokenizerEnumerator.ErrorSymbol < Me._current.SymbolId) Then
-                    'get the block end for our symbol
                     Dim be As String = Me._blockEnds(Me._current.SymbolId)
                     If ((Not (be) Is Nothing)  _
                                 AndAlso (false  _
                                 = (0 = be.Length))) Then
-                        'read until we find it or end of input
                         If (false = Me._TryReadUntilBlockEnd(be)) Then
                             Me._current.SymbolId = TableTokenizerEnumerator.ErrorSymbol
                         End If
@@ -270,7 +265,6 @@ Namespace ParsleyDemo
                                 AndAlso (false  _
                                 = (0  _
                                 = (Me._nodeFlags(Me._current.SymbolId) And 1)))) Then
-                        'update the cursor position and lex the next input, skipping this one
                         done = false
                         Me._current.Line = Me._line
                         Me._current.Column = Me._column
@@ -282,7 +276,6 @@ Namespace ParsleyDemo
 
             Loop
             Me._current.Value = Me._buffer.ToString
-            'update our state if we hit the end
             If (TableTokenizerEnumerator._EosSymbol = Me._current.SymbolId) Then
                 Me._state = TableTokenizerEnumerator._AfterEnd
             End If
@@ -293,7 +286,7 @@ Namespace ParsleyDemo
             Me._input.Dispose
             Me._state = TableTokenizerEnumerator._Disposed
         End Sub
-        'moves to the next position, updates the state accordingly, and tracks the cursor position
+        ' moves to the next position, updates the state accordingly, and tracks the cursor position
         Function _MoveNextInput() As Boolean
             If Me._input.MoveNext Then
                 If (false  _
@@ -310,7 +303,6 @@ Namespace ParsleyDemo
                         End If
                     End If
                 Else
-                    'corner case for first move
                     If (Global.Microsoft.VisualBasic.ChrW(10) = Me._input.Current) Then
                         Me._column = 1
                         Me._line = (Me._line + 1)
@@ -326,7 +318,7 @@ Namespace ParsleyDemo
             Me._state = TableTokenizerEnumerator._InnerFinished
             Return false
         End Function
-        'reads until the specified character, consuming it, returning false if it wasn't found
+        ' reads until the specified character, consuming it, returning false if it wasn't found
         Function _TryReadUntil(ByVal character As Char) As Boolean
             Dim ch As Char = Me._input.Current
             Me._buffer.Append(ch)
@@ -347,7 +339,7 @@ Namespace ParsleyDemo
             End If
             Return false
         End Function
-        'reads until the string is encountered, capturing it.
+        ' reads until the string is encountered, capturing it.
         Function _TryReadUntilBlockEnd(ByVal blockEnd As String) As Boolean
 
             Do While ((false  _
@@ -357,10 +349,9 @@ Namespace ParsleyDemo
                 Dim i As Integer = 1
                 Do While (found  _
                             AndAlso (i < blockEnd.Length))
-                    If (false  _
-                                = (Me._MoveNextInput  _
+                    If ((false = Me._MoveNextInput)  _
                                 OrElse (false  _
-                                = (Me._input.Current = blockEnd(i))))) Then
+                                = (Me._input.Current = blockEnd(i)))) Then
                         found = false
                     Else
                         If (false  _
@@ -378,15 +369,12 @@ Namespace ParsleyDemo
             Loop
             Return false
         End Function
-        'lex the next token
+        ' lex the next token
         Function _Lex() As Integer
-            'our accepting symbol id
             Dim acceptSymbolId As Integer
             Dim dfaState As Integer = 0
             If (TableTokenizerEnumerator._BeforeBegin = Me._state) Then
                 If (false = Me._MoveNextInput) Then
-                    'if we're on an accepting state, return that
-                    'otherwise, error
                     acceptSymbolId = Me._dfaTable(dfaState).AcceptSymbolId
                     If (false  _
                                 = (-1 = acceptSymbolId)) Then
@@ -399,7 +387,6 @@ Namespace ParsleyDemo
             Else
                 If ((TableTokenizerEnumerator._InnerFinished = Me._state)  _
                             OrElse (TableTokenizerEnumerator._AfterEnd = Me._state)) Then
-                    'if we're at the end just return the end symbol
                     Return TableTokenizerEnumerator._EosSymbol
                 End If
             End If
@@ -422,28 +409,20 @@ Namespace ParsleyDemo
                                 found = true
                             End If
                             j = (Integer.MaxValue - 1)
-                            'break
                         End If
                         j = (j + 1)
                     Loop
                     If found Then
-                        'set the transition destination
                         nextDfaState = entry.Destination
                         i = (Integer.MaxValue - 1)
-                        'break
                     End If
                     i = (i + 1)
                 Loop
                 If (false  _
                             = (-1 = nextDfaState)) Then
-                    'capture our character
                     Me._buffer.Append(Me._input.Current)
-                    'and iterate to our next state
                     dfaState = nextDfaState
                     If (false = Me._MoveNextInput) Then
-                        'end of stream, if we're on an accepting state,
-                        'return that, just like we do on empty string
-                        'if we're not, then we error, just like before
                         acceptSymbolId = Me._dfaTable(dfaState).AcceptSymbolId
                         If (false  _
                                     = (-1 = acceptSymbolId)) Then
@@ -455,7 +434,6 @@ Namespace ParsleyDemo
                 Else
                     done = true
                 End If
-                'no valid transition, we can exit the loop
 
             Loop
             acceptSymbolId = Me._dfaTable(dfaState).AcceptSymbolId
@@ -463,10 +441,6 @@ Namespace ParsleyDemo
                         = (-1 = acceptSymbolId)) Then
                 Return acceptSymbolId
             Else
-                'handle the error condition
-                'we have to capture the input
-                'here and then advance or the
-                'machine will never halt
                 Me._buffer.Append(Me._input.Current)
                 Me._MoveNextInput
                 Return TableTokenizerEnumerator.ErrorSymbol
