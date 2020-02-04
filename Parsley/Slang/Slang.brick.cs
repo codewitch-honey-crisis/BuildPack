@@ -253,7 +253,7 @@ if(ST.rparen!=pc.SymbolId)pc.Error("Expecting ) in new object expression");pc.Ad
 var pc2=pc.GetLookAhead(true);pc2.Advance();if(ST.comma==pc2.SymbolId)throw new SlangSyntaxException("Instantiation of multidimensional arrays is not supported",l,c,p);
 var hasSize=false;if(ST.rbracket!=pc2.SymbolId)hasSize=true;pc2=null;CodeExpression size=null;if(hasSize){pc.Advance();size=_ParseExpression(pc);if(ST.comma==pc.SymbolId)
 throw new SlangSyntaxException("Instantiation of multidimensional arrays is not supported",l,c,p);if(ST.rbracket!=pc.SymbolId)pc.Error("Expecting ] in new array expression");
-pc.Advance();}var ctr=new CodeTypeReference(te,1).Mark(te); if(ST.lbracket==pc.SymbolId)ctr=_ParseTypeArraySpec(pc,ctr);var ace=new CodeArrayCreateExpression(ctr).Mark(l,c,p);
+pc.Advance();}var ctr=new CodeTypeReference(te,1).Mark(te); if(ST.lbracket==pc.SymbolId)ctr=_ParseTypeArraySpec(pc,ctr.ArrayElementType);var ace=new CodeArrayCreateExpression(ctr).Mark(l,c,p);
 if(!hasSize){if(ST.lbrace!=pc.SymbolId)pc.Error("Expecting intitializer in new array expression");pc.Advance();while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId)
 {ace.Initializers.Add(_ParseExpression(pc));if(ST.rbrace==pc.SymbolId)break;var l2=pc.Line;var c2=pc.Column;var p2=pc.Position;if(ST.comma!=pc.SymbolId)
 pc.Error("Expecting , in array initializer expression list");pc.Advance();if(ST.lbrace==pc.SymbolId)throw new SlangSyntaxException("Expecting expression in array initializer expression list",
@@ -386,18 +386,18 @@ stmt.StartDirectives.AddRange(startDirs);if(null!=lp)stmt.LinePragma=lp;}else wh
 #endregion Preamble
 var l=pc.Line;var c=pc.Column;var p=pc.Position; if(null==stmt){_PC pc2=null;switch(pc.SymbolId){case ST.semi: pc.Advance();stmt=new CodeSnippetStatement().SetLoc(l,
 c,p);break;case ST.gotoKeyword:pc.Advance();if(ST.identifier!=pc.SymbolId)pc.Error("Expecting label identifier in goto statement");stmt=new CodeGotoStatement(pc.Value).SetLoc(l,
-c,p);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in goto statement");pc.Advance();break;case ST.returnKeyword:pc.Advance();var expr=_ParseExpression(pc);
-stmt=new CodeMethodReturnStatement(expr).Mark(l,c,p);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in return statement");pc.Advance();break;case ST.throwKeyword:
-pc.Advance();expr=_ParseExpression(pc);stmt=new CodeThrowExceptionStatement(expr).Mark(l,c,p);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in throw statement");
-pc.Advance();break;case ST.ifKeyword:stmt=_ParseIfStatement(pc);break;case ST.whileKeyword:stmt=_ParseWhileStatement(pc);break;case ST.forKeyword:stmt
-=_ParseForStatement(pc);break;case ST.tryKeyword:stmt=_ParseTryCatchFinallyStatement(pc);break;case ST.varType:stmt=_ParseVariableDeclarationStatement(pc);
-break;default: if(ST.identifier==pc.SymbolId){pc2=pc.GetLookAhead(true);pc2.Advance();if(ST.colon==pc2.SymbolId){var lbl=pc2.Value;pc.Advance();stmt=new
- CodeLabeledStatement(lbl,new CodeSnippetStatement().SetLoc(l,c,p)).SetLoc(l,c,p);pc2=null;break;}}pc2=null;pc2=pc.GetLookAhead(true);pc2.ResetAdvanceCount();
-var advc=0;try{ stmt=_ParseVariableDeclarationStatement(pc2);advc=pc2.AdvanceCount;while(advc>0){pc.Advance(false);--advc;}break;}catch(SlangSyntaxException
- sx){try{pc.ResetAdvanceCount();expr=_ParseExpression(pc);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in expression statement");pc.Advance();var bo=
-expr as CodeBinaryOperatorExpression;if(null!=bo&&CodeBinaryOperatorType.Assign==bo.Operator){var ur=bo.UserData.Contains("slang:unresolved");stmt=new
- CodeAssignStatement(bo.Left,bo.Right).Mark(l,c,p,ur);}else stmt=new CodeExpressionStatement(expr).Mark(l,c,p);break;}catch(SlangSyntaxException sx2){
-if(pc.AdvanceCount>advc)throw sx2;throw sx;}}}}
+c,p);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in goto statement");pc.Advance();break;case ST.returnKeyword:pc.Advance();if(ST.semi!=pc.SymbolId){
+stmt=new CodeMethodReturnStatement(_ParseExpression(pc)).Mark(l,c,p);}else{stmt=new CodeMethodReturnStatement().SetLoc(l,c,p);}if(ST.semi!=pc.SymbolId)
+pc.Error("Expecting ; in return statement");pc.Advance();break;case ST.throwKeyword:pc.Advance();var expr=_ParseExpression(pc);stmt=new CodeThrowExceptionStatement(expr).Mark(l,
+c,p);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in throw statement");pc.Advance();break;case ST.ifKeyword:stmt=_ParseIfStatement(pc);break;case ST.whileKeyword:
+stmt=_ParseWhileStatement(pc);break;case ST.forKeyword:stmt=_ParseForStatement(pc);break;case ST.tryKeyword:stmt=_ParseTryCatchFinallyStatement(pc);break;
+case ST.varType:stmt=_ParseVariableDeclarationStatement(pc);break;default: if(ST.identifier==pc.SymbolId){pc2=pc.GetLookAhead(true);pc2.Advance();if(ST.colon
+==pc2.SymbolId){var lbl=pc2.Value;pc.Advance();stmt=new CodeLabeledStatement(lbl,new CodeSnippetStatement().SetLoc(l,c,p)).SetLoc(l,c,p);pc2=null;break;
+}}pc2=null;pc2=pc.GetLookAhead(true);pc2.ResetAdvanceCount();var advc=0;try{ stmt=_ParseVariableDeclarationStatement(pc2);advc=pc2.AdvanceCount;while(advc>0)
+{pc.Advance(false);--advc;}break;}catch(SlangSyntaxException sx){try{pc.ResetAdvanceCount();expr=_ParseExpression(pc);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in expression statement");
+pc.Advance();var bo=expr as CodeBinaryOperatorExpression;if(null!=bo&&CodeBinaryOperatorType.Assign==bo.Operator){var ur=bo.UserData.Contains("slang:unresolved");
+stmt=new CodeAssignStatement(bo.Left,bo.Right).Mark(l,c,p,ur);}else stmt=new CodeExpressionStatement(expr).Mark(l,c,p);break;}catch(SlangSyntaxException
+ sx2){if(pc.AdvanceCount>advc)throw sx2;throw sx;}}}}
 #region Post
 stmt.StartDirectives.AddRange(startDirs);if(null!=lp)stmt.LinePragma=lp;while(!includeComments&&ST.lineComment==pc.SymbolId||ST.blockComment==pc.SymbolId)
 pc.Advance(false);while(ST.directive==pc.SymbolId&&pc.Value.StartsWith("#end",StringComparison.InvariantCulture)){stmt.EndDirectives.Add(_ParseDirective(pc)
@@ -1327,38 +1327,38 @@ new short[]{64,-1,64,64,50,-1,-1,-1,-1,-1,-1,64,51,64,-1,64,-1,-1,-1,-1,64,-1,-1
 -1,-1,51,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,50,51}), new Table(52,38,-1,new short[]{68,-1,-1,68,-1,-1,-1,-1,-1,-1,-1,68,-1,325,49,
 49,-1,-1,-1,-1,325,-1,-1,-1,-1,49,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,49,49}), new Table(0,0,-1,null), new Table(52,38,-1,new short[]{70,-1,-1,70,-1,-1,-1,-1,
 -1,-1,-1,70,-1,-1,49,49,-1,-1,-1,-1,-1,-1,-1,-1,-1,49,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,49,49}), new Table(52,44,-1,new short[]{71,71,71,71,71,-1,-1,71,71,
-71,71,71,71,71,71,71,-1,-1,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,-1,-1,-1,-1,71}), new Table(0,0,-1,null), new Table(0,0,-1,null),
- new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(0,
+71,71,71,71,71,71,71,-1,-1,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,71,-1,-1,-1,-1,71}), new Table(57,1,-1,new short[]{329}), new Table(0,
 0,-1,null), new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(0,0,-1,null),
- new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(68,2,89,new short[]{-1,-1}), new Table(0,0,-1,null), new Table(68,2,91,new short[]{-1,-1}),
- new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,109,3,3,3,3,3,3,3,3,3,3,
-3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,104,3,3,3,3,3,3,3,3,3,3,3,-1,-1,
--1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,101,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,
-44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,98,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,
-3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,99,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,
-3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,100,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,
-3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,
-102,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,103,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
-3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}),
- new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,105,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,
-new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,106,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,
-3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,107,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,
-3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,108,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,
-3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,
-3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,119,3,3,3,3,3,3,3,3,
-3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,117,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}),
- new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,113,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,
-new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,114,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,
-3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,115,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,
-3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,116,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,
-3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,118,3,3,3,3,3,
-3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
-3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new
- Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,132,3,133,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,
-new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,127,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,
-3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,123,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,
-3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,124,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,
-3,3,3,3,3,125,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,126,
+ new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(0,
+0,-1,null), new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(68,2,89,new short[]{-1,-1}), new Table(0,0,-1,null), new Table(68,2,91,new short[]
+{-1,-1}), new Table(0,0,-1,null), new Table(0,0,-1,null), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,109,3,3,3,3,3,3,
+3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,104,3,3,3,3,3,3,3,3,3,
+3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,101,3,3,3,3,3,-1,-1,-1,-1,3}),
+ new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,98,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,
+new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,99,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,
+3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,100,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,
+3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,
+3,3,3,3,3,3,3,102,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,103,3,3,3,3,3,3,3,3,
+3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,105,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new
+ Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,106,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new
+ short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,107,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,
+-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,108,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,
+3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,
+3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,119,3,
+3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,117,3,3,3,3,3,3,3,3,3,-1,
+-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,113,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,
+44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,114,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,
+3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,115,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,
+3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,116,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,
+3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,118,3,3,3,3,
+3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}),
+ new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,132,3,133,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,
+-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,127,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,
+3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,123,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,
+3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,124,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,
+3,3,3,3,3,3,125,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,126,
 3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
 3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,3,3,128,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}),
  new Table(52,44,-1,new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,129,3,3,3,3,3,3,3,3,3,3,3,3,3,3,-1,-1,-1,-1,3}), new Table(52,44,-1,
@@ -1536,23 +1536,23 @@ new short[]{3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,-1,-1,3,3,3,3,3,3,3,3,3,306,3,3,3,
 23,24,3,1,25,26,1,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,23,1,23,45,3,3,45,3,46,47,3,3,3,23,48}), new Table(44,20,-1,new short[]{328,328,
 -1,-1,-1,-1,-1,-1,70,-1,-1,70,-1,-1,-1,-1,-1,-1,-1,70}), new Table(52,12,-1,new short[]{68,-1,-1,68,-1,-1,-1,-1,-1,-1,-1,68}), new Table(52,37,-1,new short[]
 {52,-1,52,52,-1,-1,-1,-1,-1,-1,-1,52,-1,52,-1,52,-1,-1,-1,-1,52,-1,-1,-1,-1,52,52,-1,-1,-1,52,52,-1,-1,-1,-1,52}), new Table(52,12,-1,new short[]{70,-1,
--1,70,-1,-1,-1,-1,-1,-1,-1,70}), new Table(40,18,329,new short[]{-1,329,329,329,329,329,329,329,329,329,329,329,329,329,329,329,329,72}), new Table(24,
-46,330,new short[]{-1,330,330,-1,330,330,-1,330,330,330,330,330,330,330,330,330,330,330,330,330,330,330,330,330,330,330,330,331,330,330,330,330,330,73,
-330,330,330,330,330,330,330,330,330,330,-1,-1}), new Table(68,2,330,new short[]{-1,-1}), new Table(48,1,-1,new short[]{74}), new Table(52,33,332,new short[]
-{335,336,332,332,337,332,332,332,332,332,332,335,332,332,332,332,-1,-1,332,332,332,332,332,332,332,332,332,332,332,332,332,332,334}), new Table(48,41,
--1,new short[]{74,-1,-1,-1,342,-1,342,342,-1,-1,-1,-1,-1,-1,-1,342,-1,342,-1,342,-1,-1,-1,-1,342,-1,-1,-1,-1,342,342,-1,-1,-1,342,342,-1,-1,-1,-1,342}),
- new Table(48,16,-1,new short[]{74,-1,-1,-1,345,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,345}), new Table(48,41,-1,new short[]{74,-1,-1,-1,344,-1,344,344,-1,-1,-1,
--1,-1,-1,-1,344,-1,344,-1,344,-1,-1,-1,-1,344,-1,-1,-1,-1,344,344,-1,-1,-1,344,344,-1,-1,-1,-1,344}), new Table(48,41,-1,new short[]{74,-1,-1,-1,338,-1,
-338,338,-1,-1,-1,-1,-1,-1,-1,338,-1,338,-1,338,-1,-1,-1,-1,338,-1,-1,-1,-1,338,338,-1,-1,-1,338,338,-1,-1,-1,-1,338}), new Table(52,37,-1,new short[]{339,
--1,339,339,-1,-1,-1,-1,-1,-1,-1,339,-1,339,-1,339,-1,-1,-1,-1,339,-1,-1,-1,-1,339,339,-1,-1,-1,339,339,-1,-1,-1,-1,339}), new Table(52,37,-1,new short[]
-{340,-1,340,340,-1,-1,-1,-1,-1,-1,-1,340,-1,340,-1,340,-1,-1,-1,-1,340,-1,-1,-1,-1,340,340,-1,-1,-1,340,340,-1,-1,-1,-1,340}), new Table(52,37,-1,new short[]
-{341,-1,341,341,-1,-1,-1,-1,-1,-1,-1,341,-1,341,-1,341,-1,-1,-1,-1,341,-1,-1,-1,-1,341,341,-1,-1,-1,341,341,-1,-1,-1,-1,341}), new Table(52,37,-1,new short[]
-{342,-1,342,342,-1,-1,-1,-1,-1,-1,-1,342,-1,342,-1,342,-1,-1,-1,-1,342,-1,-1,-1,-1,342,342,-1,-1,-1,342,342,-1,-1,-1,-1,342}), new Table(52,37,-1,new short[]
-{343,-1,343,343,-1,-1,-1,-1,-1,-1,-1,343,-1,343,-1,343,-1,-1,-1,-1,343,-1,-1,-1,-1,343,343,-1,-1,-1,343,343,-1,-1,-1,-1,343}), new Table(52,37,-1,new short[]
-{344,-1,344,344,-1,-1,-1,-1,-1,-1,-1,344,-1,344,-1,344,-1,-1,-1,-1,344,-1,-1,-1,-1,344,344,-1,-1,-1,344,344,-1,-1,-1,-1,344}), new Table(52,37,-1,new short[]
-{332,-1,332,332,-1,-1,-1,-1,-1,-1,-1,332,-1,332,-1,332,-1,-1,-1,-1,332,-1,-1,-1,-1,332,332,-1,-1,-1,332,332,-1,-1,-1,-1,332}), new Table(52,12,-1,new short[]
-{332,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,332}),};int NextState(){if(code==ScanBuff.EndOfFile)return eofNum;else unchecked{int rslt;int idx=Map(code)-NxS[state].min;
-if(idx<0)idx+=69;if((uint)idx>=(uint)NxS[state].rng)rslt=NxS[state].dflt;else rslt=NxS[state].nxt[idx];return rslt;}}
+-1,70,-1,-1,-1,-1,-1,-1,-1,70}), new Table(57,1,329,new short[]{72}), new Table(24,46,330,new short[]{-1,330,330,-1,330,330,-1,330,330,330,330,330,330,
+330,330,330,330,330,330,330,330,330,330,330,330,330,330,331,330,330,330,330,330,73,330,330,330,330,330,330,330,330,330,330,-1,-1}), new Table(68,2,330,
+new short[]{-1,-1}), new Table(48,1,-1,new short[]{74}), new Table(52,33,332,new short[]{335,336,332,332,337,332,332,332,332,332,332,335,332,332,332,332,
+-1,-1,332,332,332,332,332,332,332,332,332,332,332,332,332,332,334}), new Table(48,41,-1,new short[]{74,-1,-1,-1,342,-1,342,342,-1,-1,-1,-1,-1,-1,-1,342,
+-1,342,-1,342,-1,-1,-1,-1,342,-1,-1,-1,-1,342,342,-1,-1,-1,342,342,-1,-1,-1,-1,342}), new Table(48,16,-1,new short[]{74,-1,-1,-1,345,-1,-1,-1,-1,-1,-1,
+-1,-1,-1,-1,345}), new Table(48,41,-1,new short[]{74,-1,-1,-1,344,-1,344,344,-1,-1,-1,-1,-1,-1,-1,344,-1,344,-1,344,-1,-1,-1,-1,344,-1,-1,-1,-1,344,344,
+-1,-1,-1,344,344,-1,-1,-1,-1,344}), new Table(48,41,-1,new short[]{74,-1,-1,-1,338,-1,338,338,-1,-1,-1,-1,-1,-1,-1,338,-1,338,-1,338,-1,-1,-1,-1,338,-1,
+-1,-1,-1,338,338,-1,-1,-1,338,338,-1,-1,-1,-1,338}), new Table(52,37,-1,new short[]{339,-1,339,339,-1,-1,-1,-1,-1,-1,-1,339,-1,339,-1,339,-1,-1,-1,-1,
+339,-1,-1,-1,-1,339,339,-1,-1,-1,339,339,-1,-1,-1,-1,339}), new Table(52,37,-1,new short[]{340,-1,340,340,-1,-1,-1,-1,-1,-1,-1,340,-1,340,-1,340,-1,-1,
+-1,-1,340,-1,-1,-1,-1,340,340,-1,-1,-1,340,340,-1,-1,-1,-1,340}), new Table(52,37,-1,new short[]{341,-1,341,341,-1,-1,-1,-1,-1,-1,-1,341,-1,341,-1,341,
+-1,-1,-1,-1,341,-1,-1,-1,-1,341,341,-1,-1,-1,341,341,-1,-1,-1,-1,341}), new Table(52,37,-1,new short[]{342,-1,342,342,-1,-1,-1,-1,-1,-1,-1,342,-1,342,
+-1,342,-1,-1,-1,-1,342,-1,-1,-1,-1,342,342,-1,-1,-1,342,342,-1,-1,-1,-1,342}), new Table(52,37,-1,new short[]{343,-1,343,343,-1,-1,-1,-1,-1,-1,-1,343,
+-1,343,-1,343,-1,-1,-1,-1,343,-1,-1,-1,-1,343,343,-1,-1,-1,343,343,-1,-1,-1,-1,343}), new Table(52,37,-1,new short[]{344,-1,344,344,-1,-1,-1,-1,-1,-1,
+-1,344,-1,344,-1,344,-1,-1,-1,-1,344,-1,-1,-1,-1,344,344,-1,-1,-1,344,344,-1,-1,-1,-1,344}), new Table(52,37,-1,new short[]{332,-1,332,332,-1,-1,-1,-1,
+-1,-1,-1,332,-1,332,-1,332,-1,-1,-1,-1,332,-1,-1,-1,-1,332,332,-1,-1,-1,332,332,-1,-1,-1,-1,332}), new Table(52,12,-1,new short[]{332,-1,-1,-1,-1,-1,-1,
+-1,-1,-1,-1,332}),};int NextState(){if(code==ScanBuff.EndOfFile)return eofNum;else unchecked{int rslt;int idx=Map(code)-NxS[state].min;if(idx<0)idx+=69;
+if((uint)idx>=(uint)NxS[state].rng)rslt=NxS[state].dflt;else rslt=NxS[state].nxt[idx];return rslt;}}
 #endregion
 #if BACKUP
  struct Context{public int bPos;public int rPos; public int cCol;public int lNum; public int state;public int cChr;}private Context ctx=new Context();
@@ -1696,28 +1696,28 @@ return 398;break;case 72: UpdatePosition(yytext);return 424;break;case 73: Updat
 break;case 78: UpdatePosition(yytext);return 435;break;case 79: UpdatePosition(yytext);return 439;break;case 80: UpdatePosition(yytext);return 438;break;
 case 81: UpdatePosition(yytext);return 445;break;case 82: UpdatePosition(yytext);return 448;break;case 83: UpdatePosition(yytext);return 447;break;case
  84: UpdatePosition(yytext);return 432;break;case 85: UpdatePosition(yytext);return 450;break;case 86: UpdatePosition(yytext);return 451;break;case 87:
- UpdatePosition(yytext);return 433;break;case 88: UpdatePosition(yytext);return 461;break;case 89: UpdatePosition(yytext);return 479;break;case 90: UpdatePosition(yytext);
-return 441;break;case 91: UpdatePosition(yytext);return 480;break;case 92: if(!_TryReadUntilBlockEnd("*/")){UpdatePosition(yytext);return-1;}UpdatePosition(yytext);
-return 481;break;case 93: UpdatePosition(yytext);return 443;break;case 100: UpdatePosition(yytext);return 408;break;case 103: UpdatePosition(yytext);return
- 420;break;case 108: UpdatePosition(yytext);return 475;break;case 109: UpdatePosition(yytext);return 469;break;case 116: UpdatePosition(yytext);return
- 404;break;case 118: UpdatePosition(yytext);return 467;break;case 119: UpdatePosition(yytext);return 489;break;case 126: UpdatePosition(yytext);return
- 492;break;case 131: UpdatePosition(yytext);return 484;break;case 137: UpdatePosition(yytext);return 493;break;case 143: UpdatePosition(yytext);return
- 494;break;case 146: UpdatePosition(yytext);return 417;break;case 152: UpdatePosition(yytext);return 418;break;case 156: UpdatePosition(yytext);return
- 397;break;case 159: UpdatePosition(yytext);return 414;break;case 161: UpdatePosition(yytext);return 416;break;case 166: UpdatePosition(yytext);return
- 412;break;case 168: UpdatePosition(yytext);return 423;break;case 170: UpdatePosition(yytext);return 406;break;case 178: UpdatePosition(yytext);return
- 498;break;case 184: UpdatePosition(yytext);return 482;break;case 191: UpdatePosition(yytext);return 401;break;case 192: UpdatePosition(yytext);return
- 473;break;case 195: UpdatePosition(yytext);return 422;break;case 197: UpdatePosition(yytext);return 470;break;case 204: UpdatePosition(yytext);return
- 411;break;case 209: UpdatePosition(yytext);return 496;break;case 213: UpdatePosition(yytext);return 487;break;case 215: UpdatePosition(yytext);return
- 405;break;case 216: UpdatePosition(yytext);return 490;break;case 219: UpdatePosition(yytext);return 413;break;case 224: UpdatePosition(yytext);return
- 421;break;case 231: UpdatePosition(yytext);return 396;break;case 232: UpdatePosition(yytext);return 403;break;case 239: UpdatePosition(yytext);return
- 485;break;case 242: UpdatePosition(yytext);return 474;break;case 245: UpdatePosition(yytext);return 499;break;case 247: UpdatePosition(yytext);return
- 407;break;case 253: UpdatePosition(yytext);return 409;break;case 259: UpdatePosition(yytext);return 402;break;case 263: UpdatePosition(yytext);return
- 410;break;case 265: UpdatePosition(yytext);return 466;break;case 266: UpdatePosition(yytext);return 415;break;case 273: UpdatePosition(yytext);return
- 488;break;case 275: UpdatePosition(yytext);return 495;break;case 279: UpdatePosition(yytext);return 477;break;case 284: UpdatePosition(yytext);return
- 497;break;case 286: UpdatePosition(yytext);return 483;break;case 290: UpdatePosition(yytext);return 399;break;case 294: UpdatePosition(yytext);return
- 419;break;case 300: UpdatePosition(yytext);return 500;break;case 303: UpdatePosition(yytext);return 400;break;case 306: UpdatePosition(yytext);return
- 472;break;case 311: UpdatePosition(yytext);return 468;break;case 313: UpdatePosition(yytext);return 486;break;case 316: UpdatePosition(yytext);return
- 491;break;case 321: UpdatePosition(yytext);return 471;break;case 323: UpdatePosition(yytext);return 501;break;default:break;}
+ UpdatePosition(yytext);return 433;break;case 88: UpdatePosition(yytext);return 461;break;case 89: UpdatePosition(yytext);break;case 90: UpdatePosition(yytext);
+return 441;break;case 91: UpdatePosition(yytext);break;case 92: if(!_TryReadUntilBlockEnd("*/")){UpdatePosition(yytext);return-1;}UpdatePosition(yytext);
+break;case 93: UpdatePosition(yytext);return 443;break;case 100: UpdatePosition(yytext);return 408;break;case 103: UpdatePosition(yytext);return 420;break;
+case 108: UpdatePosition(yytext);return 475;break;case 109: UpdatePosition(yytext);return 469;break;case 116: UpdatePosition(yytext);return 404;break;
+case 118: UpdatePosition(yytext);return 467;break;case 119: UpdatePosition(yytext);return 489;break;case 126: UpdatePosition(yytext);return 492;break;
+case 131: UpdatePosition(yytext);return 484;break;case 137: UpdatePosition(yytext);return 493;break;case 143: UpdatePosition(yytext);return 494;break;
+case 146: UpdatePosition(yytext);return 417;break;case 152: UpdatePosition(yytext);return 418;break;case 156: UpdatePosition(yytext);return 397;break;
+case 159: UpdatePosition(yytext);return 414;break;case 161: UpdatePosition(yytext);return 416;break;case 166: UpdatePosition(yytext);return 412;break;
+case 168: UpdatePosition(yytext);return 423;break;case 170: UpdatePosition(yytext);return 406;break;case 178: UpdatePosition(yytext);return 498;break;
+case 184: UpdatePosition(yytext);return 482;break;case 191: UpdatePosition(yytext);return 401;break;case 192: UpdatePosition(yytext);return 473;break;
+case 195: UpdatePosition(yytext);return 422;break;case 197: UpdatePosition(yytext);return 470;break;case 204: UpdatePosition(yytext);return 411;break;
+case 209: UpdatePosition(yytext);return 496;break;case 213: UpdatePosition(yytext);return 487;break;case 215: UpdatePosition(yytext);return 405;break;
+case 216: UpdatePosition(yytext);return 490;break;case 219: UpdatePosition(yytext);return 413;break;case 224: UpdatePosition(yytext);return 421;break;
+case 231: UpdatePosition(yytext);return 396;break;case 232: UpdatePosition(yytext);return 403;break;case 239: UpdatePosition(yytext);return 485;break;
+case 242: UpdatePosition(yytext);return 474;break;case 245: UpdatePosition(yytext);return 499;break;case 247: UpdatePosition(yytext);return 407;break;
+case 253: UpdatePosition(yytext);return 409;break;case 259: UpdatePosition(yytext);return 402;break;case 263: UpdatePosition(yytext);return 410;break;
+case 265: UpdatePosition(yytext);return 466;break;case 266: UpdatePosition(yytext);return 415;break;case 273: UpdatePosition(yytext);return 488;break;
+case 275: UpdatePosition(yytext);return 495;break;case 279: UpdatePosition(yytext);return 477;break;case 284: UpdatePosition(yytext);return 497;break;
+case 286: UpdatePosition(yytext);return 483;break;case 290: UpdatePosition(yytext);return 399;break;case 294: UpdatePosition(yytext);return 419;break;
+case 300: UpdatePosition(yytext);return 500;break;case 303: UpdatePosition(yytext);return 400;break;case 306: UpdatePosition(yytext);return 472;break;
+case 311: UpdatePosition(yytext);return 468;break;case 313: UpdatePosition(yytext);return 486;break;case 316: UpdatePosition(yytext);return 491;break;
+case 321: UpdatePosition(yytext);return 471;break;case 323: UpdatePosition(yytext);return 501;break;default:break;}
 #pragma warning restore 162, 1522
 #endregion
 }}}

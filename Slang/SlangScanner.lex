@@ -185,9 +185,9 @@
 "partial" 	{ UpdatePosition(yytext); return 484; }
 "void" 	{ UpdatePosition(yytext); return 483; }
 "assembly" 	{ UpdatePosition(yytext); return 482; }
-"/*" 	{ if(!_TryReadUntilBlockEnd("*/")) { UpdatePosition(yytext); return -1; } UpdatePosition(yytext); return 481; }
-(\/\/[^\r\n]*)+ 	{ UpdatePosition(yytext); return 480; }
-#[A-Za-z]+[\t ]*[^\r\n]* 	{ UpdatePosition(yytext); return 479; }
+"/*" 	{ if(!_TryReadUntilBlockEnd("*/")) { UpdatePosition(yytext); return -1; } UpdatePosition(yytext);  }
+(\/\/[^\r\n]*)+ 	{ UpdatePosition(yytext);  }
+#[A-Za-z]+[\t ]*[^\r\n]* 	{ UpdatePosition(yytext);  }
 ":" 	{ UpdatePosition(yytext); return 478; }
 "var" 	{ UpdatePosition(yytext); return 477; }
 ";" 	{ UpdatePosition(yytext); return 476; }
@@ -239,7 +239,7 @@
 "<=" 	{ UpdatePosition(yytext); return 428; }
 [\u0027]([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})[\u0027] 	{ UpdatePosition(yytext); return 427; }
 \"([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*\" 	{ UpdatePosition(yytext); return 426; }
-@\"([^\"|\"\"])*\" 	{ UpdatePosition(yytext); return 424; }
+@\"([^\"]|\"\")*\" 	{ UpdatePosition(yytext); return 424; }
 "base" 	{ UpdatePosition(yytext); return 423; }
 "this" 	{ UpdatePosition(yytext); return 422; }
 "null" 	{ UpdatePosition(yytext); return 421; }

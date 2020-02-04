@@ -82,7 +82,7 @@ namespace CD
 				}
 			}
 			result.Clear(); // new scope
-			foreach (CodeStatement tt in cmp.GetStatements)
+			foreach (CodeStatement tt in cmp.SetStatements)
 			{
 				var r = _TraceStatement(tt, t, out found);
 				result.AddRange(r);

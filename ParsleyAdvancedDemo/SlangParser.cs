@@ -14205,46 +14205,27 @@ namespace CD {
             throw new SyntaxException("Expecting TypeAttributesListPart", line, column, position);
         }
     }
-    ///  <summary>
-    ///  
-    ///  </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal class SyntaxException : Exception {
         private int _line;
         private int _column;
         private long _position;
-        ///  <summary>
-        ///  Creates a syntax exception with the specified arguments
-        ///  </summary>
-        ///  <param name="message">The error message</param>
-        ///  <param name="line">The line where the error occurred</param>
-        ///  <param name="column">The column where the error occured</param>
-        ///  <param name="position">The position where the error occured</param>
         public SyntaxException(string message, int line, int column, long position) : 
                 base(SyntaxException._GetMessage(message, line, column, position)) {
             this._line = line;
             this._column = column;
             this._position = position;
         }
-        ///  <summary>
-        ///  The line where the error occurred
-        ///  </summary>
         public int Line {
             get {
                 return this._line;
             }
         }
-        ///  <summary>
-        ///  The column where the error occurred
-        ///  </summary>
         public int Column {
             get {
                 return this._column;
             }
         }
-        ///  <summary>
-        ///  The position where the error occurred
-        ///  </summary>
         public long Position {
             get {
                 return this._position;
@@ -14508,10 +14489,6 @@ namespace CD {
             this._state = -3;
         }
     }
-    ///  <summary>
-    ///  An enumerator that provides lookahead without advancing the cursor
-    ///  </summary>
-    ///  <typeparam name="T">The type to enumerate</typeparam>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal class LookAheadEnumerator<T> : object, IEnumerator<T>
      {
@@ -14521,16 +14498,11 @@ namespace CD {
         private const int _Disposed = -3;
         private IEnumerator<T> _inner;
         private int _state;
-        //  for the lookahead queue
         private const int _DefaultCapacity = 16;
         private const float _GrowthFactor = 0.9F;
         private T[] _queue;
         private int _queueHead;
         private int _queueCount;
-        ///  <summary>
-        ///  Creates a new instance. Once this is created, the inner/wrapped enumerator must not be touched.
-        ///  </summary>
-        ///  <param name="inner"></param>
         public LookAheadEnumerator(IEnumerator<T> inner) {
             this._inner = inner;
             this._state = LookAheadEnumerator<T>._NotStarted;
@@ -14538,9 +14510,6 @@ namespace CD {
             this._queueHead = 0;
             this._queueCount = 0;
         }
-        ///  <summary>
-        ///  Discards the lookahead and advances the cursor to the physical position.
-        ///  </summary>
         public void DiscardLookAhead() {
             for (
             ; (1 < this._queueCount); 
@@ -14548,9 +14517,6 @@ namespace CD {
                 this._Dequeue();
             }
         }
-        ///  <summary>
-        ///  Retrieves the value under the cursor
-        ///  </summary>
         public T Current {
             get {
                 if ((0 > this._state)) {
@@ -14565,7 +14531,6 @@ namespace CD {
                 return this._queue[this._queueHead];
             }
         }
-        //  legacy enum support (required)
         object System.Collections.IEnumerator.Current {
             get {
                 return this.Current;
@@ -14576,12 +14541,6 @@ namespace CD {
                 return this._queueCount;
             }
         }
-        ///  <summary>
-        ///  Attempts to peek the specified number of positions from the current position without advancing
-        ///  </summary>
-        ///  <param name="lookahead">The offset from the current position to peek at</param>
-        ///  <param name="value">The value returned</param>
-        ///  <returns>True if the peek could be satisfied, otherwise false</returns>
         public bool TryPeek(int lookahead, out T value) {
             if ((LookAheadEnumerator<T>._Disposed == this._state)) {
                 throw new ObjectDisposedException(typeof(LookAheadEnumerator<T>).Name);
@@ -14616,11 +14575,6 @@ namespace CD {
             }
             return (-1 == lookahead);
         }
-        ///  <summary>
-        ///  Peek the specified number of positions from the current position without advancing
-        ///  </summary>
-        ///  <param name="lookahead">The offset from the current position to peek at</param>
-        ///  <returns>The value at the specified position</returns>
         public T Peek(int lookahead) {
             T value;
             if ((false == this.TryPeek(lookahead, out value))) {
@@ -14638,9 +14592,6 @@ namespace CD {
                 return (LookAheadEnumerator<T>._Ended == this._state);
             }
         }
-        ///  <summary>
-        ///  Retrieves a lookahead cursor from the current cursor that can be navigated without moving the main cursor
-        ///  </summary>
         public IEnumerable<T> LookAhead {
             get {
                 if ((0 > this._state)) {
@@ -14655,10 +14606,6 @@ namespace CD {
                 return new LookAheadEnumeratorEnumerable<T>(this);
             }
         }
-        ///  <summary>
-        ///  Advances the cursor
-        ///  </summary>
-        ///  <returns>True if more input was read, otherwise false</returns>
         bool System.Collections.IEnumerator.MoveNext() {
             if ((0 > this._state)) {
                 if ((LookAheadEnumerator<T>._Disposed == this._state)) {
@@ -14691,9 +14638,6 @@ namespace CD {
             }
             return true;
         }
-        ///  <summary>
-        ///  Resets the cursor, and clears the queue.
-        ///  </summary>
         void System.Collections.IEnumerator.Reset() {
             this._inner.Reset();
             if (((0 < this._queueCount) 
@@ -14709,10 +14653,6 @@ namespace CD {
             this._queueCount = 0;
             this._state = LookAheadEnumerator<T>._NotStarted;
         }
-        #region IDisposable Support
-        ///  <summary>
-        ///  Disposes of this instance
-        ///  </summary>
         void System.IDisposable.Dispose() {
             if ((false 
                         == (LookAheadEnumerator<T>._Disposed == this._state))) {
@@ -14758,7 +14698,6 @@ namespace CD {
             this._queueCount = (this._queueCount - 1);
             return result;
         }
-        #endregion
     }
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal class LookAheadEnumeratorEnumerable<T> : object, IEnumerable<T>

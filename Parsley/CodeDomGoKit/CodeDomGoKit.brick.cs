@@ -1356,15 +1356,20 @@ _ToArray(td.CustomAttributes),_ToArray(td.StartDirectives),_ToArray(td.EndDirect
  _GetInstanceData(tm);var tp=value as CodeTypeParameter;if(null!=tp){ if(!tp.HasConstructorConstraint&&0==tp.Constraints.Count&&0==tp.CustomAttributes.Count)
 {return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(string)}),new object[]{tp.Name});}return new KeyValuePair<MemberInfo,
 object[]>(typeof(CodeDomBuilder).GetMethod("TypeParameter"),new object[]{tp.Name,tp.HasConstructorConstraint,_ToArray(tp.Constraints),_ToArray(tp.CustomAttributes)
-});}var cc=value as CodeCatchClause;if(null!=cc){return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(string),
-typeof(CodeTypeReference),typeof(CodeStatement[])}),new object[]{cc.LocalName,cc.CatchExceptionType,cc.Statements});}var rd=value as CodeRegionDirective;
-if(null!=rd){return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(CodeRegionMode),typeof(string)}),new object[]
-{rd.RegionMode,rd.RegionText});}var cp=value as CodeChecksumPragma;if(null!=cp){return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new
- Type[]{typeof(string),typeof(Guid),typeof(byte[])}),new object[]{cp.FileName,cp.ChecksumAlgorithmId,cp.ChecksumData});}var lp=value as CodeLinePragma;
-if(null!=lp){return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(string),typeof(int)}),new object[]{lp.FileName,lp.LineNumber
-});}var cm=value as CodeComment;if(null!=cm){return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(string),typeof(bool)
-}),new object[]{cm.Text,cm.DocComment});}Guid g;if(value is Guid){g=(Guid)value;return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new
- Type[]{typeof(string)}),new object[]{g.ToString()});}throw new NotSupportedException("Unsupported type of code object. Could not retrieve the instance data.");
+});}var cad=value as CodeAttributeDeclaration;if(null!=cad){if(null!=cad.AttributeType){return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new
+ Type[]{typeof(CodeTypeReference),typeof(CodeAttributeArgument[])}),new object[]{cad.AttributeType,_ToArray(cad.Arguments)});}else{return new KeyValuePair<MemberInfo,
+object[]>(value.GetType().GetConstructor(new Type[]{typeof(string),typeof(CodeAttributeArgument[])}),new object[]{cad.Name,_ToArray(cad.Arguments)});}
+}var caa=value as CodeAttributeArgument;if(null!=caa){if(string.IsNullOrEmpty(caa.Name)){return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new
+ Type[]{typeof(CodeExpression)}),new object[]{caa.Value});}else{return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]
+{typeof(string),typeof(CodeExpression)}),new object[]{caa.Name,caa.Value});}}var cc=value as CodeCatchClause;if(null!=cc){return new KeyValuePair<MemberInfo,
+object[]>(value.GetType().GetConstructor(new Type[]{typeof(string),typeof(CodeTypeReference),typeof(CodeStatement[])}),new object[]{cc.LocalName,cc.CatchExceptionType,
+_ToArray(cc.Statements)});}var rd=value as CodeRegionDirective;if(null!=rd){return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new
+ Type[]{typeof(CodeRegionMode),typeof(string)}),new object[]{rd.RegionMode,rd.RegionText});}var cp=value as CodeChecksumPragma;if(null!=cp){return new
+ KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(string),typeof(Guid),typeof(byte[])}),new object[]{cp.FileName,cp.ChecksumAlgorithmId,cp.ChecksumData});
+}var lp=value as CodeLinePragma;if(null!=lp){return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(string),typeof(int)}),
+new object[]{lp.FileName,lp.LineNumber});}var cm=value as CodeComment;if(null!=cm){return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new
+ Type[]{typeof(string),typeof(bool)}),new object[]{cm.Text,cm.DocComment});}Guid g;if(value is Guid){g=(Guid)value;return new KeyValuePair<MemberInfo,
+object[]>(value.GetType().GetConstructor(new Type[]{typeof(string)}),new object[]{g.ToString()});}throw new NotSupportedException("Unsupported type of code object. Could not retrieve the instance data.");
 }static KeyValuePair<MemberInfo,object[]>_GetInstanceData(CodeTypeMember member){var t=member.GetType();var tc=member as CodeTypeConstructor;if(null!=tc)
 {return new KeyValuePair<MemberInfo,object[]>(typeof(CodeDomBuilder).GetMethod(t.Name.Substring(4)),new object[]{tc.Attributes,_ToArray(tc.Parameters),
 _ToArray(tc.Statements),_ToArray(tc.Comments),_ToArray(tc.CustomAttributes),_ToArray(tc.StartDirectives),_ToArray(tc.EndDirectives),tc.LinePragma});}var
@@ -1428,23 +1433,24 @@ if(null!=t){if(_HasExtraNonsense(t)){return new KeyValuePair<MemberInfo,object[]
  Type[]{typeof(CodeExpression)}),new object[]{t.ToThrow});}var tc=stmt as CodeTryCatchFinallyStatement;if(null!=tc){if(_HasExtraNonsense(tc)){return new
  KeyValuePair<MemberInfo,object[]>(typeof(CodeDomBuilder).GetMethod(stmt.GetType().Name.Substring(4)),new object[]{_ToArray(tc.TryStatements),_ToArray(tc.CatchClauses),_ToArray(tc.FinallyStatements),
 _ToArray(a.StartDirectives),_ToArray(a.EndDirectives),a.LinePragma});}return new KeyValuePair<MemberInfo,object[]>(stmt.GetType().GetConstructor(new Type[]
-{typeof(string),typeof(CodeStatement)}),new object[]{l.Label,l.Statement});}var v=stmt as CodeVariableDeclarationStatement;if(null!=v){if(_HasExtraNonsense(v))
-{return new KeyValuePair<MemberInfo,object[]>(typeof(CodeDomBuilder).GetMethod(stmt.GetType().Name.Substring(4)),new object[]{v.Type,v.Name,v.InitExpression,
-_ToArray(a.StartDirectives),_ToArray(a.EndDirectives),a.LinePragma});}return new KeyValuePair<MemberInfo,object[]>(stmt.GetType().GetConstructor(new Type[]
-{typeof(CodeTypeReference),typeof(string),typeof(CodeExpression)}),new object[]{v.Type,v.Name,v.InitExpression});}throw new NotSupportedException("The statement instance data could not be serialized.");
-}static bool _HasExtraNonsense(CodeStatement stmt){return(null!=stmt.LinePragma||0<stmt.StartDirectives.Count||0<stmt.EndDirectives.Count);}static KeyValuePair<MemberInfo,object[]>
-_GetInstanceData(CodeExpression value){var ar=value as CodeArgumentReferenceExpression;if(null!=ar)return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new
- Type[]{typeof(string)}),new object[]{ar.ParameterName});var ac=value as CodeArrayCreateExpression;if(null!=ac){if(null!=ac.Initializers&&0<ac.Initializers.Count)
-{return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(CodeTypeReference),typeof(CodeExpression[])}),new object[]
-{ac.CreateType,_ToArray(ac.Initializers)});}else if(null!=ac.SizeExpression){return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new
- Type[]{typeof(CodeTypeReference),typeof(CodeExpression)}),new object[]{ac.CreateType,ac.SizeExpression});}else return new KeyValuePair<MemberInfo,object[]>(
-value.GetType().GetConstructor(new Type[]{typeof(CodeTypeReference),typeof(int)}),new object[]{ac.CreateType,ac.Size});}var ai=value as CodeArrayIndexerExpression;
-if(null!=ai)return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(CodeExpression),typeof(CodeExpression[])}),new
- object[]{ai.TargetObject,_ToArray(ai.Indices)});var br=value as CodeBaseReferenceExpression;if(null!=br)return new KeyValuePair<MemberInfo,object[]>(
-value.GetType().GetConstructor(new Type[]{}),new object[]{});var bo=value as CodeBinaryOperatorExpression;if(null!=bo)return new KeyValuePair<MemberInfo,
-object[]>(value.GetType().GetConstructor(new Type[]{typeof(CodeExpression),typeof(CodeBinaryOperatorType),typeof(CodeExpression)}),new object[]{bo.Left,bo.Operator,bo.Right
-});var c=value as CodeCastExpression;if(null!=c)return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(CodeTypeReference),typeof(CodeExpression)}),
-new object[]{c.TargetType,c.Expression});var dv=value as CodeDefaultValueExpression;if(null!=dv)return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new
+{typeof(CodeStatement[]),typeof(CodeCatchClause[]),typeof(CodeStatement[])}),new object[]{_ToArray(tc.TryStatements),_ToArray(tc.CatchClauses),_ToArray(tc.FinallyStatements)});
+}var v=stmt as CodeVariableDeclarationStatement;if(null!=v){if(_HasExtraNonsense(v)){return new KeyValuePair<MemberInfo,object[]>(typeof(CodeDomBuilder).GetMethod(stmt.GetType().Name.Substring(4)),
+new object[]{v.Type,v.Name,v.InitExpression,_ToArray(a.StartDirectives),_ToArray(a.EndDirectives),a.LinePragma});}return new KeyValuePair<MemberInfo,object[]>(
+stmt.GetType().GetConstructor(new Type[]{typeof(CodeTypeReference),typeof(string),typeof(CodeExpression)}),new object[]{v.Type,v.Name,v.InitExpression
+});}throw new NotSupportedException("The statement instance data could not be serialized.");}static bool _HasExtraNonsense(CodeStatement stmt){return(null
+!=stmt.LinePragma||0<stmt.StartDirectives.Count||0<stmt.EndDirectives.Count);}static KeyValuePair<MemberInfo,object[]>_GetInstanceData(CodeExpression value)
+{var ar=value as CodeArgumentReferenceExpression;if(null!=ar)return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(string)
+}),new object[]{ar.ParameterName});var ac=value as CodeArrayCreateExpression;if(null!=ac){if(null!=ac.Initializers&&0<ac.Initializers.Count){return new
+ KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(CodeTypeReference),typeof(CodeExpression[])}),new object[]{ac.CreateType,
+_ToArray(ac.Initializers)});}else if(null!=ac.SizeExpression){return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(CodeTypeReference),
+typeof(CodeExpression)}),new object[]{ac.CreateType,ac.SizeExpression});}else return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new
+ Type[]{typeof(CodeTypeReference),typeof(int)}),new object[]{ac.CreateType,ac.Size});}var ai=value as CodeArrayIndexerExpression;if(null!=ai)return new
+ KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(CodeExpression),typeof(CodeExpression[])}),new object[]{ai.TargetObject,_ToArray(ai.Indices)
+});var br=value as CodeBaseReferenceExpression;if(null!=br)return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{}),new
+ object[]{});var bo=value as CodeBinaryOperatorExpression;if(null!=bo)return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]
+{typeof(CodeExpression),typeof(CodeBinaryOperatorType),typeof(CodeExpression)}),new object[]{bo.Left,bo.Operator,bo.Right});var c=value as CodeCastExpression;
+if(null!=c)return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(CodeTypeReference),typeof(CodeExpression)}),new
+ object[]{c.TargetType,c.Expression});var dv=value as CodeDefaultValueExpression;if(null!=dv)return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new
  Type[]{typeof(CodeTypeReference)}),new object[]{dv.Type});var dc=value as CodeDelegateCreateExpression;if(null!=dc)return new KeyValuePair<MemberInfo,
 object[]>(value.GetType().GetConstructor(new Type[]{typeof(CodeTypeReference),typeof(CodeExpression),typeof(string)}),new object[]{dc.DelegateType,dc.TargetObject,dc.MethodName
 });var di=value as CodeDelegateInvokeExpression;if(null!=di)return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(CodeExpression),typeof(CodeExpression[])
@@ -1471,7 +1477,8 @@ value.GetType().GetConstructor(new Type[]{typeof(object)}),new object[]{p.Value}
  Type[]{typeof(CodeTypeReference)}),new object[]{to.Type});var tr=value as CodeTypeReferenceExpression;if(null!=tr)return new KeyValuePair<MemberInfo,
 object[]>(value.GetType().GetConstructor(new Type[]{typeof(CodeTypeReference)}),new object[]{tr.Type});var vr=value as CodeVariableReferenceExpression;
 if(null!=vr)return new KeyValuePair<MemberInfo,object[]>(value.GetType().GetConstructor(new Type[]{typeof(string)}),new object[]{vr.VariableName});throw
- new NotSupportedException("Unsupported code type. Cannot convert to instance data.");}static CodeExpression[]_ToArray(CodeExpressionCollection exprs)
+ new NotSupportedException("Unsupported code type. Cannot convert to instance data.");}static CodeAttributeArgument[]_ToArray(CodeAttributeArgumentCollection
+ args){var result=new CodeAttributeArgument[args.Count];args.CopyTo(result,0);return result;}static CodeExpression[]_ToArray(CodeExpressionCollection exprs)
 {var result=new CodeExpression[exprs.Count];exprs.CopyTo(result,0);return result;}static CodeCatchClause[]_ToArray(CodeCatchClauseCollection ccs){var result
 =new CodeCatchClause[ccs.Count];ccs.CopyTo(result,0);return result;}static CodeStatement[]_ToArray(CodeStatementCollection stmts){var result=new CodeStatement[stmts.Count];
 stmts.CopyTo(result,0);return result;}static CodeAttributeDeclaration[]_ToArray(CodeAttributeDeclarationCollection attrs){var result=new CodeAttributeDeclaration[attrs.Count];
@@ -2395,7 +2402,7 @@ _TraceMember(CodeTypeMember m,CodeStatement t,out bool found){var result=new Lis
 (null!=cmm){foreach(CodeStatement tt in cmm.Statements){Debug.WriteLine(CodeDomUtility.ToString(tt));var r=_TraceStatement(tt,t,out found);result.AddRange(r);
 if(found){return result;}}found=false;return new CodeVariableDeclarationStatement[0];}var cmp=m as CodeMemberProperty;if(null!=cmp){foreach(CodeStatement
  tt in cmp.GetStatements){var r=_TraceStatement(tt,t,out found);result.AddRange(r);if(found){return result;}}}result.Clear(); foreach(CodeStatement tt
- in cmp.GetStatements){var r=_TraceStatement(tt,t,out found);result.AddRange(r);if(found){return result;}}found=false;return new CodeVariableDeclarationStatement[0];
+ in cmp.SetStatements){var r=_TraceStatement(tt,t,out found);result.AddRange(r);if(found){return result;}}found=false;return new CodeVariableDeclarationStatement[0];
 }static IList<CodeVariableDeclarationStatement>_TraceStatement(CodeStatement obj,CodeStatement target,out bool found){var ca=obj as CodeAssignStatement;
 if(null!=ca){return _TraceAssignStatement(ca,target,out found);}var cae=obj as CodeAttachEventStatement;if(null!=cae){return _TraceAttachEventStatement(cae,
 target,out found);}var cc=obj as CodeCommentStatement;if(null!=cc){return _TraceCommentStatement(cc,target,out found);}var ccnd=obj as CodeConditionStatement;

@@ -32,6 +32,7 @@ namespace Deslang
 			string codenamespace = null;
 			string codelanguage = null;
 			string t4language = null;
+			bool noserialize = false;
 			bool ifstale = false;
 			bool mutable = false;
 			TextReader input = null;
@@ -113,6 +114,9 @@ namespace Deslang
 							case "/mutable":
 								mutable = true;
 								break;
+							case "/noserialize":
+								noserialize = true;
+								break;
 							default:
 								throw new ArgumentException(string.Format("Unknown switch {0}", args[i]));
 						}
@@ -191,74 +195,144 @@ namespace Deslang
 					// now our unpatched input is in ccus
 					SlangPatcher.Patch(ccus);
 					var co = SlangPatcher.GetNextUnresolvedElement(ccus);
+					int l = 0, c = 0;
+					long p = 0L;
+
 					if (null != co)
-						Console.Error.WriteLine("Warning - input was not entirely resolved. Output may not be valid. Next unresolved element is: " + CodeDomUtility.ToString(co));
-					// now they're patched. Let's serialize.
-					// create our namespace and compileunit.
-					var ns = new CodeNamespace();
-					if (string.IsNullOrEmpty(codeclass))
-						codeclass = "Deslanged";
-					var cls = new CodeTypeDeclaration(codeclass);
-					cls.IsClass = true;
-					cls.IsPartial = true;
-					cls.TypeAttributes = TypeAttributes.NotPublic;
-					for (var i = 0; i < ccus.Length; i++)
 					{
-						var ccuInit = C.Literal(ccus[i], new CodeDomTypeConverter());
-						V.Visit(ccuInit, (ctx) => {
-							var tr = ctx.Target as CodeTypeReference;
-							if(null!=tr)
-							{
-								if (tr.BaseType.StartsWith("System.CodeDom."))
-									tr.BaseType = tr.BaseType.Substring(15);
-								else if(tr.BaseType.StartsWith("System.Reflection."))
-									tr.BaseType = tr.BaseType.Substring(18);
-							}
-							// look for our uses of codedombuilder
-							var mi = ctx.Target as CodeMethodInvokeExpression;
-							if (null != mi)
-							{
-								var tref = mi.Method.TargetObject as CodeTypeReferenceExpression;
-								if (null != tref)
-								{
-									if (0 == string.Compare("CD.CodeDomBuilder", tref.Type.BaseType, StringComparison.InvariantCulture))
-									{
-										mi.Method.TargetObject = C.TypeRef(codeclass);
-										// find the method in our donor type;
-										var m = C.GetByName(mi.Method.MethodName, donor.Members);
-										if (null != m) // if it hasn't already been moved
-										{
-											// move it 
-											m.Name = "_" + m.Name;
-											m.Attributes = (m.Attributes & ~MemberAttributes.AccessMask) | MemberAttributes.Private;
-											donor.Members.Remove(m);
-											cls.Members.Add(m);
-										}
-										mi.Method.MethodName = "_" + mi.Method.MethodName;
-									}
-								}
-							}
-						});
-						var name = Path.GetFileNameWithoutExtension(inputs[i]);
-						if (mutable)
-						{
-							var fld = C.Field(typeof(CodeCompileUnit), name, MemberAttributes.Public | MemberAttributes.Static, ccuInit);
-							cls.Members.Add(fld);
-						} else
-						{
-							var prop = C.Property(typeof(CodeCompileUnit), name, MemberAttributes.Public | MemberAttributes.Static);
-							prop.GetStatements.Add(C.Return(ccuInit));
-							cls.Members.Add(prop);
-						}
+						Console.Error.Write("Warning - input was not entirely resolved. Output may not be valid. Next unresolved element is: " + CodeDomUtility.ToString(co));
+						var o = co.UserData["slang:line"];
+						if (o is int)
+							l = (int)o;
+						o = co.UserData["slang:column"];
+						if (o is int)
+							c = (int)o;
+						o = co.UserData["slang:position"];
+						if (o is long)
+							p = (long)o;
 					}
-					if (!string.IsNullOrEmpty(codenamespace))
-						ns.Name = codenamespace;
-					ns.Types.Add(cls);
-					ns.Imports.Add(new CodeNamespaceImport("System.CodeDom"));
-					ns.Imports.Add(new CodeNamespaceImport("System.Reflection"));
+					if (l + c + p > 0)
+					{
+						Console.Error.WriteLine(" at line {0}, column {1}, position {2}", l, c, p);
+					}
+					else
+						Console.Error.WriteLine();
+					var ns = new CodeNamespace();
 					var ccuFinal = new CodeCompileUnit();
 					ccuFinal.Namespaces.Add(ns);
-					
+					if (!noserialize)
+					{
+						// now they're patched. Let's serialize.
+						// create our namespace and compileunit.
+						
+						if (string.IsNullOrEmpty(codeclass))
+							codeclass = "Deslanged";
+						var cls = new CodeTypeDeclaration(codeclass);
+						cls.IsClass = true;
+						cls.IsPartial = true;
+						cls.TypeAttributes = TypeAttributes.NotPublic;
+						for (var i = 0; i < ccus.Length; i++)
+						{
+							var ccuInit = C.Literal(ccus[i], new CodeDomTypeConverter());
+							V.Visit(ccuInit, (ctx) =>
+							{
+								var tr = ctx.Target as CodeTypeReference;
+								if (null != tr)
+								{
+									if (tr.BaseType.StartsWith("System.CodeDom."))
+										tr.BaseType = tr.BaseType.Substring(15);
+									else if (tr.BaseType.StartsWith("System.Reflection."))
+										tr.BaseType = tr.BaseType.Substring(18);
+								}
+								// look for our uses of codedombuilder
+								var mi = ctx.Target as CodeMethodInvokeExpression;
+								if (null != mi)
+								{
+									var tref = mi.Method.TargetObject as CodeTypeReferenceExpression;
+									if (null != tref)
+									{
+										if (0 == string.Compare("CD.CodeDomBuilder", tref.Type.BaseType, StringComparison.InvariantCulture))
+										{
+											mi.Method.TargetObject = C.TypeRef(codeclass);
+											// find the method in our donor type;
+											var m = C.GetByName(mi.Method.MethodName, donor.Members);
+											if (null != m) // if it hasn't already been moved
+											{
+												// move it 
+												m.Name = "_" + m.Name;
+												m.Attributes = (m.Attributes & ~MemberAttributes.AccessMask) | MemberAttributes.Private;
+												donor.Members.Remove(m);
+												cls.Members.Add(m);
+											}
+											mi.Method.MethodName = "_" + mi.Method.MethodName;
+										}
+									}
+								}
+							});
+							var name = Path.GetFileNameWithoutExtension(inputs[i]);
+							if (mutable)
+							{
+								var fld = C.Field(typeof(CodeCompileUnit), name, MemberAttributes.Public | MemberAttributes.Static, ccuInit);
+								cls.Members.Add(fld);
+							}
+							else
+							{
+								var prop = C.Property(typeof(CodeCompileUnit), name, MemberAttributes.Public | MemberAttributes.Static);
+								prop.GetStatements.Add(C.Return(ccuInit));
+								cls.Members.Add(prop);
+							}
+						}
+						if (!string.IsNullOrEmpty(codenamespace))
+							ns.Name = codenamespace;
+						ns.Types.Add(cls);
+						ns.Imports.Add(new CodeNamespaceImport("System.CodeDom"));
+						ns.Imports.Add(new CodeNamespaceImport("System.Reflection"));
+						
+					} else
+					{
+						foreach(var ccu in ccus)
+						{
+							foreach (CodeDirective dir in ccu.StartDirectives)
+								ccuFinal.StartDirectives.Add(dir);
+							foreach (CodeDirective dir in ccu.EndDirectives)
+								ccuFinal.EndDirectives.Add(dir);
+							foreach (CodeAttributeDeclaration attr in ccu.AssemblyCustomAttributes)
+								ccuFinal.AssemblyCustomAttributes.Add(attr);
+							foreach(CodeNamespace cns in ccu.Namespaces)
+							{
+								var ccns = CodeDomUtility.GetByName(cns.Name, ccuFinal.Namespaces);
+								if (null == ccns)
+								{
+									ccns = new CodeNamespace();
+									ccns.Name = cns.Name;
+									ccuFinal.Namespaces.Add(ccns);
+								}
+								foreach(CodeNamespaceImport nsi in cns.Imports)
+								{
+									var found = false;
+									foreach(CodeNamespaceImport nnsi in ccns.Imports)
+									{
+										if(nnsi.Namespace.Equals(nsi.Namespace,StringComparison.Ordinal))
+										{
+											found = true;
+											break;
+										}
+									}
+									if(!found)
+									{
+										ccns.Imports.Add(nsi);
+									}
+								}
+								foreach (CodeCommentStatement ccs in cns.Comments)
+									ccns.Comments.Add(ccs);
+								foreach(CodeTypeDeclaration td in cns.Types)
+								{
+									ccns.Types.Add(td);
+								}
+							}
+						}
+						
+					}
 					// we're ready with ccuFinal
 					var prov = CodeDomProvider.CreateProvider(codelanguage);
 					var opts = new CodeGeneratorOptions();

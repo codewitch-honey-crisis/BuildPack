@@ -13,114 +13,46 @@ namespace ParsleyDemo {
     using System.Collections.Generic;
     using System.Text;
     
-    ///  <summary>
-    ///  Reference implementation for generated shared code
-    ///  </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal struct Token {
-        ///  <summary>
-        ///  Indicates the line where the token occurs
-        ///  </summary>
         public int Line;
-        ///  <summary>
-        ///  Indicates the column where the token occurs
-        ///  </summary>
         public int Column;
-        ///  <summary>
-        ///  Indicates the position where the token occurs
-        ///  </summary>
         public long Position;
-        ///  <summary>
-        ///  Indicates the symbol id or -1 for the error symbol
-        ///  </summary>
         public int SymbolId;
-        ///  <summary>
-        ///  Indicates the value of the token
-        ///  </summary>
         public string Value;
-        ///  <summary>
-        ///  Always null in Rolex
-        ///  </summary>
         public Token[] Skipped;
     }
-    ///  <summary>
-    ///  Reference implementation for a DfaEntry
-    ///  </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal struct DfaEntry {
-        ///  <summary>
-        ///  The state transitions
-        ///  </summary>
         public DfaTransitionEntry[] Transitions;
-        ///  <summary>
-        ///  The accept symbol id or -1 for non-accepting
-        ///  </summary>
         public int AcceptSymbolId;
-        ///  <summary>
-        ///  Constructs a new instance
-        ///  </summary>
-        ///  <param name="transitions">The state transitions</param>
-        ///  <param name="acceptSymbolId">The accept symbol id</param>
         public DfaEntry(DfaTransitionEntry[] transitions, int acceptSymbolId) {
             this.Transitions = transitions;
             this.AcceptSymbolId = acceptSymbolId;
         }
     }
-    ///  <summary>
-    ///  The state transition entry
-    ///  </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal struct DfaTransitionEntry {
-        ///  <summary>
-        ///  The character ranges, packed as adjacent pairs.
-        ///  </summary>
         public char[] PackedRanges;
-        ///  <summary>
-        ///  The destination state
-        ///  </summary>
         public int Destination;
-        ///  <summary>
-        ///  Constructs a new instance
-        ///  </summary>
-        ///  <param name="packedRanges">The packed character ranges</param>
-        ///  <param name="destination">The destination state</param>
         public DfaTransitionEntry(char[] packedRanges, int destination) {
             this.PackedRanges = packedRanges;
             this.Destination = destination;
         }
     }
-    ///  <summary>
-    ///  Reference Implementation for generated shared code
-    ///  </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal class TableTokenizer : object, IEnumerable<Token> {
         public const int ErrorSymbol = -1;
-        //  our state table
         private DfaEntry[] _dfaTable;
-        //  our block ends (specified like comment<blockEnd="*/">="/*" in a rolex spec file)
         private string[] _blockEnds;
-        //  our node flags. Currently only used for the hidden attribute
         private int[] _nodeFlags;
-        //  the input cursor. We can get this from a string, a char array, or some other source.
         private IEnumerable<char> _input;
-        ///  <summary>
-        ///  Retrieves an enumerator that can be used to iterate over the tokens
-        ///  </summary>
-        ///  <returns>An enumerator that can be used to iterate over the tokens</returns>
         public IEnumerator<Token> GetEnumerator() {
             return new TableTokenizerEnumerator(this._dfaTable, this._blockEnds, this._nodeFlags, this._input.GetEnumerator());
         }
-        //  legacy collection support (required)
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
             return this.GetEnumerator();
         }
-        ///  <summary>
-        ///  Constructs a new instance
-        ///  </summary>
-        ///  <param name="dfaTable">The DFA state table to use</param>
-        ///  <param name="blockEnds">The block ends table</param>
-        ///  <param name="nodeFlags">The node flags table</param>
-        ///  <param name="input">The input character sequence</param>
         public TableTokenizer(DfaEntry[] dfaTable, string[] blockEnds, int[] nodeFlags, IEnumerable<char> input) {
             if ((null == dfaTable)) {
                 throw new ArgumentNullException("dfaTable");
@@ -142,41 +74,23 @@ namespace ParsleyDemo {
     }
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal class TableTokenizerEnumerator : object, IEnumerator<Token> {
-        //  our error symbol. Always -1
         public const int ErrorSymbol = -1;
-        //  our end of stream symbol - returned by _Lex() and used internally but not reported
         private const int _EosSymbol = -2;
-        //  our disposed state indicator
         private const int _Disposed = -4;
-        //  the state indicates the cursor is before the beginning (initial state)
         private const int _BeforeBegin = -3;
-        //  the state indicates the cursor is after the end
         private const int _AfterEnd = -2;
-        //  the state indicates that the inner input enumeration has finished (we still have one more token to report)
         private const int _InnerFinished = -1;
-        //  indicates we're currently enumerating. We spend most of our time and effort in this state
         private const int _Enumerating = 0;
-        //  indicates the tab width, used for updating the Column property when we encounter a tab
         private const int _TabWidth = 4;
-        //  the DFA state table to use.
         private DfaEntry[] _dfaTable;
-        //  the blockEnds to use
         private string[] _blockEnds;
-        //  the nodeFlags to use
         private int[] _nodeFlags;
-        //  the input cursor
         private IEnumerator<char> _input;
-        //  our state 
         private int _state;
-        //  the current token
         private Token _current;
-        //  a buffer used primarily by _Lex() to capture matched input
         private StringBuilder _buffer;
-        //  the one based line
         private int _line;
-        //  the one based column
         private int _column;
-        //  the zero based position
         private long _position;
         public TableTokenizerEnumerator(DfaEntry[] dfaTable, string[] blockEnds, int[] nodeFlags, IEnumerator<char> input) {
             this._dfaTable = dfaTable;
@@ -277,7 +191,6 @@ namespace ParsleyDemo {
             this._input.Dispose();
             this._state = TableTokenizerEnumerator._Disposed;
         }
-        //  moves to the next position, updates the state accordingly, and tracks the cursor position
         bool _MoveNextInput() {
             if (this._input.MoveNext()) {
                 if ((false 
@@ -313,7 +226,6 @@ namespace ParsleyDemo {
             this._state = TableTokenizerEnumerator._InnerFinished;
             return false;
         }
-        //  reads until the specified character, consuming it, returning false if it wasn't found
         bool _TryReadUntil(char character) {
             char ch = this._input.Current;
             this._buffer.Append(ch);
@@ -334,7 +246,6 @@ namespace ParsleyDemo {
             }
             return false;
         }
-        //  reads until the string is encountered, capturing it.
         bool _TryReadUntilBlockEnd(string blockEnd) {
             for (
             ; ((false 
@@ -363,7 +274,6 @@ namespace ParsleyDemo {
             }
             return false;
         }
-        //  lex the next token
         int _Lex() {
             int acceptSymbolId;
             int dfaState = 0;

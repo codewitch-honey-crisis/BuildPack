@@ -124,13 +124,44 @@ namespace CD
 					typeof(CodeDomBuilder).GetMethod("TypeParameter"),
 					new object[] { tp.Name,tp.HasConstructorConstraint,_ToArray(tp.Constraints),_ToArray(tp.CustomAttributes) });
 			}
+			var cad = value as CodeAttributeDeclaration;
+			if (null != cad)
+			{
+				if (null != cad.AttributeType)
+				{
+					
+					return new KeyValuePair<MemberInfo, object[]>(
+					value.GetType().GetConstructor(new Type[] { typeof(CodeTypeReference), typeof(CodeAttributeArgument[]) }),
+					new object[] { cad.AttributeType, _ToArray(cad.Arguments)});
+				} else
+				{
+					return new KeyValuePair<MemberInfo, object[]>(
+					value.GetType().GetConstructor(new Type[] { typeof(string), typeof(CodeAttributeArgument[]) }),
+					new object[] { cad.Name, _ToArray(cad.Arguments) });
+				}
+			}
+			var caa = value as CodeAttributeArgument;
+			if(null!=caa)
+			{
+				if(string.IsNullOrEmpty(caa.Name))
+				{
+					return new KeyValuePair<MemberInfo, object[]>(
+					value.GetType().GetConstructor(new Type[] { typeof(CodeExpression)}),
+					new object[] { caa.Value});
+				} else
+				{
+					return new KeyValuePair<MemberInfo, object[]>(
+					value.GetType().GetConstructor(new Type[] {typeof(string), typeof(CodeExpression) }),
+					new object[] { caa.Name, caa.Value });
+				}
+			}
 			var cc = value as CodeCatchClause;
 			if(null!=cc)
 			{
 
 				return new KeyValuePair<MemberInfo, object[]>(
 					value.GetType().GetConstructor(new Type[] { typeof(string), typeof(CodeTypeReference), typeof(CodeStatement[]) }),
-					new object[] { cc.LocalName, cc.CatchExceptionType, cc.Statements });
+					new object[] { cc.LocalName, cc.CatchExceptionType, _ToArray(cc.Statements) });
 			}
 			var rd = value as CodeRegionDirective;
 			if(null!=rd)
@@ -160,6 +191,7 @@ namespace CD
 					value.GetType().GetConstructor(new Type[] { typeof(string), typeof(bool) }),
 					new object[] { cm.Text, cm.DocComment});
 			}
+			
 			Guid g;
 			if(value is Guid)
 			{
@@ -475,8 +507,8 @@ namespace CD
 						new object[] { _ToArray(tc.TryStatements), _ToArray(tc.CatchClauses),_ToArray(tc.FinallyStatements), _ToArray(a.StartDirectives), _ToArray(a.EndDirectives), a.LinePragma });
 				}
 				return new KeyValuePair<MemberInfo, object[]>(
-					stmt.GetType().GetConstructor(new Type[] { typeof(string), typeof(CodeStatement) }),
-					new object[] { l.Label, l.Statement });
+					stmt.GetType().GetConstructor(new Type[] { typeof(CodeStatement[]),typeof(CodeCatchClause[]), typeof(CodeStatement[]) }),
+					new object[] { _ToArray(tc.TryStatements), _ToArray(tc.CatchClauses),_ToArray(tc.FinallyStatements)});
 			}
 			var v = stmt as CodeVariableDeclarationStatement;
 			if (null != v)
@@ -649,6 +681,12 @@ namespace CD
 					new object[] { vr.VariableName });
 
 			throw new NotSupportedException("Unsupported code type. Cannot convert to instance data.");
+		}
+		static CodeAttributeArgument[] _ToArray(CodeAttributeArgumentCollection args)
+		{
+			var result = new CodeAttributeArgument[args.Count];
+			args.CopyTo(result, 0);
+			return result;
 		}
 		static CodeExpression[] _ToArray(CodeExpressionCollection exprs)
 		{

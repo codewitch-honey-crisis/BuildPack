@@ -42,8 +42,9 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Slang.brick.cs" />
     <Compile Include="CodeDomGoKit.brick.cs" />
+    <Compile Include="Slang.brick.cs" />
+    <Content Include="GplexBuffers.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Shared\CodeDomBuilder.cs" />
@@ -51,6 +52,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Test\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

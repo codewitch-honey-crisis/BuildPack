@@ -44,6 +44,12 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="GPLEXcopyright.rtf" />
+    <None Include="SpecFiles\GenerateAll.bat" />
+    <None Include="SpecFiles\gplex.lex" />
+    <None Include="SpecFiles\gplex.y" />
+    <None Include="SpecFiles\gplexx.frame" />
+    <None Include="SpecFiles\guesser.frame" />
+    <None Include="SpecFiles\Guesser.lex" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GPLEX\AAST.cs" />
@@ -73,6 +79,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="ShiftReduceParser\ShiftReduceParserCode.cs" />
+    <None Include="SpecFiles\GenerateResource.cs" />
+    <None Include="SpecFiles\LookaheadHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="IncludeResources\Content.resx">
@@ -85,6 +93,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="SpecFiles\GplexBuffers.txt" />
+    <Content Include="SpecFiles\ResourceHeader.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>

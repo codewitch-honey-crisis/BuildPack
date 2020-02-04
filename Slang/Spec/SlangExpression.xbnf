@@ -121,7 +121,7 @@ boolLiteral = 'true|false';
 nullLiteral = "null";
 thisRef = "this";
 baseRef = "base";
-verbatimStringLiteral='@"([^"|""])*"';
+verbatimStringLiteral='@"([^"]|"")*"';
 // bury this
 identifier<priority=-100>='(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*';
 stringLiteral='"([^\\"\'\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*"';

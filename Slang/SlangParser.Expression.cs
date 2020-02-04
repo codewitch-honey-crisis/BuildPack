@@ -498,7 +498,7 @@ namespace Slang
 			var ctr = new CodeTypeReference(te, 1).Mark(te);
 			// if above doesn't work try setting ctr to just te
 			if(ST.lbracket==pc.SymbolId)
-				ctr= _ParseTypeArraySpec(pc, ctr);
+				ctr= _ParseTypeArraySpec(pc, ctr.ArrayElementType);
 			var ace = new CodeArrayCreateExpression(ctr).Mark(l,c,p);
 			if (!hasSize)
 			{

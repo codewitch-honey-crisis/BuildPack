@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  DESKTOP-EC2OMEU
-//  DateTime: 1/19/2020 3:30:06 AM
+//  DateTime: 2/1/2020 4:40:44 PM
 //  UserName: honey
-//  GPLEX input file <C:\Users\honey\source\repos\BuildPack\Slang\SlangScanner.lex - 1/19/2020 3:30:05 AM>
+//  GPLEX input file <C:\Users\honey\Source\Repos\BuildPack\Slang\SlangScanner.lex - 2/1/2020 4:40:44 PM>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: unicode, verbose, noParser, stack, minimize
@@ -2018,7 +2018,8 @@ public const int TabWidth = 4;
           -1, 71, 71, 71, 71, 71, 71, 71, 71, 71, -1, -1, 71, 71, 71, 71, 
           71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 71, 
           71, -1, -1, -1, -1, 71}),
-/* NxS[  72] */ new Table(0, 0, -1, null), // Shortest string "@\"\""
+/* NxS[  72] */ // Shortest string "@\"\""
+      new Table(57, 1, -1, new short[] {329}),
 /* NxS[  73] */ new Table(0, 0, -1, null), // Shortest string "\"\""
 /* NxS[  74] */ new Table(0, 0, -1, null), // Shortest string "'w'"
 /* NxS[  75] */ new Table(0, 0, -1, null), // Shortest string "<="
@@ -3212,8 +3213,7 @@ public const int TabWidth = 4;
       new Table(52, 12, -1, new short[] {70, -1, -1, 70, -1, -1, 
           -1, -1, -1, -1, -1, 70}),
 /* NxS[ 329] */ // Shortest string "@\""
-      new Table(40, 18, 329, new short[] {-1, 329, 329, 329, 329, 329, 
-          329, 329, 329, 329, 329, 329, 329, 329, 329, 329, 329, 72}),
+      new Table(57, 1, 329, new short[] {72}),
 /* NxS[ 330] */ // Shortest string "\"w"
       new Table(24, 46, 330, new short[] {-1, 330, 330, -1, 330, 330, 
           -1, 330, 330, 330, 330, 330, 330, 330, 330, 330, 330, 330, 330, 330, 330, 330, 
@@ -4010,7 +4010,7 @@ UpdatePosition(yytext); return 464;
         case 71: // Recognized '@(_|[[:IsLetter:]])(_|[[:IsLetterOrDigit:]])*',	Shortest string "@w"
 UpdatePosition(yytext); return 398;
             break;
-        case 72: // Recognized '@\"([^\"|\"\"])*\"',	Shortest string "@\"\""
+        case 72: // Recognized '@\"([^\"]|\"\")*\"',	Shortest string "@\"\""
 UpdatePosition(yytext); return 424;
             break;
         case 73: // Recognized '\"([^\\\"\a\b\f\n\r\t\v\0]|\\[^\r\n]|\\[0-7]{3}|\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*\"',	Shortest string "\"\""
@@ -4062,16 +4062,16 @@ UpdatePosition(yytext); return 433;
 UpdatePosition(yytext); return 461;
             break;
         case 89: // Recognized '#[A-Za-z]+[\t ]*[^\r\n]*',	Shortest string "#w"
-UpdatePosition(yytext); return 479;
+UpdatePosition(yytext);
             break;
         case 90: // Recognized '"*="',	Shortest string "*="
 UpdatePosition(yytext); return 441;
             break;
         case 91: // Recognized '(\/\/[^\r\n]*)+',	Shortest string "//"
-UpdatePosition(yytext); return 480;
+UpdatePosition(yytext);
             break;
         case 92: // Recognized '"/*"',	Shortest string "/*"
-if(!_TryReadUntilBlockEnd("*/")) { UpdatePosition(yytext); return -1; } UpdatePosition(yytext); return 481;
+if(!_TryReadUntilBlockEnd("*/")) { UpdatePosition(yytext); return -1; } UpdatePosition(yytext);
             break;
         case 93: // Recognized '"/="',	Shortest string "/="
 UpdatePosition(yytext); return 443;

@@ -13,64 +13,25 @@ namespace RolexDemo {
     using System.Collections.Generic;
     using System.Text;
     
-    ///  <summary>
-    ///  Reference implementation for generated shared code
-    ///  </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal struct Token {
-        ///  <summary>
-        ///  Indicates the line where the token occurs
-        ///  </summary>
         public int Line;
-        ///  <summary>
-        ///  Indicates the column where the token occurs
-        ///  </summary>
         public int Column;
-        ///  <summary>
-        ///  Indicates the position where the token occurs
-        ///  </summary>
         public long Position;
-        ///  <summary>
-        ///  Indicates the symbol id or -1 for the error symbol
-        ///  </summary>
         public int SymbolId;
-        ///  <summary>
-        ///  Indicates the value of the token
-        ///  </summary>
         public string Value;
-        ///  <summary>
-        ///  Always null in Rolex
-        ///  </summary>
         public Token[] Skipped;
     }
-    ///  <summary>
-    ///  Reference Implementation for generated shared code
-    ///  </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal abstract class CompiledTokenizer : IEnumerable<Token> {
-        //  the input cursor. We can get this from a string, a char array, or some other source.
         protected IEnumerable<char> Input;
-        //  just create our table tokenizer's enumerator, passing all of the relevant stuff
-        //  it's the real workhorse.
-        ///  <summary>
-        ///  Retrieves an enumerator that can be used to iterate over the tokens
-        ///  </summary>
-        ///  <returns>An enumerator that can be used to iterate over the tokens</returns>
         public abstract IEnumerator<Token> GetEnumerator();
-        //  we have to implement this explicitly for language independence because Slang
-        //  will not set PublicImplementationTypes on public methods which some languages
-        //  require
         IEnumerator<Token> IEnumerable<Token>.GetEnumerator() {
             return this.GetEnumerator();
         }
-        //  legacy collection support (required)
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
             return this.GetEnumerator();
         }
-        ///  <summary>
-        ///  Constructs a new instance
-        ///  </summary>
-        ///  <param name="input">The input character sequence</param>
         public CompiledTokenizer(IEnumerable<char> input) {
             if ((null == input)) {
                 throw new ArgumentNullException("input");
@@ -80,35 +41,20 @@ namespace RolexDemo {
     }
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Rolex", "0.2.0.0")]
     internal abstract class CompiledTokenizerEnumerator : IEnumerator<Token> {
-        //  our error symbol. Always -1
         public const int ErrorSymbol = -1;
-        //  our end of stream symbol - returned by Lex() and used internally but not reported
         protected const int EosSymbol = -2;
-        //  our disposed state indicator
         protected const int Disposed = -4;
-        //  the state indicates the cursor is before the beginning (initial state)
         protected const int BeforeBegin = -3;
-        //  the state indicates the cursor is after the end
         protected const int AfterEnd = -2;
-        //  the state indicates that the inner input enumeration has finished (we still have one more token to report)
         protected const int InnerFinished = -1;
-        //  indicates we're currently enumerating. We spend most of our time and effort in this state
         protected const int Enumerating = 0;
-        //  indicates the tab width, used for updating the Column property when we encounter a tab
         private const int _TabWidth = 4;
-        //  the input cursor
         private IEnumerator<char> _input;
-        //  our state 
         protected int State;
-        //  the current token
         private Token _current;
-        //  a buffer used primarily by Lex() to capture matched input
         protected StringBuilder ValueBuffer;
-        //  the one based line
         private int _line;
-        //  the one based column
         private int _column;
-        //  the zero based position
         private long _position;
         protected CompiledTokenizerEnumerator(IEnumerator<char> input) {
             this._input = input;
@@ -210,7 +156,6 @@ namespace RolexDemo {
             this._input.Dispose();
             this.State = CompiledTokenizerEnumerator.Disposed;
         }
-        //  moves to the next position, updates the state accordingly, and tracks the cursor position
         protected virtual bool MoveNextInput() {
             if (this._input.MoveNext()) {
                 if ((false 
@@ -246,7 +191,6 @@ namespace RolexDemo {
             this.State = CompiledTokenizerEnumerator.InnerFinished;
             return false;
         }
-        //  reads until the specified character, consuming it, returning false if it wasn't found
         bool _TryReadUntil(char character) {
             char ch = this._input.Current;
             this.ValueBuffer.Append(ch);
@@ -267,7 +211,6 @@ namespace RolexDemo {
             }
             return false;
         }
-        //  reads until the string is encountered, capturing it.
         bool _TryReadUntilBlockEnd(string blockEnd) {
             for (
             ; ((false 
@@ -296,7 +239,6 @@ namespace RolexDemo {
             }
             return false;
         }
-        //  lex the next token
         protected abstract int Lex();
         static void _ThrowDisposed() {
             throw new ObjectDisposedException("CompiledTokenizerEnumerator");
