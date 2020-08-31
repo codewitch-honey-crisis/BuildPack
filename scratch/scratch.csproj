@@ -70,15 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="expr\Expression.log">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Expression.xbnf</DependentUpon>
-    </None>
-    <None Include="expr\Expression.xbnf">
-      <Generator>Parsley</Generator>
-      <LastGenOutput>Expression.log</LastGenOutput>
-    </None>
+    <None Include="expr\Expression.xbnf" />
     <None Include="expr\ExpressionTokenizer.log">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -89,15 +81,7 @@
       <Generator>Rolex</Generator>
       <LastGenOutput>ExpressionTokenizer.log</LastGenOutput>
     </None>
-    <None Include="Slang.log">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Slang.xbnf</DependentUpon>
-    </None>
-    <None Include="Slang.xbnf">
-      <Generator>Parsley</Generator>
-      <LastGenOutput>Slang.log</LastGenOutput>
-    </None>
+    <None Include="Slang.xbnf" />
     <None Include="SlangExpression.xbnf" />
     <Content Include="SlangStatement.xbnf" />
     <None Include="SlangScanner.lex">

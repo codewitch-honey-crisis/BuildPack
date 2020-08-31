@@ -34,6 +34,32 @@ namespace Slang
 			pc.SetLocation(line, column, position);
 			return _ParseExpression(pc);
 		}
+
+		public static CodeTypeReference ParseType(string text)
+		{
+			var tokenizer = new SlangTokenizer(text);
+			return ParseType(tokenizer);
+		}
+		public static CodeTypeReference ReadTypeFrom(Stream stream)
+		{
+			var tokenizer = new SlangTokenizer(stream);
+			return ParseType(tokenizer);
+		}
+		public static CodeTypeReference ParseType(string text, int line, int column, long position)
+		{
+			var tokenizer = new SlangTokenizer(text);
+			var pc = new _PC(tokenizer);
+			pc.SetLocation(line, column, position);
+			return _ParseType(pc);
+		}
+		public static CodeTypeReference ReadTypeFrom(Stream stream, int line, int column, long position)
+		{
+			var tokenizer = new SlangTokenizer(stream);
+			var pc = new _PC(tokenizer);
+			pc.SetLocation(line, column, position);
+			return _ParseType(pc);
+		}
+
 		internal static CodeExpression ParseExpression(IEnumerable<Token> tokenizer)
 		{
 			var pc = new _PC(tokenizer);
@@ -91,7 +117,7 @@ namespace Slang
 				default:
 					return lhs;
 			}
-			return new CodeBinaryOperatorExpression(lhs,CodeBinaryOperatorType.Assign,new CodeBinaryOperatorExpression(lhs, op, _ParseOrExpression(pc)).Mark(l, c, p)).Mark(l,c,p,unresolved);
+			return new CodeBinaryOperatorExpression(lhs,CodeBinaryOperatorType.Assign,new CodeBinaryOperatorExpression(lhs, op, _ParseAssignExpression(pc)).Mark(l, c, p)).Mark(l,c,p,unresolved);
 		}
 		static CodeExpression _ParseBitwiseOrExpression(_PC pc)
 		{
@@ -109,7 +135,7 @@ namespace Slang
 				default:
 					return lhs;
 			}
-			return new CodeBinaryOperatorExpression(lhs, op, _ParseBitwiseAndExpression(pc)).Mark(l, c, p);
+			return new CodeBinaryOperatorExpression(lhs, op, _ParseBitwiseOrExpression(pc)).Mark(l, c, p);
 		}
 		static CodeExpression _ParseAndExpression(_PC pc)
 		{
@@ -127,7 +153,7 @@ namespace Slang
 				default:
 					return lhs;
 			}
-			return new CodeBinaryOperatorExpression(lhs, op, _ParseBitwiseOrExpression(pc)).Mark(l, c, p);
+			return new CodeBinaryOperatorExpression(lhs, op, _ParseBitwiseAndExpression(pc)).Mark(l, c, p);
 		}
 		static CodeExpression _ParseOrExpression(_PC pc)
 		{
@@ -145,7 +171,7 @@ namespace Slang
 				default:
 					return lhs;
 			}
-			return new CodeBinaryOperatorExpression(lhs, op, _ParseAndExpression(pc)).Mark(l, c, p);
+			return new CodeBinaryOperatorExpression(lhs, op, _ParseOrExpression(pc)).Mark(l, c, p);
 		}
 		static CodeExpression _ParseBitwiseAndExpression(_PC pc)
 		{
@@ -163,7 +189,7 @@ namespace Slang
 				default:
 					return lhs;
 			}
-			return new CodeBinaryOperatorExpression(lhs, op, _ParseEqualityExpression(pc)).Mark(l, c, p);
+			return new CodeBinaryOperatorExpression(lhs, op, _ParseBitwiseAndExpression(pc)).Mark(l, c, p);
 		}
 		static CodeExpression _ParseEqualityExpression(_PC pc)
 		{
@@ -185,7 +211,7 @@ namespace Slang
 				default:
 					return lhs;
 			}
-			return new CodeBinaryOperatorExpression(lhs, op, _ParseRelationalExpression(pc)).Mark(l, c, p,true);
+			return new CodeBinaryOperatorExpression(lhs, op, _ParseEqualityExpression(pc)).Mark(l, c, p,true);
 		}
 		static CodeExpression _ParseRelationalExpression(_PC pc)
 		{
@@ -215,7 +241,7 @@ namespace Slang
 				default:
 					return lhs;
 			}
-			return new CodeBinaryOperatorExpression(lhs, op, _ParseTermExpression(pc)).Mark(l, c, p);
+			return new CodeBinaryOperatorExpression(lhs, op, _ParseRelationalExpression(pc)).Mark(l, c, p);
 		}
 		static CodeExpression _ParseTermExpression(_PC pc)
 		{
@@ -237,7 +263,7 @@ namespace Slang
 				default:
 					return lhs;
 			}
-			return new CodeBinaryOperatorExpression(lhs, op, _ParseFactorExpression(pc)).Mark(l, c, p);
+			return new CodeBinaryOperatorExpression(lhs, op, _ParseTermExpression(pc)).Mark(l, c, p);
 		}
 		static CodeExpression _ParseFactorExpression(_PC pc)
 		{
@@ -263,7 +289,7 @@ namespace Slang
 				default:
 					return lhs;
 			}
-			return new CodeBinaryOperatorExpression(lhs, op, _ParseUnaryExpression(pc)).Mark(l, c, p);
+			return new CodeBinaryOperatorExpression(lhs, op, _ParseFactorExpression(pc)).Mark(l, c, p);
 		}
 		static CodeExpression _ParseUnaryExpression(_PC pc)
 		{
@@ -684,7 +710,7 @@ namespace Slang
 					}
 					// use the original context for position info
 					if (isTypeArg)
-						context.Error("Unexpected < found in found in FielRef");
+						context.Error("Unexpected < found in found in field reference");
 				}
 				// otherwise treat it all as a field ref (variable ref really).
 				return new CodeVariableReferenceExpression(_ParseIdentifier(context)).Mark(l, c, p, true);

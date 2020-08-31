@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define NOPATHS
+using System;
 using System.CodeDom;
 using System.Reflection;
 
@@ -91,6 +92,7 @@ namespace CD
 		/// Indicates the path to the object from the root, in C# format
 		/// </summary>
 		public string Path;
+
 		/// <summary>
 		/// Indicates the target of the visit operation
 		/// </summary>
@@ -2279,12 +2281,14 @@ namespace CD
 		}
 		static string _BuildPath(string path,string member,int index)
 		{
+#if !NOPATHS
 			if (string.IsNullOrEmpty(path))
 				path = member;
 			else
 				path = string.Concat(path, ".", member);
 			if (-1 != index)
 				path = string.Concat(path, "[", index.ToString(), "]");
+#endif
 			return path;
 		}
 		/// <summary>

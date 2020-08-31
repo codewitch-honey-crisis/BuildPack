@@ -38,10 +38,27 @@ namespace CD
 		internal IDictionary<string, CodeTypeReference> GetArgumentTypes(CodeDomResolverScope scope)
 		{
 			var result = new Dictionary<string, CodeTypeReference>();
+			var ctor = scope.Member as CodeConstructor;
+			if (null != ctor)
+			{
+				foreach (CodeParameterDeclarationExpression arg in ctor.Parameters)
+					result.Add(arg.Name, arg.Type);
+				return result;
+			}
+			var tctor = scope.Member as CodeTypeConstructor;
+			if (null != tctor)
+			{
+				foreach (CodeParameterDeclarationExpression arg in ctor.Parameters)
+					result.Add(arg.Name, arg.Type);
+				return result;
+			}
 			var meth = scope.Member as CodeMemberMethod;
 			if (null != meth)
+			{
 				foreach (CodeParameterDeclarationExpression arg in meth.Parameters)
 					result.Add(arg.Name, arg.Type);
+				return result;
+			}
 			var prop = scope.Member as CodeMemberProperty;
 			if (null != prop)
 				foreach (CodeParameterDeclarationExpression arg in prop.Parameters)

@@ -54,7 +54,7 @@
     <None Include="Key.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Test\" />
+    <Folder Include="Export\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

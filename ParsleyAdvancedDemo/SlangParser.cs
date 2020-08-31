@@ -13,7 +13,7 @@ namespace CD {
     using System.Text;
     using System.Collections.Generic;
     
-    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\Source\Repos\BuildPack\ParsleyAdvancedDemo\Slang.xbnf</summary>
+    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\source\repos\BuildPack\ParsleyAdvancedDemo\Slang.xbnf</summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal partial class SlangParser {
         internal const int ErrorSymbol = -1;
@@ -158,7 +158,7 @@ namespace CD {
             throw new SyntaxException("Expecting NamespaceNameList", line, column, position);
         }
     }
-    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\Source\Repos\BuildPack\ParsleyAdvancedDemo\SlangExpression.xbnf</summary>
+    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\source\repos\BuildPack\ParsleyAdvancedDemo\SlangExpression.xbnf</summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal partial class ExpressionParser {
         internal const int ErrorSymbol = -1;
@@ -5886,7 +5886,7 @@ namespace CD {
             throw new SyntaxException("Expecting rbrace or Expression", line, column, position);
         }
     }
-    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\Source\Repos\BuildPack\ParsleyAdvancedDemo\SlangStatement.xbnf</summary>
+    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\source\repos\BuildPack\ParsleyAdvancedDemo\SlangStatement.xbnf</summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal partial class StatementParser {
         internal const int ErrorSymbol = -1;
@@ -9740,7 +9740,7 @@ namespace CD {
             throw new SyntaxException("Expecting FinallyClause or CatchClauseList", line, column, position);
         }
     }
-    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\Source\Repos\BuildPack\ParsleyAdvancedDemo\SlangType.xbnf</summary>
+    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\source\repos\BuildPack\ParsleyAdvancedDemo\SlangType.xbnf</summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal partial class TypeDeclParser {
         internal const int ErrorSymbol = -1;

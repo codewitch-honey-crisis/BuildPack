@@ -1,3 +1,4 @@
+#define NOPATHS
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -494,21 +495,21 @@ _scope);var td=t as CodeTypeDeclaration;if(null!=td){return GetField(td,name,fla
 if(null!=fld)return fld;}}}}return null;}CodeMemberField _GetField(CodeTypeDeclaration type,string name,BindingFlags flags){for(int ic=type.Members.Count,
 i=0;i<ic;++i){var member=type.Members[i];var fld=member as CodeMemberField;if(null!=fld){if(0==string.Compare(fld.Name,name,StringComparison.InvariantCulture))
 {if(HasBindingFlag(flags,BindingFlags.NonPublic)&&MemberAttributes.Public!=(fld.Attributes&MemberAttributes.AccessMask)||(HasBindingFlag(flags,BindingFlags.Public)
-&&MemberAttributes.Public==(fld.Attributes&MemberAttributes.AccessMask))){if(HasBindingFlag(flags,BindingFlags.Static)&&MemberAttributes.Static==(fld.Attributes
-&MemberAttributes.ScopeMask)||MemberAttributes.Const==(fld.Attributes&MemberAttributes.ScopeMask)||(HasBindingFlag(flags,BindingFlags.Instance)&&MemberAttributes.Static
-!=(fld.Attributes&MemberAttributes.ScopeMask)&&MemberAttributes.Const!=(fld.Attributes&MemberAttributes.ScopeMask))){return fld;}}}}}if(!HasBindingFlag(flags,
-BindingFlags.DeclaredOnly)){for(int ic=type.BaseTypes.Count,i=0;i<ic;++i){ var bt=type.BaseTypes[i];var td=_resolver.TryResolveType(bt,_scope)as CodeTypeDeclaration;
-if(null!=td){var fld=_GetField(td,name,flags);if(HasBindingFlag(flags,BindingFlags.FlattenHierarchy)){if((fld.Attributes&MemberAttributes.AccessMask)!=
-MemberAttributes.Private)return fld;}else{if((fld.Attributes&MemberAttributes.ScopeMask)!=MemberAttributes.Static)return fld;}}}}return null;}CodeMemberEvent
- _GetEvent(CodeTypeDeclaration type,string name,BindingFlags flags){for(int ic=type.Members.Count,i=0;i<ic;++i){var member=type.Members[i];var fld=member
- as CodeMemberEvent;if(null!=fld){if(0==string.Compare(fld.Name,name,StringComparison.InvariantCulture)){if(HasBindingFlag(flags,BindingFlags.NonPublic)
-&&MemberAttributes.Public!=(fld.Attributes&MemberAttributes.AccessMask)||(HasBindingFlag(flags,BindingFlags.Public)&&MemberAttributes.Public==(fld.Attributes
-&MemberAttributes.AccessMask))){if(HasBindingFlag(flags,BindingFlags.Static)&&MemberAttributes.Static==(fld.Attributes&MemberAttributes.ScopeMask)||MemberAttributes.Const
-==(fld.Attributes&MemberAttributes.ScopeMask)||(HasBindingFlag(flags,BindingFlags.Instance)&&MemberAttributes.Static!=(fld.Attributes&MemberAttributes.ScopeMask)
-&&MemberAttributes.Const!=(fld.Attributes&MemberAttributes.ScopeMask))){return fld;}}}}}if(!HasBindingFlag(flags,BindingFlags.DeclaredOnly)){for(int ic
-=type.BaseTypes.Count,i=0;i<ic;++i){ var bt=type.BaseTypes[i];var td=_resolver.TryResolveType(bt,_scope)as CodeTypeDeclaration;if(null!=td){var eve=_GetEvent(td,
-name,flags);if(HasBindingFlag(flags,BindingFlags.FlattenHierarchy)){if((eve.Attributes&MemberAttributes.AccessMask)!=MemberAttributes.Private)return eve;
-}else{if((eve.Attributes&MemberAttributes.ScopeMask)!=MemberAttributes.Static)return eve;}}}}return null;}}}namespace CD{using E=CodeTypeReferenceEqualityComparer;
+&&MemberAttributes.Public==(fld.Attributes&MemberAttributes.AccessMask))){if(type.IsEnum||(HasBindingFlag(flags,BindingFlags.Static)&&MemberAttributes.Static
+==(fld.Attributes&MemberAttributes.ScopeMask)||MemberAttributes.Const==(fld.Attributes&MemberAttributes.ScopeMask))||(HasBindingFlag(flags,BindingFlags.Instance)
+&&MemberAttributes.Static!=(fld.Attributes&MemberAttributes.ScopeMask)&&MemberAttributes.Const!=(fld.Attributes&MemberAttributes.ScopeMask))){return fld;
+}}}}}if(!HasBindingFlag(flags,BindingFlags.DeclaredOnly)){for(int ic=type.BaseTypes.Count,i=0;i<ic;++i){ var bt=type.BaseTypes[i];var td=_resolver.TryResolveType(bt,
+_scope)as CodeTypeDeclaration;if(null!=td){var fld=_GetField(td,name,flags);if(HasBindingFlag(flags,BindingFlags.FlattenHierarchy)){if((fld.Attributes
+&MemberAttributes.AccessMask)!=MemberAttributes.Private)return fld;}else{if((fld.Attributes&MemberAttributes.ScopeMask)!=MemberAttributes.Static)return
+ fld;}}}}return null;}CodeMemberEvent _GetEvent(CodeTypeDeclaration type,string name,BindingFlags flags){for(int ic=type.Members.Count,i=0;i<ic;++i){var
+ member=type.Members[i];var fld=member as CodeMemberEvent;if(null!=fld){if(0==string.Compare(fld.Name,name,StringComparison.InvariantCulture)){if(HasBindingFlag(flags,
+BindingFlags.NonPublic)&&MemberAttributes.Public!=(fld.Attributes&MemberAttributes.AccessMask)||(HasBindingFlag(flags,BindingFlags.Public)&&MemberAttributes.Public
+==(fld.Attributes&MemberAttributes.AccessMask))){if(HasBindingFlag(flags,BindingFlags.Static)&&MemberAttributes.Static==(fld.Attributes&MemberAttributes.ScopeMask)
+||MemberAttributes.Const==(fld.Attributes&MemberAttributes.ScopeMask)||(HasBindingFlag(flags,BindingFlags.Instance)&&MemberAttributes.Static!=(fld.Attributes
+&MemberAttributes.ScopeMask)&&MemberAttributes.Const!=(fld.Attributes&MemberAttributes.ScopeMask))){return fld;}}}}}if(!HasBindingFlag(flags,BindingFlags.DeclaredOnly))
+{for(int ic=type.BaseTypes.Count,i=0;i<ic;++i){ var bt=type.BaseTypes[i];var td=_resolver.TryResolveType(bt,_scope)as CodeTypeDeclaration;if(null!=td)
+{var eve=_GetEvent(td,name,flags);if(HasBindingFlag(flags,BindingFlags.FlattenHierarchy)){if((eve.Attributes&MemberAttributes.AccessMask)!=MemberAttributes.Private)
+return eve;}else{if((eve.Attributes&MemberAttributes.ScopeMask)!=MemberAttributes.Static)return eve;}}}}return null;}}}namespace CD{using E=CodeTypeReferenceEqualityComparer;
 using R=CodeDomResolver;partial class CodeDomBinder{/// <summary>
 /// Selects the property that matches the given signature
 /// </summary>
@@ -588,12 +589,12 @@ return csm;}return rsm;}/// <summary>
 public CodeMemberMethod SelectMethod(BindingFlags flags,CodeMemberMethod[]match,CodeTypeReference[]types,ParameterModifier[]modifiers){int i;int j; if
 (match==null||match.Length==0)throw new ArgumentException("The array cannot be null or empty",nameof(match));CodeMemberMethod[]candidates=(CodeMemberMethod[])match.Clone();
  int CurIdx=0;for(i=0;i<candidates.Length;i++){var par=_GetParamInfos(candidates[i].Parameters,_scope);if(par.Length!=types.Length)continue;for(j=0;j<
-types.Length;j++){var pCls=par[j].ParameterType;if(null==par[j].ParameterType)continue;if(E.Equals(pCls,types[j]))continue;if(0==pCls.ArrayRank&&"System.Object"
-==pCls.BaseType)continue;if(R.IsPrimitiveType(pCls)){var type=types[j];if(!R.IsPrimitiveType(type)||!_resolver.CanConvertTo(type,pCls,_scope,true))break;
-}else{if(!_resolver.CanConvertTo(types[j],pCls,_scope,false))break;}}if(j==types.Length)candidates[CurIdx++]=candidates[i];}if(CurIdx==0)return null;if
-(CurIdx==1)return candidates[0]; int currentMin=0;bool ambig=false;int[]paramOrder=new int[types.Length];for(i=0;i<types.Length;i++)paramOrder[i]=i;for
-(i=1;i<CurIdx;i++){int newMin=FindMostSpecificMethod(candidates[currentMin],paramOrder,null,candidates[i],paramOrder,null,types,null);if(newMin==0)ambig
-=true;else{if(newMin==2){currentMin=i;ambig=false;currentMin=i;}}}if(ambig)throw new AmbiguousMatchException("Multiple members matched the target argument types");
+types.Length;j++){var pCls=par[j].ParameterType;if(null==par[j].ParameterType)continue;pCls=_resolver.GetQualifiedType(pCls,_scope);var t=_resolver.GetQualifiedType(types[j],_scope);
+if(E.Equals(pCls,t))continue;if(0==pCls.ArrayRank&&"System.Object"==pCls.BaseType)continue;if(R.IsPrimitiveType(pCls)){var type=types[j];if(!R.IsPrimitiveType(type)
+||!_resolver.CanConvertTo(type,pCls,_scope,true))break;}else{if(!_resolver.CanConvertTo(types[j],pCls,_scope,false))break;}}if(j==types.Length)candidates[CurIdx++]
+=candidates[i];}if(CurIdx==0)return null;if(CurIdx==1)return candidates[0]; int currentMin=0;bool ambig=false;int[]paramOrder=new int[types.Length];for
+(i=0;i<types.Length;i++)paramOrder[i]=i;for(i=1;i<CurIdx;i++){int newMin=FindMostSpecificMethod(candidates[currentMin],paramOrder,null,candidates[i],paramOrder,
+null,types,null);if(newMin==0)ambig=true;else{if(newMin==2){currentMin=i;ambig=false;currentMin=i;}}}if(ambig)throw new AmbiguousMatchException("Multiple members matched the target argument types");
 return candidates[currentMin];}/// <summary>
 /// Selects the property that matches the given signature
 /// </summary>
@@ -724,12 +725,14 @@ public IList<CodeCompileUnit>CompileUnits{get;}=new List<CodeCompileUnit>();/// 
 /// Creates a new CodeDomResolver
 /// </summary>
 public CodeDomResolver(){}internal IDictionary<string,CodeTypeReference>GetArgumentTypes(CodeDomResolverScope scope){var result=new Dictionary<string,
-CodeTypeReference>();var meth=scope.Member as CodeMemberMethod;if(null!=meth)foreach(CodeParameterDeclarationExpression arg in meth.Parameters)result.Add(arg.Name,
-arg.Type);var prop=scope.Member as CodeMemberProperty;if(null!=prop)foreach(CodeParameterDeclarationExpression arg in prop.Parameters)result.Add(arg.Name,
-arg.Type);return result;}internal IDictionary<string,CodeTypeReference>GetVariableTypes(CodeDomResolverScope scope){var result=new Dictionary<string,CodeTypeReference>();
-if(null==scope.Member||null==scope.Statement)return result; foreach(var v in CodeDomVariableTracer.Trace(scope.Member,scope.Statement))result.Add(v.Name,
-v.Type);return result;}static bool _TraceVarDecls(CodeStatement s,CodeStatement target,IDictionary<string,CodeTypeReference>result){ if(s==target)return
- true;var ls=s as CodeLabeledStatement;if(null!=ls){var l=new Dictionary<string,CodeTypeReference>();var v=ls.Statement as CodeVariableDeclarationStatement;
+CodeTypeReference>();var ctor=scope.Member as CodeConstructor;if(null!=ctor){foreach(CodeParameterDeclarationExpression arg in ctor.Parameters)result.Add(arg.Name,
+arg.Type);return result;}var tctor=scope.Member as CodeTypeConstructor;if(null!=tctor){foreach(CodeParameterDeclarationExpression arg in ctor.Parameters)
+result.Add(arg.Name,arg.Type);return result;}var meth=scope.Member as CodeMemberMethod;if(null!=meth){foreach(CodeParameterDeclarationExpression arg in
+ meth.Parameters)result.Add(arg.Name,arg.Type);return result;}var prop=scope.Member as CodeMemberProperty;if(null!=prop)foreach(CodeParameterDeclarationExpression
+ arg in prop.Parameters)result.Add(arg.Name,arg.Type);return result;}internal IDictionary<string,CodeTypeReference>GetVariableTypes(CodeDomResolverScope
+ scope){var result=new Dictionary<string,CodeTypeReference>();if(null==scope.Member||null==scope.Statement)return result; foreach(var v in CodeDomVariableTracer.Trace(scope.Member,scope.Statement))
+result.Add(v.Name,v.Type);return result;}static bool _TraceVarDecls(CodeStatement s,CodeStatement target,IDictionary<string,CodeTypeReference>result){
+ if(s==target)return true;var ls=s as CodeLabeledStatement;if(null!=ls){var l=new Dictionary<string,CodeTypeReference>();var v=ls.Statement as CodeVariableDeclarationStatement;
 if(null!=v)l.Add(v.Name,v.Type);else if(_TraceVarDecls(ls.Statement,target,l)){foreach(var ll in l)result.Add(ll);return true;}}var i=s as CodeIterationStatement;
 if(null!=i){var l=new Dictionary<string,CodeTypeReference>();if(i.InitStatement!=null){var v=i.InitStatement as CodeVariableDeclarationStatement;if(null
 !=v)l.Add(v.Name,v.Type);else if(_TraceVarDecls(i.InitStatement,target,l)){foreach(var ll in l)result.Add(ll);return true;}}foreach(CodeStatement ts in
@@ -1270,20 +1273,20 @@ else throw new InvalidOperationException("The declaring type is not a class, int
 }throw new InvalidOperationException("There was no declaring type in the scope from which to retrieve a this reference");}var fr=expr as CodeFieldReferenceExpression;
 if(null!=fr){var t=GetTypeOfExpression(fr.TargetObject,scope);var tt=_ResolveType(t,scope);if(null==tt)throw new InvalidOperationException("The field reference's target expression type could not be resolved");
 var binder=new CodeDomBinder(scope);var fl=BindingFlags.Public|BindingFlags.NonPublic;var isStatic=(fr.TargetObject as CodeTypeReferenceExpression)!=null;
-if(isStatic)fl|=BindingFlags.Static;else fl|=BindingFlags.Instance;var res=binder.GetField(tt,fr.FieldName,fl);if(null!=res){var mi=res as MemberInfo;
-if(null!=mi)return GetTypeForMember(mi);return GetTypeForMember(res as CodeTypeMember);}throw new InvalidOperationException("A matching field could not be found");
-}var pr=expr as CodePropertyReferenceExpression;if(null!=pr){var t=GetTypeOfExpression(pr.TargetObject,scope);var tt=_ResolveType(t,scope);if(null==tt)
-throw new InvalidOperationException("The property reference's target expression type could not be resolved");var binder=new CodeDomBinder(scope);var fl
-=BindingFlags.Public|BindingFlags.NonPublic;var isStatic=(pr.TargetObject as CodeTypeReferenceExpression)!=null;if(isStatic)fl|=BindingFlags.Static;else
- fl|=BindingFlags.Instance;var res=binder.GetPropertyGroup(tt,pr.PropertyName,fl);if(0<res.Length){var mi=res[0]as MemberInfo;if(null!=mi)return GetTypeForMember(mi);
-return GetTypeForMember(res[0]as CodeTypeMember);}throw new InvalidOperationException("A matching property could not be found");}var er=expr as CodeEventReferenceExpression;
-if(null!=er){var t=GetTypeOfExpression(er.TargetObject,scope);var tt=_ResolveType(t,scope);if(null==tt)throw new InvalidOperationException("The event reference's target expression type could not be resolved");
-var binder=new CodeDomBinder(scope);var fl=BindingFlags.Public|BindingFlags.NonPublic;var isStatic=(er.TargetObject as CodeTypeReferenceExpression)!=null;
-if(isStatic)fl|=BindingFlags.Static;else fl|=BindingFlags.Instance;var res=binder.GetEvent(tt,er.EventName,fl);if(null!=res){var mi=res as MemberInfo;
-if(null!=mi)return GetTypeForMember(mi);else return GetTypeForMember(res as CodeTypeMember);}throw new InvalidOperationException("A matching event could not be found");
-}var di=expr as CodeDelegateInvokeExpression;if(null!=di){var ctr=GetTypeOfExpression(di.TargetObject,scope);var tt=_ResolveType(ctr,scope)as Type;if(null
-==tt)throw new InvalidOperationException("The delegate invoke expression's target expression type could not resolved.");var ma=tt.GetMember("Invoke");
-if(0<ma.Length){var mi=ma[0]as MethodInfo;if(null!=mi)return new CodeTypeReference(mi.ReturnType);}throw new InvalidOperationException("The target is not a delegate");
+if(isStatic)fl|=BindingFlags.Static;else fl|=BindingFlags.Instance;var res=binder.GetField(tt,fr.FieldName,fl);if(null!=res){var ttd=tt as CodeTypeDeclaration;
+if(null!=ttd&&ttd.IsEnum)return(fr.TargetObject as CodeTypeReferenceExpression).Type;var mi=res as MemberInfo;if(null!=mi)return GetTypeForMember(mi);
+return GetTypeForMember(res as CodeTypeMember);}throw new InvalidOperationException("A matching field could not be found");}var pr=expr as CodePropertyReferenceExpression;
+if(null!=pr){var t=GetTypeOfExpression(pr.TargetObject,scope);var tt=_ResolveType(t,scope);if(null==tt)throw new InvalidOperationException("The property reference's target expression type could not be resolved");
+var binder=new CodeDomBinder(scope);var fl=BindingFlags.Public|BindingFlags.NonPublic;var isStatic=(pr.TargetObject as CodeTypeReferenceExpression)!=null;
+if(isStatic)fl|=BindingFlags.Static;else fl|=BindingFlags.Instance;var res=binder.GetPropertyGroup(tt,pr.PropertyName,fl);if(0<res.Length){var mi=res[0]
+as MemberInfo;if(null!=mi)return GetTypeForMember(mi);return GetTypeForMember(res[0]as CodeTypeMember);}throw new InvalidOperationException("A matching property could not be found");
+}var er=expr as CodeEventReferenceExpression;if(null!=er){var t=GetTypeOfExpression(er.TargetObject,scope);var tt=_ResolveType(t,scope);if(null==tt)throw
+ new InvalidOperationException("The event reference's target expression type could not be resolved");var binder=new CodeDomBinder(scope);var fl=BindingFlags.Public
+|BindingFlags.NonPublic;var isStatic=(er.TargetObject as CodeTypeReferenceExpression)!=null;if(isStatic)fl|=BindingFlags.Static;else fl|=BindingFlags.Instance;
+var res=binder.GetEvent(tt,er.EventName,fl);if(null!=res){var mi=res as MemberInfo;if(null!=mi)return GetTypeForMember(mi);else return GetTypeForMember(res
+ as CodeTypeMember);}throw new InvalidOperationException("A matching event could not be found");}var di=expr as CodeDelegateInvokeExpression;if(null!=
+di){var ctr=GetTypeOfExpression(di.TargetObject,scope);var tt=_ResolveType(ctr,scope)as Type;if(null==tt)throw new InvalidOperationException("The delegate invoke expression's target expression type could not resolved.");
+var ma=tt.GetMember("Invoke");if(0<ma.Length){var mi=ma[0]as MethodInfo;if(null!=mi)return new CodeTypeReference(mi.ReturnType);}throw new InvalidOperationException("The target is not a delegate");
 }var ie=expr as CodeIndexerExpression;if(null!=ie){var t=GetTypeOfExpression(ie.TargetObject,scope); if(0==t.ArrayRank&&0==string.Compare("System.String",
 t.BaseType))return new CodeTypeReference(typeof(char));var types=new CodeTypeReference[ie.Indices.Count];for(var i=0;i<types.Length;++i){var p=ie.Indices[i];
 var de=p as CodeDirectionExpression;if(null!=de)p=de.Expression;types[i]=GetTypeOfExpression(p,scope);if(IsNullOrVoidType(types[i]))throw new InvalidOperationException("One or more of the indexer argument types was void");
@@ -2990,8 +2993,11 @@ ctr,args.Targets),action);if(args.Cancel)return;}}}static void _VisitTypeReferen
 &&_HasTarget(args,CodeDomVisitTargets.TypeRefs)&&_CanVisit(obj.ArrayElementType,args))_VisitTypeReference(obj.ArrayElementType,args.Set(args.Root,obj,"ArrayElementType",-1,_BuildPath(args.Path,"ArrayElementType",-1),
 obj.ArrayElementType,args.Targets),action);if(args.Cancel)return;if(_HasTarget(args,CodeDomVisitTargets.TypeRefs)){for(int ic=obj.TypeArguments.Count,i=0;i<ic;++i)
 {var ctr=obj.TypeArguments[i];if(_CanVisit(ctr,args))_VisitTypeReference(ctr,args.Set(args.Root,obj,"TypeArguments",i,_BuildPath(args.Path,"TypeArguments",i),
-ctr,args.Targets),action);if(args.Cancel)return;}}}static string _BuildPath(string path,string member,int index){if(string.IsNullOrEmpty(path))path=member;
-else path=string.Concat(path,".",member);if(-1!=index)path=string.Concat(path,"[",index.ToString(),"]");return path;}/// <summary>
+ctr,args.Targets),action);if(args.Cancel)return;}}}static string _BuildPath(string path,string member,int index){
+#if !NOPATHS
+if(string.IsNullOrEmpty(path))path=member;else path=string.Concat(path,".",member);if(-1!=index)path=string.Concat(path,"[",index.ToString(),"]");
+#endif
+return path;}/// <summary>
 /// Returns the path from <paramref name="root"/> to <paramref name="target"/>
 /// </summary>
 /// <param name="root">The containing object to start the search from</param>

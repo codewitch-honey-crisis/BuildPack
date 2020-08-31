@@ -688,7 +688,7 @@ namespace CD
 						if (HasBindingFlag(flags, BindingFlags.NonPublic) && MemberAttributes.Public != (fld.Attributes & MemberAttributes.AccessMask) ||
 							(HasBindingFlag(flags, BindingFlags.Public) && MemberAttributes.Public == (fld.Attributes & MemberAttributes.AccessMask)))
 						{
-							if (HasBindingFlag(flags, BindingFlags.Static) && MemberAttributes.Static == (fld.Attributes & MemberAttributes.ScopeMask) || MemberAttributes.Const == (fld.Attributes & MemberAttributes.ScopeMask) ||
+							if (type.IsEnum || (HasBindingFlag(flags, BindingFlags.Static) && MemberAttributes.Static == (fld.Attributes & MemberAttributes.ScopeMask) || MemberAttributes.Const == (fld.Attributes & MemberAttributes.ScopeMask)) ||
 							(HasBindingFlag(flags, BindingFlags.Instance) && MemberAttributes.Static != (fld.Attributes & MemberAttributes.ScopeMask) && MemberAttributes.Const != (fld.Attributes & MemberAttributes.ScopeMask)))
 							{
 								return fld;

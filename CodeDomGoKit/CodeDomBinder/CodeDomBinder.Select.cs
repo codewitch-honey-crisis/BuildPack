@@ -342,7 +342,9 @@ namespace CD
 					var pCls = par[j].ParameterType;
 					if (null == par[j].ParameterType)
 						continue;
-					if (E.Equals(pCls, types[j]))
+					pCls = _resolver.GetQualifiedType(pCls, _scope);
+					var t = _resolver.GetQualifiedType(types[j],_scope);
+					if (E.Equals(pCls, t))
 						continue;
 					if (0 == pCls.ArrayRank && "System.Object" == pCls.BaseType)
 						continue;

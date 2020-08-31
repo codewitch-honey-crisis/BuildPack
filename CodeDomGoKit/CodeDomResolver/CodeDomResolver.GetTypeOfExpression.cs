@@ -238,6 +238,9 @@ namespace CD
 				var res = binder.GetField(tt, fr.FieldName, fl);
 				if(null!=res)
 				{
+					var ttd = tt as CodeTypeDeclaration;
+					if (null != ttd && ttd.IsEnum)
+						return (fr.TargetObject as CodeTypeReferenceExpression).Type;
 					var mi = res as MemberInfo;
 					if (null != mi)
 						return GetTypeForMember(mi);

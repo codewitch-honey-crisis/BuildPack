@@ -78,7 +78,8 @@ internal partial class Deslanged {
     }
     public static System.CodeDom.CodeCompileUnit Parser {
         get {
-            return Deslanged._CompileUnit(new string[0], new CodeNamespace[] {
+            return Deslanged._CompileUnit(new string[] {
+                        "System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"}, new CodeNamespace[] {
                         Deslanged._Namespace("", new CodeNamespaceImport[] {
                                     new CodeNamespaceImport("System.Collections.Generic")}, new CodeTypeDeclaration[0], new CodeCommentStatement[0]),
                         Deslanged._Namespace("Parsley", new CodeNamespaceImport[0], new CodeTypeDeclaration[] {

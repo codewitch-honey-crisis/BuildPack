@@ -76,7 +76,8 @@ namespace Rolex {
             result.LinePragma = linePragma;
             return result;
         }
-        public static System.CodeDom.CodeCompileUnit Token = Shared._CompileUnit(new string[0], new CodeNamespace[] {
+        public static System.CodeDom.CodeCompileUnit Token = Shared._CompileUnit(new string[] {
+                    "System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"}, new CodeNamespace[] {
                     Shared._Namespace("", new CodeNamespaceImport[0], new CodeTypeDeclaration[0], new CodeCommentStatement[0]),
                     Shared._Namespace("Rolex", new CodeNamespaceImport[0], new CodeTypeDeclaration[] {
                                 Shared._TypeDeclaration("Token", false, false, false, true, false, (MemberAttributes.Final | MemberAttributes. Private), TypeAttributes.NotPublic, new CodeTypeParameter[0], new CodeTypeReference[0], new CodeTypeMember[] {
@@ -615,8 +616,7 @@ namespace Rolex {
                                             Shared._MemberMethod(new CodeTypeReference("IEnumerator`1", new CodeTypeReference[] {
                                                             new CodeTypeReference("Token")}), "GetEnumerator", (MemberAttributes.Override | MemberAttributes. Public), new CodeParameterDeclarationExpression[0], new CodeStatement[] {
                                                         new CodeMethodReturnStatement(new CodeObjectCreateExpression(new CodeTypeReference("CompiledTokenizerEnumeratorTemplate"), new CodeExpression[] {
-                                                                        new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "Input"), "GetEnumerator"), new CodeExpression[0])}))}, new CodeTypeReference[] {
-                                                        new CodeTypeReference("CompiledTokenizer")}, null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
+                                                                        new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "Input"), "GetEnumerator"), new CodeExpression[0])}))}, new CodeTypeReference[0], null, new CodeCommentStatement[0], new CodeAttributeDeclaration[0], new CodeAttributeDeclaration[0], new CodeDirective[0], new CodeDirective[0], null),
                                             Shared._Constructor((MemberAttributes.Final | MemberAttributes. Public), new CodeParameterDeclarationExpression[] {
                                                         new CodeParameterDeclarationExpression(new CodeTypeReference("IEnumerable`1", new CodeTypeReference[] {
                                                                         new CodeTypeReference(typeof(char))}), "input")}, new CodeExpression[0], new CodeExpression[] {

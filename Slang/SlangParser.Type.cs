@@ -937,7 +937,7 @@ namespace Slang
 			_AddCustomAttributes(customAttributes, "", result.CustomAttributes);
 			_CheckCustomAttributes(customAttributes, pc);
 			result.StartDirectives.AddRange(startDirs);
-			fld.Type = _ParseType(pc);
+			//fld.Type = _ParseType(pc);
 			fld.Name = _ParseIdentifier(pc);
 			if (ST.eq==pc.SymbolId)
 			{

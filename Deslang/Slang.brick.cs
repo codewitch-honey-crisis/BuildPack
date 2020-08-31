@@ -188,67 +188,72 @@ int column,long position){throw new SlangSyntaxException(message,line,column,pos
 return ParseExpression(tokenizer);}public static CodeExpression ReadExpressionFrom(Stream stream){var tokenizer=new SlangTokenizer(stream);return ParseExpression(tokenizer);
 }public static CodeExpression ParseExpression(string text,int line,int column,long position){var tokenizer=new SlangTokenizer(text);var pc=new _PC(tokenizer);
 pc.SetLocation(line,column,position);return _ParseExpression(pc);}public static CodeExpression ReadExpressionFrom(Stream stream,int line,int column,long
- position){var tokenizer=new SlangTokenizer(stream);var pc=new _PC(tokenizer);pc.SetLocation(line,column,position);return _ParseExpression(pc);}internal
- static CodeExpression ParseExpression(IEnumerable<Token>tokenizer){var pc=new _PC(tokenizer);pc.EnsureStarted();return _ParseExpression(pc);}static CodeExpression
- _ParseExpression(_PC pc){return _ParseAssignExpression(pc);}static CodeExpression _ParseAssignExpression(_PC pc){var l=pc.Line;var c=pc.Column;var p=
-pc.Position;var unresolved=false;var lhs=_ParseOrExpression(pc);var op=default(CodeBinaryOperatorType);switch(pc.SymbolId){case ST.eq:op=CodeBinaryOperatorType.Assign;
-pc.Advance();return new CodeBinaryOperatorExpression(lhs,op,_ParseOrExpression(pc)).Mark(l,c,p);case ST.addAssign:unresolved=true; op=CodeBinaryOperatorType.Add;
-pc.Advance();break;case ST.subAssign:unresolved=true; op=CodeBinaryOperatorType.Subtract;pc.Advance();break;case ST.mulAssign:op=CodeBinaryOperatorType.Multiply;
-pc.Advance();break;case ST.divAssign:op=CodeBinaryOperatorType.Divide;pc.Advance();break;case ST.modAssign:op=CodeBinaryOperatorType.Modulus;pc.Advance();
-break;case ST.bitwiseAndAssign:op=CodeBinaryOperatorType.BitwiseAnd;pc.Advance();break;case ST.bitwiseOrAssign:op=CodeBinaryOperatorType.BitwiseOr;pc.Advance();
-break;default:return lhs;}return new CodeBinaryOperatorExpression(lhs,CodeBinaryOperatorType.Assign,new CodeBinaryOperatorExpression(lhs,op,_ParseOrExpression(pc)).Mark(l,
-c,p)).Mark(l,c,p,unresolved);}static CodeExpression _ParseBitwiseOrExpression(_PC pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;var lhs=_ParseBitwiseAndExpression(pc);
-var op=default(CodeBinaryOperatorType);switch(pc.SymbolId){case ST.bitwiseOr:op=CodeBinaryOperatorType.BitwiseOr;pc.Advance();break;default:return lhs;
-}return new CodeBinaryOperatorExpression(lhs,op,_ParseBitwiseAndExpression(pc)).Mark(l,c,p);}static CodeExpression _ParseAndExpression(_PC pc){var l=pc.Line;
-var c=pc.Column;var p=pc.Position;var lhs=_ParseBitwiseOrExpression(pc);var op=default(CodeBinaryOperatorType);switch(pc.SymbolId){case ST.and:op=CodeBinaryOperatorType.BooleanAnd;
-pc.Advance();break;default:return lhs;}return new CodeBinaryOperatorExpression(lhs,op,_ParseBitwiseOrExpression(pc)).Mark(l,c,p);}static CodeExpression
- _ParseOrExpression(_PC pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;var lhs=_ParseAndExpression(pc);var op=default(CodeBinaryOperatorType);switch
-(pc.SymbolId){case ST.or:op=CodeBinaryOperatorType.BooleanOr;pc.Advance();break;default:return lhs;}return new CodeBinaryOperatorExpression(lhs,op,_ParseAndExpression(pc)).Mark(l,
-c,p);}static CodeExpression _ParseBitwiseAndExpression(_PC pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;var lhs=_ParseEqualityExpression(pc);var
- op=default(CodeBinaryOperatorType);switch(pc.SymbolId){case ST.bitwiseAnd:op=CodeBinaryOperatorType.BitwiseAnd;pc.Advance();break;default:return lhs;
-}return new CodeBinaryOperatorExpression(lhs,op,_ParseEqualityExpression(pc)).Mark(l,c,p);}static CodeExpression _ParseEqualityExpression(_PC pc){var l
-=pc.Line;var c=pc.Column;var p=pc.Position;var lhs=_ParseRelationalExpression(pc);var op=default(CodeBinaryOperatorType);switch(pc.SymbolId){case ST.eqEq:
-op=CodeBinaryOperatorType.IdentityEquality;pc.Advance();break;case ST.notEq:op=CodeBinaryOperatorType.IdentityInequality;pc.Advance();break;default:return
- lhs;}return new CodeBinaryOperatorExpression(lhs,op,_ParseRelationalExpression(pc)).Mark(l,c,p,true);}static CodeExpression _ParseRelationalExpression(_PC
- pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;var lhs=_ParseTermExpression(pc);var op=default(CodeBinaryOperatorType);switch(pc.SymbolId){case ST.lt:
-op=CodeBinaryOperatorType.LessThan;pc.Advance();break;case ST.lte:op=CodeBinaryOperatorType.LessThanOrEqual;pc.Advance();break;case ST.gt:op=CodeBinaryOperatorType.GreaterThan;
-pc.Advance();break;case ST.gte:op=CodeBinaryOperatorType.GreaterThanOrEqual;pc.Advance();break;default:return lhs;}return new CodeBinaryOperatorExpression(lhs,
-op,_ParseTermExpression(pc)).Mark(l,c,p);}static CodeExpression _ParseTermExpression(_PC pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;var lhs=_ParseFactorExpression(pc);
-var op=default(CodeBinaryOperatorType);switch(pc.SymbolId){case ST.add:op=CodeBinaryOperatorType.Add;pc.Advance();break;case ST.sub:op=CodeBinaryOperatorType.Subtract;
-pc.Advance();break;default:return lhs;}return new CodeBinaryOperatorExpression(lhs,op,_ParseFactorExpression(pc)).Mark(l,c,p);}static CodeExpression _ParseFactorExpression(_PC
- pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;var lhs=_ParseUnaryExpression(pc);var op=default(CodeBinaryOperatorType);switch(pc.SymbolId){case
- ST.mul:pc.Advance();op=CodeBinaryOperatorType.Multiply;break;case ST.div:pc.Advance();op=CodeBinaryOperatorType.Divide;break;case ST.mod:pc.Advance();
-op=CodeBinaryOperatorType.Modulus;break;default:return lhs;}return new CodeBinaryOperatorExpression(lhs,op,_ParseUnaryExpression(pc)).Mark(l,c,p);}static
- CodeExpression _ParseUnaryExpression(_PC pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;var sid=pc.SymbolId;if(ST.lparen==sid){var pc2=pc.GetLookAhead(true);
-try{_ParseCastExpression(pc2);return _ParseCastExpression(pc);}catch(SlangSyntaxException){return _ParsePrimaryExpression(pc);}}switch(pc.SymbolId){case
- ST.add:pc.Advance();return _ParseUnaryExpression(pc);case ST.sub:pc.Advance();var rhs=_ParseUnaryExpression(pc);var pp=rhs as CodePrimitiveExpression;
-if(null!=pp){if(pp.Value is int)return new CodePrimitiveExpression(-(int)pp.Value).SetLoc(l,c,p);if(pp.Value is long)return new CodePrimitiveExpression(-(long)pp.Value).SetLoc(l,c,p);
-if(pp.Value is float)return new CodePrimitiveExpression(-(float)pp.Value).SetLoc(l,c,p);if(pp.Value is double)return new CodePrimitiveExpression(-(double)pp.Value).SetLoc(l,c,p);
-if(pp.Value is char)return new CodePrimitiveExpression(-(char)pp.Value).SetLoc(l,c,p);}return new CodeBinaryOperatorExpression(new CodePrimitiveExpression(0).SetLoc(l,c,p),
-CodeBinaryOperatorType.Subtract,rhs).Mark(l,c,p);case ST.not:pc.Advance();return new CodeBinaryOperatorExpression(new CodePrimitiveExpression(false).SetLoc(l,
-c,p),CodeBinaryOperatorType.ValueEquality,_ParseUnaryExpression(pc)).Mark(l,c,p);case ST.inc:pc.Advance();var expr=_ParseUnaryExpression(pc);return new
- CodeBinaryOperatorExpression(expr,CodeBinaryOperatorType.Assign,new CodeBinaryOperatorExpression(expr,CodeBinaryOperatorType.Add,new CodePrimitiveExpression(1).Mark(l,
-c,p)).Mark(l,c,p)).Mark(l,c,p);case ST.dec:pc.Advance();expr=_ParseUnaryExpression(pc);return new CodeBinaryOperatorExpression(expr,CodeBinaryOperatorType.Assign,
-new CodeBinaryOperatorExpression(expr,CodeBinaryOperatorType.Subtract,new CodePrimitiveExpression(1).Mark(l,c,p)).Mark(l,c,p)).Mark(l,c,p);}return _ParsePrimaryExpression(pc);
-}static CodeExpression _ParsePrimaryExpression(_PC pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;CodeExpression result=null;switch(pc.SymbolId){
-case ST.verbatimStringLiteral:result=_ParseVerbatimString(pc);break;case ST.stringLiteral:result=_ParseString(pc);break;case ST.characterLiteral:result
-=_ParseChar(pc);break;case ST.integerLiteral:result=_ParseInteger(pc);break;case ST.floatLiteral:result=_ParseFloat(pc);break;case ST.boolLiteral:result
-=new CodePrimitiveExpression("true"==pc.Value).SetLoc(l,c,p);pc.Advance();break;case ST.nullLiteral:pc.Advance(); return new CodePrimitiveExpression(null).SetLoc(l,c,p);
-case ST.identifier:case ST.verbatimIdentifier:result=new CodeVariableReferenceExpression(_ParseIdentifier(pc)).Mark(l,c,p,true);break;case ST.typeOf:result
-=_ParseTypeOf(pc);break;case ST.defaultOf:result=_ParseDefault(pc);break;case ST.newKeyword:result=_ParseNew(pc);break;case ST.thisRef:result=new CodeThisReferenceExpression().SetLoc(l,
-c,p);pc.Advance();break;case ST.baseRef:result=new CodeBaseReferenceExpression().SetLoc(l,c,p);pc.Advance();break;case ST.lparen: pc.Advance();result=_ParseExpression(pc);
-if(ST.rparen!=pc.SymbolId)pc.Error("Unterminated ( in subexpression",l,c,p);pc.Advance();break;case ST.objectType:case ST.boolType:case ST.stringType:
-case ST.charType:case ST.byteType:case ST.sbyteType:case ST.shortType:case ST.ushortType:case ST.intType:case ST.uintType:case ST.longType:case ST.ulongType:
-case ST.floatType:case ST.doubleType:case ST.decimalType:result=new CodeTypeReferenceExpression(_ParseType(pc)).Mark(l,c,p);break;default:result=_ParseTypeOrFieldRef(pc);
-break;}var done=false;while(!done&&!pc.IsEnded){l=pc.Line;c=pc.Column;p=pc.Position;switch(pc.SymbolId){case ST.lparen:pc.Advance();var di=new CodeDelegateInvokeExpression(result).Mark(l,
-c,p,true);di.Parameters.AddRange(_ParseMethodArgList(pc));if(ST.rparen!=pc.SymbolId)throw new SlangSyntaxException("Unterminated method or delegate invoke expression",
-l,c,p);pc.Advance();result=di;break;case ST.lbracket:pc.Advance();var idxr=new CodeIndexerExpression(result).Mark(l,c,p,true);idxr.Indices.AddRange(_ParseArgList(pc));
-if(ST.rbracket!=pc.SymbolId)throw new SlangSyntaxException("Unterminated indexer expression",l,c,p);pc.Advance();result=idxr;break;case ST.dot:pc.Advance();
-result=new CodeFieldReferenceExpression(result,_ParseIdentifier(pc)).Mark(l,c,p,true);break;default:done=true;break;}}return result;}static CodeExpression
- _ParseCastExpression(_PC pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;if(ST.lparen!=pc.SymbolId)pc.Error("Expecting ( in cast expression");pc.Advance();
-var ctr=_ParseType(pc);if(ST.rparen!=pc.SymbolId)pc.Error("Expecting ) in cast expression");pc.Advance();return new CodeCastExpression(ctr,_ParseUnaryExpression(pc)).Mark(l,
-c,p);}static CodeExpression _ParseNew(_PC pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;if(ST.newKeyword!=pc.SymbolId)pc.Error("Expecting new");
-pc.Advance();var te=_ParseTypeElement(pc);if(ST.lparen==pc.SymbolId){pc.Advance();var oc=new CodeObjectCreateExpression(te).Mark(l,c,p);oc.Parameters.AddRange(_ParseArgList(pc));
+ position){var tokenizer=new SlangTokenizer(stream);var pc=new _PC(tokenizer);pc.SetLocation(line,column,position);return _ParseExpression(pc);}public
+ static CodeTypeReference ParseType(string text){var tokenizer=new SlangTokenizer(text);return ParseType(tokenizer);}public static CodeTypeReference ReadTypeFrom(Stream
+ stream){var tokenizer=new SlangTokenizer(stream);return ParseType(tokenizer);}public static CodeTypeReference ParseType(string text,int line,int column,
+long position){var tokenizer=new SlangTokenizer(text);var pc=new _PC(tokenizer);pc.SetLocation(line,column,position);return _ParseType(pc);}public static
+ CodeTypeReference ReadTypeFrom(Stream stream,int line,int column,long position){var tokenizer=new SlangTokenizer(stream);var pc=new _PC(tokenizer);pc.SetLocation(line,
+column,position);return _ParseType(pc);}internal static CodeExpression ParseExpression(IEnumerable<Token>tokenizer){var pc=new _PC(tokenizer);pc.EnsureStarted();
+return _ParseExpression(pc);}static CodeExpression _ParseExpression(_PC pc){return _ParseAssignExpression(pc);}static CodeExpression _ParseAssignExpression(_PC
+ pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;var unresolved=false;var lhs=_ParseOrExpression(pc);var op=default(CodeBinaryOperatorType);switch
+(pc.SymbolId){case ST.eq:op=CodeBinaryOperatorType.Assign;pc.Advance();return new CodeBinaryOperatorExpression(lhs,op,_ParseOrExpression(pc)).Mark(l,c,
+p);case ST.addAssign:unresolved=true; op=CodeBinaryOperatorType.Add;pc.Advance();break;case ST.subAssign:unresolved=true; op=CodeBinaryOperatorType.Subtract;
+pc.Advance();break;case ST.mulAssign:op=CodeBinaryOperatorType.Multiply;pc.Advance();break;case ST.divAssign:op=CodeBinaryOperatorType.Divide;pc.Advance();
+break;case ST.modAssign:op=CodeBinaryOperatorType.Modulus;pc.Advance();break;case ST.bitwiseAndAssign:op=CodeBinaryOperatorType.BitwiseAnd;pc.Advance();
+break;case ST.bitwiseOrAssign:op=CodeBinaryOperatorType.BitwiseOr;pc.Advance();break;default:return lhs;}return new CodeBinaryOperatorExpression(lhs,CodeBinaryOperatorType.Assign,new
+ CodeBinaryOperatorExpression(lhs,op,_ParseAssignExpression(pc)).Mark(l,c,p)).Mark(l,c,p,unresolved);}static CodeExpression _ParseBitwiseOrExpression(_PC
+ pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;var lhs=_ParseBitwiseAndExpression(pc);var op=default(CodeBinaryOperatorType);switch(pc.SymbolId)
+{case ST.bitwiseOr:op=CodeBinaryOperatorType.BitwiseOr;pc.Advance();break;default:return lhs;}return new CodeBinaryOperatorExpression(lhs,op,_ParseBitwiseOrExpression(pc)).Mark(l,
+c,p);}static CodeExpression _ParseAndExpression(_PC pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;var lhs=_ParseBitwiseOrExpression(pc);var op=default(CodeBinaryOperatorType);
+switch(pc.SymbolId){case ST.and:op=CodeBinaryOperatorType.BooleanAnd;pc.Advance();break;default:return lhs;}return new CodeBinaryOperatorExpression(lhs,
+op,_ParseBitwiseAndExpression(pc)).Mark(l,c,p);}static CodeExpression _ParseOrExpression(_PC pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;var lhs
+=_ParseAndExpression(pc);var op=default(CodeBinaryOperatorType);switch(pc.SymbolId){case ST.or:op=CodeBinaryOperatorType.BooleanOr;pc.Advance();break;
+default:return lhs;}return new CodeBinaryOperatorExpression(lhs,op,_ParseOrExpression(pc)).Mark(l,c,p);}static CodeExpression _ParseBitwiseAndExpression(_PC
+ pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;var lhs=_ParseEqualityExpression(pc);var op=default(CodeBinaryOperatorType);switch(pc.SymbolId){case
+ ST.bitwiseAnd:op=CodeBinaryOperatorType.BitwiseAnd;pc.Advance();break;default:return lhs;}return new CodeBinaryOperatorExpression(lhs,op,_ParseBitwiseAndExpression(pc)).Mark(l,
+c,p);}static CodeExpression _ParseEqualityExpression(_PC pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;var lhs=_ParseRelationalExpression(pc);var
+ op=default(CodeBinaryOperatorType);switch(pc.SymbolId){case ST.eqEq:op=CodeBinaryOperatorType.IdentityEquality;pc.Advance();break;case ST.notEq:op=CodeBinaryOperatorType.IdentityInequality;
+pc.Advance();break;default:return lhs;}return new CodeBinaryOperatorExpression(lhs,op,_ParseEqualityExpression(pc)).Mark(l,c,p,true);}static CodeExpression
+ _ParseRelationalExpression(_PC pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;var lhs=_ParseTermExpression(pc);var op=default(CodeBinaryOperatorType);
+switch(pc.SymbolId){case ST.lt:op=CodeBinaryOperatorType.LessThan;pc.Advance();break;case ST.lte:op=CodeBinaryOperatorType.LessThanOrEqual;pc.Advance();
+break;case ST.gt:op=CodeBinaryOperatorType.GreaterThan;pc.Advance();break;case ST.gte:op=CodeBinaryOperatorType.GreaterThanOrEqual;pc.Advance();break;
+default:return lhs;}return new CodeBinaryOperatorExpression(lhs,op,_ParseRelationalExpression(pc)).Mark(l,c,p);}static CodeExpression _ParseTermExpression(_PC
+ pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;var lhs=_ParseFactorExpression(pc);var op=default(CodeBinaryOperatorType);switch(pc.SymbolId){case
+ ST.add:op=CodeBinaryOperatorType.Add;pc.Advance();break;case ST.sub:op=CodeBinaryOperatorType.Subtract;pc.Advance();break;default:return lhs;}return new
+ CodeBinaryOperatorExpression(lhs,op,_ParseTermExpression(pc)).Mark(l,c,p);}static CodeExpression _ParseFactorExpression(_PC pc){var l=pc.Line;var c=pc.Column;
+var p=pc.Position;var lhs=_ParseUnaryExpression(pc);var op=default(CodeBinaryOperatorType);switch(pc.SymbolId){case ST.mul:pc.Advance();op=CodeBinaryOperatorType.Multiply;
+break;case ST.div:pc.Advance();op=CodeBinaryOperatorType.Divide;break;case ST.mod:pc.Advance();op=CodeBinaryOperatorType.Modulus;break;default:return lhs;
+}return new CodeBinaryOperatorExpression(lhs,op,_ParseFactorExpression(pc)).Mark(l,c,p);}static CodeExpression _ParseUnaryExpression(_PC pc){var l=pc.Line;
+var c=pc.Column;var p=pc.Position;var sid=pc.SymbolId;if(ST.lparen==sid){var pc2=pc.GetLookAhead(true);try{_ParseCastExpression(pc2);return _ParseCastExpression(pc);
+}catch(SlangSyntaxException){return _ParsePrimaryExpression(pc);}}switch(pc.SymbolId){case ST.add:pc.Advance();return _ParseUnaryExpression(pc);case ST.sub:
+pc.Advance();var rhs=_ParseUnaryExpression(pc);var pp=rhs as CodePrimitiveExpression;if(null!=pp){if(pp.Value is int)return new CodePrimitiveExpression(-(int)pp.Value).SetLoc(l,c,p);
+if(pp.Value is long)return new CodePrimitiveExpression(-(long)pp.Value).SetLoc(l,c,p);if(pp.Value is float)return new CodePrimitiveExpression(-(float)pp.Value).SetLoc(l,c,p);
+if(pp.Value is double)return new CodePrimitiveExpression(-(double)pp.Value).SetLoc(l,c,p);if(pp.Value is char)return new CodePrimitiveExpression(-(char)pp.Value).SetLoc(l,
+c,p);}return new CodeBinaryOperatorExpression(new CodePrimitiveExpression(0).SetLoc(l,c,p),CodeBinaryOperatorType.Subtract,rhs).Mark(l,c,p);case ST.not:
+pc.Advance();return new CodeBinaryOperatorExpression(new CodePrimitiveExpression(false).SetLoc(l,c,p),CodeBinaryOperatorType.ValueEquality,_ParseUnaryExpression(pc)).Mark(l,
+c,p);case ST.inc:pc.Advance();var expr=_ParseUnaryExpression(pc);return new CodeBinaryOperatorExpression(expr,CodeBinaryOperatorType.Assign,new CodeBinaryOperatorExpression(expr,
+CodeBinaryOperatorType.Add,new CodePrimitiveExpression(1).Mark(l,c,p)).Mark(l,c,p)).Mark(l,c,p);case ST.dec:pc.Advance();expr=_ParseUnaryExpression(pc);
+return new CodeBinaryOperatorExpression(expr,CodeBinaryOperatorType.Assign,new CodeBinaryOperatorExpression(expr,CodeBinaryOperatorType.Subtract,new CodePrimitiveExpression(1).Mark(l,
+c,p)).Mark(l,c,p)).Mark(l,c,p);}return _ParsePrimaryExpression(pc);}static CodeExpression _ParsePrimaryExpression(_PC pc){var l=pc.Line;var c=pc.Column;
+var p=pc.Position;CodeExpression result=null;switch(pc.SymbolId){case ST.verbatimStringLiteral:result=_ParseVerbatimString(pc);break;case ST.stringLiteral:
+result=_ParseString(pc);break;case ST.characterLiteral:result=_ParseChar(pc);break;case ST.integerLiteral:result=_ParseInteger(pc);break;case ST.floatLiteral:
+result=_ParseFloat(pc);break;case ST.boolLiteral:result=new CodePrimitiveExpression("true"==pc.Value).SetLoc(l,c,p);pc.Advance();break;case ST.nullLiteral:
+pc.Advance(); return new CodePrimitiveExpression(null).SetLoc(l,c,p);case ST.identifier:case ST.verbatimIdentifier:result=new CodeVariableReferenceExpression(_ParseIdentifier(pc)).Mark(l,c,p,true);
+break;case ST.typeOf:result=_ParseTypeOf(pc);break;case ST.defaultOf:result=_ParseDefault(pc);break;case ST.newKeyword:result=_ParseNew(pc);break;case
+ ST.thisRef:result=new CodeThisReferenceExpression().SetLoc(l,c,p);pc.Advance();break;case ST.baseRef:result=new CodeBaseReferenceExpression().SetLoc(l,
+c,p);pc.Advance();break;case ST.lparen: pc.Advance();result=_ParseExpression(pc);if(ST.rparen!=pc.SymbolId)pc.Error("Unterminated ( in subexpression",l,c,p);
+pc.Advance();break;case ST.objectType:case ST.boolType:case ST.stringType:case ST.charType:case ST.byteType:case ST.sbyteType:case ST.shortType:case ST.ushortType:
+case ST.intType:case ST.uintType:case ST.longType:case ST.ulongType:case ST.floatType:case ST.doubleType:case ST.decimalType:result=new CodeTypeReferenceExpression(_ParseType(pc)).Mark(l,
+c,p);break;default:result=_ParseTypeOrFieldRef(pc);break;}var done=false;while(!done&&!pc.IsEnded){l=pc.Line;c=pc.Column;p=pc.Position;switch(pc.SymbolId)
+{case ST.lparen:pc.Advance();var di=new CodeDelegateInvokeExpression(result).Mark(l,c,p,true);di.Parameters.AddRange(_ParseMethodArgList(pc));if(ST.rparen
+!=pc.SymbolId)throw new SlangSyntaxException("Unterminated method or delegate invoke expression",l,c,p);pc.Advance();result=di;break;case ST.lbracket:
+pc.Advance();var idxr=new CodeIndexerExpression(result).Mark(l,c,p,true);idxr.Indices.AddRange(_ParseArgList(pc));if(ST.rbracket!=pc.SymbolId)throw new
+ SlangSyntaxException("Unterminated indexer expression",l,c,p);pc.Advance();result=idxr;break;case ST.dot:pc.Advance();result=new CodeFieldReferenceExpression(result,
+_ParseIdentifier(pc)).Mark(l,c,p,true);break;default:done=true;break;}}return result;}static CodeExpression _ParseCastExpression(_PC pc){var l=pc.Line;
+var c=pc.Column;var p=pc.Position;if(ST.lparen!=pc.SymbolId)pc.Error("Expecting ( in cast expression");pc.Advance();var ctr=_ParseType(pc);if(ST.rparen
+!=pc.SymbolId)pc.Error("Expecting ) in cast expression");pc.Advance();return new CodeCastExpression(ctr,_ParseUnaryExpression(pc)).Mark(l,c,p);}static
+ CodeExpression _ParseNew(_PC pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;if(ST.newKeyword!=pc.SymbolId)pc.Error("Expecting new");pc.Advance();
+var te=_ParseTypeElement(pc);if(ST.lparen==pc.SymbolId){pc.Advance();var oc=new CodeObjectCreateExpression(te).Mark(l,c,p);oc.Parameters.AddRange(_ParseArgList(pc));
 if(ST.rparen!=pc.SymbolId)pc.Error("Expecting ) in new object expression");pc.Advance();return oc;}else if(ST.lbracket!=pc.SymbolId)pc.Error("Expecting [ or ( after type element in new expression");
 var pc2=pc.GetLookAhead(true);pc2.Advance();if(ST.comma==pc2.SymbolId)throw new SlangSyntaxException("Instantiation of multidimensional arrays is not supported",l,c,p);
 var hasSize=false;if(ST.rbracket!=pc2.SymbolId)hasSize=true;pc2=null;CodeExpression size=null;if(hasSize){pc.Advance();size=_ParseExpression(pc);if(ST.comma==pc.SymbolId)
@@ -276,8 +281,8 @@ c,p);}static CodeExpression _ParseTypeOrFieldRef(_PC context,bool skipDot=false)
 var pc2=context.GetLookAhead(true);SlangSyntaxException sx,sx2=null;var fieldAdvCount=0;try{_ParseIdentifier(pc2); if(ST.dot==pc2.SymbolId){if(pc2.IsEnded)
 pc2.Error("Unexpected end of stream while parsing type of field reference");var pc4=pc2.GetLookAhead(true);while(ST.dot==pc4.SymbolId){pc4.Advance();_ParseIdentifier(pc4);
 }var i=pc4.AdvanceCount;while(1<i){pc2.Advance();--i;}} if(ST.lt==pc2.SymbolId){pc2.Advance();var isTypeArg=false;try{_ParseType(pc2);if(ST.gt==pc2.SymbolId
-||ST.comma==pc2.SymbolId){isTypeArg=true;}}catch(SlangSyntaxException){} if(isTypeArg)context.Error("Unexpected < found in found in FielRef");} return
- new CodeVariableReferenceExpression(_ParseIdentifier(context)).Mark(l,c,p,true);}catch(SlangSyntaxException ex){sx=ex;} fieldAdvCount=pc2.AdvanceCount;
+||ST.comma==pc2.SymbolId){isTypeArg=true;}}catch(SlangSyntaxException){} if(isTypeArg)context.Error("Unexpected < found in found in field reference");
+} return new CodeVariableReferenceExpression(_ParseIdentifier(context)).Mark(l,c,p,true);}catch(SlangSyntaxException ex){sx=ex;} fieldAdvCount=pc2.AdvanceCount;
 if(context.IsEnded)context.Error("Unexpected end of stream while parsing type of field reference"); var pc3=context.GetLookAhead(true);try{ _ParseType(pc3);
  return new CodeTypeReferenceExpression(_ParseType(context)).Mark(line,column,position);}catch(SlangSyntaxException ex){sx2=ex;}var advCount=pc3.AdvanceCount;
  var typeAdvCount=advCount; var toks=new List<Token>();if(context.IsEnded)context.Error("Unexpected end of stream while parsing type of field reference");
@@ -403,10 +408,10 @@ stmt.StartDirectives.AddRange(startDirs);if(null!=lp)stmt.LinePragma=lp;while(!i
 pc.Advance(false);while(ST.directive==pc.SymbolId&&pc.Value.StartsWith("#end",StringComparison.InvariantCulture)){stmt.EndDirectives.Add(_ParseDirective(pc)
 as CodeDirective);while(!includeComments&&ST.lineComment==pc.SymbolId||ST.blockComment==pc.SymbolId)pc.Advance(false);}
 #endregion Post
-return stmt;}static CodeStatementCollection _ParseStatements(_PC pc,bool includeComments=false){var result=new CodeStatementCollection();while(!pc.IsEnded
-&&ST.rbrace!=pc.SymbolId)result.Add(_ParseStatement(pc,includeComments));return result;}static CodeStatementCollection _ParseStatementOrBlock(_PC pc){
-var l=pc.Line;var c=pc.Column;var p=pc.Position;CodeStatementCollection result;if(ST.lbrace==pc.SymbolId){pc.Advance();result=_ParseStatements(pc,true);
-if(ST.rbrace!=pc.SymbolId)pc.Error("Unterminated statement block",l,c,p);pc.Advance();return result;}result=new CodeStatementCollection();result.Add(_ParseStatement(pc,
+return stmt;}static CodeStatementCollection _ParseStatements(_PC pc,bool includeComments=false){var result=new CodeStatementCollection();pc.EnsureStarted();
+while(!pc.IsEnded&&ST.rbrace!=pc.SymbolId)result.Add(_ParseStatement(pc,includeComments));return result;}static CodeStatementCollection _ParseStatementOrBlock(_PC
+ pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;CodeStatementCollection result;if(ST.lbrace==pc.SymbolId){pc.Advance();result=_ParseStatements(pc,
+true);if(ST.rbrace!=pc.SymbolId)pc.Error("Unterminated statement block",l,c,p);pc.Advance();return result;}result=new CodeStatementCollection();result.Add(_ParseStatement(pc,
 false));return result;}static CodeStatement _ParseTryCatchFinallyStatement(_PC pc){var l=pc.Line;var c=pc.Column;var p=pc.Position;if(ST.tryKeyword!=pc.SymbolId)
 pc.Error("Expecting try");pc.Advance();var result=new CodeTryCatchFinallyStatement().Mark(l,c,p);if(ST.lbrace!=pc.SymbolId)pc.Error("Expecting { in try statement");
 pc.Advance();result.TryStatements.AddRange(_ParseStatements(pc,true));if(ST.rbrace!=pc.SymbolId)pc.Error("Expecting } in try statement");pc.Advance();
@@ -599,8 +604,8 @@ var llp=d as CodeLinePragma;if(null!=llp)lp=llp;else if(null!=d)startDirs.Add(d 
 break;case ST.lineComment:comments.Add(_ParseCommentStatement(pc,true));break;}}IDictionary<string,CodeAttributeDeclarationCollection>customAttributes
 =null;if(ST.lbracket==pc.SymbolId)customAttributes=_ParseAttributeGroups(pc);line=pc.Line;column=pc.Column;position=pc.Position;var fld=new CodeMemberField().Mark(line,
 column,position);result=fld;result.Comments.AddRange(comments);if(null!=lp)result.LinePragma=lp;_AddCustomAttributes(customAttributes,"",result.CustomAttributes);
-_CheckCustomAttributes(customAttributes,pc);result.StartDirectives.AddRange(startDirs);fld.Type=_ParseType(pc);fld.Name=_ParseIdentifier(pc);if(ST.eq==pc.SymbolId)
-{pc.Advance();fld.InitExpression=_ParseExpression(pc);}if(ST.comma==pc.SymbolId)pc.Advance(false);else if(ST.rbrace!=pc.SymbolId)pc.Error("Expecting , or } in enum declaration");
+_CheckCustomAttributes(customAttributes,pc);result.StartDirectives.AddRange(startDirs); fld.Name=_ParseIdentifier(pc);if(ST.eq==pc.SymbolId){pc.Advance();
+fld.InitExpression=_ParseExpression(pc);}if(ST.comma==pc.SymbolId)pc.Advance(false);else if(ST.rbrace!=pc.SymbolId)pc.Error("Expecting , or } in enum declaration");
 while(ST.directive==pc.SymbolId&&pc.Value.StartsWith("#end",StringComparison.InvariantCulture))result.EndDirectives.Add(_ParseDirective(pc)as CodeDirective);
 return result;}[System.Diagnostics.DebuggerNonUserCode()]static void _CheckCustomAttributes(IDictionary<string,CodeAttributeDeclarationCollection>attrs,_PC
  pc){if(null!=attrs&&0<attrs.Count){foreach(var kvp in attrs){var ctr=kvp.Value[0].AttributeType;var o=ctr.UserData["slang:line"];int l=0,c=0;long p=0L;
@@ -702,20 +707,21 @@ del);}}}}static void _Patch(CodeMemberProperty prop,CodeDomVisitContext ctx,Code
 td.BaseTypes[i];var t=resolver.TryResolveType(ctr,scope);if(null!=t){var ma=binder.GetPropertyGroup(t,prop.Name,BindingFlags.Instance|BindingFlags.Public
 |BindingFlags.DeclaredOnly);if(0<ma.Length){var p=binder.SelectProperty(BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly,ma,null,_GetParameterTypes(prop.Parameters),
 null);if(null!=p)prop.ImplementationTypes.Add(ctr);}}}}prop.UserData.Remove("slang:unresolved");}}static void _Patch(CodeBinaryOperatorExpression op,CodeDomVisitContext
- ctx,CodeDomResolver resolver){if(null!=op){var scope=resolver.GetScope(op);if(CodeBinaryOperatorType.IdentityEquality==op.Operator){if(_HasUnresolved(op.Left))
-return;var tr1=resolver.GetTypeOfExpression(op.Left);if(resolver.IsValueType(tr1)){if(_HasUnresolved(op.Right))return;var tr2=resolver.GetTypeOfExpression(op.Right);
-if(resolver.IsValueType(tr2)){op.Operator=CodeBinaryOperatorType.ValueEquality;}}op.UserData.Remove("slang:unresolved");}else if(CodeBinaryOperatorType.IdentityInequality
-==op.Operator){if(_HasUnresolved(op.Left))return;var tr1=resolver.GetTypeOfExpression(op.Left);if(resolver.IsValueType(tr1)){if(_HasUnresolved(op.Right))
-return;var tr2=resolver.GetTypeOfExpression(op.Right);if(resolver.IsValueType(tr2)){ op.Operator=CodeBinaryOperatorType.ValueEquality;var newOp=new CodeBinaryOperatorExpression(new
- CodePrimitiveExpression(false),CodeBinaryOperatorType.ValueEquality,op);CodeDomVisitor.ReplaceTarget(ctx,newOp);}}op.UserData.Remove("slang:unresolved");
-}}}static void _Patch(CodeMemberMethod meth,CodeDomVisitContext ctx,CodeDomResolver resolver){if(null!=meth){ if(null==meth.PrivateImplementationType)
-{var scope=resolver.GetScope(meth);var td=scope.DeclaringType;var binder=new CodeDomBinder(scope);for(int ic=td.BaseTypes.Count,i=0;i<ic;++i){var ctr=
-td.BaseTypes[i];var t=resolver.TryResolveType(ctr,scope);if(null!=t){var ma=binder.GetMethodGroup(t,meth.Name,BindingFlags.Instance|BindingFlags.Public
-|BindingFlags.DeclaredOnly);if(0<ma.Length){var m=binder.SelectMethod(BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly,ma,_GetParameterTypes(meth.Parameters),
-null);if(null!=m)meth.ImplementationTypes.Add(ctr);}}}}meth.UserData.Remove("slang:unresolved");if("Main"==meth.Name&&(meth.Attributes&MemberAttributes.ScopeMask)
-==MemberAttributes.Static){if(0==meth.Parameters.Count&&null==meth.ReturnType||"System.Void"==meth.ReturnType.BaseType){var epm=new CodeEntryPointMethod();
-epm.Attributes=meth.Attributes;epm.LinePragma=meth.LinePragma;epm.StartDirectives.AddRange(meth.StartDirectives);epm.EndDirectives.AddRange(meth.EndDirectives);
-epm.Comments.AddRange(meth.Comments);epm.CustomAttributes.AddRange(meth.CustomAttributes);epm.ReturnTypeCustomAttributes.AddRange(meth.ReturnTypeCustomAttributes);
+ ctx,CodeDomResolver resolver){if(null!=op){ var scope=resolver.GetScope(op);if(CodeBinaryOperatorType.IdentityEquality==op.Operator){if(_HasUnresolved(op.Left))
+return; var tr1=resolver.GetTypeOfExpression(op.Left);if(resolver.IsValueType(tr1)){if(_HasUnresolved(op.Right))return;var tr2=resolver.GetTypeOfExpression(op.Right);
+if(resolver.IsValueType(tr2)){var op2=new CodeBinaryOperatorExpression(op.Left,CodeBinaryOperatorType.ValueEquality,op.Right);CodeDomVisitor.ReplaceTarget(ctx,
+op2);return;}}op.UserData.Remove("slang:unresolved");}else if(CodeBinaryOperatorType.IdentityInequality==op.Operator){if(_HasUnresolved(op.Left))return;
+var tr1=resolver.GetTypeOfExpression(op.Left);if(resolver.IsValueType(tr1)){if(_HasUnresolved(op.Right))return;var tr2=resolver.GetTypeOfExpression(op.Right);
+if(resolver.IsValueType(tr2)){ op.Operator=CodeBinaryOperatorType.ValueEquality;var newOp=new CodeBinaryOperatorExpression(new CodePrimitiveExpression(false),
+CodeBinaryOperatorType.ValueEquality,op);CodeDomVisitor.ReplaceTarget(ctx,newOp);}}op.UserData.Remove("slang:unresolved");}}}static void _Patch(CodeMemberMethod
+ meth,CodeDomVisitContext ctx,CodeDomResolver resolver){if(null!=meth){ if(null==meth.PrivateImplementationType){var scope=resolver.GetScope(meth);var
+ td=scope.DeclaringType;var binder=new CodeDomBinder(scope);for(int ic=td.BaseTypes.Count,i=0;i<ic;++i){var ctr=td.BaseTypes[i];var t=resolver.TryResolveType(ctr,
+scope);if(null!=t){var ma=binder.GetMethodGroup(t,meth.Name,BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly);if(0<ma.Length){var isIface
+=false;var ttd=t as CodeTypeDeclaration;if(null!=ttd){isIface=ttd.IsInterface;}else{var rrt=t as Type;isIface=rrt.IsInterface;}if(isIface){var m=binder.SelectMethod(BindingFlags.Instance
+|BindingFlags.Public|BindingFlags.DeclaredOnly,ma,_GetParameterTypes(meth.Parameters),null);if(null!=m)meth.ImplementationTypes.Add(ctr);}}}}}meth.UserData.Remove("slang:unresolved");
+if("Main"==meth.Name&&(meth.Attributes&MemberAttributes.ScopeMask)==MemberAttributes.Static){if(0==meth.Parameters.Count&&null==meth.ReturnType||"System.Void"
+==meth.ReturnType.BaseType){var epm=new CodeEntryPointMethod();epm.Attributes=meth.Attributes;epm.LinePragma=meth.LinePragma;epm.StartDirectives.AddRange(meth.StartDirectives);
+epm.EndDirectives.AddRange(meth.EndDirectives);epm.Comments.AddRange(meth.Comments);epm.CustomAttributes.AddRange(meth.CustomAttributes);epm.ReturnTypeCustomAttributes.AddRange(meth.ReturnTypeCustomAttributes);
 epm.TypeParameters.AddRange(meth.TypeParameters);epm.PrivateImplementationType=meth.PrivateImplementationType;epm.ImplementationTypes.AddRange(meth.ImplementationTypes);
 epm.Name=meth.Name;epm.Statements.AddRange(meth.Statements);CodeDomVisitor.ReplaceTarget(ctx,epm);}}}}static CodeTypeReference[]_GetParameterTypes(CodeParameterDeclarationExpressionCollection
  parms){var result=new CodeTypeReference[parms.Count];for(var i=0;i<result.Length;i++)result[i]=parms[i].Type;return result;}static void _Patch(CodeVariableReferenceExpression
@@ -748,7 +754,7 @@ if(null!=mr){var mi=new CodeMethodInvokeExpression(mr);mi.Parameters.AddRange(di
 throw new ArgumentException(_AppendLineInfo("The code contains an incomplete variable declaration",vd),"resolver");if(!_HasUnresolved(vd.InitExpression))
 {var t=resolver.GetTypeOfExpression(vd.InitExpression,resolver.GetScope(vd.InitExpression));vd.Type=t;if(!CodeDomResolver.IsNullOrVoidType(t)){vd.UserData.Remove("slang:unresolved");
 }}}}}static void _Patch(CodeFieldReferenceExpression fr,CodeDomVisitContext ctx,CodeDomResolver resolver){if(null!=fr){ if(!fr.TargetObject.UserData.Contains("slang:unresolved"))
-{var scope=resolver.GetScope(fr);var binder=new CodeDomBinder(scope);var t=resolver.GetTypeOfExpression(fr.TargetObject);if(null!=t&&CodeDomResolver.IsNullOrVoidType(t)
+{var scope=resolver.GetScope(fr);var binder=new CodeDomBinder(scope);var t=resolver.GetTypeOfExpression(fr.TargetObject,scope);if(null!=t&&CodeDomResolver.IsNullOrVoidType(t)
 &&fr.TargetObject is CodeVariableReferenceExpression)return; var isStatic=false;var tre=fr.TargetObject as CodeTypeReferenceExpression;if(null!=tre)isStatic
 =true;var tt=resolver.TryResolveType(isStatic?tre.Type:t,scope,true);if(null==tt)throw new InvalidOperationException(_AppendLineInfo(string.Format("The type {0} could not be resolved",
 t.BaseType),t));var td=tt as CodeTypeDeclaration; var m=binder.GetField(tt,fr.FieldName,_BindFlags);if(null!=m){fr.UserData.Remove("slang:unresolved");

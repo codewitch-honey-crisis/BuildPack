@@ -268,6 +268,7 @@ namespace Slang
 		static CodeStatementCollection _ParseStatements(_PC pc, bool includeComments=false)
 		{
 			var result = new CodeStatementCollection();
+			pc.EnsureStarted();
 			while (!pc.IsEnded && ST.rbrace!=pc.SymbolId)
 				result.Add(_ParseStatement(pc, includeComments));
 			return result;

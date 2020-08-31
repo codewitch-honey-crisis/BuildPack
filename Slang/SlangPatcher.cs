@@ -262,11 +262,19 @@ namespace Slang
 		{
 			if (null != op)
 			{
+				
+				//var rf = op.Left as CodeFieldReferenceExpression;
+				//if (null != rf && rf.FieldName == "Reduce")
+				//	System.Diagnostics.Debugger.Break();
 				var scope = resolver.GetScope(op);
 				if (CodeBinaryOperatorType.IdentityEquality == op.Operator)
 				{
 					if (_HasUnresolved(op.Left))
 						return;
+					//var vop = op.Right as CodeVariableReferenceExpression;
+					//if (null != vop && vop.VariableName == "n")
+					//	System.Diagnostics.Debugger.Break();
+
 					var tr1 = resolver.GetTypeOfExpression(op.Left);
 					if (resolver.IsValueType(tr1))
 					{
@@ -275,7 +283,9 @@ namespace Slang
 						var tr2 = resolver.GetTypeOfExpression(op.Right);
 						if (resolver.IsValueType(tr2))
 						{
-							op.Operator = CodeBinaryOperatorType.ValueEquality;
+							var op2 = new CodeBinaryOperatorExpression(op.Left, CodeBinaryOperatorType.ValueEquality, op.Right);
+							CodeDomVisitor.ReplaceTarget(ctx, op2);
+							return;
 						}
 					}
 					op.UserData.Remove("slang:unresolved");
@@ -322,9 +332,22 @@ namespace Slang
 							var ma = binder.GetMethodGroup(t, meth.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
 							if (0 < ma.Length)
 							{
-								var m = binder.SelectMethod(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly, ma, _GetParameterTypes(meth.Parameters), null);
-								if (null != m)
-									meth.ImplementationTypes.Add(ctr);
+								var isIface = false;
+								var ttd = t as CodeTypeDeclaration;
+								if(null!=ttd)
+								{
+									isIface = ttd.IsInterface;
+								} else
+								{
+									var rrt = t as Type;
+									isIface = rrt.IsInterface;
+								}
+								if (isIface)
+								{
+									var m = binder.SelectMethod(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly, ma, _GetParameterTypes(meth.Parameters), null);
+									if (null != m)
+										meth.ImplementationTypes.Add(ctr);
+								}
 							}
 
 
@@ -598,7 +621,7 @@ namespace Slang
 
 					var scope = resolver.GetScope(fr);
 					var binder = new CodeDomBinder(scope);
-					var t = resolver.GetTypeOfExpression(fr.TargetObject);
+					var t = resolver.GetTypeOfExpression(fr.TargetObject,scope);
 					if (null != t && CodeDomResolver.IsNullOrVoidType(t) && fr.TargetObject is CodeVariableReferenceExpression)
 						return; // can't patch this field yet - it's part of a var reference that hasn't been filled in
 					var isStatic = false;

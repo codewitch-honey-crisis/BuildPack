@@ -189,6 +189,7 @@ namespace Deslang
 						if(0==i)
 						{
 							ccu.ReferencedAssemblies.AddRange(asms.ToArray());
+							ccu.ReferencedAssemblies.Add(typeof(CodeObject).Assembly.GetName().ToString());
 						}
 						ccus[i]=ccu;
 					}
