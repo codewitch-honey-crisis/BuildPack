@@ -337,7 +337,7 @@ else if(isDecimal)n=decimal.Parse(s);else n=double.Parse(s);pc.Advance();return 
 =s.StartsWith("-0x")||s.StartsWith("0x");var ch=char.ToLowerInvariant(s[s.Length-1]);if('l'==ch){isLong=true;s=s.Substring(0,s.Length-1);}else if('u'==
 ch){isUnsigned=true;s=s.Substring(0,s.Length-1);} ch=char.ToLowerInvariant(s[s.Length-1]);if('l'==ch){isLong=true;s=s.Substring(0,s.Length-1);}else if
 ('u'==ch){isUnsigned=true;s=s.Substring(0,s.Length-1);} if(isHex)s=s.Substring(2);var d=(double)long.Parse(s,isHex?NumberStyles.AllowHexSpecifier:NumberStyles.Integer);
-object n=null;if(isUnsigned&&(isLong||(d<=uint.MaxValue&&d>=uint.MinValue))){if(isNeg){if(!isHex)n=unchecked((ulong)long.Parse(s));else n=unchecked((ulong)-long.Parse(s.Substring(1),
+object n=null;if(isUnsigned&&(isLong||(d>=uint.MaxValue||d<uint.MinValue))){if(isNeg){if(!isHex)n=unchecked((ulong)long.Parse(s));else n=unchecked((ulong)-long.Parse(s.Substring(1),
 NumberStyles.AllowHexSpecifier));}else n=ulong.Parse(s,isHex?NumberStyles.AllowHexSpecifier:NumberStyles.Integer);}else if(isUnsigned){if(isNeg){if(!isHex)
 {if(isLong)n=ulong.Parse(s);else n=uint.Parse(s);}else{if(isLong)n=unchecked((ulong)-long.Parse(s.Substring(1),NumberStyles.AllowHexSpecifier));else n
 =unchecked(-uint.Parse(s.Substring(1),NumberStyles.AllowHexSpecifier));}}else{if(isLong)n=ulong.Parse(s,isHex?NumberStyles.AllowHexSpecifier:NumberStyles.Integer);

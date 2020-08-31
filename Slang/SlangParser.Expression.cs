@@ -1178,7 +1178,7 @@ namespace Slang
 				s = s.Substring(2);
 			var d = (double)long.Parse(s, isHex ? NumberStyles.AllowHexSpecifier : NumberStyles.Integer);
 			object n = null;
-			if (isUnsigned && (isLong || (d <= uint.MaxValue && d >= uint.MinValue)))
+			if (isUnsigned && (isLong || (d >= uint.MaxValue || d < uint.MinValue)))
 			{
 				if (isNeg)
 				{
