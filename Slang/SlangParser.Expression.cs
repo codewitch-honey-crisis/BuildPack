@@ -1195,12 +1195,27 @@ namespace Slang
 				if (isNeg)
 				{
 					if (!isHex)
-						n = unchecked((uint)int.Parse(s));
+					{
+						if (isLong)
+							n = ulong.Parse(s);
+						else
+							n = uint.Parse(s);
+					}
 					else
-						n = unchecked((uint)-int.Parse(s.Substring(1), NumberStyles.AllowHexSpecifier));
+					{
+						if (isLong)
+							n = unchecked((ulong)-long.Parse(s.Substring(1), NumberStyles.AllowHexSpecifier));
+						else
+							n = unchecked(-uint.Parse(s.Substring(1), NumberStyles.AllowHexSpecifier));
+					}
 				}
 				else
-					n = uint.Parse(s, isHex ? NumberStyles.AllowHexSpecifier : NumberStyles.Integer);
+				{
+					if(isLong)
+						n = ulong.Parse(s, isHex ? NumberStyles.AllowHexSpecifier : NumberStyles.Integer);
+					else
+						n = uint.Parse(s, isHex ? NumberStyles.AllowHexSpecifier : NumberStyles.Integer);
+				}
 			}
 			else
 			{
@@ -1208,9 +1223,13 @@ namespace Slang
 				{
 					if (!isHex)
 						n = int.Parse(s);
+					else if(isLong)
+						n = unchecked(-long.Parse(s.Substring(1), NumberStyles.AllowHexSpecifier));
 					else
 						n = unchecked(-int.Parse(s.Substring(1), NumberStyles.AllowHexSpecifier));
 				}
+				else if(isLong)
+					n = long.Parse(s, isHex ? NumberStyles.AllowHexSpecifier : NumberStyles.Integer);
 				else
 					n = int.Parse(s, isHex ? NumberStyles.AllowHexSpecifier : NumberStyles.Integer);
 			}

@@ -339,9 +339,12 @@ ch){isUnsigned=true;s=s.Substring(0,s.Length-1);} ch=char.ToLowerInvariant(s[s.L
 ('u'==ch){isUnsigned=true;s=s.Substring(0,s.Length-1);} if(isHex)s=s.Substring(2);var d=(double)long.Parse(s,isHex?NumberStyles.AllowHexSpecifier:NumberStyles.Integer);
 object n=null;if(isUnsigned&&(isLong||(d<=uint.MaxValue&&d>=uint.MinValue))){if(isNeg){if(!isHex)n=unchecked((ulong)long.Parse(s));else n=unchecked((ulong)-long.Parse(s.Substring(1),
 NumberStyles.AllowHexSpecifier));}else n=ulong.Parse(s,isHex?NumberStyles.AllowHexSpecifier:NumberStyles.Integer);}else if(isUnsigned){if(isNeg){if(!isHex)
-n=unchecked((uint)int.Parse(s));else n=unchecked((uint)-int.Parse(s.Substring(1),NumberStyles.AllowHexSpecifier));}else n=uint.Parse(s,isHex?NumberStyles.AllowHexSpecifier
-:NumberStyles.Integer);}else{if(isNeg){if(!isHex)n=int.Parse(s);else n=unchecked(-int.Parse(s.Substring(1),NumberStyles.AllowHexSpecifier));}else n=int.Parse(s,
-isHex?NumberStyles.AllowHexSpecifier:NumberStyles.Integer);}pc.Advance();return new CodePrimitiveExpression(n).SetLoc(l,c,p);}
+{if(isLong)n=ulong.Parse(s);else n=uint.Parse(s);}else{if(isLong)n=unchecked((ulong)-long.Parse(s.Substring(1),NumberStyles.AllowHexSpecifier));else n
+=unchecked(-uint.Parse(s.Substring(1),NumberStyles.AllowHexSpecifier));}}else{if(isLong)n=ulong.Parse(s,isHex?NumberStyles.AllowHexSpecifier:NumberStyles.Integer);
+else n=uint.Parse(s,isHex?NumberStyles.AllowHexSpecifier:NumberStyles.Integer);}}else{if(isNeg){if(!isHex)n=int.Parse(s);else if(isLong)n=unchecked(-long.Parse(s.Substring(1),
+NumberStyles.AllowHexSpecifier));else n=unchecked(-int.Parse(s.Substring(1),NumberStyles.AllowHexSpecifier));}else if(isLong)n=long.Parse(s,isHex?NumberStyles.AllowHexSpecifier
+:NumberStyles.Integer);else n=int.Parse(s,isHex?NumberStyles.AllowHexSpecifier:NumberStyles.Integer);}pc.Advance();return new CodePrimitiveExpression(n).SetLoc(l,c,p);
+}
 #endregion
 #region String/Char escapes
 static string _ParseEscapeChar(IEnumerator<char>e,_PC pc){if(e.MoveNext()){switch(e.Current){case'r':e.MoveNext();return"\r";case'n':e.MoveNext();return
