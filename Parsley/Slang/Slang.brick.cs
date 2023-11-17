@@ -394,18 +394,18 @@ stmt.StartDirectives.AddRange(startDirs);if(null!=lp)stmt.LinePragma=lp;}else wh
 #endregion Preamble
 var l=pc.Line;var c=pc.Column;var p=pc.Position; if(null==stmt){_PC pc2=null;switch(pc.SymbolId){case ST.semi: pc.Advance();stmt=new CodeSnippetStatement().SetLoc(l,
 c,p);break;case ST.gotoKeyword:pc.Advance();if(ST.identifier!=pc.SymbolId)pc.Error("Expecting label identifier in goto statement");stmt=new CodeGotoStatement(pc.Value).SetLoc(l,
-c,p);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in goto statement");pc.Advance();break;case ST.returnKeyword:pc.Advance();if(ST.semi!=pc.SymbolId){
-stmt=new CodeMethodReturnStatement(_ParseExpression(pc)).Mark(l,c,p);}else{stmt=new CodeMethodReturnStatement().SetLoc(l,c,p);}if(ST.semi!=pc.SymbolId)
-pc.Error("Expecting ; in return statement");pc.Advance();break;case ST.throwKeyword:pc.Advance();var expr=_ParseExpression(pc);stmt=new CodeThrowExceptionStatement(expr).Mark(l,
+c,p);pc.Advance();if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in goto statement");pc.Advance();break;case ST.returnKeyword:pc.Advance();if(ST.semi!=
+pc.SymbolId){stmt=new CodeMethodReturnStatement(_ParseExpression(pc)).Mark(l,c,p);}else{stmt=new CodeMethodReturnStatement().SetLoc(l,c,p);}if(ST.semi
+!=pc.SymbolId)pc.Error("Expecting ; in return statement");pc.Advance();break;case ST.throwKeyword:pc.Advance();var expr=_ParseExpression(pc);stmt=new CodeThrowExceptionStatement(expr).Mark(l,
 c,p);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in throw statement");pc.Advance();break;case ST.ifKeyword:stmt=_ParseIfStatement(pc);break;case ST.whileKeyword:
 stmt=_ParseWhileStatement(pc);break;case ST.forKeyword:stmt=_ParseForStatement(pc);break;case ST.tryKeyword:stmt=_ParseTryCatchFinallyStatement(pc);break;
 case ST.varType:stmt=_ParseVariableDeclarationStatement(pc);break;default: if(ST.identifier==pc.SymbolId){pc2=pc.GetLookAhead(true);pc2.Advance();if(ST.colon
-==pc2.SymbolId){var lbl=pc2.Value;pc.Advance();stmt=new CodeLabeledStatement(lbl,new CodeSnippetStatement().SetLoc(l,c,p)).SetLoc(l,c,p);pc2=null;break;
-}}pc2=null;pc2=pc.GetLookAhead(true);pc2.ResetAdvanceCount();var advc=0;try{ stmt=_ParseVariableDeclarationStatement(pc2);advc=pc2.AdvanceCount;while(advc>0)
-{pc.Advance(false);--advc;}break;}catch(SlangSyntaxException sx){try{pc.ResetAdvanceCount();expr=_ParseExpression(pc);if(ST.semi!=pc.SymbolId)pc.Error("Expecting ; in expression statement");
-pc.Advance();var bo=expr as CodeBinaryOperatorExpression;if(null!=bo&&CodeBinaryOperatorType.Assign==bo.Operator){var ur=bo.UserData.Contains("slang:unresolved");
-stmt=new CodeAssignStatement(bo.Left,bo.Right).Mark(l,c,p,ur);}else stmt=new CodeExpressionStatement(expr).Mark(l,c,p);break;}catch(SlangSyntaxException
- sx2){if(pc.AdvanceCount>advc)throw sx2;throw sx;}}}}
+==pc2.SymbolId){var lbl=pc2.Value;pc.Advance();stmt=new CodeLabeledStatement(lbl,new CodeSnippetStatement().SetLoc(l,c,p)).SetLoc(l,c,p);pc.Advance();
+pc2=null;break;}}pc2=null;pc2=pc.GetLookAhead(true);pc2.ResetAdvanceCount();var advc=0;try{ stmt=_ParseVariableDeclarationStatement(pc2);advc=pc2.AdvanceCount;
+while(advc>0){pc.Advance(false);--advc;}break;}catch(SlangSyntaxException sx){try{pc.ResetAdvanceCount();expr=_ParseExpression(pc);if(ST.semi!=pc.SymbolId)
+pc.Error("Expecting ; in expression statement");pc.Advance();var bo=expr as CodeBinaryOperatorExpression;if(null!=bo&&CodeBinaryOperatorType.Assign==bo.Operator)
+{var ur=bo.UserData.Contains("slang:unresolved");stmt=new CodeAssignStatement(bo.Left,bo.Right).Mark(l,c,p,ur);}else stmt=new CodeExpressionStatement(expr).Mark(l,
+c,p);break;}catch(SlangSyntaxException sx2){if(pc.AdvanceCount>advc)throw sx2;throw sx;}}}}
 #region Post
 stmt.StartDirectives.AddRange(startDirs);if(null!=lp)stmt.LinePragma=lp;while(!includeComments&&ST.lineComment==pc.SymbolId||ST.blockComment==pc.SymbolId)
 pc.Advance(false);while(ST.directive==pc.SymbolId&&pc.Value.StartsWith("#end",StringComparison.InvariantCulture)){stmt.EndDirectives.Add(_ParseDirective(pc)

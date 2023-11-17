@@ -38,6 +38,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="Try\PatchTest.cs" />
     <Content Include="Test\Token.cs" />
     <Content Include="Test\TableTokenizerTemplate.cs" />
     <Content Include="Test\TableTokenizer.cs" />

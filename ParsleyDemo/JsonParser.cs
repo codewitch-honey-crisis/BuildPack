@@ -13,7 +13,7 @@ namespace ParsleyDemo {
     using System.Text;
     using System.Collections.Generic;
     
-    /// <summary>Parses the indicated grammar. Refer to C:\Users\honey\source\repos\BuildPack\ParsleyDemo\json.xbnf</summary>
+    /// <summary>Parses the indicated grammar. Refer to C:\Users\gazto\Source\Repos\BuildPack\ParsleyDemo\json.xbnf</summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Parsley", "0.1.2.0")]
     internal partial class JsonParser {
         internal const int ErrorSymbol = -1;

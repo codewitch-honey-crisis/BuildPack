@@ -5,10 +5,10 @@
 //  See accompanying file GPLEXcopyright.rtf.
 //
 //  GPLEX Version:  1.2.2
-//  Machine:  DESKTOP-EC2OMEU
-//  DateTime: 8/31/2020 1:36:31 AM
-//  UserName: honey
-//  GPLEX input file <C:\Users\honey\source\repos\BuildPack\ParsleyAdvancedDemo\Slang.lex - 8/31/2020 1:08:26 AM>
+//  Machine:  HEAVY
+//  DateTime: 11/17/2023 9:55:41 AM
+//  UserName: gazto
+//  GPLEX input file <C:\Users\gazto\Source\Repos\BuildPack\ParsleyAdvancedDemo\Slang.lex - 11/17/2023 9:55:41 AM>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: unicode, verbose, noParser, stack, minimize

@@ -145,6 +145,7 @@ namespace CD
 						if (ST.identifier != pc.SymbolId)
 							pc.Error("Expecting label identifier in goto statement");
 						stmt = new CodeGotoStatement(pc.Value).SetLoc(l, c, p);
+						pc.Advance();
 						if (ST.semi != pc.SymbolId)
 							pc.Error("Expecting ; in goto statement");
 						pc.Advance();
@@ -191,6 +192,7 @@ namespace CD
 								var lbl = pc2.Value;
 								pc.Advance();
 								stmt = new CodeLabeledStatement(lbl, new CodeSnippetStatement().SetLoc(l, c, p)).SetLoc(l, c, p);
+								pc.Advance();
 								pc2 = null;
 								break;
 							}

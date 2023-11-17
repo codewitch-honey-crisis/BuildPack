@@ -10,8 +10,8 @@ namespace SlangDemo
 	{
 		static void Main()
 		{
-			Demo();
-			//ParsePerf();
+			//Demo();
+			ParsePerf();
 		}
 		static void Demo()
 		{
@@ -86,7 +86,7 @@ namespace SlangDemo
 		}
 		static void ParsePerf()
 		{
-			foreach (var file in Directory.GetFiles(@"..\..\Test", "*.cs"))
+			foreach (var file in Directory.GetFiles(@"..\..\Try", "*.cs"))
 			{
 				_Test(file);
 			}

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29613.14
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34302.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeDomGoKit", "CodeDomGoKit\CodeDomGoKit.csproj", "{F1935A78-6ECA-4AA9-9BE2-0C64BE4297C7}"
 EndProject
@@ -55,8 +55,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParsleyAdvancedDemo", "Pars
 		{DD05A876-2846-43F3-B14A-E919D22C20DD} = {DD05A876-2846-43F3-B14A-E919D22C20DD}
 		{440C9EA8-409C-4B1D-88B7-A2B5FFF87700} = {440C9EA8-409C-4B1D-88B7-A2B5FFF87700}
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParsleyDevstudio", "ParsleyDevstudio\ParsleyDevstudio.csproj", "{EDC65D71-2C29-4B25-9AD8-B1962648C58A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "scratch", "scratch\scratch.csproj", "{08E8CF61-5DA5-4808-9831-27CBC3D2984B}"
 EndProject
@@ -135,10 +133,6 @@ Global
 		{0B607CCB-E8E2-4B9C-AE5D-F9BBEB9DD852}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B607CCB-E8E2-4B9C-AE5D-F9BBEB9DD852}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B607CCB-E8E2-4B9C-AE5D-F9BBEB9DD852}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EDC65D71-2C29-4B25-9AD8-B1962648C58A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EDC65D71-2C29-4B25-9AD8-B1962648C58A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EDC65D71-2C29-4B25-9AD8-B1962648C58A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EDC65D71-2C29-4B25-9AD8-B1962648C58A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{08E8CF61-5DA5-4808-9831-27CBC3D2984B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{08E8CF61-5DA5-4808-9831-27CBC3D2984B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08E8CF61-5DA5-4808-9831-27CBC3D2984B}.Release|Any CPU.ActiveCfg = Release|Any CPU
